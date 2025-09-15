@@ -1,0 +1,21 @@
+/hack/tools/bin
+/dev
+
+*.test
+*.coverprofile
+*.html
+.vscode
+.idea
+.DS_Store
+*~
+
+.golangci.yaml
+# Virtual go & fuse
+.virtualgo
+.fuse_hidden*
+
+# GitGuardian
+.cache_ggshield
+
+# gosec
+gosec-report.sarif
