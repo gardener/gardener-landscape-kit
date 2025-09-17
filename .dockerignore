@@ -1,0 +1,13 @@
+/args
+/bin
+/tmp/*
+/local
+/dev
+
+*.test
+*.coverprofile
+*.html
+.vscode
+.idea
+.DS_Store
+*~
