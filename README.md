@@ -2,7 +2,7 @@
 
 [![reuse compliant](https://reuse.software/badge/reuse-compliant.svg)](https://reuse.software/)
 
-`gardener-landscape-kit`, short gala, is a toolkit for generating manifests to facilitate GitOps-based management of Gardener landscapes.
+`gardener-landscape-kit`, short GLK, is a toolkit for generating manifests to facilitate GitOps-based management of Gardener landscapes.
 
 ## Scope
 
