@@ -12,6 +12,7 @@ import (
 	"k8s.io/component-base/version/verflag"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate"
 )
 
 // Name is a const for the name of this component.
@@ -43,7 +44,7 @@ func NewCommand() *cobra.Command {
 	cmd.SilenceUsage = true
 
 	for _, subcommand := range []*cobra.Command{
-		//subcommand.NewCommand(opts),
+		generate.NewCommand(opts),
 	} {
 		cmd.AddCommand(subcommand)
 	}
