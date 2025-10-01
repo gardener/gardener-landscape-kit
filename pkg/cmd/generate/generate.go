@@ -6,11 +6,11 @@ package generate
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	"github.com/gardener/gardener-landscape-kit/pkg/components"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate.
@@ -47,12 +47,23 @@ gardner-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /pat
 	return cmd
 }
 
-func run(ctx context.Context, opts *Options) error {
+func run(_ context.Context, opts *Options) error {
+	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir)
+
 	if opts.LandscapeDir != "" {
-		fmt.Println("Generating landscape directory...")
+		if err := CreateLandscapeDirStructure(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
+			return err
+		}
 	} else {
-		fmt.Println("Generating base directory...")
+		if err := CreateBaseDirStructure(opts.Log, opts.BaseDir, componentOpts.GetFilesystem()); err != nil {
+			return err
+		}
 	}
 
-	return nil
+	reg := components.NewRegistry()
+
+	// Register all components here
+	// reg.RegisterComponent(component)
+
+	return reg.Generate(componentOpts)
 }

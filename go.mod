@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/gardener/gardener v1.127.1
 	github.com/go-logr/logr v1.4.3
+	github.com/spf13/afero v1.14.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
 	golang.org/x/tools v0.36.0
