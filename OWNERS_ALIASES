@@ -3,5 +3,8 @@
 aliases:
   gardener-landscape-kit-reviewers:
   - timuthy
+  - LucaBernstein
+  - MartinWeindel
+  - oliver-goetz
   gardener-landscape-kit-approvers:
   - timuthy
