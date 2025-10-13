@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 
+	"github.com/gardener/gardener-landscape-kit/pkg/clusters"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 )
 
@@ -25,7 +26,7 @@ func CreateBaseDirStructure(log logr.Logger, baseDir string, fs afero.Afero) err
 		GLKSystemDirName,
 		components.DirName,
 	} {
-		if err := fs.MkdirAll(path.Join(baseDir, dirName), 0744); err != nil {
+		if err := fs.MkdirAll(path.Join(baseDir, dirName), 0700); err != nil {
 			return fmt.Errorf("error creating directory %s: %w", dirName, err)
 		}
 	}
@@ -40,8 +41,9 @@ func CreateLandscapeDirStructure(log logr.Logger, landscapeDir string, fs afero.
 	for _, dirName := range []string{
 		GLKSystemDirName,
 		components.DirName,
+		clusters.DirName,
 	} {
-		if err := fs.MkdirAll(path.Join(landscapeDir, dirName), 0744); err != nil {
+		if err := fs.MkdirAll(path.Join(landscapeDir, dirName), 0700); err != nil {
 			return fmt.Errorf("error creating directory %s: %w", dirName, err)
 		}
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/gardener/gardener-landscape-kit/pkg/clusters"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 )
@@ -23,10 +24,10 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 		Long:  "Generates or updates the base or landscape specific directories.",
 
 		Example: `# Generate the landscape base directory
-gardner-landscape-kit generate --base-dir /path/to/base/dir
+gardener-landscape-kit generate --base-dir /path/to/base/dir
 
 # Generate the landscape directory
-gardner-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /path/to/landscape/dir
+gardener-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /path/to/landscape/dir
 `,
 
 		RunE: func(cmd *cobra.Command, _ []string) error {
@@ -51,6 +52,9 @@ func run(_ context.Context, opts *Options) error {
 	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir)
 	if opts.LandscapeDir != "" {
 		if err := CreateLandscapeDirStructure(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
+			return err
+		}
+		if err := clusters.GenerateFluxSystemCluster(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
 			return err
 		}
 	} else {

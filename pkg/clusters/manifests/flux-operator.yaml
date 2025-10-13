@@ -1,0 +1,38 @@
+# WARNING: This file contains template values (e.g. << inputs.provider.name >>).
+# Manual editing is usually not required unless you intend to modify the template itself.
+# Changes here may be overwritten by the gardener-landscape-kit.
+
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  inputs:
+  - version: "v0.30.x"
+  resources:
+  - apiVersion: source.toolkit.fluxcd.io/v1
+    kind: OCIRepository
+    metadata:
+      name: << inputs.provider.name >>
+      namespace: << inputs.provider.namespace >>
+    spec:
+      interval: 30m
+      url: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+      layerSelector:
+        mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+        operation: copy
+      ref:
+        semver: << inputs.version | quote >>
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    metadata:
+      name: << inputs.provider.name >>
+      namespace: << inputs.provider.namespace >>
+    spec:
+      interval: 30m
+      releaseName: << inputs.provider.name >>
+      serviceAccountName: << inputs.provider.name >>
+      chartRef:
+        kind: OCIRepository
+        name: << inputs.provider.name >>
