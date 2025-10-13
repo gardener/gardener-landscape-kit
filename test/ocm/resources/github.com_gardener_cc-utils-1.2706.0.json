@@ -1,0 +1,267 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/cc-utils",
+    "version": "1.2706.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "github_hostname": "github.com",
+            "teamname": "gardener/ci-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-22T16:05:12Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "job-image",
+        "version": "1.2706.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/package-versions",
+            "value": [
+              {
+                "name": "containerd",
+                "version": "v1.6.15"
+              }
+            ]
+          },
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cicd/job-image:1.2706.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "1.2706.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cicd/job-image:1.2706.0@sha256:827aa6cfb2f157f937f3c21d179df952ae79fb62dc212586c8e762dd9e2c67eb",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-cicd-whd",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:36538ffb9efe9124e1dc9453d593a1694894bcb0b3d5c29bab263c3c90938e55",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 17840,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-cicd-cli",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9caf0e5d3669cb82950f8c0b53c979d8042ebe39e00972e5a056fef0e44cefcd",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 30264,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-cicd-libs",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b70b253bfccab2fd18424ca993a6eb082f1ca7d344872ced60a717ee7576e18a",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 337428,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-gha-libs",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:cf78de8cec5e31b15e33c356907e00ec2f0393f0a226f5d8e91f50f3e1bb3a68",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 218380,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-oci",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:47ea19bfbffacc0adc4b391838782fd848b44e11d6d1c71cd9dc46572ec54c2b",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 44492,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-ocm",
+        "version": "1.2706.0",
+        "type": "application/x-xz",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c569561dd99bd25f5d8f560775c540396e619c33998d92d1c5480c67a2a19e5c",
+          "mediaType": "application/x-xz",
+          "referenceName": null,
+          "size": 30720,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "sast-linting-evidence",
+        "version": "1.2706.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "pybandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use bandit (linter) for SAST-Scans.\nSee: https://bandit.readthedocs.io/en/latest/\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a82a9510d4b606339561f039fe6fe439feea747cc28f527d83429cf4fa63c112",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 577,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "1.2706.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:cbc1269ab78eb23ea1ae0d9033d9cb74f56c91b9bf956d9cfcd0713b377ce920",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1694,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "1.2706.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c570cb57cdd253533354592adbabb10bcc0c0646082787ee933d58d969f7eadb",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 115,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "1.2706.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 1024,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "1.2706.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "pybandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use bandit (linter) for SAST scans\nsee: https://bandit.readthedocs.io/en/latest/\n"
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "0b7c0735d65c42d56ce22e58e823b25a787e7dea",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/cc-utils",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

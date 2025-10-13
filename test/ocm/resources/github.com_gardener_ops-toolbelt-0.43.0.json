@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/ops-toolbelt",
+    "version": "0.43.0",
+    "creationTime": "2025-08-12T07:04:41Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "ops-toolbelt",
+        "version": "0.43.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/ops-toolbelt:0.43.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.43.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/ops-toolbelt:0.43.0@sha256:1546f13313acfc9a951d9a5efd3cd374682e1e33140e74543be787ee88060e6b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shellcheck-report",
+        "version": "0.43.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "shellcheck"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use shellcheck for sast-scans. See: https://github.com/koalaman/shellcheck\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f4a795e0e47f7bd55d335cd2281a4bf139f95f56b670a52828a8cdb5feccec81",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 237,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "bandit-report",
+        "version": "0.43.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "bandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use bandit for sast-scans. See: https://github.com/PyCQA/bandit\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:143b45c9e8153f0f73cadc7dc4db7118c6c89415d01dd795ac220ae42a01e33a",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 658,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.43.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:580452449fdeb885592d415d89d2346ac8046a8e60208a8eea42bd6e40a7298a",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1210,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.43.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b2a5120562c7987903a093579d604908d85c0ea5d95782f9b52fb92495666bb2",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 114,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.43.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use bandit and shellcheck for sast scanning, see attached reports.",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "08c95ed1f4196f07d201457f97920ec17e90dbe7",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/ops-toolbelt",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "gardenlinux",
+        "version": "1877.2",
+        "componentName": "github.com/gardenlinux/gardenlinux",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

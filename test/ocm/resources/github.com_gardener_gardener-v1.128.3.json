@@ -1,0 +1,2860 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener",
+    "version": "v1.128.3",
+    "labels": [
+      {
+        "name": "imagevector.gardener.cloud/images",
+        "value": {
+          "images": [
+            {
+              "name": "gardenadm",
+              "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/gardenadm",
+              "resourceId": {
+                "name": "gardenadm"
+              },
+              "sourceRepository": "github.com/gardener/gardener"
+            },
+            {
+              "name": "hyperkube",
+              "repository": "europe-docker.pkg.dev/gardener-project/releases/hyperkube",
+              "sourceRepository": "github.com/gardener/hyperkube"
+            },
+            {
+              "name": "kube-apiserver",
+              "repository": "registry.k8s.io/kube-apiserver",
+              "sourceRepository": "github.com/kubernetes/kubernetes"
+            },
+            {
+              "name": "kube-controller-manager",
+              "repository": "registry.k8s.io/kube-controller-manager",
+              "sourceRepository": "github.com/kubernetes/kubernetes"
+            },
+            {
+              "name": "kube-scheduler",
+              "repository": "registry.k8s.io/kube-scheduler",
+              "sourceRepository": "github.com/kubernetes/kubernetes"
+            },
+            {
+              "name": "kube-proxy",
+              "repository": "registry.k8s.io/kube-proxy",
+              "sourceRepository": "github.com/kubernetes/kubernetes"
+            }
+          ]
+        }
+      }
+    ],
+    "creationTime": "2025-09-29T14:00:08Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "resource-manager",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3@sha256:9ae791300e5890f419e0a8cc203241c5767de20c39a1a57de47797bb6d67168b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "resource-manager",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3f4fa20175f067cb991727ec02451c5fef16d3647c85f55f82ece0776f0d5df2",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 181,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenlet",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3@sha256:aeb1046888bf33d323bf8159c8062379e9c5221f9c644c99f9665252b6295bbb",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardenlet",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:de88700901483c7c162997581b3f73d76f0e1a5fad883a586d5b9aa6ef401b2e",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 153,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9df8c85188a367e7fbcac3b5e663270b3bdc1b93d42dad0288d821c8d0916442",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 132220116,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "operator",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/operator:v1.128.3"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/operator:v1.128.3@sha256:a725e1af232c78f160a4ee043f39b7a4fbb3104e19e8897829bd06f4a6e208d0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "operator",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8acf16f41f11c83fd3b64a1e212fdd23658cb938ae6dd78e567cd396d3b84067",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 151,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "controlplane",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/controlplane:v1.128.3"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/controlplane:v1.128.3@sha256:e44e5fb96559676f2ae264c7392c2f9a0e786379ff414c8be515a7160d289f8e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "controlplane",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0169d4270af54d261c0d4513d3a4d3aedd51af965b761cc9ec204081727e2166",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 587,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:eac7aa51dae71ab3d37d7b87bc009408adb4d8f063349afdade378c7ba3c0fe7",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 140821204,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0b82b825aa860da9af7c2e52abf34ffed4527a3e216a38517c9193284960b886",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 53443315,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3932b8472c5ba5f8dfe166001b351a0d74aff75cdcdd6f5646bb8ae4de6a278c",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 56392629,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:03bc9b76064badf0e317939ee2daad1785f9905605eb404aafb17f4d281d5068",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 6512,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "operator",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/operator:v1.128.3"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.128.3"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/operator:v1.128.3@sha256:df2cc87f22d44cab5fd2ee22dafa2a8e75985953198a19a3c8ab5a58821a9cb4",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:129d47f5629c999049a461226be78ad721043a435579f3142c806d04579dc1ef",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 53172252,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenadm",
+        "version": "v1.128.3",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:aefb202f7d998a824e5f8b60b4daab4a2da3262bc880263814ad431d1ed1aad9",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 48879984,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9c179b9bac220185414663d8dba5ad9827e4f21dc93c267bff86f6c63e738c1b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 179383,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "apiserver",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-apiserver"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:6de833f0513d4ae4e49910eebfe925f45c9b19d7b1fa47bc3959ad914d2092bd",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-controller",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-admission-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/admission-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/admission-controller:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:2b52910820b68b1d1d48733073576b9805fcb5e9d1e7d23954dd5e9cd0644b27",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "controller-manager",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/controller-manager:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:4ce9a0ffb0210e25feb0090053d77ab4ef49a8219b6c5a3aa40760f4375761c4",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "scheduler",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-scheduler"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/scheduler"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/scheduler:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:988805aa069ac4e29cd6366696844483db95d8c8ea8bde25da706d97ada4dc12",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardenlet",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardenlet"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/gardenlet"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/gardenlet:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:2dda1465ef70cde4de2d5f9316326e245438acd38efe6515073ff73b496bfec8",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "resource-manager",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-resource-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/resource-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/resource-manager:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:18ba69edd74a449d6150cbd5bf76bb7efdd6ebce8c74a7e08124ad3cf6f837d6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "node-agent",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "gardener-node-agent"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/node-agent"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/node-agent:v1.128.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:0509b78b7352f36d4c83835484c31092073abc3805b448604e683c220fa25cf0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "pause-container",
+        "version": "3.10",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "pause-container is not accessible from outside k8s clusters and not interacted with from other containers or other systems\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "pause-container"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/pause"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/kubernetes/blob/master/build/pause/Dockerfile"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/pause:3.10"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/pause:3.10@sha256:adafa755d1f0acb952eb9ecde0dbceec4674e8f1042d1c13b15a77f5d78c8160",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "etcd",
+        "version": "v3.4.34",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "etcd"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/coreos/etcd"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/etcd-io/etcd"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/coreos/etcd:v3.4.34"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/coreos/etcd:v3.4.34@sha256:8cb5a3559fbbe5f59a212c4e2d35ed43b2768e43fb23cbfc8c4e1ae127392b40",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "nginx-ingress-controller",
+        "version": "v1.13.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "nginx-ingress-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/ingress-nginx/controller-chroot"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/ingress-nginx"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/ingress-nginx/controller-chroot:v1.13.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/ingress-nginx/controller-chroot:v1.13.2@sha256:ccbb542342cf62c1558ae0ec7822382ed607a69f71c3d7becae311dd3b005ec8",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "opentelemetry-operator",
+        "version": "v0.129.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "opentelemetry-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/opentelemetry-operator/opentelemetry-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/open-telemetry/opentelemetry-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/opentelemetry-operator/opentelemetry-operator:v0.129.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/opentelemetry-operator/opentelemetry-operator:v0.129.1@sha256:63d4d0ae7c6abe7c8847067af705fc5d79c6c582a920d26e22bccb9fd5b480ac",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "opentelemetry-collector",
+        "version": "0.129.1",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "opentelemetry-collector"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/opentelemetry-collector-releases/opentelemetry-collector-contrib"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/open-telemetry/opentelemetry-collector"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.129.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.129.1@sha256:95bbcb4ef1e62092fe51ed4c92995e9797572e433c9191b819e59c806b1b63ba",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "prometheus-operator",
+        "version": "v0.85.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "prometheus-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus-operator/prometheus-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus-operator/prometheus-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus-operator/prometheus-operator:v0.85.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus-operator/prometheus-operator:v0.85.0@sha256:c122c984aae09ade61a4c5195731109ad1ad329770d15695ca19326a9400aad5",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "alertmanager",
+        "version": "v0.28.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "alertmanager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus/alertmanager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus/alertmanager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus/alertmanager:v0.28.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus/alertmanager:v0.28.1@sha256:589147e65e6dd07f8bb07cbf033a9926e17999b6b10a84bfd8aa154e938968b9",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "prometheus",
+        "version": "v3.5.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "prometheus"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus/prometheus"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus/prometheus"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus/prometheus:v3.5.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus/prometheus:v3.5.0@sha256:d614cdcf3f9508dd03a3f0b78b640bb71a757c0dc2ac802b2bad4c1e317a7e4f",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "configmap-reloader",
+        "version": "v0.85.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "configmap-reloader"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus-operator/prometheus-config-reloader"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus-operator/prometheus-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.85.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus-operator/prometheus-config-reloader:v0.85.0@sha256:172de26cde1a58b0743e622964dff52072d4541305bb27eba5940ad776f70df2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cortex",
+        "version": "v1.19.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cortex"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cortexproject/cortex"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cortexproject/cortex:v1.19.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cortexproject/cortex:v1.19.0@sha256:3cf27982c3ccf4a32328880682cf0cf7a700317e6f8a8499910b54e3b43b47a0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "kube-state-metrics",
+        "version": "v2.17.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "kube-state-metrics"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/kube-state-metrics"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/kube-state-metrics/kube-state-metrics:v2.17.0@sha256:95c429abf53b1a20174ba81593ba90f3db5403edf07dbb07284cea2d0083af3b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "node-exporter",
+        "version": "v1.9.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "comment": "the node-exporter is also deployed to the shoot cluster",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "node-exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus/node-exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus/node_exporter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus/node-exporter:v1.9.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus/node-exporter:v1.9.1@sha256:d88466fb3dd1c9b0c2b855204813cb282ffdad4e74082c54f9928aa0f4a61b1c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "plutono",
+        "version": "v7.5.41",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "plutono"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/plutono"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/credativ/plutono"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/plutono:v7.5.41"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/credativ/plutono:v7.5.41@sha256:b1e4d8fecdf4b1ba6b9a09fae1fc48cb8b9e51be0d50984d1921b86d99761207",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "plutono-data-refresher",
+        "version": "1.30.10",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "plutono-data-refresher"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/kiwigrid/k8s-sidecar"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kiwigrid/k8s-sidecar"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/kiwigrid/k8s-sidecar:1.30.10"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/kiwigrid/k8s-sidecar:1.30.10@sha256:d495d88c8914f2228fb0707218ef51d90c09167cc79eb40008a7e0dfbc0b4c87",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "blackbox-exporter",
+        "version": "v0.27.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "comment": "the blackbox-exporter is also deployed to the shoot cluster",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "blackbox-exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/prometheus/blackbox-exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/prometheus/blackbox_exporter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/prometheus/blackbox-exporter:v0.27.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/prometheus/blackbox-exporter:v0.27.0@sha256:99ffc310196e7a80da5ab850b1732c96372d6e6afa70598aef2e960ba1d1896d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "metrics-server",
+        "version": "v0.8.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/metrics-server/metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "\u003e= 1.31"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/metrics-server/metrics-server:v0.8.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/metrics-server/metrics-server:v0.8.0@sha256:740060e6e48b2c746e85d0cfb985cf2c2fb302b6334904241f949b7431778e8d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "metrics-server",
+        "version": "v0.7.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/metrics-server/metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/metrics-server"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "\u003e= 1.29 \u003c 1.31"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/metrics-server/metrics-server:v0.7.2@sha256:c23c277b728b2838a0c7a9634d170e1e5d3a0324bfa5b049216f98348989711e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "perses",
+        "version": "v0.52.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "perses"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/persesdev/perses"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/perses/perses"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/persesdev/perses:v0.52.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/persesdev/perses:v0.52.0@sha256:7c36a37cfa14200fa233a67bfa7b19e7d0a130e48daec641b827017b077389b7",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "perses-operator",
+        "version": "v0.2.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "perses-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/persesdev/perses-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/perses/perses-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/persesdev/perses-operator:v0.2.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/persesdev/perses-operator:v0.2.0@sha256:0b412806fe729ef118992347f23323e752167bccd8cbd78f6838d4487ae56e9b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "coredns",
+        "version": "v1.12.4",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "coredns"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/coredns/coredns"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/coredns/coredns"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/coredns/coredns:v1.12.4"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/coredns/coredns:v1.12.4@sha256:cda0506cec00632d01d4c5d031f9c6724b2a472de9a6b106a3e3323b985d2db0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "node-local-dns",
+        "version": "1.26.5",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "node-local-dns"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/dns/k8s-dns-node-cache"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/kubernetes/blob/master/cluster/addons/dns/nodelocaldns"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/dns/k8s-dns-node-cache:1.26.5"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/dns/k8s-dns-node-cache:1.26.5@sha256:b3f0f3c1b43d28be4a7f993b5896797c55dea58e177b2fb73036db15a63c28cd",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "node-problem-detector",
+        "version": "v0.8.21",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "node-problem-detector"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/node-problem-detector/node-problem-detector"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/node-problem-detector"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/node-problem-detector/node-problem-detector:v0.8.21"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/node-problem-detector/node-problem-detector:v0.8.21@sha256:acab7970a2913ea0a77a87cb5ec828a2651dd3b8a381e4158aef3f40c5e8b3cd",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "kubernetes-dashboard",
+        "version": "v2.7.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "not deployed as part of gardener infrastructure. Offered to users for development purposes only, accompanied w/ warning that no support be provided.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "kubernetes-dashboard"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/kubernetesui/dashboard"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/dashboard"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/kubernetesui/dashboard:v2.7.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/kubernetesui/dashboard:v2.7.0@sha256:1d95ec3952a49d3d2012956a630caea588c2a0b244a7bd210162567f3ff075c2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "kubernetes-dashboard-metrics-scraper",
+        "version": "v1.0.9",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "not deployed as part of gardener infrastructure. Offered to users for development purposes only, accompanied w/ warning that no support be provided.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "kubernetes-dashboard-metrics-scraper"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/kubernetesui/metrics-scraper"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/dashboard"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/kubernetesui/metrics-scraper:v1.0.9"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/kubernetesui/metrics-scraper:v1.0.9@sha256:fd4f6cab16a8164999d25a60ce2313c4dca6378a3beb48f8194463e1f47b1fbd",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "fluent-operator",
+        "version": "v3.3.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "fluent-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/fluent-operator/fluent-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/fluent/fluent-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/fluent-operator/fluent-operator:v3.3.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/fluent-operator/fluent-operator:v3.3.0@sha256:912bf005d4f18b804245e9906c93db02393403546ac470b62b820d9c84c8b14c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "fluent-bit",
+        "version": "v3.2.5",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "low",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "fluent-bit"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/fluent-operator/fluent-bit"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/fluent/fluent-operator"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/fluent-operator/fluent-bit:v3.2.5"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/fluent-operator/fluent-bit:v3.2.5@sha256:306a992396016297718b7dcc141429f4b4ef7c2a307893b3e2472092fb3a8bd6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "vali",
+        "version": "v2.2.26",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "vali"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/vali"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/credativ/vali"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/vali:v2.2.26"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/credativ/vali:v2.2.26@sha256:f4142aba65a1b2e5eef75e4b9c9f94495b5e66bf79d5a1bb252ff1c896c0570d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "kube-rbac-proxy",
+        "version": "v0.19.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "comment": "kube-rbac-proxy is an authentication proxy working with credentials",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "kube-rbac-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/brancz/kube-rbac-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/brancz/kube-rbac-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/brancz/kube-rbac-proxy:v0.19.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/brancz/kube-rbac-proxy:v0.19.1@sha256:18f59c72e362c7765357a3a665c79369f84ac66b17f60581790b4d600a31a431",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "valitail",
+        "version": "v2.2.15",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "comment": "valitail is running as a client (not as a server) and as such is not publicly exposed to the internet. Vulnerabilities with Attack Vector:Network are not exploitable.",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "valitail"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/valitail"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/credativ/vali"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/credativ/valitail:v2.2.15"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/credativ/valitail:v2.2.15@sha256:5482176541e9f2fd4cdfd78c8b5260cc850d197e5654c2a0d1d98ce4ab0140ee",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "vpa-admission-controller",
+        "version": "1.4.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "vpa-admission-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/autoscaling/vpa-admission-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/autoscaling/vpa-admission-controller:1.4.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/autoscaling/vpa-admission-controller:1.4.2@sha256:bf5dd33b79d931c6d477e391440e434e51a2b82ccaedacaaf5df656bfdf14699",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "vpa-recommender",
+        "version": "1.4.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "vpa-recommender"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/autoscaling/vpa-recommender"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/autoscaling/vpa-recommender:1.4.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/autoscaling/vpa-recommender:1.4.2@sha256:9dd2534c204b3bb30c17a9b39f53b14eb09ae776e1715926baf2c25f0eac9a3b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "vpa-updater",
+        "version": "1.4.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "vpa-updater"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/autoscaling/vpa-updater"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/autoscaling/vpa-updater:1.4.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/autoscaling/vpa-updater:1.4.2@sha256:bb0f2787232d931d43435fb8461c1791d39a577f4e7eea8bd022f19a493a9d9d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cluster-proportional-autoscaler",
+        "version": "v1.9.0",
+        "labels": [
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cluster-proportional-autoscaler"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/cpa/cluster-proportional-autoscaler"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "https://github.com/kubernetes-sigs/cluster-proportional-autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/cpa/cluster-proportional-autoscaler:v1.9.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/cpa/cluster-proportional-autoscaler:v1.9.0@sha256:bc5be9858d29652151d43354e606f2c70789d3a3761998bd75df9198ba9728d1",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "istio-proxy",
+        "version": "1.25.5-distroless",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "istio-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "gcr.io/istio-release/proxyv2"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/istio/istio"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "gcr.io/istio-release/proxyv2:1.25.5-distroless"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/gcr_io/istio-release/proxyv2:1.25.5-distroless@sha256:36952e88f5fb81670c5b673d538cbcab59d48c4c792294f9cc5a53cf6583a373",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "istio-istiod",
+        "version": "1.25.5-distroless",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "istio-istiod"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "gcr.io/istio-release/pilot"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/istio/istio"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "gcr.io/istio-release/pilot:1.25.5-distroless"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/gcr_io/istio-release/pilot:1.25.5-distroless@sha256:c15dc4c5dc1587af677b9e30b17c9d3e6087474dc1486ccbc9e0e40a86476c90",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "envoy-proxy",
+        "version": "v1.35.3-distroless",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/package-versions",
+            "value": [
+              {
+                "name": "v8",
+                "version": "13.8.258.26"
+              },
+              {
+                "name": "grpc",
+                "version": "1.72.0"
+              },
+              {
+                "name": "luajit",
+                "version": "19878ec"
+              },
+              {
+                "name": "nghttp2",
+                "version": "1.66.0"
+              },
+              {
+                "name": "protobuf",
+                "version": "29.3"
+              },
+              {
+                "name": "fmt",
+                "version": "11.2.0"
+              },
+              {
+                "name": "boringssl",
+                "version": "0.20250514.0"
+              },
+              {
+                "name": "lua",
+                "version": "5.1"
+              },
+              {
+                "name": "yaml-cpp",
+                "version": "0.8.0"
+              }
+            ]
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "envoy-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/envoyproxy/envoy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/envoyproxy/envoy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/envoyproxy/envoy:distroless-v1.35.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/envoyproxy/envoy:distroless-v1.35.3@sha256:9726c3e4e348c01fd07f1686db9ef61ece8d7eb76ab86c056ab83163db532dec",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.128.3",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a36a94b1061b84b389a27a0b11fb8ce597e440398aaf60512256ce46e85479ce",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1464,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.128.3",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:76a9e49037b36e127baa435b6640d3b64361d2731dea09eed9b73e5fa790c22b",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.128.3",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "172d156822a97cd7c8079dd6304d4f053c9a98dc",
+          "ref": "refs/heads/release-v1.128",
+          "repoUrl": "github.com/gardener/gardener",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "gardener-discovery-server",
+        "version": "v0.7.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "gardener-discovery-server",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/gardener-discovery-server",
+                  "resourceId": {
+                    "name": "gardener-discovery-server"
+                  },
+                  "sourceRepository": "github.com/gardener/gardener-discovery-server",
+                  "tag": "v0.7.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/gardener-discovery-server",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "gardener-dashboard",
+        "version": "1.82.2",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "gardener-dashboard",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/dashboard",
+                  "resourceId": {
+                    "name": "gardener-dashboard"
+                  },
+                  "sourceRepository": "github.com/gardener/dashboard",
+                  "tag": "1.82.2"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/dashboard",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "terminal-controller-manager",
+        "version": "v0.34.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "terminal-controller-manager",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/terminal-controller-manager",
+                  "resourceId": {
+                    "name": "terminal-controller-manager"
+                  },
+                  "sourceRepository": "github.com/gardener/terminal-controller-manager",
+                  "tag": "v0.34.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/terminal-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "etcd-druid",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "etcd-druid",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/etcd-druid",
+                  "resourceId": {
+                    "name": "etcd-druid"
+                  },
+                  "sourceRepository": "github.com/gardener/etcd-druid",
+                  "tag": "v0.32.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/etcd-druid",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "dependency-watchdog",
+        "version": "v1.5.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "dependency-watchdog",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/dependency-watchdog",
+                  "resourceId": {
+                    "name": "dependency-watchdog"
+                  },
+                  "sourceRepository": "github.com/gardener/dependency-watchdog",
+                  "tag": "v1.5.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/dependency-watchdog",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ingress-default-backend",
+        "version": "0.24.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "none",
+                        "comment": "Show static page when no path is found",
+                        "confidentiality_requirement": "none",
+                        "integrity_requirement": "none",
+                        "network_exposure": "private",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ingress-default-backend",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/ingress-default-backend",
+                  "resourceId": {
+                    "name": "ingress-default-backend"
+                  },
+                  "sourceRepository": "github.com/gardener/ingress-default-backend",
+                  "tag": "0.24.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ingress-default-backend",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "machine-controller-manager",
+        "version": "v0.60.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "gardener-operator"
+                      }
+                    }
+                  ],
+                  "name": "machine-controller-manager",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager",
+                  "resourceId": {
+                    "name": "machine-controller-manager"
+                  },
+                  "sourceRepository": "github.com/gardener/machine-controller-manager",
+                  "tag": "v0.60.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/machine-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "cluster-autoscaler",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler",
+                  "resourceId": {
+                    "name": "cluster-autoscaler"
+                  },
+                  "sourceRepository": "github.com/gardener/autoscaler",
+                  "tag": "v1.33.0",
+                  "targetVersion": "\u003e= 1.33"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/autoscaler",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.32.1",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "cluster-autoscaler",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler",
+                  "resourceId": {
+                    "name": "cluster-autoscaler"
+                  },
+                  "sourceRepository": "github.com/gardener/autoscaler",
+                  "tag": "v1.32.1",
+                  "targetVersion": "1.32.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/autoscaler",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "cluster-autoscaler",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler",
+                  "resourceId": {
+                    "name": "cluster-autoscaler"
+                  },
+                  "sourceRepository": "github.com/gardener/autoscaler",
+                  "tag": "v1.31.0",
+                  "targetVersion": "1.31.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/autoscaler",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.30.2",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "cluster-autoscaler",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler",
+                  "resourceId": {
+                    "name": "cluster-autoscaler"
+                  },
+                  "sourceRepository": "github.com/gardener/autoscaler",
+                  "tag": "v1.30.2",
+                  "targetVersion": "1.30.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/autoscaler",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.29.2",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "cluster-autoscaler",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler",
+                  "resourceId": {
+                    "name": "cluster-autoscaler"
+                  },
+                  "sourceRepository": "github.com/gardener/autoscaler",
+                  "tag": "v1.29.2",
+                  "targetVersion": "1.29.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/autoscaler",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "vpn-server",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "vpn-server",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-server",
+                  "resourceId": {
+                    "name": "vpn-server"
+                  },
+                  "sourceRepository": "github.com/gardener/vpn2",
+                  "tag": "0.41.1"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/vpn2",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "gardener-metrics-exporter",
+        "version": "0.40.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "gardener-metrics-exporter",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/metrics-exporter",
+                  "resourceId": {
+                    "name": "metrics-exporter"
+                  },
+                  "sourceRepository": "github.com/gardener/gardener-metrics-exporter",
+                  "tag": "0.40.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/gardener-metrics-exporter",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "vpn-client",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "vpn-client",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-client",
+                  "resourceId": {
+                    "name": "vpn-client"
+                  },
+                  "sourceRepository": "github.com/gardener/vpn2",
+                  "tag": "0.41.1"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/vpn2",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "alpine-conntrack",
+        "version": "3.21.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "alpine-conntrack",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/alpine-conntrack",
+                  "resourceId": {
+                    "name": "alpine-conntrack"
+                  },
+                  "sourceRepository": "github.com/gardener/alpine-conntrack",
+                  "tag": "3.21.3"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/alpine-conntrack",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "alpine-iptables",
+        "version": "3.22.1",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "alpine-iptables",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/alpine-iptables",
+                  "resourceId": {
+                    "name": "alpine-iptables"
+                  },
+                  "sourceRepository": "github.com/gardener/alpine-iptables",
+                  "tag": "3.22.1"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/alpine-iptables",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "fluent-bit-plugin-installer",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "none",
+                        "comment": "no data is stored or processed by the installer",
+                        "confidentiality_requirement": "none",
+                        "integrity_requirement": "none",
+                        "network_exposure": "private",
+                        "user_interaction": "gardener-operator"
+                      }
+                    },
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "teamname": "gardener/logging-maintainers",
+                          "type": "githubTeam"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "fluent-bit-plugin-installer",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/fluent-bit-to-vali",
+                  "resourceId": {
+                    "name": "fluent-bit-to-vali"
+                  },
+                  "sourceRepository": "github.com/gardener/logging",
+                  "tag": "v0.65.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/logging",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "vali-curator",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "none",
+                        "integrity_requirement": "high",
+                        "network_exposure": "private",
+                        "user_interaction": "gardener-operator"
+                      }
+                    },
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "teamname": "gardener/logging-maintainers",
+                          "type": "githubTeam"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "vali-curator",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/vali-curator",
+                  "resourceId": {
+                    "name": "vali-curator"
+                  },
+                  "sourceRepository": "github.com/gardener/logging",
+                  "tag": "v0.65.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/logging",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "telegraf",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "none",
+                        "comment": "telegraf is not accessible from outside the seed cluster and does not interact with confidential data\n",
+                        "confidentiality_requirement": "none",
+                        "integrity_requirement": "none",
+                        "network_exposure": "private",
+                        "user_interaction": "gardener-operator"
+                      }
+                    },
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "teamname": "gardener/logging-maintainers",
+                          "type": "githubTeam"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "telegraf",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/telegraf-iptables",
+                  "resourceId": {
+                    "name": "telegraf-iptables"
+                  },
+                  "sourceRepository": "github.com/gardener/logging",
+                  "tag": "v0.65.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/logging",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "event-logger",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "private",
+                        "user_interaction": "gardener-operator"
+                      }
+                    },
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "teamname": "gardener/logging-maintainers",
+                          "type": "githubTeam"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "event-logger",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/event-logger",
+                  "resourceId": {
+                    "name": "event-logger"
+                  },
+                  "sourceRepository": "github.com/gardener/logging",
+                  "tag": "v0.65.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/logging",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "tune2fs",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "none",
+                        "integrity_requirement": "none",
+                        "network_exposure": "private",
+                        "user_interaction": "gardener-operator"
+                      }
+                    },
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "teamname": "gardener/logging-maintainers",
+                          "type": "githubTeam"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "tune2fs",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/tune2fs",
+                  "resourceId": {
+                    "name": "tune2fs"
+                  },
+                  "sourceRepository": "github.com/gardener/logging",
+                  "tag": "v0.65.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/logging",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "apiserver-proxy-sidecar",
+        "version": "v0.19.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "apiserver-proxy-sidecar",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy",
+                  "resourceId": {
+                    "name": "apiserver-proxy"
+                  },
+                  "sourceRepository": "github.com/gardener/apiserver-proxy",
+                  "tag": "v0.19.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/apiserver-proxy",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

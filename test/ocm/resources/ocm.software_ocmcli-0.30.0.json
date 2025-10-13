@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "ocm.software/ocmcli",
+    "version": "0.30.0",
+    "creationTime": "2025-09-22T13:29:06Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "ghcr.io",
+        "subPath": "open-component-model/ocm",
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "ocm.software",
+    "resources": [
+      {
+        "name": "ocmcli",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "downloadName",
+            "value": "ocm"
+          }
+        ],
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:49673b586c5dafc767d71d4cc9eb0af5112a49d3b02523203c768399cdf072d9",
+          "mediaType": "application/octet-stream",
+          "referenceName": null,
+          "size": null,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "49673b586c5dafc767d71d4cc9eb0af5112a49d3b02523203c768399cdf072d9"
+        }
+      },
+      {
+        "name": "ocmcli",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "downloadName",
+            "value": "ocm"
+          }
+        ],
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:864f6aff6a5db521668153c18f4a07faad4a289c9b0cb9c559cc47820716d992",
+          "mediaType": "application/octet-stream",
+          "referenceName": null,
+          "size": null,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "864f6aff6a5db521668153c18f4a07faad4a289c9b0cb9c559cc47820716d992"
+        }
+      },
+      {
+        "name": "ocmcli",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "downloadName",
+            "value": "ocm"
+          }
+        ],
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a8950e190482fd17a0fd01fc4e23671e87a9822fc180cd870d35a09f0e183c0e",
+          "mediaType": "application/octet-stream",
+          "referenceName": null,
+          "size": null,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "a8950e190482fd17a0fd01fc4e23671e87a9822fc180cd870d35a09f0e183c0e"
+        }
+      },
+      {
+        "name": "ocmcli",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "downloadName",
+            "value": "ocm"
+          }
+        ],
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:eeb5c6273e32dd0b47138d171e8b6750165ded21d19cd0a53122e22cacfa1226",
+          "mediaType": "application/octet-stream",
+          "referenceName": null,
+          "size": null,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "eeb5c6273e32dd0b47138d171e8b6750165ded21d19cd0a53122e22cacfa1226"
+        }
+      },
+      {
+        "name": "ocmcli",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "downloadName",
+            "value": "ocm"
+          }
+        ],
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4431edf683c6b62c7587388ca34e97f197a6118d4b4ebf556f2813a390811534",
+          "mediaType": "application/octet-stream",
+          "referenceName": null,
+          "size": null,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "4431edf683c6b62c7587388ca34e97f197a6118d4b4ebf556f2813a390811534"
+        }
+      },
+      {
+        "name": "ocmcli-image",
+        "version": "0.30.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "ghcr.io/open-component-model/ocm/ocm.software/ocmcli/ocmcli-image:0.30.0@sha256:2d52fb0f02e9344858a2e2a5b3130a210309070809b1677062257a9bc89c2812"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/ghcr_io/open-component-model/ocm/ocm_software/ocmcli/ocmcli-image:0.30.0@sha256:74fc9c24ebd2c9fbac1ccf87c32dcf3efb8c41ce5cafd39eb17f79701093ce4c",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "74fc9c24ebd2c9fbac1ccf87c32dcf3efb8c41ce5cafd39eb17f79701093ce4c"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "source",
+        "version": "0.30.0",
+        "type": "filesytem",
+        "access": {
+          "commit": "54e0190ccb6bb4be3388d7dba494cc2ef5133722",
+          "ref": null,
+          "repoUrl": "github.com/open-component-model/ocm",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

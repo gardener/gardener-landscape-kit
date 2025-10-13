@@ -1,0 +1,236 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/oidc-apps-controller",
+    "version": "v0.15.0",
+    "creationTime": "2025-09-22T06:16:05Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "oidc-apps-controller",
+        "version": "v0.15.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/oidc-apps-controller:v0.15.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/oidc-apps-controller:v0.15.0@sha256:b928ac11cc28a0d03fc4f03e5c34d0be8fac03392e337310cdf1dbd5ccad43bf",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "oidc-apps-controller",
+        "version": "v0.15.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b45024c968afa7c223e16e07e2481fcf84a7ce35751612be01ee96ad0278408d",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 175,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "oidc-apps-controller",
+        "version": "v0.15.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/oidc-apps-controller:v0.15.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.15.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/oidc-apps-controller:v0.15.0@sha256:b65d762d623686f2f7b9ecb2747539d6d6b9121ffabd16b4574cf31a19ad6607",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.15.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c96d71ee67bf32a1e036c9998d71a9e605e95cba699e5d2ac445df776d8ae055",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1310,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.15.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:487d0f290254a86be1b7678dbf2ae354d0fdaff5645e1065d414ffe633a328a0",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2126,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "oauth2-proxy",
+        "version": "v7.12.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "oauth2-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/oauth2-proxy/oauth2-proxy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/oauth2-proxy/oauth2-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/oauth2-proxy/oauth2-proxy:v7.12.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/oauth2-proxy/oauth2-proxy:v7.12.0@sha256:584d4953076a03b29fa9426db9883fe2d7ffb36c0da4d7f8c73a9a76be165636",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.15.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 1024,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.15.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "355b4bc28c3dc231469da1551f012ea41a65ea0d",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/oidc-apps-controller",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "kube-rbac-proxy-watcher",
+        "version": "v0.1.13",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "kube-rbac-proxy-watcher",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/kube-rbac-proxy-watcher",
+                  "resourceId": {
+                    "name": "kube-rbac-proxy-watcher"
+                  },
+                  "sourceRepository": "github.com/gardener/kube-rbac-proxy-watcher",
+                  "tag": "v0.1.13"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/kube-rbac-proxy-watcher",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

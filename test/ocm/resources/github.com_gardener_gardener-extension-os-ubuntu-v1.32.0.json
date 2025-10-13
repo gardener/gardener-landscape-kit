@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-os-ubuntu",
+    "version": "v1.32.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "MrBatschner"
+          },
+          {
+            "type": "githubUser",
+            "username": "Roncossek"
+          },
+          {
+            "type": "githubUser",
+            "username": "Vincinator"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-16T11:50:11Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-os-ubuntu",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/os-ubuntu:v1.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.32.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/os-ubuntu:v1.32.0@sha256:4e39de0780ac09ff2531e454854c9642465fb09f6480af92f243d9ba3a2c1090",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a6846cce287e09492e6620aeb021d919673a3eeefc0ef897b1267a8d0b14e847",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 647,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:48219ff58532244116eeaed38ab582776c671c03553cb013cc6838139c21b5ba",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4761,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "os-ubuntu",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/os-ubuntu:v1.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/os-ubuntu:v1.32.0@sha256:80cc7a3ef7b4fb3163ef8278c6763a823f31c1b3ac3bbd7686d97ff2dabd45c7",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "os-ubuntu",
+        "version": "v1.32.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:99594413eb0f243a7f478b47b45e0c743175360b5c5b9c68d0ecc2fedcaad5a5",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 172,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.32.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:75bc691cafb3ad8c714868c2c79437a2003b9906b54545ada5faf2cc03593694",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 886,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.32.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2bd4e94000a643d72ba8ad45e3ba437dea76bf032b856ea946df6732af602490",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3584,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "310a4094cd4385d7729bbcfbc3546a34ce7ab47d",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-os-ubuntu",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

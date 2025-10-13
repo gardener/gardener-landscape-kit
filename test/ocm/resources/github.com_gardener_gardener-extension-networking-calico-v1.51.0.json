@@ -1,0 +1,575 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-networking-calico",
+    "version": "v1.51.0",
+    "creationTime": "2025-09-18T07:46:47Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "networking-calico",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/networking-calico:v1.51.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/networking-calico:v1.51.0@sha256:0fd4ecb120203ef7892919a516fef189d51277735f78e4dc451d47af316606d0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "networking-calico",
+        "version": "v1.51.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:44df201d360635873533df83ee8e703468fbfbb70a9a360fd3658b611bc116b9",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 188,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f5763271cb8ad9ef0e09b9f83b91455cfab24c8a2d560207b306e3107317b799",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1449,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9ae3b0f3fd163b9d147841b9b17bc335cf65462a413691099fe216f1fcba6d20",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 6843,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-networking-calico",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/networking-calico:v1.51.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.51.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/networking-calico:v1.51.0@sha256:2195c94549d4b45e054cc954d7fe3529413cb7a5b01a8197e3571cffa9290f87",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-extension-admission-calico",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/admission-calico:v1.51.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.51.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/admission-calico:v1.51.0@sha256:b68c3d8c2ff20e9c3b88903594ff8ecbc5105389376b811f0e0d6da390dfd69a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-calico-runtime",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-calico-runtime:v1.51.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-calico-runtime:v1.51.0@sha256:1357e4a544ec80a4322093607d3d2ee075f4176bbbf6585a0771acc47ba34746",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-calico-runtime",
+        "version": "v1.51.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:86265007e2286ca5694cb0a6c064c7621ee84019d9b416a56c62cbfc19abd27b",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 194,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "admission-calico-application",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-calico-application:v1.51.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-calico-application:v1.51.0@sha256:1b7a73c50a8efe1e1a6f3d3508ca3aa979f8998305491a5daf23e456ca2032cc",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-calico-application",
+        "version": "v1.51.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:39270cd2b4cb202e984735dfb858faabf9f185b54ab89031494ad641e8624948",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 198,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "calico-node",
+        "version": "v3.30.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-node"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/calico/node"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/projectcalico/calico"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/calico/node:v3.30.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/calico/node:v3.30.3@sha256:1254e2162bb002a6d1677446e843a13e38be83e06cb28fe9da86810f849c08f2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "calico-cni",
+        "version": "v3.30.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-cni"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/calico/cni"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/projectcalico/cni-plugin"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/calico/cni:v3.30.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/calico/cni:v3.30.3@sha256:5d87d4d23a61177d923a09e06081824c919d91bd787646dc62ba5be48aecb3ac",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "calico-typha",
+        "version": "v3.30.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "payload are two statically linked ELF-binaries and some configuration/license files - not suitable for binary-id-scanning",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-typha"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/calico/typha"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/projectcalico/typha"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/calico/typha:v3.30.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/calico/typha:v3.30.3@sha256:5e9cf1668ec6386c828ce1ccece3737682d27aaf92e5b8d063d8e9f15532e163",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "calico-kube-controllers",
+        "version": "v3.30.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-kube-controllers"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/calico/kube-controllers"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/projectcalico/kube-controllers"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/calico/kube-controllers:v3.30.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/calico/kube-controllers:v3.30.3@sha256:7694fbc7b12375d686f830cb852d0e78f92d441658bd3167fd8b6804d3dfabc1",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "calico-cpa",
+        "version": "v1.9.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-cpa"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/cpa/cluster-proportional-autoscaler"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/cluster-proportional-autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/cpa/cluster-proportional-autoscaler:v1.9.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/cpa/cluster-proportional-autoscaler:v1.9.0@sha256:bc5be9858d29652151d43354e606f2c70789d3a3761998bd75df9198ba9728d1",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "calico-cpva",
+        "version": "v0.8.4",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "calico-cpva"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/cpa/cpvpa"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/cluster-proportional-vertical-autoscaler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/cpa/cpvpa:v0.8.4"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/cpa/cpvpa:v0.8.4@sha256:718f252d47f13e9d47f0b9b51adbff72f43329602d3567cdf7f2c78d51505692",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "bird-exporter",
+        "version": "1.4.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "bird-exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "ghcr.io/czerwonk/bird_exporter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/czerwonk/bird_exporter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "ghcr.io/czerwonk/bird_exporter:1.4.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/ghcr_io/czerwonk/bird_exporter:1.4.3@sha256:763646b83757e396893268d39ec453191c7328e0abe42024da65c8e5f3bf8914",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.51.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2303cafe439ba75bcf5f22eacf46a7d3040cca8b08356ae115ed3a0ceb2bba4a",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 991,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.51.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ed2ae08d999d3a7c30fabc487bb10ae80fb078a3f8f97fc9bfb33c9e6ead5dd2",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3584,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.51.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "3da920de4488fa9e9268c28945f70193853ac985",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-networking-calico",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

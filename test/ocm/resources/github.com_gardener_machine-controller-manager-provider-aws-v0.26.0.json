@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/machine-controller-manager-provider-aws",
+    "version": "v0.26.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "aaronfern"
+          },
+          {
+            "type": "githubUser",
+            "username": "unmarshall"
+          },
+          {
+            "type": "githubUser",
+            "username": "elankath"
+          },
+          {
+            "type": "githubUser",
+            "username": "thiyyakat"
+          },
+          {
+            "type": "githubUser",
+            "username": "takoverflow"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-07T09:47:17Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "machine-controller-manager-provider-aws",
+        "version": "v0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager-provider-aws:v0.26.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.26.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/machine-controller-manager-provider-aws:v0.26.0@sha256:8ad0c078ea3dedd0e2e3fc1c5e83be48e1681dfd9c2fc924ba77a8b1dc2a60d7",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f36dc5bdffd8c39b34634427be55e8c244bb5607c3ba2d888399fbc23e3e482c",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2598,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "pybandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:d3d5e3c929048372cefe40ebc548e25783ae4e2abe2cbd38da4f8e17dfd615f3",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 654,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.26.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:fd1671015c7121092a888d40e237392ca3acf327bdc0618985b4444e3a84ddcc",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 594,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.26.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:d89d4fab74eb3f1fbb214722ed50223588cb4cf1bb6e822ca1b8cafd8f4c5fae",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 9728,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.26.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "cac3077e538a6cc8b4dd829fb042edde391d5cbb",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/machine-controller-manager-provider-aws",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "machine-controller-manager",
+        "version": "v0.60.0",
+        "componentName": "github.com/gardener/machine-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

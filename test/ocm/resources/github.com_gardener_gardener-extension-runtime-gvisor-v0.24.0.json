@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-runtime-gvisor",
+    "version": "v0.24.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "MrBatschner"
+          },
+          {
+            "type": "githubUser",
+            "username": "Roncossek"
+          },
+          {
+            "type": "githubUser",
+            "username": "Vincinator"
+          }
+        ]
+      },
+      {
+        "name": "imagevector.gardener.cloud/images",
+        "value": {
+          "images": [
+            {
+              "name": "runtime-gvisor-installation",
+              "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation",
+              "sourceRepository": "github.com/gardener/gardener-extension-runtime-gvisor"
+            }
+          ]
+        }
+      }
+    ],
+    "creationTime": "2025-09-16T11:49:17Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-runtime-gvisor",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.24.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.24.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.24.0@sha256:d8b033060a519b06df3026ae80f2a1edd6939db95bdd89a31f1f4370bd815123",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "runtime-gvisor",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.24.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.24.0@sha256:e16a18136440dda49c092104dfe4ad2a62f5241f2435387824afc4d9d91427e0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "runtime-gvisor",
+        "version": "v0.24.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b850f2ec2a66fd760b70cfb96465b8c85e084a4e7d9e8fdcdc14a5f3c44e77a2",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 182,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-runtime-gvisor-installation",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.24.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.24.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.24.0@sha256:77de071ce824a96f572409a0e68ffdacda6e94f45e402ac2bb8e113c53a3bb19",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:1a0694a35ac3ce8b5ef416d2aec929d17acce7ab8e57208fb9e9cb30cc3c4cf8",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1406,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c286400b7c07ccaf70758730a2f15b19389f1dba39b72dab35a6eac8ef249d8c",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 5821,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.24.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4c2097eb932670eaa800b37926cf1de39be09ad7e287fd4408ac89026494ab49",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 592,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.24.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8e90e4ec91177bc446891bc0b39e3f27d35ae6258bbe12405b541167b5eec787",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "95b63e65abfac662f243dce8b78013affcb27cb6",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-runtime-gvisor",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

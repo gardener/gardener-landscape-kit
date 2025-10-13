@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/alpine-conntrack",
+    "version": "3.21.3",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "teamname": "gardener/alpine-conntrack-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      },
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-02-17T08:10:53.707451+00:00"
+      }
+    ],
+    "creationTime": "2025-02-17T08:10:54Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "alpine-conntrack",
+        "version": "3.21.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/alpine-conntrack:3.21.3"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack:3.21.3@sha256:78af1e338e7bd65c566e2edf298daae4fba78edbde12aadbe19c7ba504aa726a",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "78af1e338e7bd65c566e2edf298daae4fba78edbde12aadbe19c7ba504aa726a"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_alpine-conntrack",
+        "version": "3.21.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "the repository does not include any source, but only a Dockerfile.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "7d6c3a84f9ca214e5f87a0ebda3bd1bab5c7be83",
+          "ref": "refs/tags/3.21.3",
+          "repoUrl": "github.com/gardener/alpine-conntrack",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

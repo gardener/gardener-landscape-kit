@@ -1,0 +1,407 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/terraformer",
+    "version": "v2.28.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-04-24T11:50:32.622124+00:00"
+      }
+    ],
+    "creationTime": "2025-04-24T11:50:32.622185+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "terraformer",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer:v2.28.0@sha256:1b478946d10aab092eee13584e3eed50b06a634851a0498223b629020ac936c2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-alicloud",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-alicloud:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-alicloud:v2.28.0@sha256:5e5bb7f0346cd84d69a2f36ee2950dc4ec2603318893e02fbe6df7e4c3cd1659",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-aws",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-aws:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-aws:v2.28.0@sha256:26f05ad01243292a7e85ce42710f7e89c9154cadcbba8cfd7ae0c6ba8ef91061",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-azure",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-azure:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-azure:v2.28.0@sha256:6df1607fb94517fa68058240567916d6b633539a7102cca65378555497d2e7ed",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-gcp",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-gcp:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-gcp:v2.28.0@sha256:3184e8fc0bb75f495b1f80a926d74e039bdb50ee4f10d7cb893e2333c1ff57ff",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-openstack",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-openstack:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-openstack:v2.28.0@sha256:2c0337ad12c89191ecc4a2507f2cb43739ddcee7533ad3d4ae8b646c08a790ef",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-equinixmetal",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "only open source related component",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "only open source related component",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-equinixmetal:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-equinixmetal:v2.28.0@sha256:3b232f236cf9f33b31179a464ea498557f22fd2261ec6260d891c79992e67406",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "terraformer-slim",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "local development/testing related component",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "local development/testing related component",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-slim:v2.28.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v2.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terraformer-slim:v2.28.0@sha256:5ca44e05943d53a48630df27a7d9baa0b0a5b93f9e2c16c9e0c9ee1b60036d85",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/terraformer/pull/158\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9f12837b50a6ec4570f9c8355b9181abf8fb1ccd1290a34b255bf632e8d77d34",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6679,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v2.28.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a8d7509b0cd7059a78e1936437c4130a205d77002d415757cd2305ed205f3d46",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1102,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_terraformer",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "6e7cce10052222a020c9490f26065c08b9b49c46",
+          "ref": "refs/tags/v2.28.0",
+          "repoUrl": "github.com/gardener/terraformer",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

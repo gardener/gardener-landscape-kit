@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/cert-management",
+    "version": "v0.18.0",
+    "creationTime": "2025-09-09T08:51:53Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "cert-controller-manager",
+        "version": "v0.18.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/cert-controller-manager:v0.18.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/cert-controller-manager:v0.18.0@sha256:8a1e27adb0dd9c0f94b2d44cec6b4c663ebe40e7059f696c10ce10801ff27906",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cert-controller-manager",
+        "version": "v0.18.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6a09b68b831cf18c7d274aebcd8a9b1cc830d52f6367f71a3de043c724b5de34",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 173,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.18.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:cd049e13b203fc65a4856069a16f15786b9cde53b072676fb688523e13bba2dd",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2077,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.18.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9b9364b25482102cc3744f9eae8f450fc6de91cbdee6720313a45bf3362362ed",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 7898,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "cert-management",
+        "version": "v0.18.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager:v0.18.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.18.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cert-controller-manager:v0.18.0@sha256:a9761b884d5003295c56340067a3277d69892c67484dd836c96abf5bd45f9200",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.18.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:57c7ec5a5d1019c240ed6c363ac4556404cba0d7fd2ea4799e496a48ce91ba62",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 3991,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.18.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:682546b3d05496d9483471347254d6b2635ba55ff48dff0b61e68f8e4652108c",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 9216,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.18.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "f5a0a160e5b545004e7b141b1196a549c57e47ea",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/cert-management",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

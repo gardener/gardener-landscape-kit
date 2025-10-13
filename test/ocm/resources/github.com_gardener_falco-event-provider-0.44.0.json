@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/falco-event-provider",
+    "version": "0.44.0",
+    "creationTime": "2025-09-15T09:14:56Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "0.44.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0dcdea9dcca15c34eaaad38a8c48866b6d131981793f7e5400c3d314586efa1b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 647,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.44.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:324c22024d3b28957a6749eb0439e405cc89835d789dcbedea4f3c925b115af0",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 5064,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "falco-event-provider",
+        "version": "0.44.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/falco-event-provider:0.44.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.44.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/falco-event-provider:0.44.0@sha256:e827956d40b4b4d74f9162729b01549c26c1f55286400d8e96a98e877ae9b4ad",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "0.44.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 1024,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.44.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "b34b52dcb7939c2fbb34d1367234a01556da90b7",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/falco-event-provider",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

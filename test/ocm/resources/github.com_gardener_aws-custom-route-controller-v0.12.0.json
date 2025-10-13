@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/aws-custom-route-controller",
+    "version": "v0.12.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "codeowners"
+          }
+        ]
+      },
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-05-23T08:12:36.704686+00:00"
+      }
+    ],
+    "creationTime": "2025-05-23T08:12:36.704746+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "aws-custom-route-controller",
+        "version": "v0.12.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/aws-custom-route-controller:v0.12.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.12.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/aws-custom-route-controller:v0.12.0@sha256:ea5c4760fe525677c8af35a99f239510a6453b3b6ea80ef0b5659984db4c7d4a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.12.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/aws-custom-route-controller/pull/34\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:85ba6ca44a4cfe75da613304237c31761e1339b544268a5b8557a0366e127654",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5215,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.12.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:959b54832fe63fde6b0f4159c08c91d536ad5c47236dea469a968801cc6a5223",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 300,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_aws-custom-route-controller",
+        "version": "v0.12.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "bd0673aa85724c12fa5e41de704321d1f59b89ab",
+          "ref": "refs/tags/v0.12.0",
+          "repoUrl": "github.com/gardener/aws-custom-route-controller",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

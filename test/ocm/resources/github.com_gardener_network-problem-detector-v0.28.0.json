@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/network-problem-detector",
+    "version": "v0.28.0",
+    "creationTime": "2025-09-01T08:19:00Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "network-problem-detector",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/network-problem-detector:v0.28.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.28.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/network-problem-detector:v0.28.0@sha256:341384206e270d367ab786a28cd1f6f832d1dd6832cc5e0b6a59bf9b038d0325",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:802ea5404421874b7bc634ba155694249795d70c9832681e6d3bbe3c6c0ca5f8",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 3427,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:789e1ecd9d63b7c7607391c1f57eb7e716f9a160ec1e325ece22190d9f4babbf",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4727,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.28.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:e6309d2abddcbf1bd9d5e622622ad79abd485c918e15e3178432f4738f966984",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 764,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.28.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:71feb606773bb4e869e9159b9c2a84a3b86eecc7b36c9029f5b7a9caaef34c17",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3072,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "24b0da2c8f4dc52760e0f0115ae163a6181248e9",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/network-problem-detector",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

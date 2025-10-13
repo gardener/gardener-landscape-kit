@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/machine-controller-manager-provider-gcp",
+    "version": "v0.25.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-06-06T07:58:02.293022+00:00"
+      }
+    ],
+    "creationTime": "2025-06-06T07:58:02.293081+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "machine-controller-manager-provider-gcp",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager-provider-gcp:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.25.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/machine-controller-manager-provider-gcp:v0.25.0@sha256:f10b5f3f59de79ff98083ea490120df00717858aa90487ddb9d509fe2c36cba5",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "check-build-step-log",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3ca7b3f157fbc10f83696e8cf4e999d9683bbd89acfb7f696fa8518c7433a08a",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6910,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.25.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:502d5158a3b8991c506832832e4293723e04eb8da5eb8990f2a726cc83cfd96b",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 471,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_machine-controller-manager-provider-gcp",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "e029cac21f35d701be866266e38dbc9df23f7c6f",
+          "ref": "refs/tags/v0.25.0",
+          "repoUrl": "github.com/gardener/machine-controller-manager-provider-gcp",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "github_com_gardener_machine-controller-manager",
+        "version": "v0.58.0",
+        "componentName": "github.com/gardener/machine-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/oidc-webhook-authenticator",
+    "version": "v0.37.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-07-09T08:41:30.175584+00:00"
+      }
+    ],
+    "creationTime": "2025-07-09T08:41:30.175645+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "oidc-webhook-authenticator",
+        "version": "v0.37.0",
+        "labels": [
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/oidc-webhook-authenticator:v0.37.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.37.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/oidc-webhook-authenticator:v0.37.0@sha256:cfa7313e7838f33096649002759401d0d33e2600fdad2b7f833184c68dbb81de",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "check-build-step-log",
+        "version": "v0.37.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/oidc-webhook-authenticator/pull/165\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9a190ef278ea349d4896a2359c91637507922df70060dd6174679ef6c877fc65",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 2819,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.37.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:633e1222332134d89bec1038f1c537862a07dac91e857be6443b72839fd5479e",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1063,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_oidc-webhook-authenticator",
+        "version": "v0.37.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "647aa17f13dfba7998e73fdd7c9a26acf1401ef3",
+          "ref": "refs/tags/v0.37.0",
+          "repoUrl": "github.com/gardener/oidc-webhook-authenticator",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

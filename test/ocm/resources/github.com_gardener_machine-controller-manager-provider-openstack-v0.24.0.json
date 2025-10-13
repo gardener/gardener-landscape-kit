@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/machine-controller-manager-provider-openstack",
+    "version": "v0.24.0",
+    "creationTime": "2025-09-04T11:37:17Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "machine-controller-manager-provider-openstack",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager-provider-openstack:v0.24.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.24.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/machine-controller-manager-provider-openstack:v0.24.0@sha256:2fa1c3eef7cf21b3ea7383db7e138c95af5a77bbf821e80f078962e30f9d8c4f",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:d9055a4ef2f19e2a5112a5b92dc3d77124e0a4dd29cfff6e7c6c17bdef41c6c0",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1225,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.24.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9cfc8374b6bac46a9c35fff5301b16f0be4b625f18e4fdd97f7db9ed3f211787",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 639,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.24.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:604b5e28060a5572191c8cb992af62caccde8d4bd951b597df8dcbee3b92fe3a",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 9728,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "fc2b1ee5d645c40fcae8666c1c09f5c9a71a48ee",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/machine-controller-manager-provider-openstack",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "machine-controller-manager",
+        "version": "v0.60.0",
+        "componentName": "github.com/gardener/machine-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

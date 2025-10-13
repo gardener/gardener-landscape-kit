@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-image-rewriter",
+    "version": "v0.4.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-09-24T08:34:37.304436+00:00"
+      }
+    ],
+    "creationTime": "2025-09-24T08:34:37.304496+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-image-rewriter",
+        "version": "v0.4.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/image-rewriter:v0.4.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.4.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/image-rewriter:v0.4.0@sha256:26b12d74fad33e4df88b675415f6023c1073d901c8c05ebe0be24c1fcc6e801e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "image-rewriter",
+        "version": "v0.4.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/image-rewriter:v0.4.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/image-rewriter:v0.4.0@sha256:744e4c163c17823eef8a551fc0fcc860f8a60473c28c25d0edc6cb93be5c3f7b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "image-rewriter",
+        "version": "v0.4.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ba8458ea2c78667d2399c6ef16165b757a2f3af72bd8da338c188546df815cdd",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 182,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.4.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-extension-image-rewriter/pull/272\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:00d0921302ea8fc0b9acc1d16e2921b2264ca232e99944b2869bad65d2833f79",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5237,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.4.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:da145a8d24e45f7ba97964e8c9c8bc09c1f9b018d0f5c48390328008224c0bb2",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 569,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.4.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b3a42cde7c29cd4158af63ff00bae989f5cd12ec6ef913427ba540f4816b26f5",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-extension-image-rewriter",
+        "version": "v0.4.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "b86844271e50b42094817b582d53621f4286d6b8",
+          "ref": "refs/tags/v0.4.0",
+          "repoUrl": "github.com/gardener/gardener-extension-image-rewriter",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

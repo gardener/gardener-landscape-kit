@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-lakom-service",
+    "version": "v0.20.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-07-10T12:26:06.435661+00:00"
+      }
+    ],
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-shoot-lakom-service",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-lakom-service:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.20.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-lakom-service:v0.20.0@sha256:f4ae3f403e6f1f22be600061aa878573a1fda3abd4531f2ebc5f6f3b26160d61",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-lakom-admission",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-lakom-admission:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.20.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-lakom-admission:v0.20.0@sha256:93f670e1206a249db0a2fec61149817e748b13ddf9cac9a2ef653a38390cb29c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-lakom-service",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-service:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-service:v0.20.0@sha256:ebd4c0801ebe2b1f0ab54351d3a5567c984d9b21c6f0c218fbdbf3bf8512dadc",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "lakom",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/lakom:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/lakom:v0.20.0@sha256:4f8545daddc7c21a0eb40168c5ca515a99b81be9994650cea0ffc880c8367c42",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-lakom-admission-application",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-admission-application:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-admission-application:v0.20.0@sha256:d952aed26183802a67d329b685965886eabbb6f7590b284c8c39397af38e589b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-lakom-admission-runtime",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-admission-runtime:v0.20.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-lakom-admission-runtime:v0.20.0@sha256:9b9eecef37678253db74fc9ebe649730690d36174f31e6964dd5bcf37e9dfae3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "lakom",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "lakom"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/lakom"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener-extension-shoot-lakom-service"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/lakom:v0.20.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/lakom:v0.20.0@sha256:0f843ad5dffd22404f26b7efe4c25d90d95cee017bf76abaf5e4ce3355a95e8d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-lakom-service",
+        "version": "v0.20.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0b5b18bea403b82e1adff44d0f38592bb7bcbcff2c3f26fc68d14fd790284354",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 192,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "lakom",
+        "version": "v0.20.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0b254b8ef1c81ba281a7e89a17230f9d0bb57b11926d0dc1b09d3a71f7150074",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 145,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-lakom-admission-application",
+        "version": "v0.20.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f099ca80c81c0ef5b1064506ec922aa9f873bcc0230e83d566495f683aeb76e",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 208,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-lakom-admission-runtime",
+        "version": "v0.20.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:44706380ca147f0470ece9b94a5d2a34e0a8708c323182a8286142ff6b0d3557",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 204,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-extension-shoot-lakom-service/pull/116\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3ad3b5b9b27276d5e9aa5b599fe2a6adfde718fb87aba09a6f230054d0b500f1",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6967,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.20.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:26109bf8190c1cee6f3afb9960983f030b098b3ad3d427cd60dd633fcc4c04b7",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 3675,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-extension-shoot-lakom-service",
+        "version": "v0.20.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "f360b9eb32f74bb00ebf3fe891a27b0dfcea08fd",
+          "ref": "refs/tags/v0.20.0",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-lakom-service",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-rsyslog-relp",
+    "version": "v0.10.1",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-09-26T09:36:54.175516+00:00"
+      }
+    ],
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-shoot-rsyslog-relp",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-rsyslog-relp:v0.10.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.10.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-rsyslog-relp:v0.10.1@sha256:93fe3b1b8dcf2394453eb8d4e6dc4c14630fb4a03f4114a03d7d592e12b64f31",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-rsyslog-relp-admission",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-rsyslog-relp-admission:v0.10.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.10.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-rsyslog-relp-admission:v0.10.1@sha256:231318f3ff08b1f4de7a5e66981894078d7b32fad374ced07488a68aac40c248",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp:v0.10.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp:v0.10.1@sha256:bdffce81528bc7ff2e29fa53af0fc8eb5f1f61e380fb1f600b5c929f13eb0b52",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp-admission-application",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp-admission-application:v0.10.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp-admission-application:v0.10.1@sha256:da583f71f764d2004cb808e9f5c2155c9c5cd836126b61ddafd8f8fae5ee937e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp-admission-runtime",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp-admission-runtime:v0.10.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-rsyslog-relp-admission-runtime:v0.10.1@sha256:211fd29bab450ef75b8cd39a1ed8995cbc5aae3f94e42ecb9dc20d3a0717ef95",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "alpine",
+        "version": "3.22.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "The alpine container is not accessible from outside k8s clusters and not interacted with from other containers or other systems.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "alpine"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/alpine"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/alpine:3.22.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/alpine:3.22.1@sha256:179f7b08578c07b335c82700ff4f0df8d8578d08a002198f6929130e8841fd2e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "pause-container",
+        "version": "3.10",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/binary_id/v1",
+            "value": {
+              "comment": "The pause container is not accessible from outside k8s clusters and not interacted with from other containers or other systems.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "pause-container"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/pause"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/kubernetes/blob/master/build/pause/Dockerfile"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/pause:3.10"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/pause:3.10@sha256:adafa755d1f0acb952eb9ecde0dbceec4674e8f1042d1c13b15a77f5d78c8160",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp",
+        "version": "v0.10.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:56ab4781091dc88a73767049e3e232c69f3b711f91b009514f86627bdd515eca",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 190,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp-admission-application",
+        "version": "v0.10.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:e9728b81fab72e8ed2f03765c6a7a96e4ced6bbc62c20f31a937eff7d4b14dd7",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 222,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-rsyslog-relp-admission-runtime",
+        "version": "v0.10.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:eff80917e3a5fc57a74e828d23cccec7cf3bd030241e3a342a69325521617c73",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 218,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-extension-shoot-rsyslog-relp/pull/189\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c5fa1a1369dcc4c34be3feb600049bf042b59e26334ba75cff963136d03fbd2c",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6480,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.10.1",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ce829447ba5aed73430c263a8169f4db9413b9487da87fe34bf013d813b05e12",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 250,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.10.1",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:39e70268affc62cc56aa44e8e2715909c95afb51d4a264e23dfb60066421a98e",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-extension-shoot-rsyslog-relp",
+        "version": "v0.10.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "a203b1d72d9d694aee1accab669c8dfe0d5f91e4",
+          "ref": "refs/tags/v0.10.1",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-rsyslog-relp",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

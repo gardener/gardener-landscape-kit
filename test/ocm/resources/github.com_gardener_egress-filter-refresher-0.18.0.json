@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/egress-filter-refresher",
+    "version": "0.18.0",
+    "creationTime": "2025-07-28T14:19:10Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "0.18.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/egress-filter-refresher/pull/50\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:23fb3c310e098cb5ffe480049aae412b8c0fa408947618df5e0d39eba28e6f28",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1471,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.18.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6a880f1e395338a978010600f0f5de8567ee4fce5a62e156804ff5f342387542",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4845,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "egress-filter",
+        "version": "0.18.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/egress-filter:0.18.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.18.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/egress-filter:0.18.0@sha256:cf837155973f09b9a0468d6bea296bd96face2c7ae0e2d011d69697af710b577",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.18.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a66636acdd8c67e2f2cc2ffe700c0e674c77dac56a204657e6eb93aeccfc4718",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 221,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.18.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "6823c90d68029f2992b940f233b384608afb8950",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/egress-filter-refresher",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

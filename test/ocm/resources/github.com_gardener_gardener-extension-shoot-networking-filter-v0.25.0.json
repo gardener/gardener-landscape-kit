@@ -1,0 +1,408 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-networking-filter",
+    "version": "v0.25.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "codeowners"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-16T08:11:37Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "runtime-networking-filter",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/runtime-networking-filter:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/runtime-networking-filter:v0.25.0@sha256:fb97a084f6fa9448e1f173c235da7eeed69fda936b1e9a869018de36530d9bfb",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "runtime-networking-filter",
+        "version": "v0.25.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:e42abc991a4a824da626aa5319331ed3df728ea053f81b8e8cf599e18be66483",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 194,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-networking-filter-admission-runtime",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter-admission-runtime:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter-admission-runtime:v0.25.0@sha256:25471480719771156ab51133d6d6eee94bff00c16f0b79a01ca35d87751db119",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-networking-filter-admission-runtime",
+        "version": "v0.25.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8a7fc2d5f0ccd949e826903b79a6ea51c4a378bd1f22590b5803ea7b3b6b8349",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 228,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-networking-filter-admission",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-networking-filter-admission:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.25.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-networking-filter-admission:v0.25.0@sha256:e3633c680d3d45ae1530d954b1ee17edd31e25bd1574ed9a1e837802fe532a1e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-networking-filter",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter:v0.25.0@sha256:5e7cf88b947992fca7a239f3b0838ef598b368d8852a4603c0411686bb6bcd1f",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-networking-filter",
+        "version": "v0.25.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5402a471d8221d48de124c556d7e9ee8d91274c763bc46bf6a752989618272a6",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 200,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-networking-filter-admission-application",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter-admission-application:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-filter-admission-application:v0.25.0@sha256:998141e8871e6953a8ba21153d217c7a94c57184e53e881eeafb11057761aca2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-networking-filter-admission-application",
+        "version": "v0.25.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:174996a03a242970a49ca89d2821db827dbb15bb3b7936f0041b47060ca0180b",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 222,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-networking-filter",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-networking-filter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-networking-filter:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.25.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-networking-filter:v0.25.0@sha256:960ee2455baea5e68018852a3906db5d203995f094813a3c08249f87f5b55c09",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-runtime-networking-filter",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/public/gardener/extensions/runtime-networking-filter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-networking-filter:v0.25.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.25.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-networking-filter:v0.25.0@sha256:491be4ca8bfbbcb018954206032b83d04d91e38f3a2a16e23dd615ac048fdc8b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:06e122b393636fd7d3a16854068893916f230e61c9503c14ce69f155b2c4fca2",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1775,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a5639230eadb3b27704c61c75e76b9b5558096bfa15b1a52e891c002bf3a8bb1",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 7120,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.25.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ab9c4ab1ae609d1b37055bc2468a561f597beb01f73680bf423ea604dd22bfe4",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 535,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.25.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:20f5ac4d1a55f2476ad995e69cf2bf398ee8c5c9a2cd8cdc6992e2efe5e269af",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.25.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "b4b79078d8742d09c93853e4b0c3ad5d83a1527a",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-networking-filter",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "egress-filter",
+        "version": "0.18.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "egress-filter",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/egress-filter",
+                  "resourceId": {
+                    "name": "egress-filter"
+                  },
+                  "sourceRepository": "github.com/gardener/egress-filter-refresher",
+                  "tag": "0.18.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/egress-filter-refresher",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

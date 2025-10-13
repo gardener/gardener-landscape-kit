@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/terminal-controller-manager",
+    "version": "v0.34.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-01-20T09:28:35.150514+00:00"
+      }
+    ],
+    "creationTime": "2025-01-20T09:28:35Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "terminal-controller-manager",
+        "version": "v0.34.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/terminal-controller-manager:v0.34.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/terminal-controller-manager:v0.34.0@sha256:99b9d4b8e96a7aaedc132f9b6ab5e2707f50ac88dc4750d0f920f63a1f56f752",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "99b9d4b8e96a7aaedc132f9b6ab5e2707f50ac88dc4750d0f920f63a1f56f752"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.34.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/terminal-controller-manager/pull/328\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:d254d7cb9285f52f8243d948a8a1ff80a0634ba9dfab20de45f4dcce0f3f385c",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 4095,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "d254d7cb9285f52f8243d948a8a1ff80a0634ba9dfab20de45f4dcce0f3f385c"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_terminal-controller-manager",
+        "version": "v0.34.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "8f97fda43124c70a243eb861d740735a358d6efd",
+          "ref": "refs/tags/v0.34.0",
+          "repoUrl": "github.com/gardener/terminal-controller-manager",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

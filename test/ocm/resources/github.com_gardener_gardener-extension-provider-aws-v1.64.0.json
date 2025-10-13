@@ -1,0 +1,1358 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-provider-aws",
+    "version": "v1.64.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "github_hostname": "github.com",
+            "teamname": "gardener/gardener-extension-provider-aws-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-25T07:18:40Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "alpine",
+        "version": "3.20.3",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry-1.docker.io/library/alpine:3.20.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry-1_docker_io/library/alpine:3.20.3@sha256:e705bbb0602e29f3a9a4d6fa14ca4a4e33bcda2df36b3da9d75d6de70a133376",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "pause",
+        "version": "3.10",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/pause:3.10"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/pause:3.10@sha256:adafa755d1f0acb952eb9ecde0dbceec4674e8f1042d1c13b15a77f5d78c8160",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-extension-admission-aws",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/admission-aws:v1.64.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.64.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/admission-aws:v1.64.0@sha256:7f0ad65134ee136344a05e3f9176741b80db479c6326e9eebe162012711fd615",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "pybandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST Scans.\nsee: https://github.com/securego/gosec\nenabled by: https://github.com/gardener/gardener-extension-provider-aws/pull/112\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:bc8c502db1d858cdf3223d5c273bf14f9fc5aecda9c0a51c1033b6559fe5d87b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 3232,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:00183988d130e361026a27524a3f34c886e60771982b29d76e6603db71817586",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 20883,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "admission-aws-application",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application:v1.64.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application:v1.64.0@sha256:510fa4b406c83bb4a3e84caca3898f360974f811278e5955603b9774b06b2c0b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-aws-application",
+        "version": "v1.64.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:1521cd5df89cf3fb815e33055195d452158b965b5db26ac0ec1589f02d93d29d",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 192,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "admission-aws-runtime",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:v1.64.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:v1.64.0@sha256:744f81ba903f3b448c237eec0a7ca7bf9e171c7bf047f04b8f9e5a79c2c2ebb9",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-aws-runtime",
+        "version": "v1.64.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:41141ba9f7786b061ee072c6dbb0d5b27cc65a11ca2437198b2f8f31d32b7f70",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 188,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-provider-aws",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/provider-aws:v1.64.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.64.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/provider-aws:v1.64.0@sha256:3980d30c50b67e2111d49d37b163fb44ffb900902bf044db64a53da8a429d199",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "provider-aws",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws:v1.64.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/provider-aws:v1.64.0@sha256:f94d9a4192ebbf5a666432c27725fd2ddd77051dfd151eaf1d5963a79f838682",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "provider-aws",
+        "version": "v1.64.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2450bb8aa03119b2f6592c4f3c385765aaaaf7569f6720e0d8e1e1433c091a3d",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 178,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "cloud-controller-manager",
+        "version": "v1.29.8",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/cloud-provider-aws"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "1.29.x"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager:v1.29.8"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/cloud-controller-manager:v1.29.8@sha256:80d19f570c9212bff9bdda124575f60cdaf8b1e97491936ab5c69846783f30de",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cloud-controller-manager",
+        "version": "v1.30.8",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/cloud-provider-aws"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "1.30.x"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager:v1.30.8"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/cloud-controller-manager:v1.30.8@sha256:1c2b30659f0bef9d37441f5046cca11bd3a1b11157af96745e1c07db0d004e2f",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cloud-controller-manager",
+        "version": "v1.31.7",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/cloud-provider-aws"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "1.31.x"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager:v1.31.7"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/cloud-controller-manager:v1.31.7@sha256:f584f4609cea45e7e03e0d87d21294b8ac076a65fe2ae242adeca0ac80cf426f",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cloud-controller-manager",
+        "version": "v1.32.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/cloud-provider-aws"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "1.32.x"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager:v1.32.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/cloud-controller-manager:v1.32.3@sha256:14ff4c410b054edc0b0b53fef6f0006ef0ebe0f653c820562d77074aba15da1a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cloud-controller-manager",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes/cloud-provider-aws"
+          },
+          {
+            "name": "imagevector.gardener.cloud/target-version",
+            "value": "\u003e= 1.33"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/cloud-controller-manager:v1.33.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/cloud-controller-manager:v1.33.0@sha256:882330da1e6c6da23f75ec23b28155260439665d9b8f5dd5891749e68bfd3da6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "aws-load-balancer-controller",
+        "version": "v2.13.3",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "aws-load-balancer-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/eks/aws-load-balancer-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/aws-load-balancer-controller"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/eks/aws-load-balancer-controller:v2.13.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/eks/aws-load-balancer-controller:v2.13.3@sha256:7428612c3193d1482adba9cec256df5707431beba17728f1ec1c70ccaf1e32e7",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-driver",
+        "version": "v1.47.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-driver"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/provider-aws/aws-ebs-csi-driver"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/aws-ebs-csi-driver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/provider-aws/aws-ebs-csi-driver:v1.47.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/provider-aws/aws-ebs-csi-driver:v1.47.0@sha256:dfdae45f7ff9c89c14bc7a0da8b81a0978f680fddeab331f8440a643909d72c6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-driver-efs",
+        "version": "v2.1.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-driver-efs"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "public.ecr.aws/efs-csi-driver/amazon/aws-efs-csi-driver"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-sigs/aws-efs-csi-driver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "public.ecr.aws/efs-csi-driver/amazon/aws-efs-csi-driver:v2.1.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/public_ecr_aws/efs-csi-driver/amazon/aws-efs-csi-driver:v2.1.0@sha256:747bea140f6cc7898163ca28c2972f7ba0f550427d3bc5ade0c8658cbb147f4b",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-volume-modifier",
+        "version": "v0.5.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-volume-modifier"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/ebs-csi-driver/volume-modifier-for-k8s"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/awslabs/volume-modifier-for-k8s"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/ebs-csi-driver/volume-modifier-for-k8s:v0.5.1"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/ebs-csi-driver/volume-modifier-for-k8s:v0.5.1@sha256:f2afa714f3f51682833b0fb779843485accd6afcfd29af6bd55b35feb091c941",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-provisioner",
+        "version": "v5.3.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-provisioner"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/csi-provisioner"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/external-provisioner"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/csi-provisioner:v5.3.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/csi-provisioner:v5.3.0@sha256:f6e5624ec80aa90a864fafe168c242af022fc387995e20c432f00f9e87ea4814",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-attacher",
+        "version": "v4.9.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-attacher"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/csi-attacher"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/external-attacher"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/csi-attacher:v4.9.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/csi-attacher:v4.9.0@sha256:aed2991c8dce90425fb996d531702c263394cfb7bbb4615b08dff78d38af3ec9",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-resizer",
+        "version": "v1.14.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-resizer"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/csi-resizer"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/external-resizer"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/csi-resizer:v1.14.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/csi-resizer:v1.14.0@sha256:3a6e92a4326ab9dbbc7e1957703f00cd175d0fe1b694c114130af6d09217519d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-snapshotter",
+        "version": "v8.3.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-snapshotter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/csi-snapshotter"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/external-snapshotter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/csi-snapshotter:v8.3.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/csi-snapshotter:v8.3.0@sha256:faa0f8ac6455fc6e6857a59cbd3210e51864e8563645aa58564fc424f94988cc",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-snapshot-controller",
+        "version": "v8.3.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-snapshot-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/snapshot-controller"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/external-snapshotter"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/snapshot-controller:v8.3.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/snapshot-controller:v8.3.0@sha256:5c4f674f5b13baea9bb69f777f2ac3463366c900484cbc61d1b6990ac4cb9989",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-node-driver-registrar",
+        "version": "v2.14.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-node-driver-registrar"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/csi-node-driver-registrar"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/node-driver-registrar"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.14.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/csi-node-driver-registrar:v2.14.0@sha256:b7a3670e28a517b779bdbf4d23c4b13a5c6409ab8723cb387e6f8368823c3325",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "csi-liveness-probe",
+        "version": "v2.16.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "csi-liveness-probe"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "registry.k8s.io/sig-storage/livenessprobe"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/kubernetes-csi/livenessprobe"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/sig-storage/livenessprobe:v2.16.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/registry_k8s_io/sig-storage/livenessprobe:v2.16.0@sha256:808042b538b8c7f3fae758f73b1b8f7156c11dcbaeb903333a1a6cbfc6cb72e3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.64.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a767de1c64e96a7ec82f97a2aa2fc302ab383b7bcdb273d54f76f3deeb89ede0",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 2936,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.64.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:1ef561f9e792d33974a0296f02fa22431349f3287a07ea915a3b370e11e9a0b1",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 5632,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.64.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for SAST Scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "094f43378798696c55eebf0006072bcf58e70ee4",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-provider-aws",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "terraformer",
+        "version": "v2.28.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "gardener-operator"
+                      }
+                    }
+                  ],
+                  "name": "terraformer",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/terraformer-aws",
+                  "resourceId": {
+                    "name": "terraformer"
+                  },
+                  "sourceRepository": "github.com/gardener/terraformer",
+                  "tag": "v2.28.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/terraformer",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "machine-controller-manager-provider-aws",
+        "version": "v0.26.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "gardener-operator"
+                      }
+                    }
+                  ],
+                  "name": "machine-controller-manager-provider-aws",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager-provider-aws",
+                  "resourceId": {
+                    "name": "machine-controller-manager-provider-aws"
+                  },
+                  "sourceRepository": "github.com/gardener/machine-controller-manager-provider-aws",
+                  "tag": "v0.26.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/machine-controller-manager-provider-aws",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "aws-custom-route-controller",
+        "version": "v0.12.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "gardener-operator"
+                      }
+                    }
+                  ],
+                  "name": "aws-custom-route-controller",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/aws-custom-route-controller",
+                  "resourceId": {
+                    "name": "aws-custom-route-controller"
+                  },
+                  "sourceRepository": "github.com/gardener/aws-custom-route-controller",
+                  "tag": "v0.12.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/aws-custom-route-controller",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "aws-ipam-controller",
+        "version": "v0.6.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "gardener-operator"
+                      }
+                    }
+                  ],
+                  "name": "aws-ipam-controller",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/aws-ipam-controller",
+                  "resourceId": {
+                    "name": "aws-ipam-controller"
+                  },
+                  "sourceRepository": "github.com/gardener/aws-ipam-controller",
+                  "tag": "v0.6.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/aws-ipam-controller",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ecr-credential-provider",
+        "version": "v1.29.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ecr-credential-provider",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/ecr-credential-provider",
+                  "resourceId": {
+                    "name": "ecr-credential-provider"
+                  },
+                  "sourceRepository": "github.com/gardener/ecr-credential-provider",
+                  "tag": "v1.29.0",
+                  "targetVersion": "\u003c 1.30"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ecr-credential-provider",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ecr-credential-provider",
+        "version": "v1.30.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ecr-credential-provider",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/ecr-credential-provider",
+                  "resourceId": {
+                    "name": "ecr-credential-provider"
+                  },
+                  "sourceRepository": "github.com/gardener/ecr-credential-provider",
+                  "tag": "v1.30.3",
+                  "targetVersion": "1.30.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ecr-credential-provider",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ecr-credential-provider",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ecr-credential-provider",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/ecr-credential-provider",
+                  "resourceId": {
+                    "name": "ecr-credential-provider"
+                  },
+                  "sourceRepository": "github.com/gardener/ecr-credential-provider",
+                  "tag": "v1.31.0",
+                  "targetVersion": "1.31.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ecr-credential-provider",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ecr-credential-provider",
+        "version": "v1.32.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ecr-credential-provider",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/ecr-credential-provider",
+                  "resourceId": {
+                    "name": "ecr-credential-provider"
+                  },
+                  "sourceRepository": "github.com/gardener/ecr-credential-provider",
+                  "tag": "v1.32.0",
+                  "targetVersion": "1.32.x"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ecr-credential-provider",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "ecr-credential-provider",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "gardener.cloud/cve-categorisation",
+                      "value": {
+                        "authentication_enforced": false,
+                        "availability_requirement": "low",
+                        "confidentiality_requirement": "high",
+                        "integrity_requirement": "high",
+                        "network_exposure": "protected",
+                        "user_interaction": "end-user"
+                      }
+                    }
+                  ],
+                  "name": "ecr-credential-provider",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/ecr-credential-provider",
+                  "resourceId": {
+                    "name": "ecr-credential-provider"
+                  },
+                  "sourceRepository": "github.com/gardener/ecr-credential-provider",
+                  "tag": "v1.33.0",
+                  "targetVersion": "\u003e= 1.33"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/ecr-credential-provider",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

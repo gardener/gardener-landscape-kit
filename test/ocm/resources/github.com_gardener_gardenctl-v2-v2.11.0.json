@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardenctl-v2",
+    "version": "v2.11.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-05-13T10:41:36.323005+00:00"
+      }
+    ],
+    "creationTime": "2025-05-13T10:41:36.323076+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardenctl-v2",
+        "version": "v2.11.0",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:99532cc73d1145c5add4447661a637e7d48734c8094248f2396f1e8231a98807",
+          "mediaType": "application/x-executable",
+          "referenceName": null,
+          "size": 78596471,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenctl-v2",
+        "version": "v2.11.0",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a806aab77b5ef7e59a91030f7130d0dcb751f1b85a86716dc64d80dc626ada48",
+          "mediaType": "application/x-executable",
+          "referenceName": null,
+          "size": 75552413,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenctl-v2",
+        "version": "v2.11.0",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b7a4af6d23e498fb76450404612ac329c89769d3386b8b532e42bb680ffc401f",
+          "mediaType": "application/x-mach-binary",
+          "referenceName": null,
+          "size": 78928976,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenctl-v2",
+        "version": "v2.11.0",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:35ba8289acd7f92f13ec4421031af17e5303f2e0b5ec3b8e51a8e2a26e8f8faa",
+          "mediaType": "application/x-mach-binary",
+          "referenceName": null,
+          "size": 76354418,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenctl-v2",
+        "version": "v2.11.0",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:477cf9ce5c1d92af9c519f94d4d519598336de9d690c8d30237186f1e8ee61fd",
+          "mediaType": "application/vnd.microsoft.portable-executable",
+          "referenceName": null,
+          "size": 79369216,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v2.11.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/gardenctl-v2/pull/470\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:609f37a46994ed8bd6da2dc6a41f1cb1c991d24b7da80ce0e476606698d19028",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5835,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v2.11.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:489b2f3f95c4caca0415fc4bf28e2f5d75a478fab0ae9b8fbb521f35da9b5114",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 558,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardenctl-v2",
+        "version": "v2.11.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "434d0aaf3e2379c98d8b827db6725c2f98b43148",
+          "ref": "refs/tags/v2.11.0",
+          "repoUrl": "github.com/gardener/gardenctl-v2",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

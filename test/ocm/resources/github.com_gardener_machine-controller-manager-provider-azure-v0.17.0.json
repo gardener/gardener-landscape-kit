@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/machine-controller-manager-provider-azure",
+    "version": "v0.17.0",
+    "creationTime": "2025-09-08T10:26:28Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v0.17.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:eedcba4c5ecd5e6274fe7b88518a76a584b73b01fb23093c7d694f74e136a370",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1482,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "machine-controller-manager-provider-azure",
+        "version": "v0.17.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager-provider-azure:v0.17.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.17.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/machine-controller-manager-provider-azure:v0.17.0@sha256:7996b2d7d2736bb0083991493bceb3de188ddaf8bb309274bded6db0d646a261",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.17.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6936ab3580173f034eedf3e8c044a30249541e29666cdde3b02ccaf7a1615cab",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1422,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.17.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:497e48973cd7c7bb99521cabf139aaecc5e22698f86b69e8976e90839b940e19",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 9216,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.17.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "c773046a5b010dbd79243dbd0d9f85b38ccf5c0a",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/machine-controller-manager-provider-azure",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "machine-controller-manager",
+        "version": "v0.60.0",
+        "componentName": "github.com/gardener/machine-controller-manager",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-dns-service",
+    "version": "v1.70.0",
+    "creationTime": "2025-09-22T15:42:12Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9a8ead55efb52c3c5c5ecd2ede618395fd7d51ab79eb26489661248483f8f44b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 647,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a954b5280fa779f78d7b448e085012504cd5a889438f22cffcc4cfbd1113171a",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 7249,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-dns-service-admission-application",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-application:v1.70.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-application:v1.70.0@sha256:d9027ff08b56d91d273f319ab905496d3ff446bea6ef8702bff0c8146d874d44",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-dns-service-admission-application",
+        "version": "v1.70.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:60f14e24b3008858c84cf4aa4009f6851606f554196850669d8bbf55159321b4",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 220,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-admission-shoot-dns-service",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/admission-shoot-dns-service:v1.70.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.70.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/admission-shoot-dns-service:v1.70.0@sha256:945f687f2c35fbff3f0b94176ab10374b32c68dab54b03dd5fb9d9a5743b0d66",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-dns-service",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service:v1.70.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service:v1.70.0@sha256:64fbefe901860b2dae894998a9c8dbd0b86c8f6e4496efa26154f0cc4e027fa5",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-dns-service",
+        "version": "v1.70.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4c03761c20341be08ccec3ae1d1540e708ab36996ad19699e2d6fde5f8654721",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 188,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-dns-service",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-dns-service:v1.70.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.70.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-dns-service:v1.70.0@sha256:0f1dd712ef2d4e15ccafecd377f601810784d510dd31fc4d8bbed02577721768",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-dns-service-admission-runtime",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-runtime:v1.70.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-runtime:v1.70.0@sha256:36bc0be7134d5813d2f11d3b9f725d53980f1f5e42f535b9b71265d5e7e07c8a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-dns-service-admission-runtime",
+        "version": "v1.70.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4c99065894af1e954ef294497fdce2c0ca82eba323fe5762033f0be24ceed13f",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 216,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.70.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:57fc2ec447f3ea70ae6e6a7b9b41a9494ff51c6599fd4015a0b4a3f4670a6f0e",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1050,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.70.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6981db185ce85e4f3c178b84c7a65d7de54b772b01fe4db996e861b909cd4f63",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.70.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "283f82014f8c6ddfcc712341a80daa31b660cce1",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-dns-service",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "dns-controller-manager",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "dns-controller-manager",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/dns-controller-manager",
+                  "resourceId": {
+                    "name": "dns-controller-manager"
+                  },
+                  "sourceRepository": "github.com/gardener/external-dns-management",
+                  "tag": "v0.28.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/external-dns-management",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

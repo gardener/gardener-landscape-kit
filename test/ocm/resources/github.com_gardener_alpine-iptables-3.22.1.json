@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/alpine-iptables",
+    "version": "3.22.1",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "teamname": "gardener/alpine-iptables-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-08-05T13:09:11Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "alpine-iptables",
+        "version": "3.22.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/alpine-iptables:3.22.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "3.22.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-iptables:3.22.1@sha256:c2d52d1512f276fc00b1a4595bdccaa95daf3e56cdcbd53490b72d40e9e1d159",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "3.22.1",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ab621c854b6a592bedacc10b12aea2841d7cfb50342e9e379e42b56c4a680b88",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 118,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "3.22.1",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "the repository does not include any source, but only a Dockerfile.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "4e0ca0f5286b5f25a124100bd7aae93c99aa9478",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/alpine-iptables",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-os-suse-chost",
+    "version": "v1.31.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "MrBatschner"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-16T11:10:33Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:42750cc0ec2333e2df0816c93b733780b6d8c915841a4c2ceda864abda014114",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 647,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:65a5bc3a7795ca15746f72a4de0b13f4b97dfab621f6bab2ef475d57be9bc7d5",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4753,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-os-suse-chost",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/os-suse-chost:v1.31.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.31.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/os-suse-chost:v1.31.0@sha256:887a1b374676b2de6619843c1c5503241a61d49d62c6c11ae8f0992ae90ec38a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "os-suse-chost",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/os-suse-chost:v1.31.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/os-suse-chost:v1.31.0@sha256:10bc1312b974a96c15bd6d9593c8a2da61d533586e8de009254a42bd92268560",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "os-suse-chost",
+        "version": "v1.31.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:900b04d0952721eb7181cc4a57d82979d5693e08aa01f61f4b4b206ed01e8cb6",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 180,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.31.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9aed8f63f25eee1af58768edd8994fc5d38df8c0b5d6519e86472715dd1cd5cb",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1427,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.31.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:82ec9592d4714459ef27107ab868cb30a0035a54f257a971ad26a9e295ca529f",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 4096,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.31.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "2212a99184aab176cf5dda72a910ad873d1d7adf",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-os-suse-chost",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

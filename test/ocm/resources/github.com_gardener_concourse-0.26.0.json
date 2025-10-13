@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/concourse",
+    "version": "0.26.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "github_hostname": "github.com",
+            "teamname": "gardener/ci-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      },
+      {
+        "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+        "value": {
+          "comment": "the repository does not contain source code, but only the\nbuild-description of concourse-ci\n",
+          "policy": "skip"
+        }
+      }
+    ],
+    "creationTime": "2025-09-16T17:46:48Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "concourse-web",
+        "version": "0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-web:0.26.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.26.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cicd/concourse-web:0.26.0@sha256:5b606a557b97833f5d891205f36428478ff6e46f35a854c105fdd299d30c53eb",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "concourse-resource-time",
+        "version": "0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "none",
+              "confidentiality_requirement": "none",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-resource-time:0.26.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.26.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cicd/concourse-resource-time:0.26.0@sha256:914cb3fdf1ba77e106b836040c39f1ccc867f9b8c431f22ab498406246c347ff",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "concourse-resource-git",
+        "version": "0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-resource-git:0.26.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.26.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cicd/concourse-resource-git:0.26.0@sha256:dc7c9a0209e4ec00d836aee67f2362dc1dbb1df6c3680b802464c30a0637de94",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "concourse-worker",
+        "version": "0.26.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cicd/concourse-worker:0.26.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.26.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/cicd/concourse-worker:0.26.0@sha256:638ee10ee1177ef33df55f837cdfcbec5237eedc417a441b605b9a279ab90b86",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "0.26.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 1024,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.26.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "b1297da1b8d8ae60e0b24c33632d1da7feb60d01",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/concourse",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

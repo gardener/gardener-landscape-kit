@@ -1,0 +1,217 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardenlogin",
+    "version": "v0.7.1",
+    "creationTime": "2025-08-21T13:33:23Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardenlogin",
+        "version": "v0.7.1",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5e8d74911101e4938ffe6a9bdf4dab9e7fd6bc90dcd361dd9c87b0c8347f780e",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 63513600,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenlogin",
+        "version": "v0.7.1",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f5ad55e523570cac47ab52b41a4d5d276ad9cdef3c82b05a67ad20536a2694f2",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 62849113,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenlogin",
+        "version": "v0.7.1",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:dcb3a5f2aad41f97e98b7b8b1e55a6c4e2faf3cb7440a910643e711b3c6d8f84",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 60353405,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenlogin",
+        "version": "v0.7.1",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:bcbc2dd2eeface439e3e459482dea355cc6548925747836442960ae0141f6c58",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 60993714,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardenlogin",
+        "version": "v0.7.1",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:fa3ba5e18a82644b4f0f11f26912db367c5f58abaebbfd5e1255d64bb1b17faf",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 63085456,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.7.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a69d4261d267d0d173a3e572cf840e92b5e9711fb35a861bbbb9772846ce5320",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1480,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.7.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:aa8604ca09a47e4bbc89ba7b03a991ae36c6c9465257c3d2d96cbab512aef39f",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2782,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.7.1",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2ea36657455161ac66ba62dbe37ae51167c77295bdd83eb8ec9d3e0f512eb277",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 269,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.7.1",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b9973d7a51d594dea865655d6616d4eee4231c051cdb0f422b212efc2d162205",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.7.1",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "46014d029d61780000044d748b4fa07c770e501d",
+          "ref": "refs/heads/hotfix-v0.7",
+          "repoUrl": "github.com/gardener/gardenlogin",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

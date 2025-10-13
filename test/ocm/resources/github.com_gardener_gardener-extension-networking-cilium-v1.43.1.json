@@ -1,0 +1,600 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-networking-cilium",
+    "version": "v1.43.1",
+    "labels": [
+      {
+        "name": "imagevector.gardener.cloud/images",
+        "value": {
+          "images": [
+            {
+              "name": "kube-proxy",
+              "repository": "registry.k8s.io/kube-proxy",
+              "sourceRepository": "github.com/kubernetes/kubernetes"
+            }
+          ]
+        }
+      }
+    ],
+    "creationTime": "2025-09-18T12:58:42Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "admission-cilium-runtime",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-runtime:v1.43.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-runtime:v1.43.1@sha256:8add60eb0598df5ae0460be39faabdd373407351d74d8956888eebf5a336f58a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-cilium-runtime",
+        "version": "v1.43.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5a6a9082aa087ecbcde9497b7f26ef5049d96b4c52088c2e7d0aa0f4a5b4f8d8",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 194,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-admission-cilium",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/admission-cilium:v1.43.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.43.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/admission-cilium:v1.43.1@sha256:fff3b45b3d82804200216dc439f41cfa14f8727f03301c56c71f3d19b861ae36",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-cilium-application",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-application:v1.43.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-cilium-application:v1.43.1@sha256:2072a37c28ce976451213cf013d8e34bc281761ad76afb56bf9a4705e4579b7e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-cilium-application",
+        "version": "v1.43.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8766339cb0fd53717aef11ecef5fadddaf0c9486786faed1c65ae3d4ef0c73c5",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 198,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-networking-cilium",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/networking-cilium:v1.43.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.43.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/networking-cilium:v1.43.1@sha256:55adcc40fc1942b231b0c7503df8f31c20a75e4279ed869ea95be1a03f3b80b4",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "networking-cilium",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/networking-cilium:v1.43.1"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/networking-cilium:v1.43.1@sha256:3628969ddacdb9120102ac128290c75ca94ea4486e27f3137f06cef0efb5063e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "networking-cilium",
+        "version": "v1.43.1",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:32344bc77c43b2e27bb390e5f408edf1799333b53f75e1731a2f89a59d631bb2",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 188,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3ca7d1b8257d0c9c287baac83e97e99048c56ae7390e13e032b220bee9656a49",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1447,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:95dcc409654af44b6bc55a7850007bab6544636b7038c2e0fb78329d938cbb76",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 6804,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "cilium-agent",
+        "version": "v1.17.7",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/package-versions",
+            "value": [
+              {
+                "name": "v8",
+                "version": "12.9.202.27"
+              }
+            ]
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cilium-agent"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/cilium"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/cilium"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/cilium:v1.17.7"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/cilium:v1.17.7@sha256:b6ace519219866b0ec35d562714d83906167360c98d6b2cf89808c13c46f4326",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cilium-envoy",
+        "version": "v1.33.6-1754542786-4d9638583910acb3e34d77e436cbd745d910a437",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/package-versions",
+            "value": [
+              {
+                "name": "c-ares",
+                "version": "1.21.0"
+              }
+            ]
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cilium-envoy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/cilium-envoy"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/cilium"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/cilium-envoy:v1.33.6-1754542786-4d9638583910acb3e34d77e436cbd745d910a437"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/cilium-envoy:v1.33.6-1754542786-4d9638583910acb3e34d77e436cbd745d910a437@sha256:dab78552a5dc3e0c118c02fc03a051d051c87495dd96d7bbb9216790d5e946ef",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "cilium-operator",
+        "version": "v1.17.7",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cilium-operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/operator"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/cilium"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/operator:v1.17.7"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/operator:v1.17.7@sha256:fe241a1bf677da38875a35e496d03e4f331a01a2e69d05c798248f9f47823a60",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "hubble-ui",
+        "version": "v0.13.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "hubble-ui"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/hubble-ui"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/hubble-ui"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/hubble-ui:v0.13.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/hubble-ui:v0.13.2@sha256:109284fa36fde4acdd3c774401ef8247754d08d438286eff7612ec3456a2afdc",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "hubble-ui-backend",
+        "version": "v0.13.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "hubble-ui-backend"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/hubble-ui-backend"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/hubble-ui-backend"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/hubble-ui-backend:v0.13.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/hubble-ui-backend:v0.13.2@sha256:2fe3ef0c87a58cac7c802328eae33a697b5d432bb4849dbe24f0b2a010bf32de",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "hubble-relay",
+        "version": "v1.17.7",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "hubble-relay"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/hubble-relay"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/hubble-ui"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/hubble-relay:v1.17.7"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/hubble-relay:v1.17.7@sha256:227a65bf87409ea376c9b90e4bcf85e64f4c65214ae0950560e285d05f81ba91",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "certgen",
+        "version": "v0.2.4",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "certgen"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "quay.io/cilium/certgen"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/cilium/certgen"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "quay.io/cilium/certgen:v0.2.4"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/quay_io/cilium/certgen:v0.2.4@sha256:75bc5d737100f41dacc7205596a48b60b139b2f9358a4b376da7e17a385a8b8a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.43.1",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2bb0f1cb9be7d0a2868bdc526250d6f19cf9ba914caabf2cb6402c64ded7d52d",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 430,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.43.1",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:01547e10e4542783d00be6270ad8763a456ce0d9907957afb2f0c16cc3c82848",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.43.1",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "d2dfac71376a25ea6f1c35c7e95f7eee514fb039",
+          "ref": "refs/heads/release-v1.43",
+          "repoUrl": "github.com/gardener/gardener-extension-networking-cilium",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/vpn2",
+    "version": "0.41.1",
+    "creationTime": "2025-08-12T16:07:33Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "vpn-server",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-server:0.41.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.41.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-server:0.41.1@sha256:fd0535996e332e977eeb2ddc0490bda74b23102e61e21db6ca59bc329a3a1762",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "vpn-client",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-client:0.41.1"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.41.1"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-client:0.41.1@sha256:b9c8192128008a59498e9a3f117f9c7c2a4811ce7307e91f6776858168b2b6a3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a16e0866674599b0032b45c073bf6e3bb55b8c26f2db868a1f2a775e2c5d0dc6",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1400,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:3503909ff7b90e4ad93a5496571813258b77d06b17fbb4b904a1e455c79fa3a7",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2800,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "0.41.1",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 1024,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.41.1",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "3db4dfca5241c33829b3fb52bbc944fbe85102e4",
+          "ref": "refs/heads/release-v0.41",
+          "repoUrl": "github.com/gardener/vpn2",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

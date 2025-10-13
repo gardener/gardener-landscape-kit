@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/diki",
+    "version": "v0.19.2",
+    "creationTime": "2025-08-27T13:03:05Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "none",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/diki:v0.19.2"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.19.2"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/diki:v0.19.2@sha256:340848d0ccce6723644b395580e846b152760f24a5e7ac8332fc801ee22f9f3a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.19.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nEnabled by https://github.com/gardener/diki/pull/333\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2e677d2f9248d024996eb694ea19a6b17f843ea5e7d30eb529c8c38c4bdaf16c",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1576,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.19.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:fb081e0a786e9854c4401572f55449a8a41fc4d7674cd82a6452425351aa9dc4",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 14445,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:89689841708c398dfbe910f3c7a02a7f07261b88c6f74a07eb8fea8ead635919",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 100395794,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ae6a4f0fe2cfda04c05895431b7980d98565ab4bee32f2f3c0bc485f64c14c2b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 102856471,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "windows"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:64d7f26c0f6b833513593c7916e12f2a4fc9841cc749625ca9eb6fdae4ad71c2",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 103863296,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "extraIdentity": {
+          "architecture": "amd64",
+          "os": "darwin"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:e27ba56c9bfb9c79dc27974ef178eb865f4b92c30b56057933e317004f341bb4",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 103623968,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki",
+        "version": "v0.19.2",
+        "extraIdentity": {
+          "architecture": "arm64",
+          "os": "linux"
+        },
+        "type": "executable",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:78cfbd0d419cd507ced704744f6b5494c5604bb99198b0c898dfe8eef1638e9b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 98972837,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "diki-ops",
+        "version": "v0.19.2",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "diki-ops"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/diki-ops"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/diki"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/diki-ops:v0.19.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/diki-ops:v0.19.2@sha256:89e86239c43c7ca5734a870c28f98bbe5bdf428f695de343d39499177b465fd0",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.19.2",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:55d907e8005a15f8057575437d93e8ce2e9bd5c21b63c6e050af135dbc747d9c",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 454,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.19.2",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f9dda3d132a32b659f37626c8759c302b135af0a4e863dbc37893740e84759d1",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.19.2",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "3259279fdb714fa4d4449b30e16c85be72ffc375",
+          "ref": "refs/heads/release-v0.19.0",
+          "repoUrl": "github.com/gardener/diki",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

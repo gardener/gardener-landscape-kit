@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-discovery-server",
+    "version": "v0.7.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-07-10T09:19:32.900986+00:00"
+      }
+    ],
+    "creationTime": "2025-07-10T09:19:32.901043+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-discovery-server",
+        "version": "v0.7.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/gardener-discovery-server:v0.7.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.7.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/gardener-discovery-server:v0.7.0@sha256:6e97c9669ac7b990cb1974e182a9973e57e058f76a19cb71e630afe4c5b532ff",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.7.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-discovery-server/pull/70\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:89883aef7d118e7c94d488efebe0b17ff0bf510d984c9af42ec158be39bfdefa",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5498,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.7.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:1667c737a237425def0a0fe884003c20da01310b7ba8dd2b4a52fb2f06ea8302",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1289,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-discovery-server",
+        "version": "v0.7.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "7006304d51faa210b31d59162bc14234456ac31d",
+          "ref": "refs/tags/v0.7.0",
+          "repoUrl": "github.com/gardener/gardener-discovery-server",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

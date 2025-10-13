@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-registry-cache",
+    "version": "v0.17.2",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-09-18T15:07:42.348170+00:00"
+      }
+    ],
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-registry-cache",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/registry-cache:v0.17.2"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.17.2"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/registry-cache:v0.17.2@sha256:38a40584bcc4061dcd9d93d7ce78786fe86b57cdaae56855508f7cb31bf13251",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gardener-extension-registry-cache-admission",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/registry-cache-admission:v0.17.2"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.17.2"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/registry-cache-admission:v0.17.2@sha256:546d2cd3d2946b5b9d2392aca0597f611959fd86a821b34a74005df913ae7dd6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "registry-cache",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/registry-cache:v0.17.2"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/registry-cache:v0.17.2@sha256:a83c6adc5312efd69e369a5ed6cc51548e694e40e9c09b7eb5f4d1952be949f6",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-registry-cache-application",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-registry-cache-application:v0.17.2"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-registry-cache-application:v0.17.2@sha256:debd28ca2699594740a6f74b61f39e692f528db5c2600fb29bd6b8cc6b38e2b3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "admission-registry-cache-runtime",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-registry-cache-runtime:v0.17.2"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/admission-registry-cache-runtime:v0.17.2@sha256:ba93c09e81979c162561b3bcd8bece4b7abb6f3328792579fb3712b7ea464b6e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "registry",
+        "version": "3.0.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/registry"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/distribution/distribution"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/3rd/registry:3.0.0@sha256:8e2051101049aa6d9294f064f04711ea43097443d6ce1506399c09c6dc856c0c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "registry-cache",
+        "version": "v0.17.2",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b5afccdeaf490a27af00522209ae7b073e905c439e4a18089487ca5f0f113905",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 182,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "admission-registry-cache-application",
+        "version": "v0.17.2",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:416c7ac3e1a8b6bdf441f861245ee8023e28b91e0dfa85341de27cd7abd56177",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 214,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "admission-registry-cache-runtime",
+        "version": "v0.17.2",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:477383b5db35f0055f83adf7c0f323a3914a6f613d044a8954e6e39656d44375",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 210,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-extension-registry-cache/pull/272\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b3a7ef73fe7b54809020c38419cb9d22227e9760a062afd097491ee78092fc3c",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 7120,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.17.2",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a9dd4f42e43c154bc31e52dc604610be496df6a4c4b05d10761b853825b4b842",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 268,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.17.2",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2c8130e20956049f40ac9a028c1473ba6da800d65d9ec6cb0f551003a0ac2525",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-extension-registry-cache",
+        "version": "v0.17.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "7abf62edbdcabf29e9ebec90c65e4c7614244c80",
+          "ref": "refs/tags/v0.17.2",
+          "repoUrl": "github.com/gardener/gardener-extension-registry-cache",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

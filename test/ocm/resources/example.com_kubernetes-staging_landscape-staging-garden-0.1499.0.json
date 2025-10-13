@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "example.com/kubernetes-staging/landscape-staging-garden",
+    "version": "0.1499.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-09-29T19:11:55.557550+00:00"
+      }
+    ],
+    "creationTime": "2025-09-29T19:11:55.557646+00:00",
+    "repositoryContexts": [
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "release-notes-archive",
+        "version": "0.1499.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:76a9e49037b36e127baa435b6640d3b64361d2731dea09eed9b73e5fa790c22b",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "example_com_kubernetes_landscape-setup",
+        "version": "0.6914.2",
+        "componentName": "example.com/kubernetes/landscape-setup",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "gardenlinux",
+        "version": "1877.3",
+        "componentName": "github.com/gardenlinux/gardenlinux",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

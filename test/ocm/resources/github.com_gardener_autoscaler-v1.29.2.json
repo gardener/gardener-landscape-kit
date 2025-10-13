@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/autoscaler",
+    "version": "v1.29.2",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2024-10-23T07:36:22.472768+00:00"
+      }
+    ],
+    "creationTime": "2024-10-23T07:36:22Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "internal",
+    "resources": [
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.29.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.29.2"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.29.2@sha256:dbe066f3b54fe90051aa43ca17b00293043e27a1b2432c90300072c0d4f3197a",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "dbe066f3b54fe90051aa43ca17b00293043e27a1b2432c90300072c0d4f3197a"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_autoscaler",
+        "version": "v1.29.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "path_config": {
+                "exclude_paths": [
+                  ".*/aws-sdk-go/.*",
+                  "^vendor/.*",
+                  ".*/vendor/.*",
+                  ".*/cloudprovider/((?!mcm/).)*/.*",
+                  "^addon-resizer/.*",
+                  "^vertical-pod-autoscaler/.*"
+                ]
+              },
+              "policy": "scan"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "e16e8551ef796d842689f070a461f65b854c9b40",
+          "ref": "refs/tags/v1.29.2",
+          "repoUrl": "github.com/gardener/autoscaler",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

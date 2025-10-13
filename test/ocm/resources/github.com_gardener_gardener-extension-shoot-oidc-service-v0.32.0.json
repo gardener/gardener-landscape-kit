@@ -1,0 +1,196 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-oidc-service",
+    "version": "v0.32.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-07-09T09:44:49.767963+00:00"
+      }
+    ],
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-shoot-oidc-service",
+        "version": "v0.32.0",
+        "labels": [
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-oidc-service:v0.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.32.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-oidc-service:v0.32.0@sha256:3fcec48030502fdfbeff15016f709d460162150bbf5977832aed4476718fc64c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-oidc-service",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service:v0.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service:v0.32.0@sha256:8d28359dbc79f682045a96e2338b0c5eeb5da83cc5959509f9280751935d931c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-oidc-service",
+        "version": "v0.32.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a63c98d86a2bd3c974626b5dc5999cce661f15b23958b40f2ef40ffc1b393b3d",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 190,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/gardener-extension-shoot-oidc-service/pull/248\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:ffb406f442efe951bb970f099e62b9ca937dfd792ecc331e40f831f6115cc0f8",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5829,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.32.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:cf32db453172183d40b23a5b325f97a646d4ba6399cff6409a66c3e63a67e8cd",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 2395,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-extension-shoot-oidc-service",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "581104ca635b1f489260296db96312a347eb94e8",
+          "ref": "refs/tags/v0.32.0",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-oidc-service",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "oidc-webhook-authenticator",
+        "version": "v0.37.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "labels": [
+                    {
+                      "name": "cloud.gardener.cnudie/responsibles",
+                      "value": [
+                        {
+                          "type": "githubUser",
+                          "username": "dimityrmirchev"
+                        },
+                        {
+                          "email": "vpnachev",
+                          "type": "githubUser"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": "oidc-webhook-authenticator",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/oidc-webhook-authenticator",
+                  "resourceId": {
+                    "name": "oidc-webhook-authenticator"
+                  },
+                  "sourceRepository": "github.com/gardener/oidc-webhook-authenticator",
+                  "tag": "v0.37.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/oidc-webhook-authenticator",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

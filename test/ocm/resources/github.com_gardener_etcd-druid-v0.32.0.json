@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/etcd-druid",
+    "version": "v0.32.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "teamname": "gardener/etcd-druid-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-01T03:42:14Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9d988127779e5e6a02af62057c46a453bbdc5a903c566ee261b79851e5c3d0ce",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 3345,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "etcd-druid",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/etcd-druid:v0.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.32.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/etcd-druid:v0.32.0@sha256:4826bff37aa2acf033a86b1a236dda9628e953cfa90e4db8f76c6f962c4dbdce",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "etcd-druid",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/etcd-druid:v0.32.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/etcd-druid:v0.32.0@sha256:6a5dbff74bb49efb12bc5ec71bddf077bec612ad212dbc7624ba46bbe959a2f3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "etcd-druid",
+        "version": "v0.32.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f195ba76ae2eb57d952ff03629cca69350833d225510d22d2716e7a709b19c76",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 155,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "alpine",
+        "version": "3.21.3",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "alpine"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/public/3rd/alpine"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/public/3rd/alpine:3.21.3"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/public/3rd/alpine:3.21.3@sha256:afe8fe3db69da44dbaabe317e37cfb29087954de310ef7d22f1d441e3ad5979a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.32.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c78f4af7b6a97de1965b6a3c96d8ce8de065a00ac21b1e7468759e1d2d37aea4",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 2069,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.32.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4d273a724c136cce2d08c9740f0edb8685efacf53b2154859a9a4084fcba3c9e",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 8704,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.32.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "460d33b911f3cfb25f33f3c55f902d687e2d698b",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/etcd-druid",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "etcd-wrapper",
+        "version": "v0.5.2",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "etcd-wrapper",
+                  "repository": "europe-docker.pkg.dev/gardener-project/public/gardener/etcd-wrapper",
+                  "resourceId": {
+                    "name": "etcd-wrapper"
+                  },
+                  "sourceRepository": "github.com/gardener/etcd-wrapper",
+                  "tag": "v0.5.2"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/etcd-wrapper",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "etcd-backup-restore",
+        "version": "v0.38.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "etcd-backup-restore",
+                  "repository": "europe-docker.pkg.dev/gardener-project/public/gardener/etcdbrctl",
+                  "resourceId": {
+                    "name": "etcdbrctl"
+                  },
+                  "sourceRepository": "github.com/gardener/etcd-backup-restore",
+                  "tag": "v0.38.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/etcd-backup-restore",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

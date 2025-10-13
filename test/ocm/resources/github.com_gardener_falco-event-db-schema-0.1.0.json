@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/falco-event-db-schema",
+    "version": "0.1.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "teamname": "gardener/gardener-extension-shoot-falco-service-maintainers",
+            "type": "githubTeam"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-08-07T11:26:34Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "0.1.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "pybandit"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use bandit (linter) for SAST scans\nsee: https://bandit.readthedocs.io/en/latest/\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f31bbbeffdaebeabb8a3f32ee531614449bebd41c9ddeee123e16875878de98c",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 537,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "falco-event-db-schema",
+        "version": "0.1.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/falco-event-db-schema:0.1.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.1.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/falco-event-db-schema:0.1.0@sha256:0c59456ecbe197fb5bd39973c55ab0aa377cdd6593ac44beb4f7afc0ea4fcb4a",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.1.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:0f1aed8b8a1832e7e9faa73e3c2d726c2ea39026240e232c4d10cfb40fbb6df3",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 125,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.1.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "3674eb14c3fa45ad9765a1f55e0a46472a830d9a",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/falco-event-db-schema",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

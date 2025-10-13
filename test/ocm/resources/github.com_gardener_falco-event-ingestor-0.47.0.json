@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/falco-event-ingestor",
+    "version": "0.47.0",
+    "creationTime": "2025-09-18T11:05:26Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "falco-event-ingestor",
+        "version": "0.47.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "public",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/falco-event-ingestor:0.47.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.47.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/falco-event-ingestor:0.47.0@sha256:f0bafcb3ef665247e4317c272af663faaf78189d1f927be9e59ecd47f43ee0f8",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "0.47.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:2d252c7d7621a98769d9057ed37a725786e648d8df7a3c4db4d49dad6de380c7",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 648,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.47.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:00a5bdd5610ce91baa26f7981fb08f893578e7602e20988323db6476c108cbeb",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4030,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.47.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b55159580b772ae8002e2e1bc170e5a8828ddb60df5479a5ea50dcfad53565c1",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 200,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "0.47.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:1669da43cef1a78a7e7ea776ea64072e70bb49dfe18b5a5ea4f465be48b410ce",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2048,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.47.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "dd9b7e2b87ca1d62aa9d9e88e7f32376b9c798c0",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/falco-event-ingestor",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

@@ -1,5 +1,7 @@
 /hack/tools/bin
 /dev
+/output/
+/.idea/
 
 *.test
 *.coverprofile

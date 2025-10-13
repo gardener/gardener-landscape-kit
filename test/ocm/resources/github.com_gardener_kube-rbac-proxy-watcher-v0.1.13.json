@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/kube-rbac-proxy-watcher",
+    "version": "v0.1.13",
+    "creationTime": "2025-09-22T05:04:44Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v0.1.13",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:7cc633f9b6ec6c9ebc15568087ed08f41fd6b96017d25be13173b2f94af7cdbb",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 645,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "kube-rbac-proxy-watcher",
+        "version": "v0.1.13",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/kube-rbac-proxy-watcher:v0.1.13"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.1.13"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/kube-rbac-proxy-watcher:v0.1.13@sha256:c58f88f681a796df3bf2e509ee4cf1955b70cf9b4df608f52b719e3bd2174a18",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.1.13",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f7a4d5dd106e71c71484689f42c5406b94c6bc7a5b90db87c0e01afcb86357f8",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 747,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.1.13",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5d4dfa514bd13a45022f1c88121ac6ebb926e7508336bb32b330d995a1dd3e31",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3072,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.1.13",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "6960032e2a093af043cd50c26844b095feaeaaa3",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/kube-rbac-proxy-watcher",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

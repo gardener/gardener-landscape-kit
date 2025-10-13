@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-os-gardenlinux",
+    "version": "v0.33.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "MrBatschner"
+          },
+          {
+            "type": "githubUser",
+            "username": "Roncossek"
+          },
+          {
+            "type": "githubUser",
+            "username": "Vincinator"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-09-16T11:52:45Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v0.33.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:31bdd43c614d6a14de15769b18234bf573f8c97bc8b5aed9aacd75bf39750f36",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 648,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.33.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8cb3ca36302e3ce43cbf67a5e5bc0b5828d62c361017e251d11243825dfbba76",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4924,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "os-gardenlinux",
+        "version": "v0.33.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/os-gardenlinux:v0.33.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/os-gardenlinux:v0.33.0@sha256:2d9360bdfdc59cf39cabd40e2a60af7268bb1b21db3569b2ee3b672015406bff",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "os-gardenlinux",
+        "version": "v0.33.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6e8abba4ba1256367b3b85c816f9e579981a4015fd862bc8ec54b48253ee5832",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 182,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-os-gardenlinux",
+        "version": "v0.33.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/os-gardenlinux:v0.33.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.33.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/os-gardenlinux:v0.33.0@sha256:77a93e6fac68211e0038045c4f644127071aafc2d754f253c5d97e47054432b1",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.33.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:69cc4bb9b4016ef216c45eca4455d12995ef914f144fb6fb4e496da8937d8ffc",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 708,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.33.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c08348155e94f233f13e5573c3f05a9b1e7cfd73a0d7d537a62998cdfe79bbbd",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3072,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.33.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "f71b35813928b2f3bdc5fb93118e885f3227f3c7",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-os-gardenlinux",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

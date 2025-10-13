@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-networking-problemdetector",
+    "version": "v0.29.0",
+    "creationTime": "2025-09-01T10:12:32Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "shoot-networking-problemdetector",
+        "version": "v0.29.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-problemdetector:v0.29.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker-pkg-dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-problemdetector:v0.29.0@sha256:e53bb0c0976b2583f3b75d8602c655d5becffdae2c0dc879c0f169efe0266079",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-networking-problemdetector",
+        "version": "v0.29.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6bddd0ed5fd8430355f3996d536a6d02b6ada14cf9c23c1d7eb4ab92f6722fd3",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 218,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.29.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:cbf2cb8dc5a22352df4dbcc47de784b50e5499a034ea185ddfea870b4dd63496",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 654,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.29.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a1428fc1d316dcef499ce07f8e766a13fb4f36806b589a9e68af581f0a526bf8",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 5022,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "gardener-extension-shoot-networking-problemdetector",
+        "version": "v0.29.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "low",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-networking-problemdetector:v0.29.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.29.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-networking-problemdetector:v0.29.0@sha256:b4c5616b1e2b288b6fae6f1d62e7925776bc463aa7ad999064b39f2bf0695ea2",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.29.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f16ab4e5e584761e846b0d9411c0a5b11ecea9a51192c94ceaa6ebcb095b7eca",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 462,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.29.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f8aa194da2de04d84d6b5d429e7f61ecb73f7931466eb49629452c498dafb38b",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 4608,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.29.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "91ff8b673e3ec6233f62ab51816cf57d7713c126",
+          "ref": "refs/heads/main",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-networking-problemdetector",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": [
+      {
+        "name": "network-problem-detector-agent",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "network-problem-detector-agent",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/network-problem-detector",
+                  "resourceId": {
+                    "name": "network-problem-detector"
+                  },
+                  "sourceRepository": "github.com/gardener/network-problem-detector",
+                  "tag": "v0.28.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/network-problem-detector",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "network-problem-detector-controller",
+        "version": "v0.28.0",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/images",
+            "value": {
+              "images": [
+                {
+                  "name": "network-problem-detector-controller",
+                  "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/network-problem-detector",
+                  "resourceId": {
+                    "name": "network-problem-detector"
+                  },
+                  "sourceRepository": "github.com/gardener/network-problem-detector",
+                  "tag": "v0.28.0"
+                }
+              ]
+            }
+          }
+        ],
+        "componentName": "github.com/gardener/network-problem-detector",
+        "digest": {
+          "hashAlgorithm": "",
+          "normalisationAlgorithm": "",
+          "value": ""
+        }
+      }
+    ]
+  }
+}

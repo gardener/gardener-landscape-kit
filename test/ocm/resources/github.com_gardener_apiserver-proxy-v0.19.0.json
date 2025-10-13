@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/apiserver-proxy",
+    "version": "v0.19.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "codeowners"
+          }
+        ]
+      },
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-02-07T15:39:47.534065+00:00"
+      }
+    ],
+    "creationTime": "2025-02-07T15:39:48Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "apiserver-proxy",
+        "version": "v0.19.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "low",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "end-user"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy:v0.19.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver-proxy:v0.19.0@sha256:d3b9d9af4f420682fda692211a170a52702efb0ee3a3a12e1532f6ff10e2e764",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "d3b9d9af4f420682fda692211a170a52702efb0ee3a3a12e1532f6ff10e2e764"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.19.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/apiserver-proxy/pull/143\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b02c31d75eeb73ad8fecf0f0ab8de7ea2ba9dd63047791a2f96502ec423d7b4f",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 4447,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "b02c31d75eeb73ad8fecf0f0ab8de7ea2ba9dd63047791a2f96502ec423d7b4f"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_apiserver-proxy",
+        "version": "v0.19.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "bc9260c10c96fc60fd3a112f0081c30d3dd3c2c4",
+          "ref": "refs/tags/v0.19.0",
+          "repoUrl": "github.com/gardener/apiserver-proxy",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

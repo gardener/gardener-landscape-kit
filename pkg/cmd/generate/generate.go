@@ -29,7 +29,7 @@ gardner-landscape-kit generate --base-dir /path/to/base/dir
 gardner-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /path/to/landscape/dir
 `,
 
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if err := opts.validate(); err != nil {
 				return err
 			}
@@ -49,7 +49,6 @@ gardner-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /pat
 
 func run(_ context.Context, opts *Options) error {
 	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir)
-
 	if opts.LandscapeDir != "" {
 		if err := CreateLandscapeDirStructure(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
 			return err

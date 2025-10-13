@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/logging",
+    "version": "v0.65.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-02-20T20:34:28.869543+00:00"
+      }
+    ],
+    "creationTime": "2025-02-20T20:34:29Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "fluent-bit-to-vali",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "none",
+              "comment": "no data is stored or processed by the installer",
+              "confidentiality_requirement": "none",
+              "integrity_requirement": "none",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/fluent-bit-to-vali:v0.65.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/fluent-bit-to-vali:v0.65.0@sha256:8baf9ff6d8e0a14a18397463e20f9676905a03fa938f74aa9a88de8e8e67ab9c",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "8baf9ff6d8e0a14a18397463e20f9676905a03fa938f74aa9a88de8e8e67ab9c"
+        }
+      },
+      {
+        "name": "vali-curator",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "none",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/vali-curator:v0.65.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/vali-curator:v0.65.0@sha256:802b3887e02442182c7b2536c8d8dc6976bce0bff9581e416169f00eb91997db",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "802b3887e02442182c7b2536c8d8dc6976bce0bff9581e416169f00eb91997db"
+        }
+      },
+      {
+        "name": "telegraf-iptables",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "none",
+              "comment": "telegraf is not accessible from outside the seed cluster and does not interact with confidential data",
+              "confidentiality_requirement": "none",
+              "integrity_requirement": "none",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/telegraf-iptables:v0.65.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/telegraf-iptables:v0.65.0@sha256:0cdc7246bacd91ba7dbbca1ec7284d64e5a36c94850b8b3790c160f1e3124b7f",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "0cdc7246bacd91ba7dbbca1ec7284d64e5a36c94850b8b3790c160f1e3124b7f"
+        }
+      },
+      {
+        "name": "event-logger",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/event-logger:v0.65.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/event-logger:v0.65.0@sha256:2bbf0d3c43fa0fa9e15717d68fb55d5aa4510a4cd53785d1730011601de13306",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "2bbf0d3c43fa0fa9e15717d68fb55d5aa4510a4cd53785d1730011601de13306"
+        }
+      },
+      {
+        "name": "tune2fs",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "none",
+              "integrity_requirement": "none",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/tune2fs:v0.65.0"
+          },
+          {
+            "name": "cloud.gardener/ctt-hint",
+            "value": {
+              "processingRules": [
+                "images"
+              ]
+            }
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "repo.example.com/staging/europe-docker_pkg_dev/gardener-project/releases/gardener/tune2fs:v0.65.0@sha256:5e3afe34a8f7316f3033cd7a7f6f8204642d0ebf382640d48047343294a1d72a",
+          "type": "ociRegistry"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "ociArtifactDigest/v1",
+          "value": "5e3afe34a8f7316f3033cd7a7f6f8204642d0ebf382640d48047343294a1d72a"
+        }
+      },
+      {
+        "name": "verify-build-step-log",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/logging/pull/261\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:55c37520b4d4dbae4f3c2fd9d630c7a4280f295134c527c111c41d72834a0d29",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6680,
+          "type": "localBlob/v1"
+        },
+        "digest": {
+          "hashAlgorithm": "SHA-256",
+          "normalisationAlgorithm": "genericBlobDigest/v1",
+          "value": "55c37520b4d4dbae4f3c2fd9d630c7a4280f295134c527c111c41d72834a0d29"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_logging",
+        "version": "v0.65.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "We use gosec for sast scanning, see attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "c98630093a5a2900105ae2509de1c1f75dc409f0",
+          "ref": "refs/tags/v0.65.0",
+          "repoUrl": "github.com/gardener/logging",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

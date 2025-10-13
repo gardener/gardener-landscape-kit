@@ -13,6 +13,7 @@ import (
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd/resolveocm"
 )
 
 // Name is a const for the name of this component.
@@ -45,6 +46,7 @@ func NewCommand() *cobra.Command {
 
 	for _, subcommand := range []*cobra.Command{
 		generate.NewCommand(opts),
+		resolveocm.NewCommand(opts),
 	} {
 		cmd.AddCommand(subcommand)
 	}
