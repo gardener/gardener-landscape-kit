@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/meta"
 )
 
 const (
@@ -24,11 +24,8 @@ const (
 	FluxRuntimeClusterDirName = RuntimeClusterDirName + "/flux-system"
 )
 
+// GenerateFluxSystemCluster generates the flux-system cluster instance in the given landscape directory.
 func GenerateFluxSystemCluster(log logr.Logger, landscapeDir string, fs afero.Afero) error {
-	if err := generateFluxSystemDir(landscapeDir, fs); err != nil {
-		return err
-	}
-
 	generatedFluxInstance, err := generateFluxInstance()
 	if err != nil {
 		return err
@@ -38,36 +35,22 @@ func GenerateFluxSystemCluster(log logr.Logger, landscapeDir string, fs afero.Af
 	if err != nil {
 		return err
 	}
-	if err := createOrUpdateManifest(generatedFluxInstance, landscapeDir, fluxInstanceFilePath, fs); err != nil {
+	if err := meta.CreateOrUpdateManifest(generatedFluxInstance, landscapeDir, fluxInstanceFilePath, fs); err != nil {
 		return err
+	}
+	if !instanceFileExisted {
+		logFluxFirstSteps(log, landscapeDir, fluxInstanceFilePath)
 	}
 
 	upgradeResource, err := generateFluxOperatorAutoUpgradeResource()
 	if err != nil {
 		return err
 	}
-	if err = createOrUpdateManifest(upgradeResource, landscapeDir, path.Join(FluxRuntimeClusterDirName, FluxOperatorFileName), fs); err != nil {
+	if err = meta.CreateOrUpdateManifest(upgradeResource, landscapeDir, path.Join(FluxRuntimeClusterDirName, FluxOperatorFileName), fs); err != nil {
 		return err
-	}
-
-	if !instanceFileExisted {
-		logFluxFirstSteps(log, landscapeDir, fluxInstanceFilePath)
 	}
 
 	return nil
-}
-
-func generateFluxSystemDir(landscapeDir string, fs afero.Afero) error {
-	return fs.MkdirAll(path.Join(landscapeDir, FluxRuntimeClusterDirName), 0700)
-}
-
-// TODO(LucaBernstein): Extract and properly implement: Calculate diff and only apply changes to already existing file.
-func createOrUpdateManifest[T client.Object](obj T, landscapeDir, filePath string, fs afero.Afero) error {
-	objYaml, err := yaml.Marshal(obj)
-	if err != nil {
-		return err
-	}
-	return fs.WriteFile(path.Join(landscapeDir, filePath), objYaml, 0600)
 }
 
 func logFluxFirstSteps(log logr.Logger, landscapeDir, fluxInstanceFilePath string) {

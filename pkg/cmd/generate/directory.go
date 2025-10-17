@@ -13,17 +13,15 @@ import (
 
 	"github.com/gardener/gardener-landscape-kit/pkg/clusters"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/meta"
 )
-
-// GLKSystemDirName is the name of the directory that contains system files for gardener-landscape-kit.
-const GLKSystemDirName = ".glk"
 
 // CreateBaseDirStructure creates the base directory structure.
 func CreateBaseDirStructure(log logr.Logger, baseDir string, fs afero.Afero) error {
 	log.Info("Creating base directory", "baseDir", baseDir)
 
 	for _, dirName := range []string{
-		GLKSystemDirName,
+		meta.GLKSystemDirName,
 		components.DirName,
 	} {
 		if err := fs.MkdirAll(path.Join(baseDir, dirName), 0700); err != nil {
@@ -39,7 +37,7 @@ func CreateLandscapeDirStructure(log logr.Logger, landscapeDir string, fs afero.
 	log.Info("Creating landscape directory", "landscapeDir", landscapeDir)
 
 	for _, dirName := range []string{
-		GLKSystemDirName,
+		meta.GLKSystemDirName,
 		components.DirName,
 		clusters.DirName,
 	} {
