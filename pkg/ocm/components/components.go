@@ -41,6 +41,7 @@ func ComponentReferenceFromNameAndVersion(name, version string) ComponentReferen
 // Dependency represents a dependency of a component, including its image vector.
 type Dependency struct {
 	ComponentReference
+
 	ImageVector []ocmimagevector.ExtendedImageSource
 }
 

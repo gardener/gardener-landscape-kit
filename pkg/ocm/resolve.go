@@ -89,7 +89,7 @@ func (r *ocmComponentsResolver) printRepositories() {
 
 func (r *ocmComponentsResolver) ensureOutputDirectories() error {
 	descriptorDir := path.Join(r.outputDir, "descriptors")
-	if err := os.MkdirAll(descriptorDir, 0755); err != nil {
+	if err := os.MkdirAll(descriptorDir, 0700); err != nil {
 		return fmt.Errorf("failed to create output directory %s: %w", descriptorDir, err)
 	}
 	return nil
@@ -116,7 +116,7 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 			return nil, fmt.Errorf("failed to marshal json: %w", err)
 		}
 		filename := cref.ToFilename(path.Join(r.outputDir, "descriptors"))
-		if err := os.WriteFile(filename, data, 0644); err != nil {
+		if err := os.WriteFile(filename, data, 0600); err != nil {
 			return nil, fmt.Errorf("failed to write file %s: %w", filename, err)
 		}
 
@@ -174,7 +174,7 @@ func (r *ocmComponentsResolver) writeComponentList() error {
 	if err != nil {
 		return fmt.Errorf("failed to dump component list as YAML: %w", err)
 	}
-	if err := os.WriteFile(listFilename, []byte(listData), 0644); err != nil {
+	if err := os.WriteFile(listFilename, []byte(listData), 0600); err != nil {
 		return fmt.Errorf("failed to write component list file %s: %w", listFilename, err)
 	}
 	r.log.Info(fmt.Sprintf("Wrote component list to %s", listFilename))
@@ -205,11 +205,11 @@ func writeObject(outputDir string, cref components.ComponentReference, obj any) 
 		return fmt.Errorf("failed to marshal: %w", err)
 	}
 
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	if err := os.MkdirAll(outputDir, 0700); err != nil {
 		return fmt.Errorf("failed to create output directory %s: %w", outputDir, err)
 	}
 	outputFile := cref.ToFilename(outputDir)
-	return os.WriteFile(outputFile, output, 0644)
+	return os.WriteFile(outputFile, output, 0600)
 }
 
 func createRepoAccesses(cfg *config.Config) ([]*ociaccess.RepoAccess, error) {

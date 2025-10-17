@@ -12,6 +12,7 @@ import (
 // ExtendedImageSource is an extended image source that includes additional metadata for internal processing.
 type ExtendedImageSource struct {
 	imagevector.ImageSource
+
 	Labels       []descriptorruntime.Label
 	ResourceName string
 	ResourceID   *ResourceID

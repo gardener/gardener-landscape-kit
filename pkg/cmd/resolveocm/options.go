@@ -82,7 +82,7 @@ func (o *Options) effectiveOutputDir(subdir string) string {
 }
 
 func loadConfigFile(filename string) (*config.Config, error) {
-	data, err := os.ReadFile(filename)
+	data, err := os.ReadFile(filename) // #nosec G304 -- Trusted file from CLI argument.
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/meta"
@@ -24,7 +24,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 	})
 
 	It("should overwrite the manifest file if no meta file is present yet", func() {
-		obj := &v1.ConfigMap{
+		obj := &corev1.ConfigMap{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "v1",
 				Kind:       "ConfigMap",
@@ -55,7 +55,7 @@ metadata: {}`
 	})
 
 	It("should patch only changed default values on subsequent generates and retain custom modifications", func() {
-		obj := &v1.ConfigMap{
+		obj := &corev1.ConfigMap{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "v1",
 				Kind:       "ConfigMap",

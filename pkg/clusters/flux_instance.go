@@ -8,7 +8,7 @@ import (
 	_ "embed"
 	"time"
 
-	"github.com/controlplaneio-fluxcd/flux-operator/api/v1"
+	v1 "github.com/controlplaneio-fluxcd/flux-operator/api/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -17,8 +17,8 @@ const (
 	FluxInstanceFileName = "flux-instance.yaml"
 )
 
-func generateFluxInstance() (*v1.FluxInstance, error) {
-	o := &v1.FluxInstance{
+func generateFluxInstance() *v1.FluxInstance {
+	return &v1.FluxInstance{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "FluxInstance",
 			APIVersion: "fluxcd.controlplane.io/v1",
@@ -71,5 +71,4 @@ func generateFluxInstance() (*v1.FluxInstance, error) {
 			},
 		},
 	}
-	return o, nil
 }

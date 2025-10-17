@@ -26,10 +26,7 @@ const (
 
 // GenerateFluxSystemCluster generates the flux-system cluster instance in the given landscape directory.
 func GenerateFluxSystemCluster(log logr.Logger, landscapeDir string, fs afero.Afero) error {
-	generatedFluxInstance, err := generateFluxInstance()
-	if err != nil {
-		return err
-	}
+	generatedFluxInstance := generateFluxInstance()
 	fluxInstanceFilePath := path.Join(FluxRuntimeClusterDirName, FluxInstanceFileName)
 	instanceFileExisted, err := fs.Exists(path.Join(landscapeDir, fluxInstanceFilePath))
 	if err != nil {
