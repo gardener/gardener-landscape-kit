@@ -5,18 +5,13 @@
 package meta
 
 import (
-	"encoding/json"
-	"maps"
+	"bytes"
 	"os"
 	"path"
-	"slices"
 
-	jsonpatch "github.com/evanphx/json-patch"
-	"github.com/gardener/gardener/pkg/utils"
-	goccyyaml "github.com/goccy/go-yaml"
 	"github.com/spf13/afero"
-	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
-	"k8s.io/apimachinery/pkg/util/sets"
+	"go.yaml.in/yaml/v4"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
 const (
@@ -31,13 +26,6 @@ const (
 // If the manifest file already exists, it patches changes from the newDefaultYaml.
 // Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
 func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs afero.Afero) error {
-	newManifest := newDefaultYaml // default in case no existing manifest is present
-	var newDefaultObj map[string]interface{}
-	newDefaultComments := goccyyaml.CommentMap{}
-	if err := goccyyaml.UnmarshalWithOptions(newDefaultYaml, &newDefaultObj, goccyyaml.CommentToMap(newDefaultComments)); err != nil {
-		return err
-	}
-
 	filePathManifest := path.Join(baseDir, filePath)
 	oldManifest, err := fs.ReadFile(filePathManifest)
 	if err != nil && !os.IsNotExist(err) {
@@ -45,7 +33,7 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 	}
 
 	filePathDefault := path.Join(baseDir, GLKSystemDirName, DefaultDirName, filePath)
-	oldDefaultManifest, err := fs.ReadFile(filePathDefault)
+	oldDefaultYaml, err := fs.ReadFile(filePathDefault)
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
@@ -58,120 +46,289 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 			return err
 		}
 	}
-	if len(oldManifest) > 0 {
-		var oldDefaultObject map[string]interface{}
-		oldDefaultComments := goccyyaml.CommentMap{}
-		if err := goccyyaml.UnmarshalWithOptions(oldDefaultManifest, &oldDefaultObject, goccyyaml.CommentToMap(oldDefaultComments)); err != nil {
-			return err
-		}
 
-		var oldObject map[string]interface{}
-		oldComments := goccyyaml.CommentMap{}
-		if err := goccyyaml.UnmarshalWithOptions(oldManifest, &oldObject, goccyyaml.CommentToMap(oldComments)); err != nil {
-			return err
-		}
-
-		oldDefaultJson, err := json.Marshal(oldDefaultObject)
-		if err != nil {
-			return err
-		}
-		newDefaultJson, err := json.Marshal(newDefaultObj)
-		if err != nil {
-			return err
-		}
-		oldJson, err := json.Marshal(oldObject)
-		if err != nil {
-			return err
-		}
-
-		patch, err := jsonmergepatch.CreateThreeWayJSONMergePatch(oldJson, newDefaultJson, oldDefaultJson)
-		if err != nil {
-			return err
-		}
-
-		newJson, err := jsonpatch.MergePatch(oldJson, patch)
-		if err != nil {
-			return err
-		}
-
-		var newObject map[string]interface{}
-		if err := json.Unmarshal(newJson, &newObject); err != nil {
-			return err
-		}
-		newManifest, err = goccyyaml.MarshalWithOptions(newObject, goccyyaml.WithComment(mergeComments(oldDefaultComments, newDefaultComments, oldComments)))
-		if err != nil {
-			return err
-		}
+	// Parse all three versions
+	var oldDefault, newDefault, current yaml.Node
+	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
+		return err
 	}
-
-	if err := fs.WriteFile(filePathManifest, newManifest, 0600); err != nil {
+	if err := yaml.Unmarshal(oldManifest, &current); err != nil {
 		return err
 	}
 
-	// Write new metadata file
+	// If no old default exists, use empty node (will cause all existing keys to be treated as user-added)
+	if len(oldDefaultYaml) > 0 {
+		if err := yaml.Unmarshal(oldDefaultYaml, &oldDefault); err != nil {
+			return err
+		}
+	}
+
+	// Perform three-way merge
+	merged := threeWayMerge(&oldDefault, &newDefault, &current)
+
+	// Write the merged result back
+	var buf bytes.Buffer
+	encoder := yaml.NewEncoder(&buf)
+	encoder.SetIndent(2)
+	if err := encoder.Encode(merged); err != nil {
+		return err
+	}
+	if err := encoder.Close(); err != nil {
+		return err
+	}
+
+	mergedYaml := buf.Bytes()
+
+	if err := fs.WriteFile(filePathManifest, mergedYaml, 0600); err != nil {
+		return err
+	}
+
+	// Update the default
 	if err := fs.WriteFile(filePathDefault, newDefaultYaml, 0600); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func mergeComments(oldDefault, newDefault, manifest goccyyaml.CommentMap) goccyyaml.CommentMap {
-	var (
-		oldDefaultComments = make(map[string]map[goccyyaml.CommentPosition]*goccyyaml.Comment, len(oldDefault))
-		newDefaultComments = make(map[string]map[goccyyaml.CommentPosition]*goccyyaml.Comment, len(newDefault))
-		manifestComments   = make(map[string]map[goccyyaml.CommentPosition]*goccyyaml.Comment, len(manifest))
-	)
-
-	for commentPath, comments := range oldDefault {
-		oldDefaultComments[commentPath] = utils.CreateMapFromSlice(comments, func(cm *goccyyaml.Comment) goccyyaml.CommentPosition {
-			return cm.Position
-		})
+// threeWayMerge performs a three-way merge of YAML nodes
+// oldDefault: the previous default template
+// newDefault: the new default template
+// current: the user's current version (possibly modified)
+func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
+	// Unwrap document nodes
+	if oldDefault.Kind == yaml.DocumentNode {
+		oldDefault = oldDefault.Content[0]
 	}
-	for commentPath, comments := range newDefault {
-		newDefaultComments[commentPath] = utils.CreateMapFromSlice(comments, func(cm *goccyyaml.Comment) goccyyaml.CommentPosition {
-			return cm.Position
-		})
+	if newDefault.Kind == yaml.DocumentNode {
+		newDefault = newDefault.Content[0]
 	}
-	for commentPath, comments := range manifest {
-		manifestComments[commentPath] = utils.CreateMapFromSlice(comments, func(cm *goccyyaml.Comment) goccyyaml.CommentPosition {
-			return cm.Position
-		})
+	if current.Kind == yaml.DocumentNode {
+		return &yaml.Node{
+			Kind:    yaml.DocumentNode,
+			Content: []*yaml.Node{threeWayMerge(oldDefault, newDefault, current.Content[0])},
+		}
 	}
 
-	oldDefaultCommentsSet := sets.New(slices.Collect(maps.Keys(oldDefaultComments))...)
-	newDefaultCommentsSet := sets.New(slices.Collect(maps.Keys(newDefaultComments))...)
-	sameCommentPaths := oldDefaultCommentsSet.Intersection(newDefaultCommentsSet)
-	addedCommentPaths := newDefaultCommentsSet.Difference(oldDefaultCommentsSet)
+	// If current equals oldDefault (including comments), no user modifications were made - use newDefault
+	if nodesEqual(oldDefault, current, true) {
+		return newDefault
+	}
 
-	for commentPath := range sameCommentPaths.Union(addedCommentPaths) {
-		for position, comment := range newDefaultComments[commentPath] {
-			if oldDefaultComment, exists := oldDefaultComments[commentPath][position]; exists {
-				if newDefaultComment, exists := newDefaultComments[commentPath][position]; exists && slices.Equal(oldDefaultComment.Texts, newDefaultComment.Texts) {
-					continue
+	// Build maps for easier lookup (we only handle mappings for Kubernetes manifests)
+	oldMap := buildMap(oldDefault)
+	currentMap := buildMap(current)
+	newMap := buildMap(newDefault)
+
+	// Create result node preserving current's comments
+	result := &yaml.Node{
+		Kind:        yaml.MappingNode,
+		Style:       newDefault.Style,
+		Tag:         newDefault.Tag,
+		HeadComment: current.HeadComment,
+		LineComment: current.LineComment,
+		FootComment: current.FootComment,
+	}
+
+	// Process keys from newDefault
+	for i := 0; i < len(newDefault.Content); i += 2 {
+		newKeyNode, newValueNode := newDefault.Content[i], newDefault.Content[i+1]
+		key := newKeyNode.Value
+		oldValue, oldExists := oldMap[key]
+		currentValue, currentExists := currentMap[key]
+
+		var resultKeyNode, resultValue *yaml.Node
+
+		if !currentExists {
+			// New key - add from newDefault
+			resultKeyNode, resultValue = newKeyNode, newValueNode
+		} else {
+			resultKeyNode = findKeyNode(current, key)
+
+			// Handle nested structures (mappings and sequences)
+			if currentValue.Kind == yaml.MappingNode && newValueNode.Kind == yaml.MappingNode {
+				if !oldExists {
+					oldValue = &yaml.Node{Kind: yaml.MappingNode}
 				}
-			}
-			if _, exists := manifestComments[commentPath]; !exists {
-				manifestComments[commentPath] = map[goccyyaml.CommentPosition]*goccyyaml.Comment{
-					position: comment,
+				resultValue = threeWayMerge(oldValue, newValueNode, currentValue)
+			} else if currentValue.Kind == yaml.SequenceNode && newValueNode.Kind == yaml.SequenceNode {
+				if !oldExists {
+					oldValue = &yaml.Node{Kind: yaml.SequenceNode}
 				}
-				continue
-			}
-			if _, exists := manifestComments[commentPath][position]; exists {
-				// Append new comment texts before existing comment in manifest.
-				manifestComments[commentPath][position].Texts = append(comment.Texts, manifestComments[commentPath][position].Texts...)
+				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue)
+			} else if oldExists && !nodesEqual(oldValue, newValueNode, false) {
+				// Default changed - use new value with user's comments
+				resultValue = &yaml.Node{
+					Kind: newValueNode.Kind, Value: newValueNode.Value, Style: newValueNode.Style, Tag: newValueNode.Tag,
+					HeadComment: currentValue.HeadComment, LineComment: currentValue.LineComment, FootComment: currentValue.FootComment,
+					Content: newValueNode.Content,
+				}
 			} else {
-				// Add new comment at this position.
-				manifestComments[commentPath][position] = comment
+				// Keep user's version
+				resultValue = currentValue
 			}
 		}
+
+		result.Content = append(result.Content, resultKeyNode, resultValue)
 	}
 
-	for commentPath, comments := range manifestComments {
-		manifest[commentPath] = nil
-		for _, c := range comments {
-			manifest[commentPath] = append(manifest[commentPath], c)
+	// Then add any keys from current that don't exist in newDefault AND didn't exist in oldDefault (user-added keys)
+	for i := 0; i < len(current.Content); i += 2 {
+		keyNode, valueNode := current.Content[i], current.Content[i+1]
+		key := keyNode.Value
+
+		_, existsInNew := newMap[key]
+		_, existedInOld := oldMap[key]
+
+		if !existsInNew && !existedInOld {
+			// Key exists only in current (user-added) - keep it at the end
+			result.Content = append(result.Content, keyNode, valueNode)
 		}
 	}
 
-	return manifest
+	return result
+}
+
+// threeWayMergeSequence performs a three-way merge of YAML sequence nodes (arrays)
+// Arrays are treated as unordered sets - order is not preserved
+func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
+	if nodesEqual(oldDefault, current, true) {
+		return newDefault
+	}
+
+	result := &yaml.Node{
+		Kind:        yaml.SequenceNode,
+		Style:       newDefault.Style,
+		Tag:         newDefault.Tag,
+		HeadComment: current.HeadComment,
+		LineComment: current.LineComment,
+		FootComment: current.FootComment,
+	}
+
+	// Build sets for lookup
+	oldSet := make(map[string]bool)
+	for _, item := range oldDefault.Content {
+		oldSet[nodeToString(item)] = true
+	}
+
+	currentMap := make(map[string]*yaml.Node)
+	for _, item := range current.Content {
+		currentMap[nodeToString(item)] = item
+	}
+
+	// Add user-modified/added items from current
+	for key, item := range currentMap {
+		if !oldSet[key] {
+			result.Content = append(result.Content, item)
+		}
+	}
+
+	// Add items from newDefault (new additions or unchanged items)
+	for _, newItem := range newDefault.Content {
+		key := nodeToString(newItem)
+		if !oldSet[key] {
+			// New template item
+			result.Content = append(result.Content, newItem)
+		} else if currentItem, exists := currentMap[key]; exists {
+			// Unchanged item - use current version for comments
+			result.Content = append(result.Content, currentItem)
+		}
+	}
+
+	return result
+}
+
+// nodeToString converts a node to a string representation for comparison
+func nodeToString(node *yaml.Node) string {
+	if node.Kind == yaml.ScalarNode {
+		return node.Value
+	}
+	// For non-scalar nodes, marshal to YAML for comparison
+	var buf bytes.Buffer
+	encoder := yaml.NewEncoder(&buf)
+	encoder.SetIndent(2)
+	utilruntime.Must(encoder.Encode(node))
+	utilruntime.Must(encoder.Close())
+	return buf.String()
+}
+
+// findKeyNode finds the key node for a given key in a mapping (assumes node is a mapping)
+func findKeyNode(node *yaml.Node, key string) *yaml.Node {
+	for i := 0; i < len(node.Content); i += 2 {
+		if node.Content[i].Value == key {
+			return node.Content[i]
+		}
+	}
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: key}
+}
+
+// buildMap creates a map from YAML mapping node for easier lookup (assumes node is a mapping)
+func buildMap(node *yaml.Node) map[string]*yaml.Node {
+	result := make(map[string]*yaml.Node)
+	for i := 0; i < len(node.Content); i += 2 {
+		key := node.Content[i].Value
+		value := node.Content[i+1]
+		result[key] = value
+	}
+	return result
+}
+
+// nodesEqual checks if two YAML nodes are equal
+// compareComments: if true, comments must also match; if false, only values are compared
+func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
+	if a.Kind != b.Kind {
+		return false
+	}
+
+	// Check comments if requested
+	if compareComments {
+		if a.HeadComment != b.HeadComment ||
+			a.LineComment != b.LineComment ||
+			a.FootComment != b.FootComment {
+			return false
+		}
+	}
+
+	switch a.Kind {
+	case yaml.ScalarNode:
+		return a.Value == b.Value
+	case yaml.SequenceNode:
+		if len(a.Content) != len(b.Content) {
+			return false
+		}
+		// For sequences, always compare in order
+		for i := range a.Content {
+			if !nodesEqual(a.Content[i], b.Content[i], compareComments) {
+				return false
+			}
+		}
+		return true
+	case yaml.MappingNode:
+		if len(a.Content) != len(b.Content) {
+			return false
+		}
+		if compareComments {
+			// When comparing comments, order matters
+			for i := range a.Content {
+				if !nodesEqual(a.Content[i], b.Content[i], true) {
+					return false
+				}
+			}
+		} else {
+			// When ignoring comments, use map comparison (order-independent)
+			aMap := buildMap(a)
+			bMap := buildMap(b)
+			if len(aMap) != len(bMap) {
+				return false
+			}
+			for key, aValue := range aMap {
+				bValue, exists := bMap[key]
+				if !exists || !nodesEqual(aValue, bValue, false) {
+					return false
+				}
+			}
+		}
+		return true
+	}
+	return true
 }
