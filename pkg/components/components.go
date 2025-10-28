@@ -5,27 +5,20 @@
 package components
 
 import (
-	"path"
-
 	"github.com/spf13/afero"
 )
 
 const (
 	// DirName is the directory name where components are stored.
 	DirName = "components"
-
-	// KustomizeBaseDirName is the directory name for the base component.
-	KustomizeBaseDirName = "base"
-	// KustomizeOverlayDirName is the directory name for overlays.
-	KustomizeOverlayDirName = "overlays"
 )
 
 // Options is an interface for options passed to components.
 type Options interface {
 	// GetBaseDir returns the base directory that serves as the foundation (base) for any landscape.
-	GetBaseDir(name string) string
-	// GetLandscapeDir returns the landscape directory. If the returned path is nil, only the base directory should be generated.
-	GetLandscapeDir(name string) string
+	GetBaseDir() string
+	// GetLandscapeDir returns the landscape directory. If the returned path is empty, only the base directory should be generated.
+	GetLandscapeDir() string
 	// GetFilesystem returns the filesystem to use.
 	GetFilesystem() afero.Afero
 }
@@ -43,13 +36,13 @@ type options struct {
 }
 
 // GetBaseDir returns the base directory that serves as the foundation (base) for any landscape.
-func (o options) GetBaseDir(name string) string {
-	return path.Join(o.baseDir, DirName, name, KustomizeBaseDirName)
+func (o options) GetBaseDir() string {
+	return o.baseDir
 }
 
-// GetLandscapeDir returns the landscape directory. If the returned path is nil, only the base directory should be generated.
-func (o options) GetLandscapeDir(name string) string {
-	return path.Join(o.baseDir, DirName, name, KustomizeOverlayDirName)
+// GetLandscapeDir returns the landscape directory. If the returned path is empty, only the base directory should be generated.
+func (o options) GetLandscapeDir() string {
+	return o.landscapeDir
 }
 
 // GetFilesystem returns the filesystem to use.
@@ -58,10 +51,10 @@ func (o options) GetFilesystem() afero.Afero {
 }
 
 // NewOptions returns a new Options instance.
-func NewOptions(baseDir string, landscapeDir string) Options {
+func NewOptions(baseDir string, landscapeDir string, fs afero.Afero) Options {
 	return &options{
 		baseDir:      baseDir,
 		landscapeDir: landscapeDir,
-		filesystem:   afero.Afero{Fs: afero.NewOsFs()},
+		filesystem:   fs,
 	}
 }
