@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package clusters_test
+package kustomization_test
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestMeta(t *testing.T) {
+func TestKustomization(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Clusters Suite")
+	RunSpecs(t, "Kustomization Suite")
 }
