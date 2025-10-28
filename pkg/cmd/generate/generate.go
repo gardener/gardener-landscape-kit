@@ -54,7 +54,7 @@ func run(_ context.Context, opts *Options) error {
 		if err := CreateLandscapeDirStructure(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
 			return err
 		}
-		if err := clusters.GenerateFluxSystemCluster(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
+		if err := clusters.GenerateFluxSystemCluster(opts.Log, opts.BaseDir, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
 			return err
 		}
 	} else {
