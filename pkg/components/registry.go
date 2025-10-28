@@ -24,8 +24,14 @@ func (r *registry) RegisterComponent(component Interface) {
 // Generate generates all registered components. Generation happens serially in the order of registration.
 func (r *registry) Generate(opts Options) error {
 	for _, component := range r.components {
-		if err := component.Generate(opts); err != nil {
-			return err
+		if opts.GetLandscapeDir() == "" {
+			if err := component.GenerateBase(opts); err != nil {
+				return err
+			}
+		} else {
+			if err := component.GenerateLandscape(opts); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

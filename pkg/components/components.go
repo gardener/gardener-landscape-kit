@@ -25,8 +25,10 @@ type Options interface {
 
 // Interface is the components interface that each component must implement.
 type Interface interface {
-	// Generate generates the component.
-	Generate(Options) error
+	// GenerateBase generates the component base dir.
+	GenerateBase(Options) error
+	// GenerateLandscape generates the component landscape dir.
+	GenerateLandscape(Options) error
 }
 
 type options struct {
