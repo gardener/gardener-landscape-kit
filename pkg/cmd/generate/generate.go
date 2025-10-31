@@ -52,14 +52,7 @@ gardener-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /pa
 func run(_ context.Context, opts *Options) error {
 	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir, afero.Afero{Fs: afero.NewOsFs()})
 	if opts.LandscapeDir != "" {
-		if err := CreateLandscapeDirStructure(opts.Log, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
-			return err
-		}
 		if err := clusters.GenerateFluxSystemCluster(opts.Log, opts.BaseDir, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
-			return err
-		}
-	} else {
-		if err := CreateBaseDirStructure(opts.Log, opts.BaseDir, componentOpts.GetFilesystem()); err != nil {
 			return err
 		}
 	}
