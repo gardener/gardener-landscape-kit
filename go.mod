@@ -7,6 +7,7 @@ require (
 	github.com/controlplaneio-fluxcd/flux-operator v0.32.0
 	github.com/gardener/gardener v1.127.1
 	github.com/go-logr/logr v1.4.3
+	github.com/ironcore-dev/vgopath v0.1.5
 	github.com/onsi/ginkgo/v2 v2.25.3
 	github.com/onsi/gomega v1.38.2
 	github.com/spf13/afero v1.14.0

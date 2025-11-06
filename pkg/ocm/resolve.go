@@ -15,15 +15,15 @@ import (
 	"github.com/go-logr/logr"
 	"ocm.software/open-component-model/bindings/go/descriptor/runtime"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/ocm/config"
 	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
 type ocmComponentsResolver struct {
 	log        logr.Logger
-	cfg        *config.Config
+	cfg        *configv1alpha1.OCMConfiguration
 	outputDir  string
 	components *components.Components
 	repos      []*ociaccess.RepoAccess
@@ -31,7 +31,7 @@ type ocmComponentsResolver struct {
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
-func ResolveOCMComponents(log logr.Logger, cfg *config.Config, outputDir string) error {
+func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.OCMConfiguration, outputDir string) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
@@ -212,7 +212,7 @@ func writeObject(outputDir string, cref components.ComponentReference, obj any) 
 	return os.WriteFile(outputFile, output, 0600)
 }
 
-func createRepoAccesses(cfg *config.Config) ([]*ociaccess.RepoAccess, error) {
+func createRepoAccesses(cfg *configv1alpha1.OCMConfiguration) ([]*ociaccess.RepoAccess, error) {
 	var repos []*ociaccess.RepoAccess
 
 	for _, url := range cfg.Repositories {

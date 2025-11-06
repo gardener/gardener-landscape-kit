@@ -41,9 +41,22 @@ tidy:
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
 	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg
 
+.PHONY: generate
+generate: $(GEN_CRD_API_REFERENCE_DOCS) $(VGOPATH)
+	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./pkg/...
+	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
+
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) bash $(GARDENER_HACK_DIR)/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
+
+.PHONY: check-generate
+check-generate:
+	@bash $(GARDENER_HACK_DIR)/check-generate.sh $(REPO_ROOT)
+
+.PHONY: clean
+clean:
+	@bash $(GARDENER_HACK_DIR)/clean.sh ./pkg/... ./test/...
 
 .PHONY: sast
 sast: $(GOSEC)
@@ -69,4 +82,4 @@ test-clean:
 verify: check format test sast
 
 .PHONY: verify-extended
-verify-extended: check format test-cov sast-report
+verify-extended: check-generate check format test-cov sast-report

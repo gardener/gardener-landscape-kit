@@ -8,26 +8,37 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/spf13/pflag"
-	"k8s.io/apimachinery/pkg/util/yaml"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	configv1alpha1validation "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
-	"github.com/gardener/gardener-landscape-kit/pkg/ocm/config"
 )
+
+var configDecoder runtime.Decoder
+
+func init() {
+	configScheme := runtime.NewScheme()
+	utilruntime.Must(configv1alpha1.AddToScheme(configScheme))
+	configDecoder = serializer.NewCodecFactory(configScheme).UniversalDecoder()
+}
 
 // Options contains options for this command.
 type Options struct {
 	*cmd.Options
 
+	configFilePath string
+
 	// LandscapeDir is the directory containing all landscape specific configuration files.
 	// It is used as output directory.
 	LandscapeDir string
-	// ConfigPath is a path to a configuration file containing repositories and/or the root component
-	ConfigPath string
 
-	Config *config.Config
+	// ConfigPath is the configuration file containing repositories and/or the root component.
+	Config *configv1alpha1.OCMConfiguration
 }
 
 // Validate validates the options.
@@ -36,28 +47,8 @@ func (o *Options) validate() error {
 		return fmt.Errorf("landscape dir is required")
 	}
 
-	if o.ConfigPath == "" {
-		return fmt.Errorf("config option is required")
-	}
-
-	var err error
-	o.Config, err = loadConfigFile(o.ConfigPath)
-	if err != nil {
-		return fmt.Errorf("loading config file %s failed: %w", o.ConfigPath, err)
-	}
-
-	if o.Config.RootComponent.Name == "" {
-		return fmt.Errorf("root component name is required in config file")
-	}
-	if len(strings.Split(o.Config.RootComponent.Name, "/")) == 1 {
-		return fmt.Errorf("root component name must be qualified (format 'example.com/my-org/my-root-component:1.23.4')")
-	}
-	if o.Config.RootComponent.Version == "" {
-		return fmt.Errorf("root component version is required in config file")
-	}
-
-	if len(o.Config.Repositories) == 0 {
-		return fmt.Errorf("at least one OCI repository must be specified in config file")
+	if errs := configv1alpha1validation.ValidateOCMConfiguration(o.Config); len(errs) > 0 {
+		return fmt.Errorf("invalid configuration: %v", errs.ToAggregate())
 	}
 
 	return nil
@@ -65,12 +56,20 @@ func (o *Options) validate() error {
 
 // Complete completes the options.
 func (o *Options) complete() error {
+	if o.configFilePath == "" {
+		return fmt.Errorf("config option is required")
+	}
+
+	if err := o.loadConfigFile(o.configFilePath); err != nil {
+		return fmt.Errorf("loading config file %s failed: %w", o.configFilePath, err)
+	}
+
 	return nil
 }
 
 func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.LandscapeDir, "landscape-dir", "l", "", "Path to a directory containing the landscape specific configuration files, aka overlays.")
-	fs.StringVar(&o.ConfigPath, "config", "", "Optional config file with repositories and other configuration.")
+	fs.StringVarP(&o.configFilePath, "config", "c", "", "Optional config file with repositories and other configuration.")
 }
 
 func (o *Options) effectiveOutputDir(subdir string) string {
@@ -81,15 +80,16 @@ func (o *Options) effectiveOutputDir(subdir string) string {
 	return outputDir
 }
 
-func loadConfigFile(filename string) (*config.Config, error) {
+func (o *Options) loadConfigFile(filename string) error {
 	data, err := os.ReadFile(filename) // #nosec G304 -- Trusted file from CLI argument.
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	cfg := &config.Config{}
-	if err := yaml.Unmarshal(data, cfg); err != nil {
-		return nil, err
+	o.Config = &configv1alpha1.OCMConfiguration{}
+	if err = runtime.DecodeInto(configDecoder, data, o.Config); err != nil {
+		return fmt.Errorf("error decoding config: %w", err)
 	}
-	return cfg, nil
+
+	return nil
 }
