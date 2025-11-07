@@ -148,25 +148,24 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 			resultKeyNode = findKeyNode(current, key)
 
 			// Handle nested structures (mappings and sequences)
-			if currentValue.Kind == yaml.MappingNode && newValueNode.Kind == yaml.MappingNode {
+			switch {
+			case currentValue.Kind == yaml.MappingNode && newValueNode.Kind == yaml.MappingNode:
 				if !oldExists {
 					oldValue = &yaml.Node{Kind: yaml.MappingNode}
 				}
 				resultValue = threeWayMerge(oldValue, newValueNode, currentValue)
-			} else if currentValue.Kind == yaml.SequenceNode && newValueNode.Kind == yaml.SequenceNode {
+			case currentValue.Kind == yaml.SequenceNode && newValueNode.Kind == yaml.SequenceNode:
 				if !oldExists {
 					oldValue = &yaml.Node{Kind: yaml.SequenceNode}
 				}
 				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue)
-			} else if oldExists && !nodesEqual(oldValue, newValueNode, false) {
-				// Default changed - use new value with user's comments
+			case oldExists && !nodesEqual(oldValue, newValueNode, false):
 				resultValue = &yaml.Node{
 					Kind: newValueNode.Kind, Value: newValueNode.Value, Style: newValueNode.Style, Tag: newValueNode.Tag,
 					HeadComment: currentValue.HeadComment, LineComment: currentValue.LineComment, FootComment: currentValue.FootComment,
 					Content: newValueNode.Content,
 				}
-			} else {
-				// Keep user's version
+			default:
 				resultValue = currentValue
 			}
 		}
