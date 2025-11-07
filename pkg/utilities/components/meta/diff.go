@@ -69,11 +69,9 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 	// Write the merged result back
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
+	defer encoder.Close()
 	encoder.SetIndent(2)
 	if err := encoder.Encode(merged); err != nil {
-		return err
-	}
-	if err := encoder.Close(); err != nil {
 		return err
 	}
 
@@ -139,6 +137,10 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 
 		var resultKeyNode, resultValue *yaml.Node
 
+		if oldExists && !currentExists {
+			// Has been dropped from current.
+			continue
+		}
 		if !currentExists {
 			// New key - add from newDefault
 			resultKeyNode, resultValue = newKeyNode, newValueNode
@@ -190,7 +192,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 }
 
 // threeWayMergeSequence performs a three-way merge of YAML sequence nodes (arrays)
-// Arrays are treated as unordered sets - order is not preserved
+// Order is preserved based on newDefault, with user additions appended at the end
 func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 	if nodesEqual(oldDefault, current, true) {
 		return newDefault
@@ -216,22 +218,29 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Nod
 		currentMap[nodeToString(item)] = item
 	}
 
-	// Add user-modified/added items from current
-	for key, item := range currentMap {
-		if !oldSet[key] {
-			result.Content = append(result.Content, item)
-		}
+	newSet := make(map[string]bool)
+	for _, item := range newDefault.Content {
+		newSet[nodeToString(item)] = true
 	}
 
-	// Add items from newDefault (new additions or unchanged items)
+	// Process items in newDefault order to preserve order
 	for _, newItem := range newDefault.Content {
 		key := nodeToString(newItem)
 		if !oldSet[key] {
-			// New template item
+			// New template item - add from newDefault
 			result.Content = append(result.Content, newItem)
 		} else if currentItem, exists := currentMap[key]; exists {
 			// Unchanged item - use current version for comments
 			result.Content = append(result.Content, currentItem)
+		}
+		// If item was in oldSet but not in currentMap, it was removed by user - skip it
+	}
+
+	// Add user-added items (items in current but not in oldDefault) at the end
+	for _, item := range current.Content {
+		key := nodeToString(item)
+		if !oldSet[key] && !newSet[key] {
+			result.Content = append(result.Content, item)
 		}
 	}
 

@@ -1,0 +1,31 @@
+# Comment at apiVersion to be removed later on.
+apiVersion: v1alpha1
+# Comment at kind to be modified later on.
+kind: TestFixture
+metadata:
+  labels:
+    # this foo label needs to be adapted
+    foo: bar
+# Please fill in your data here:
+data:
+  # This is the key. Please change it.
+  key: value
+  key2: value1
+  key3: value2
+  key4: value3
+enumeration:
+  - item1
+  # Comment for item2
+  - item2 # Comment besides item2
+  # Please remove the following item:
+  - should_be_removed
+  - item3
+complex_array:
+  - name: itemA
+    value: 10
+    # Comment for itemA
+    description: This is item A
+  # This is complex
+  - name: itemB
+    value: 20
+    description: This is item B
