@@ -32,6 +32,9 @@ var (
 	manifestDefaultNew string
 	//go:embed testdata/manifest-4-expected-generated.yaml
 	manifestGenerated string
+
+	//go:embed testdata/multiple-manifests.yaml
+	multipleManifests string
 )
 
 var _ = Describe("Meta Dir Config Diff", func() {
@@ -139,6 +142,14 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(Equal(strings.ReplaceAll(expectedConfigMapOutputWithNewKey, "key: value", "key: newDefaultValue") + "\n"))
+		})
+
+		It("should handle multiple manifests within a single yaml file correctly", func() {
+			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifests), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
+
+			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifests))
 		})
 	})
 })

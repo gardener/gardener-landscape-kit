@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"os"
 	"path"
+	"slices"
 
 	"github.com/spf13/afero"
 	"go.yaml.in/yaml/v4"
@@ -47,19 +48,80 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 		}
 	}
 
+	// Split manifest file
+	newDefaultSectionOrders, newDefaultYamlSections := splitManifestFile(newDefaultYaml)
+	currentSectionOrders, currentYamlSections := splitManifestFile(oldManifest)
+	oldDefaultSectionOrders, oldDefaultYamlSections := splitManifestFile(oldDefaultYaml)
+
+	var output []byte
+	for sectionIndex, sectionKey := range newDefaultSectionOrders {
+		// Add document separator for subsequent sections
+		if len(output) > 0 {
+			output = append(output, []byte("---\n")...)
+		}
+		// Add current sections not matching client.Object (e.g., comments, empty documents)
+		if len(currentSectionOrders) > sectionIndex && currentSectionOrders[sectionIndex] == "" {
+			output = append(output, currentYamlSections[sectionIndex]...)
+		}
+		// Add new default sections not matching client.Object (e.g., comments, empty documents)
+		if sectionKey == "" {
+			output = append(output, newDefaultYamlSections[sectionIndex]...)
+			output = append(output, []byte("\n")...)
+			continue
+		}
+
+		var currentContents, oldDefaultContents []byte
+		if index := slices.Index(currentSectionOrders, sectionKey); index != -1 {
+			currentContents = currentYamlSections[index]
+		}
+		if oldIndex := slices.Index(oldDefaultSectionOrders, sectionKey); oldIndex != -1 {
+			oldDefaultContents = oldDefaultYamlSections[oldIndex]
+		}
+		mergedYaml, err := threeWayMergeDocument(
+			newDefaultYamlSections[sectionIndex],
+			currentContents,
+			oldDefaultContents,
+		)
+		if err != nil {
+			return err
+		}
+		output = append(output, mergedYaml...)
+	}
+	// Last, add all custom file content and keys not covered
+	for sectionIndex, sectionKey := range currentSectionOrders {
+		if len(currentYamlSections[sectionIndex]) > 0 &&
+			(sectionKey == "" && sectionIndex >= len(newDefaultSectionOrders) || !slices.Contains(newDefaultSectionOrders, sectionKey)) {
+			output = append(output, []byte("\n---\n")...)
+			output = append(output, currentYamlSections[sectionIndex]...)
+		}
+	}
+
+	if err := fs.WriteFile(filePathManifest, output, 0600); err != nil {
+		return err
+	}
+
+	// Update the default
+	if err := fs.WriteFile(filePathDefault, newDefaultYaml, 0600); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func threeWayMergeDocument(newDefaultYaml, oldManifest, oldDefaultYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
-		return err
+		return nil, err
 	}
 	if err := yaml.Unmarshal(oldManifest, &current); err != nil {
-		return err
+		return nil, err
 	}
 
 	// If no old default exists, use empty node (will cause all existing keys to be treated as user-added)
 	if len(oldDefaultYaml) > 0 {
 		if err := yaml.Unmarshal(oldDefaultYaml, &oldDefault); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -72,21 +134,10 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 	defer encoder.Close()
 	encoder.SetIndent(2)
 	if err := encoder.Encode(merged); err != nil {
-		return err
+		return nil, err
 	}
 
-	mergedYaml := buf.Bytes()
-
-	if err := fs.WriteFile(filePathManifest, mergedYaml, 0600); err != nil {
-		return err
-	}
-
-	// Update the default
-	if err := fs.WriteFile(filePathDefault, newDefaultYaml, 0600); err != nil {
-		return err
-	}
-
-	return nil
+	return buf.Bytes(), nil
 }
 
 // threeWayMerge performs a three-way merge of YAML nodes
@@ -339,4 +390,29 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 		return true
 	}
 	return true
+}
+
+func splitManifestFile(combinedYaml []byte) ([]string, [][]byte) {
+	splits := bytes.Split(combinedYaml, []byte("\n---\n"))
+	keysOrder := make([]string, len(splits))
+	for i, d := range splits {
+		var t map[string]interface{}
+		yaml.Unmarshal(d, &t)
+		key := buildKey(t)
+		keysOrder[i] = key
+	}
+	return keysOrder, splits
+}
+
+func buildKey(t map[string]interface{}) string {
+	apiVersion, _ := t["apiVersion"].(string)
+	kind, _ := t["kind"].(string)
+	metadata, _ := t["metadata"].(map[string]interface{})
+	name, _ := metadata["name"].(string)
+	namespace, _ := metadata["namespace"].(string)
+	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
+		return ""
+	}
+
+	return apiVersion + "/" + kind + "/" + namespace + "/" + name
 }
