@@ -19,18 +19,18 @@ import (
 )
 
 var (
-	//go:embed fixtures/expected_configmap_output_default.yaml
+	//go:embed testdata/expected_configmap_output_default.yaml
 	expectedDefaultConfigMapOutput string
-	//go:embed fixtures/expected_configmap_output_newkey.yaml
+	//go:embed testdata/expected_configmap_output_newkey.yaml
 	expectedConfigMapOutputWithNewKey string
 
-	//go:embed fixtures/manifest-1-default.yaml
+	//go:embed testdata/manifest-1-default.yaml
 	manifestDefault string
-	//go:embed fixtures/manifest-2-edited.yaml
+	//go:embed testdata/manifest-2-edited.yaml
 	manifestEdited string
-	//go:embed fixtures/manifest-3-new-default.yaml
+	//go:embed testdata/manifest-3-new-default.yaml
 	manifestDefaultNew string
-	//go:embed fixtures/manifest-4-expected-generated.yaml
+	//go:embed testdata/manifest-4-expected-generated.yaml
 	manifestGenerated string
 )
 
