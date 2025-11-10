@@ -1,0 +1,33 @@
+apiVersion: v1alpha1
+# Edit: Just a test fixture manifest.
+kind: TestFixture
+metadata:
+  labels:
+    # Very new label
+    newLabel: newValue
+    bar: baz
+data:
+  # This is the key. Please change it.
+  key: valueChanged
+  # New comment for key4
+  key4: value4
+  keyModified: value2
+  # add new value in between with comments
+  keyInBetween: added_by_user # with a comment
+enumeration:
+  # Comment for item2
+  - item2 # Comment besides item2
+  - item17 # Very new
+  - item0_new
+  - item4_new
+complex_array:
+  - name: itemA
+    # need >99
+    value: 100
+    # Comment for itemA
+    description: This is item A
+  # This is complex - updated
+  - name: itemB
+    value: 25
+    description: This is item B (modified in default)
+  - name: itemC_new

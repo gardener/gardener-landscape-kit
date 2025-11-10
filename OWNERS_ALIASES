@@ -1,0 +1,13 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+aliases:
+  gardener-landscape-kit-reviewers:
+  - timuthy
+  - LucaBernstein
+  - MartinWeindel
+  - oliver-goetz
+  gardener-landscape-kit-approvers:
+  - timuthy
+  - LucaBernstein
+  - MartinWeindel
+  - oliver-goetz

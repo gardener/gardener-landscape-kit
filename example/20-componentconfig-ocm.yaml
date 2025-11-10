@@ -1,0 +1,8 @@
+apiVersion: landscape.config.gardener.cloud/v1alpha1
+kind: OCMConfiguration
+# repositories:
+# - <repo-url>
+# rootComponent:
+#   name: <component-name>
+#   version: <component-version>
+# originalRefs: true
