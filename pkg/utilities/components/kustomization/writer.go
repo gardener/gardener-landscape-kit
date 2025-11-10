@@ -25,6 +25,8 @@ const (
 )
 
 // WriteKustomizationComponent writes the objects and a Kustomization file to the fs.
+// The Kustomization file references all other objects.
+// The objects map will be modified to include the Kustomization file.
 func WriteKustomizationComponent(objects map[string][]byte, baseDir, componentDir string, fs afero.Afero) error {
 	kustomization := &kustomize.Kustomization{
 		TypeMeta: kustomize.TypeMeta{
