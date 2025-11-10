@@ -31,11 +31,11 @@ gardener-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /pa
 `,
 
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			if err := opts.validate(); err != nil {
+			if err := opts.complete(); err != nil {
 				return err
 			}
 
-			if err := opts.complete(); err != nil {
+			if err := opts.validate(); err != nil {
 				return err
 			}
 
