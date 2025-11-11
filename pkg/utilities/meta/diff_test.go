@@ -31,6 +31,15 @@ var (
 	manifestDefaultNew string
 	//go:embed testdata/manifest-4-expected-generated.yaml
 	manifestGenerated string
+
+	//go:embed testdata/multiple-manifests-1-initial.yaml
+	multipleManifestsInitial string
+	//go:embed testdata/multiple-manifests-2-edited.yaml
+	multipleManifestsEdited string
+	//go:embed testdata/multiple-manifests-3-new-default.yaml
+	multipleManifestsNewDefault string
+	//go:embed testdata/multiple-manifests-4-expected-generated.yaml
+	multipleManifestsExpectedGenerated string
 )
 
 var _ = Describe("Meta Dir Config Diff", func() {
@@ -81,6 +90,27 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			content, err := meta.ThreeWayMergeManifest(nil, []byte(expectedConfigMapOutputWithNewKey), []byte(strings.ReplaceAll(expectedDefaultConfigMapOutput, "key: value", "key: newDefaultValue")))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(Equal(strings.ReplaceAll(expectedConfigMapOutputWithNewKey, "key: value", "key: newDefaultValue") + "\n"))
+		})
+
+		It("should handle multiple manifests within a single yaml file correctly", func() {
+			content, err := meta.ThreeWayMergeManifest(nil, []byte(multipleManifestsInitial), nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsInitial))
+
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsInitial))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsInitial))
+
+			// Editing the written manifest and updating the manifest with the same default content should not overwrite anything
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsEdited))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsEdited))
+
+			// New default manifest changes should be applied, while custom edits should be retained.
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsNewDefault), []byte(multipleManifestsEdited))
+			Expect(err).NotTo(HaveOccurred())
+			println(string(content))
+			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
 		})
 	})
 })

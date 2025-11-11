@@ -6,6 +6,7 @@ package meta
 
 import (
 	"bytes"
+	"slices"
 
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -13,6 +14,59 @@ import (
 
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
 func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
+	diff := newManifestDiff(newDefaultYaml, currentYaml, oldDefaultYaml)
+	return buildManifestOutput(diff)
+}
+
+// buildManifestOutput constructs the merged manifest output from the diff.
+func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
+	var output []byte
+
+	for idx, sectionKey := range diff.newDefaultSectionOrders {
+		addContent := collectSectionComments(diff, idx)
+
+		for _, content := range addContent {
+			output = addWithSeparator(output, []byte(content))
+		}
+
+		if isSectionComment(diff, idx) {
+			continue
+		}
+
+		newDefault := diff.newDefaultYamlSections[idx]
+		oldIdx := slices.Index(diff.oldDefaultSectionOrders, sectionKey)
+		var oldDefault []byte
+		if oldIdx != -1 {
+			oldDefault = diff.oldDefaultYamlSections[oldIdx]
+		}
+		var current []byte
+		curIdx := slices.Index(diff.currentSectionOrders, sectionKey)
+		if curIdx != -1 {
+			current = diff.currentYamlSections[curIdx]
+		} else if oldIdx != -1 && diff.oldDefaultSectionOrders[oldIdx] == sectionKey {
+			continue // removed by user
+		}
+
+		merged, err := threeWayMergeDocument(newDefault, current, oldDefault)
+		if err != nil {
+			return nil, err
+		}
+		output = addWithSeparator(output, merged)
+	}
+
+	appendix := collectAppendix(diff)
+	for _, extra := range appendix {
+		output = addWithSeparator(output, []byte(extra))
+	}
+
+	// Ensure output ends with a newline for readability
+	if len(output) > 0 && output[len(output)-1] != '\n' {
+		output = append(output, '\n')
+	}
+	return output, nil
+}
+
+func threeWayMergeDocument(newDefaultYaml, currentYaml, oldDefaultYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
@@ -294,4 +348,118 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 		return true
 	}
 	return true
+}
+
+func splitManifestFile(combinedYaml []byte) ([]string, [][]byte) {
+	splits := bytes.Split(combinedYaml, []byte("\n---\n"))
+	keysOrder := make([]string, len(splits))
+	for i, d := range splits {
+		var t map[string]interface{}
+		err := yaml.Unmarshal(d, &t)
+		key := buildKey(t)
+		if err != nil || key == "" {
+			key = string(d)
+		}
+		keysOrder[i] = key
+	}
+	return keysOrder, splits
+}
+
+type manifestDiff struct {
+	newDefaultSectionOrders, currentSectionOrders, oldDefaultSectionOrders []string
+	newDefaultYamlSections, currentYamlSections, oldDefaultYamlSections    [][]byte
+}
+
+func newManifestDiff(newDefaultYaml, oldManifest, oldDefaultYaml []byte) *manifestDiff {
+	newDefaultSectionOrders, newDefaultYamlSections := splitManifestFile(newDefaultYaml)
+	currentSectionOrders, currentYamlSections := splitManifestFile(oldManifest)
+	oldDefaultSectionOrders, oldDefaultYamlSections := splitManifestFile(oldDefaultYaml)
+
+	return &manifestDiff{
+		newDefaultSectionOrders: newDefaultSectionOrders,
+		newDefaultYamlSections:  newDefaultYamlSections,
+		currentSectionOrders:    currentSectionOrders,
+		currentYamlSections:     currentYamlSections,
+		oldDefaultSectionOrders: oldDefaultSectionOrders,
+		oldDefaultYamlSections:  oldDefaultYamlSections,
+	}
+}
+
+func (m *manifestDiff) isCurrentRelevantComment(sectionIndex int, pendingContent []string) (bool, string) {
+	if len(m.currentSectionOrders) > sectionIndex &&
+		m.currentSectionOrders[sectionIndex] == string(m.currentYamlSections[sectionIndex]) &&
+		len(m.currentYamlSections[sectionIndex]) > 0 &&
+		(len(pendingContent) == 0 || !slices.Contains(pendingContent, m.currentSectionOrders[sectionIndex])) {
+		return true, m.currentSectionOrders[sectionIndex]
+	}
+	return false, ""
+}
+
+func (m *manifestDiff) isNewDefaultRelevantComment(sectionIndex int, pendingContent []string) (bool, bool, string) {
+	isComment := len(m.newDefaultSectionOrders) > sectionIndex &&
+		m.newDefaultSectionOrders[sectionIndex] == string(m.newDefaultYamlSections[sectionIndex]) &&
+		len(m.newDefaultYamlSections[sectionIndex]) > 0
+	if isComment && !slices.Contains(m.oldDefaultSectionOrders, m.newDefaultSectionOrders[sectionIndex]) &&
+		(len(pendingContent) == 0 || !slices.Contains(pendingContent, m.newDefaultSectionOrders[sectionIndex])) {
+		return true, true, m.newDefaultSectionOrders[sectionIndex]
+	}
+	return isComment, false, ""
+}
+
+func addWithSeparator(output, content []byte) []byte {
+	if len(output) > 0 {
+		if output[len(output)-1] != '\n' {
+			output = append(output, '\n')
+		}
+		output = append(output, []byte("---\n")...)
+	}
+	if len(content) > 0 {
+		output = append(output, content...)
+	}
+	return output
+}
+
+// collectSectionComments gathers relevant comments for a section.
+func collectSectionComments(diff *manifestDiff, idx int) []string {
+	var comments []string
+	if _, relevant, content := diff.isNewDefaultRelevantComment(idx, comments); relevant {
+		comments = append(comments, content)
+	}
+	if relevant, content := diff.isCurrentRelevantComment(idx, comments); relevant {
+		comments = append(comments, content)
+	}
+	return comments
+}
+
+// isSectionComment checks if the section is a comment-only section.
+func isSectionComment(diff *manifestDiff, idx int) bool {
+	isComment, _, _ := diff.isNewDefaultRelevantComment(idx, nil)
+	return isComment
+}
+
+// collectAppendix gathers custom file content and keys not covered by defaults.
+func collectAppendix(diff *manifestDiff) []string {
+	var appendix []string
+	for idx, sectionKey := range diff.currentSectionOrders {
+		if len(diff.currentYamlSections[idx]) > 0 &&
+			(sectionKey != string(diff.currentYamlSections[idx]) &&
+				!slices.Contains(diff.newDefaultSectionOrders, sectionKey) ||
+				idx >= len(diff.newDefaultSectionOrders)) {
+			appendix = append(appendix, string(diff.currentYamlSections[idx]))
+		}
+	}
+	return appendix
+}
+
+func buildKey(t map[string]interface{}) string {
+	apiVersion, _ := t["apiVersion"].(string)
+	kind, _ := t["kind"].(string)
+	metadata, _ := t["metadata"].(map[string]interface{})
+	name, _ := metadata["name"].(string)
+	namespace, _ := metadata["namespace"].(string)
+	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
+		return ""
+	}
+
+	return apiVersion + "/" + kind + "/" + namespace + "/" + name
 }
