@@ -32,6 +32,15 @@ var (
 	manifestDefaultNew string
 	//go:embed testdata/manifest-4-expected-generated.yaml
 	manifestGenerated string
+
+	//go:embed testdata/multiple-manifests-1-initial.yaml
+	multipleManifestsInitial string
+	//go:embed testdata/multiple-manifests-2-edited.yaml
+	multipleManifestsEdited string
+	//go:embed testdata/multiple-manifests-3-new-default.yaml
+	multipleManifestsNewDefault string
+	//go:embed testdata/multiple-manifests-4-expected-generated.yaml
+	multipleManifestsExpectedGenerated string
 )
 
 var _ = Describe("Meta Dir Config Diff", func() {
@@ -139,6 +148,36 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(Equal(strings.ReplaceAll(expectedConfigMapOutputWithNewKey, "key: value", "key: newDefaultValue") + "\n"))
+		})
+
+		It("should handle multiple manifests within a single yaml file correctly", func() {
+			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
+
+			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsInitial))
+
+			// Updating the manifest with the same content should not change anything
+			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
+
+			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsInitial))
+
+			Expect(fs.WriteFile("/landscape/manifest/config.yaml", []byte(multipleManifestsEdited), 0600)).To(Succeed())
+
+			// Updating the manifest with the same default content should not overwrite anything
+			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
+
+			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsEdited))
+
+			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsNewDefault), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
+
+			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
 		})
 	})
 })
