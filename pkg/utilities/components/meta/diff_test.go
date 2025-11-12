@@ -93,33 +93,23 @@ var _ = Describe("Meta Dir Config Diff", func() {
 		})
 
 		It("should handle multiple manifests within a single yaml file correctly", func() {
-			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
-
-			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
-			Expect(err).ToNot(HaveOccurred())
+			content, err := meta.ThreeWayMergeManifest(nil, []byte(multipleManifestsInitial), nil)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(multipleManifestsInitial))
 
-			// Updating the manifest with the same content should not change anything
-			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
-
-			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
-			Expect(err).ToNot(HaveOccurred())
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsInitial))
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(multipleManifestsInitial))
 
-			// Edit written manifest
-			Expect(fs.WriteFile("/landscape/manifest/config.yaml", []byte(multipleManifestsEdited), 0600)).To(Succeed())
-
-			// Updating the manifest with the same default content should not overwrite anything
-			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsInitial), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
-
-			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
-			Expect(err).ToNot(HaveOccurred())
+			// Editing the written manifest and updating the manifest with the same default content should not overwrite anything
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsEdited))
+			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(multipleManifestsEdited))
 
-			Expect(meta.CreateOrUpdateManifest([]byte(multipleManifestsNewDefault), "/landscape", "manifest/config.yaml", fs)).To(Succeed())
-
-			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
-			Expect(err).ToNot(HaveOccurred())
+			// New default manifest changes should be applied, while custom edits should be retained.
+			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsNewDefault), []byte(multipleManifestsEdited))
+			Expect(err).NotTo(HaveOccurred())
+			println(string(content))
 			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
 		})
 	})

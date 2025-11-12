@@ -13,6 +13,7 @@ data:
   edited: "true"
   in: "default"
 ---
+---
 apiVersion: test/v1
 kind: FourthTestObject
 ---
