@@ -57,6 +57,8 @@ var _ = Describe("Components", func() {
 		Expect(c.ComponentsCount()).To(Equal(1))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refShootCertService))
+
+		By("resolved references")
 		imageVector, err := c.GetImageVector(refShootCertService, false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(HaveLen(1))
@@ -79,6 +81,8 @@ var _ = Describe("Components", func() {
 				Tag:        ptr.To("v0.17.7"),
 				Version:    ptr.To("v0.17.7"),
 			}))
+
+		By("check resources for ociImage, helmChart and helmchart-imagemap types")
 		resources := c.GetResources(refShootCertService)
 		Expect(resources).To(HaveLen(4))
 		Expect(resources).To(ContainElements(
@@ -109,13 +113,15 @@ var _ = Describe("Components", func() {
 		))
 	})
 
-	It("should produce correct image vector for gardener/gardener", func() {
+	It("should produce correct image vector for gardener/gardener for rewritten images in OCM components", func() {
 		loadWithDep(3, refRoot)
 		Expect(c.ComponentsCount()).To(Equal(23))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 		imageVector, err := c.GetImageVector(refGardener, false)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("check target versions / referenced resources")
 		Expect(filterByNamePrefix(imageVector, "cluster-autoscaler")).To(HaveLen(5))
 		Expect(filterByNamePrefix(imageVector, "cluster-autoscaler")).To(ContainElements(
 			imagevector.ImageSource{
@@ -138,6 +144,8 @@ var _ = Describe("Components", func() {
 				Tag:           ptr.To("v1.33.0@sha256:4932021e763b81c2679dda43af369619976a1a177726c8a507aa9003e84c18e3"),
 				Version:       ptr.To("v1.33.0"),
 			}))
+
+		By("check gardener images")
 		Expect(filterByNamePrefix(imageVector, "gardener-")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:       "gardener-admission-controller",
@@ -158,6 +166,7 @@ var _ = Describe("Components", func() {
 				Version:    ptr.To("v1.128.3"),
 			}))
 
+		By("check images from a referenced components")
 		Expect(filterByNamePrefix(imageVector, "vpn-")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "vpn-client",
@@ -172,6 +181,7 @@ var _ = Describe("Components", func() {
 				Version:    ptr.To("0.41.1"),
 			}))
 
+		By("check images referenced from Kubernetes component by label `imagevector.gardener.cloud/images`")
 		Expect(filterByNamePrefix(imageVector, "hyperkube")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:          "hyperkube",
@@ -201,6 +211,7 @@ var _ = Describe("Components", func() {
 		Expect(countImagesByName(imageVector, "kube-proxy")).To(Equal(kubernetesVersionCount))
 		Expect(countImagesByName(imageVector, "kube-scheduler")).To(Equal(kubernetesVersionCount))
 
+		By("check resolution if resourceID == component name")
 		Expect(filterByNamePrefix(imageVector, "ingress-default-backend")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "ingress-default-backend",
@@ -209,7 +220,7 @@ var _ = Describe("Components", func() {
 				Version:    ptr.To("0.24.0"),
 			}))
 
-		// check resolution by resourceID
+		By("check resolution if resourceID != component name")
 		Expect(filterByNamePrefix(imageVector, "apiserver-proxy-sidecar")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "apiserver-proxy-sidecar",
@@ -218,6 +229,7 @@ var _ = Describe("Components", func() {
 				Version:    ptr.To("v0.19.0"),
 			}))
 
+		By("check resources for ociImage, helmChart and helmchart-imagemap types")
 		resources := c.GetResources(refGardener)
 		Expect(resources).To(HaveLen(52))
 		Expect(resources).To(ContainElements(
