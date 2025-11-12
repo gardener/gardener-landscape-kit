@@ -28,39 +28,44 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: '1.25'
-      - name: run-tests
+      - name: run-verify
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/blobs.d
-          make verify-extended |& tee /tmp/blobs.d/tests-log.txt
-          tar czf /tmp/blobs.d/tests-log.tar.gz -C /tmp/blobs.d tests-log.txt
+          make verify-extended |& tee /tmp/blobs.d/verify-log.txt
+          tar czf /tmp/blobs.d/gosec-report.tar.gz gosec-report.sarif
+          tar czf /tmp/blobs.d/verify-log.tar.gz -C /tmp/blobs.d verify-log.txt
       - name: add-tests-report-to-component-descriptor
         uses: gardener/cc-utils/.github/actions/export-ocm-fragments@master
         with:
           blobs-directory: /tmp/blobs.d
           ocm-resources: |
-            name: test-results
-            relation: local
-            access:
-              type: localBlob
-              localReference: tests-log.tar.gz
-            labels:
+            - name: gosec-report
+              relation: local
+              access:
+                type: localBlob
+                localReference: gosec-report.tar.gz
+              labels:
               - name: gardener.cloud/purposes
                 value:
-                  - test
+                - lint
+                - sast
+                - gosec
+              - name: gardener.cloud/comment
+                value: |
+                  we use gosec (linter) for SAST scans
+                  see: https://github.com/securego/gosec
+            - name: test-results
+              relation: local
+              access:
+                type: localBlob
+                localReference: verify-log.tar.gz
+              labels:
+              - name: gardener.cloud/purposes
+                value:
+                - test
 
-  sast-lint:
-    uses: gardener/cc-utils/.github/workflows/sastlint-ocm.yaml@master
-    permissions:
-      contents: read
-    with:
-      linter: gosec
-      run: |
-        git config --global user.email some.one@some.where
-        git config --global user.name 'Some One'
-        mkdir /tmp/blobs.d
-        make sast-report
 
   gardener-landscape-kit:
     permissions:
