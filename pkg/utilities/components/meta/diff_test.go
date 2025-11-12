@@ -164,6 +164,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(Equal(multipleManifestsInitial))
 
+			// Edit written manifest
 			Expect(fs.WriteFile("/landscape/manifest/config.yaml", []byte(multipleManifestsEdited), 0600)).To(Succeed())
 
 			// Updating the manifest with the same default content should not overwrite anything
