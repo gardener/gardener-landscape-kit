@@ -22,29 +22,26 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
 	var output []byte
 
-	for idx, sectionKey := range diff.newDefaultSectionOrders {
-		addContent := collectSectionComments(diff, idx)
-
-		for _, content := range addContent {
-			output = addWithSeparator(output, []byte(content))
-		}
-
-		if isSectionComment(diff, idx) {
+	for idx, sectionKey := range diff.currentSectionOrders {
+		if sectionKey == "" {
 			continue
 		}
 
-		newDefault := diff.newDefaultYamlSections[idx]
-		oldIdx := slices.Index(diff.oldDefaultSectionOrders, sectionKey)
-		var oldDefault []byte
-		if oldIdx != -1 {
-			oldDefault = diff.oldDefaultYamlSections[oldIdx]
+		isRelevantComment, content := diff.isCurrentRelevantComment(idx)
+		if isRelevantComment {
+			output = addWithSeparator(output, []byte(content))
+			continue
 		}
-		var current []byte
-		curIdx := slices.Index(diff.currentSectionOrders, sectionKey)
-		if curIdx != -1 {
-			current = diff.currentYamlSections[curIdx]
-		} else if oldIdx != -1 && diff.oldDefaultSectionOrders[oldIdx] == sectionKey {
-			continue // removed by user
+
+		var oldDefault, newDefault, current []byte
+		current = diff.currentYamlSections[idx]
+		newDefaultIdx := slices.Index(diff.newDefaultSectionOrders, sectionKey)
+		if newDefaultIdx != -1 {
+			newDefault = diff.newDefaultYamlSections[newDefaultIdx]
+		}
+		oldDefaultIdx := slices.Index(diff.oldDefaultSectionOrders, sectionKey)
+		if oldDefaultIdx != -1 {
+			oldDefault = diff.oldDefaultYamlSections[oldDefaultIdx]
 		}
 
 		merged, err := threeWayMergeDocument(newDefault, current, oldDefault)
@@ -385,25 +382,13 @@ func newManifestDiff(newDefaultYaml, oldManifest, oldDefaultYaml []byte) *manife
 	}
 }
 
-func (m *manifestDiff) isCurrentRelevantComment(sectionIndex int, pendingContent []string) (bool, string) {
+func (m *manifestDiff) isCurrentRelevantComment(sectionIndex int) (bool, string) {
 	if len(m.currentSectionOrders) > sectionIndex &&
 		m.currentSectionOrders[sectionIndex] == string(m.currentYamlSections[sectionIndex]) &&
-		len(m.currentYamlSections[sectionIndex]) > 0 &&
-		(len(pendingContent) == 0 || !slices.Contains(pendingContent, m.currentSectionOrders[sectionIndex])) {
+		len(m.currentYamlSections[sectionIndex]) > 0 {
 		return true, m.currentSectionOrders[sectionIndex]
 	}
 	return false, ""
-}
-
-func (m *manifestDiff) isNewDefaultRelevantComment(sectionIndex int, pendingContent []string) (bool, bool, string) {
-	isComment := len(m.newDefaultSectionOrders) > sectionIndex &&
-		m.newDefaultSectionOrders[sectionIndex] == string(m.newDefaultYamlSections[sectionIndex]) &&
-		len(m.newDefaultYamlSections[sectionIndex]) > 0
-	if isComment && !slices.Contains(m.oldDefaultSectionOrders, m.newDefaultSectionOrders[sectionIndex]) &&
-		(len(pendingContent) == 0 || !slices.Contains(pendingContent, m.newDefaultSectionOrders[sectionIndex])) {
-		return true, true, m.newDefaultSectionOrders[sectionIndex]
-	}
-	return isComment, false, ""
 }
 
 func addWithSeparator(output, content []byte) []byte {
@@ -419,33 +404,16 @@ func addWithSeparator(output, content []byte) []byte {
 	return output
 }
 
-// collectSectionComments gathers relevant comments for a section.
-func collectSectionComments(diff *manifestDiff, idx int) []string {
-	var comments []string
-	if _, relevant, content := diff.isNewDefaultRelevantComment(idx, comments); relevant {
-		comments = append(comments, content)
-	}
-	if relevant, content := diff.isCurrentRelevantComment(idx, comments); relevant {
-		comments = append(comments, content)
-	}
-	return comments
-}
-
-// isSectionComment checks if the section is a comment-only section.
-func isSectionComment(diff *manifestDiff, idx int) bool {
-	isComment, _, _ := diff.isNewDefaultRelevantComment(idx, nil)
-	return isComment
-}
-
-// collectAppendix gathers custom file content and keys not covered by defaults.
+// collectAppendix gathers custom file content and keys not covered by current.
 func collectAppendix(diff *manifestDiff) []string {
 	var appendix []string
-	for idx, sectionKey := range diff.currentSectionOrders {
-		if len(diff.currentYamlSections[idx]) > 0 &&
-			(sectionKey != string(diff.currentYamlSections[idx]) &&
-				!slices.Contains(diff.newDefaultSectionOrders, sectionKey) ||
-				idx >= len(diff.newDefaultSectionOrders)) {
-			appendix = append(appendix, string(diff.currentYamlSections[idx]))
+	for idx, sectionKey := range diff.newDefaultSectionOrders {
+		newDefaultContent := string(diff.newDefaultYamlSections[idx])
+		hasContent := len(newDefaultContent) > 0
+		isIncludedInCurrent := slices.Contains(diff.currentSectionOrders, sectionKey)
+		isIncludedInOldDefault := slices.Contains(diff.oldDefaultSectionOrders, sectionKey)
+		if hasContent && !isIncludedInCurrent && !isIncludedInOldDefault {
+			appendix = append(appendix, newDefaultContent)
 		}
 	}
 	return appendix

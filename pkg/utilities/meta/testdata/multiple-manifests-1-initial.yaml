@@ -1,4 +1,6 @@
-# This comment should be preserved
+# This comment should be preserved.
+---
+# This comment is changed.
 ---
 apiVersion: test/v1
 kind: FirstTestObject
