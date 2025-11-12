@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-metrics-exporter",
+    "version": "0.40.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-07-02T14:19:31.181760+00:00"
+      }
+    ],
+    "creationTime": "2025-07-02T14:19:31.181823+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "metrics-exporter",
+        "version": "0.40.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/metrics-exporter:0.40.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.40.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/metrics-exporter:0.40.0@sha256:f02c30d95382f9ab32ad75d8af2e3dd91d1ba87fc3152cdc5f63950a56f7ff60",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "sast-build-step-log",
+        "version": "0.40.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\nenabled by https://github.com/gardener/gardener-metrics-exporter/pull/120\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:5df8bab19592fe13a6b07ad8d001e94ebfed4590e6642f3e9b58deeaf89621e3",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 1186,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.40.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:e0a0674f466cbda280f2b39d8a90d4a7e8ef7beee9d629f77d2c729d368e4e04",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 372,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_gardener-metrics-exporter",
+        "version": "0.40.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "acd611b3967d7bdba6960d5c7a00f68f62f37b6e",
+          "ref": "refs/tags/0.40.0",
+          "repoUrl": "github.com/gardener/gardener-metrics-exporter",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

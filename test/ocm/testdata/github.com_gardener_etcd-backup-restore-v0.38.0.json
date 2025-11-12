@@ -1,0 +1,150 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/etcd-backup-restore",
+    "version": "v0.38.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-08-26T06:03:07.372533+00:00"
+      }
+    ],
+    "creationTime": "2025-08-26T06:03:07.372593+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "etcdbrctl",
+        "version": "v0.38.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/responsibles",
+            "value": [
+              {
+                "teamname": "gardener/etcd-druid-maintainers",
+                "type": "githubTeam"
+              }
+            ]
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/etcdbrctl:v0.38.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.38.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/etcdbrctl:v0.38.0@sha256:2c584e5156a880ba96d6340d61e8199fe1dbce81d8015c148053977eba1d8cdb",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "check-build-step-log",
+        "version": "v0.38.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:8e4bdbaa38d49286cf0588e5cbb33f9d9b85dee4471dc53cd39f8aac2142565a",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 11118,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.38.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:c057442da7169e88238ee8f88ea63aa8c4e779665a40da983cf413ba883dff70",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 1854,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.38.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:38a87ea8ad7269b83a513cee072f0af1284557274ae69c4fdba5178085565b00",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 4608,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_etcd-backup-restore",
+        "version": "v0.38.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "e945b4493d6cebce35914ce7228ccfe2a61b1801",
+          "ref": "refs/tags/v0.38.0",
+          "repoUrl": "github.com/gardener/etcd-backup-restore",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

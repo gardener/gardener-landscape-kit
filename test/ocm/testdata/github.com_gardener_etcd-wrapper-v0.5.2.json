@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/etcd-wrapper",
+    "version": "v0.5.2",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-06-24T05:29:42.012745+00:00"
+      }
+    ],
+    "creationTime": "2025-06-24T05:29:42.012802+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "etcd-wrapper",
+        "version": "v0.5.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": true,
+              "availability_requirement": "high",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "private",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/responsibles",
+            "value": [
+              {
+                "teamname": "gardener/etcd-druid-maintainers",
+                "type": "githubTeam"
+              }
+            ]
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/etcd-wrapper:v0.5.2"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.5.2"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/etcd-wrapper:v0.5.2@sha256:9bc6e0fa86c3d13b7f818370f62e7895217fdee166748600c1922bc743e82f32",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "check-build-step-log",
+        "version": "v0.5.2",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:263d911dc44c7553e25fe3113ef796ba832337f9a843752f42804a453a47a061",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 5315,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.5.2",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b4af1e57a5fbc9a5f5c06ab785f56d5e1712616458be236d15209d92cd6d10a2",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 239,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_etcd-wrapper",
+        "version": "v0.5.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "7f2b09b99b8a9e72d7bff95db4ad49e03efbf5f1",
+          "ref": "refs/tags/v0.5.2",
+          "repoUrl": "github.com/gardener/etcd-wrapper",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

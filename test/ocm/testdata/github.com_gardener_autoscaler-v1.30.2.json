@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/autoscaler",
+    "version": "v1.30.2",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-02-04T21:50:24.637320+00:00"
+      }
+    ],
+    "creationTime": "2025-02-04T21:50:24.637391+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.30.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.30.2"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.30.2@sha256:632003975f643291e31d221154134e5d85527d84d9598ddfba80f68d89761cd6",
+          "type": "ociRegistry"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_autoscaler",
+        "version": "v1.30.2",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "path_config": {
+                "exclude_paths": [
+                  ".*/aws-sdk-go/.*",
+                  "^vendor/.*",
+                  ".*/vendor/.*",
+                  ".*/cloudprovider/((?!mcm/).)*/.*",
+                  "^addon-resizer/.*",
+                  "^vertical-pod-autoscaler/.*"
+                ]
+              },
+              "policy": "scan"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "31815d2daf51b833dae15c3f309c6551c5cbb3bd",
+          "ref": "refs/tags/v1.30.2",
+          "repoUrl": "github.com/gardener/autoscaler",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

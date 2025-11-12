@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/autoscaler",
+    "version": "v1.33.0",
+    "labels": [
+      {
+        "name": "cloud.gardener.cnudie/responsibles",
+        "value": [
+          {
+            "type": "githubUser",
+            "username": "aaronfern"
+          },
+          {
+            "type": "githubUser",
+            "username": "elankath"
+          }
+        ]
+      }
+    ],
+    "creationTime": "2025-08-22T08:29:50Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a68ebd21b3e42a75038247ffb6f09e5ff9e559980ac23b6b864690e7445f2f63",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 2952,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "cluster-autoscaler",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.33.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.33.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler:v1.33.0@sha256:4932021e763b81c2679dda43af369619976a1a177726c8a507aa9003e84c18e3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.33.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:d32f48a7a7449717a3ef4ec44862a55738b17b1dff5d0009653d2799e34c2299",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 494,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.33.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:fbe870bad1f39ff722f7c4c9dd687a3a4856d53c71a7b6b588d9d8ddc0a53606",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.33.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "79d36ccd6144e2241604f9c84abd1f76a487355f",
+          "ref": "refs/heads/machine-controller-manager-provider",
+          "repoUrl": "github.com/gardener/autoscaler",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

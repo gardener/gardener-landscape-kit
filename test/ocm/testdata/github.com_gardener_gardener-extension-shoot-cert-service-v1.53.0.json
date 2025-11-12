@@ -1,0 +1,210 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/gardener-extension-shoot-cert-service",
+    "version": "v1.53.0",
+    "creationTime": "2025-09-03T13:59:52Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gardener-extension-shoot-cert-service",
+        "version": "v1.53.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.53.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v1.53.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:9c7791c841d6a0c323726a76254123d6040c25622153d0d97a8dd266a23a6f83",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 1391,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v1.53.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:f7232845fdd95022546e9a3315f74e7435faababeeb1fe313cb622221a7727ee",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 8094,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "shoot-cert-service",
+        "version": "v1.53.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "shoot-cert-service",
+        "version": "v1.53.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:fd100bb5ee2ceee6efec69ed86a680ab049318b812b00b43f2947c73fa91b03f",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 190,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "cert-management",
+        "version": "v0.17.7",
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "cert-management"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/cert-management"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager:v0.17.7"
+          }
+        ],
+        "type": "ociImage",
+        "relation": "external",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/cert-controller-manager:v0.17.7@sha256:6f55f7bf5a6498dc0d138e5cde33eb39a090ceeee1fe80647008cb8e04676d8c",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.53.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:bd5385d048ef16bc3e99b84a7b47c4367b146c8bd5240dd54fefa8ef3f4b10ab",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 890,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v1.53.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:17d5f54eb7518e1130a9048091c164b0ce1cce7f0179c776eb3e31c6622972ea",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 3584,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v1.53.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "60104118c753d5860de6689a2ddf5032e268c461",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/gardener-extension-shoot-cert-service",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}
