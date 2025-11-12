@@ -1,10 +1,6 @@
-name: Build
+name: HEAD Build
 
 on:
-  pull_request:
-    branches:
-      - main
-      - 'release-v*'
   push:
     branches:
       - main
