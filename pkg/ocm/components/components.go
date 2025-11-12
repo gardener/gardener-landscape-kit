@@ -27,8 +27,10 @@ type ComponentReference string
 
 const (
 	rootComponentReference = "<ROOT>"
-	resourceTypeOCIImage   = "ociImage"
-	resourceTypeHelmChart  = "helmChart/v1"
+	// ResourceTypeOCIImage is a resource type for OCI images.
+	ResourceTypeOCIImage = "ociImage"
+	// ResourceTypeHelmChart is a resource type for helm charts.
+	ResourceTypeHelmChart = "helmChart/v1"
 	// ResourceTypeHelmChartImageMap is a resource type for helm chart image maps.
 	ResourceTypeHelmChartImageMap = "helmchart-imagemap"
 )
@@ -160,7 +162,7 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 	var resources []Resource
 	for _, res := range descriptor.Component.Resources {
 		switch res.Type {
-		case resourceTypeOCIImage:
+		case ResourceTypeOCIImage:
 			src, err := resourceToImageSource(res)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
@@ -183,7 +185,7 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 					Value:   reference,
 				})
 			}
-		case resourceTypeHelmChart:
+		case ResourceTypeHelmChart:
 			var spec accessv1.OCIImage
 			if err := ociaccess.DefaultScheme.Convert(res.Access, &spec); err != nil {
 				return nil, err
@@ -511,7 +513,7 @@ func rawToImageSources(value json.RawMessage) ([]*ocmimagevector.ExtendedImageSo
 }
 
 func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.ExtendedImageSource, error) {
-	if res.Type != resourceTypeOCIImage {
+	if res.Type != ResourceTypeOCIImage {
 		return nil, nil
 	}
 
@@ -521,7 +523,7 @@ func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.Exte
 	)
 	for _, value := range res.Labels {
 		switch value.Name {
-		case labelNameImageVectorName:
+		case LabelNameImageVectorName:
 			src.Name, err = toString(value.Value)
 			src.ResourceName = res.Name
 		case labelNameImageVectorRepository:
@@ -532,7 +534,7 @@ func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.Exte
 			src.TargetVersion, err = toStringPtr(value.Value)
 		case labelNameCveCategorisation:
 			src.Labels = append(src.Labels, value)
-		case labelNameOriginalRef:
+		case LabelNameOriginalRef:
 			src.OriginalRef, err = toStringPtr(value.Value)
 		default:
 			// ignore

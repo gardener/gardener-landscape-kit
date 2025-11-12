@@ -83,3 +83,6 @@ verify: check format test sast
 
 .PHONY: verify-extended
 verify-extended: check-generate check format test-cov sast-report
+
+generate-ocm-testdata:
+	@go run ./hack/tools/ocm-testdata-generator -config $(REPO_ROOT)/test/ocm/testdata/config.yaml

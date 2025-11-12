@@ -12,10 +12,13 @@ const (
 	// LabelImageVectorApplicationValueKubernetes is the label value for the kubernetes application.
 	LabelImageVectorApplicationValueKubernetes = "kubernetes"
 
-	labelNameImageVectorName             = "imagevector.gardener.cloud/name"
+	// LabelNameImageVectorName is the label name for the image vector name
+	LabelNameImageVectorName = "imagevector.gardener.cloud/name"
+	// LabelNameOriginalRef is the label name for storing the original reference of a component
+	LabelNameOriginalRef = "cloud.gardener.cnudie/migration/original_ref"
+
 	labelNameImageVectorRepository       = "imagevector.gardener.cloud/repository"
 	labelNameImageVectorSourceRepository = "imagevector.gardener.cloud/source-repository"
 	labelNameImageVectorTargetVersion    = "imagevector.gardener.cloud/target-version"
 	labelNameCveCategorisation           = "gardener.cloud/cve-categorisation"
-	labelNameOriginalRef                 = "cloud.gardener.cnudie/migration/original_ref"
 )
