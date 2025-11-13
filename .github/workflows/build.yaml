@@ -72,7 +72,6 @@ jobs:
       contents: read
     needs:
       - tests
-      - sast-lint
     strategy:
       matrix:
         args:
