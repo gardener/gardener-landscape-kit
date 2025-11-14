@@ -14,37 +14,22 @@ import (
 
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
 func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
-	diff := newManifestDiff(newDefaultYaml, currentYaml, oldDefaultYaml)
-	return buildManifestOutput(diff)
-}
+	var (
+		output []byte
 
-// buildManifestOutput constructs the merged manifest output from the diff.
-func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
-	var output []byte
+		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
+	)
 
-	for idx, sectionKey := range diff.currentSectionOrders {
-		if sectionKey == "" {
+	for sect := range diff.current.sections() {
+		if sect.isComment {
+			output = addWithSeparator(output, sect.content)
 			continue
 		}
 
-		isRelevantComment, content := diff.isCurrentRelevantComment(idx)
-		if isRelevantComment {
-			output = addWithSeparator(output, []byte(content))
-			continue
-		}
-
-		var oldDefault, newDefault, current []byte
-		current = diff.currentYamlSections[idx]
-		newDefaultIdx := slices.Index(diff.newDefaultSectionOrders, sectionKey)
-		if newDefaultIdx != -1 {
-			newDefault = diff.newDefaultYamlSections[newDefaultIdx]
-		}
-		oldDefaultIdx := slices.Index(diff.oldDefaultSectionOrders, sectionKey)
-		if oldDefaultIdx != -1 {
-			oldDefault = diff.oldDefaultYamlSections[oldDefaultIdx]
-		}
-
-		merged, err := threeWayMergeDocument(newDefault, current, oldDefault)
+		current := sect.content
+		newDefault := diff.newDefault.splits[sect.key]
+		oldDefault := diff.oldDefault.splits[sect.key]
+		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +38,7 @@ func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
 
 	appendix := collectAppendix(diff)
 	for _, extra := range appendix {
-		output = addWithSeparator(output, []byte(extra))
+		output = addWithSeparator(output, extra)
 	}
 
 	// Ensure output ends with a newline for readability
@@ -63,7 +48,7 @@ func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
 	return output, nil
 }
 
-func threeWayMergeDocument(newDefaultYaml, currentYaml, oldDefaultYaml []byte) ([]byte, error) {
+func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
@@ -80,10 +65,10 @@ func threeWayMergeDocument(newDefaultYaml, currentYaml, oldDefaultYaml []byte) (
 		}
 	}
 
-	// Perform three-way merge
-	merged := threeWayMerge(&oldDefault, &newDefault, &current)
+	return encodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
+}
 
-	// Write the merged result back
+func encodeResult(merged *yaml.Node) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	defer encoder.Close()
@@ -347,48 +332,64 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-func splitManifestFile(combinedYaml []byte) ([]string, [][]byte) {
-	splits := bytes.Split(combinedYaml, []byte("\n---\n"))
-	keysOrder := make([]string, len(splits))
-	for i, d := range splits {
+type orderedMap struct {
+	keys   []string
+	splits map[string][]byte
+}
+
+type section struct {
+	key     string
+	content []byte
+
+	isComment bool
+}
+
+func (om *orderedMap) sections() func(yield func(*section) bool) {
+	return func(yield func(*section) bool) {
+		for _, key := range om.keys {
+			if !yield(&section{
+				key,
+				om.splits[key],
+				len(key) > 0 && key == string(om.splits[key]),
+			}) {
+				return
+			}
+		}
+	}
+}
+
+func splitManifestFile(combinedYaml []byte) *orderedMap {
+	var values [][]byte
+	if len(combinedYaml) > 0 { // Only split if there is content
+		values = bytes.Split(combinedYaml, []byte("\n---\n"))
+	}
+	om := &orderedMap{
+		keys:   make([]string, len(values)),
+		splits: make(map[string][]byte),
+	}
+	for i, v := range values {
 		var t map[string]interface{}
-		err := yaml.Unmarshal(d, &t)
+		err := yaml.Unmarshal(v, &t)
 		key := buildKey(t)
 		if err != nil || key == "" {
-			key = string(d)
+			key = string(v)
 		}
-		keysOrder[i] = key
+		om.keys[i] = key
+		om.splits[key] = v
 	}
-	return keysOrder, splits
+	return om
 }
 
 type manifestDiff struct {
-	newDefaultSectionOrders, currentSectionOrders, oldDefaultSectionOrders []string
-	newDefaultYamlSections, currentYamlSections, oldDefaultYamlSections    [][]byte
+	oldDefault, newDefault, current *orderedMap
 }
 
-func newManifestDiff(newDefaultYaml, oldManifest, oldDefaultYaml []byte) *manifestDiff {
-	newDefaultSectionOrders, newDefaultYamlSections := splitManifestFile(newDefaultYaml)
-	currentSectionOrders, currentYamlSections := splitManifestFile(oldManifest)
-	oldDefaultSectionOrders, oldDefaultYamlSections := splitManifestFile(oldDefaultYaml)
-
+func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
 	return &manifestDiff{
-		newDefaultSectionOrders: newDefaultSectionOrders,
-		newDefaultYamlSections:  newDefaultYamlSections,
-		currentSectionOrders:    currentSectionOrders,
-		currentYamlSections:     currentYamlSections,
-		oldDefaultSectionOrders: oldDefaultSectionOrders,
-		oldDefaultYamlSections:  oldDefaultYamlSections,
+		oldDefault: splitManifestFile(oldDefaultYaml),
+		newDefault: splitManifestFile(newDefaultYaml),
+		current:    splitManifestFile(currentYaml),
 	}
-}
-
-func (m *manifestDiff) isCurrentRelevantComment(sectionIndex int) (bool, string) {
-	if len(m.currentSectionOrders) > sectionIndex &&
-		m.currentSectionOrders[sectionIndex] == string(m.currentYamlSections[sectionIndex]) &&
-		len(m.currentYamlSections[sectionIndex]) > 0 {
-		return true, m.currentSectionOrders[sectionIndex]
-	}
-	return false, ""
 }
 
 func addWithSeparator(output, content []byte) []byte {
@@ -398,22 +399,17 @@ func addWithSeparator(output, content []byte) []byte {
 		}
 		output = append(output, []byte("---\n")...)
 	}
-	if len(content) > 0 {
-		output = append(output, content...)
-	}
-	return output
+	return append(output, content...)
 }
 
 // collectAppendix gathers custom file content and keys not covered by current.
-func collectAppendix(diff *manifestDiff) []string {
-	var appendix []string
-	for idx, sectionKey := range diff.newDefaultSectionOrders {
-		newDefaultContent := string(diff.newDefaultYamlSections[idx])
-		hasContent := len(newDefaultContent) > 0
-		isIncludedInCurrent := slices.Contains(diff.currentSectionOrders, sectionKey)
-		isIncludedInOldDefault := slices.Contains(diff.oldDefaultSectionOrders, sectionKey)
-		if hasContent && !isIncludedInCurrent && !isIncludedInOldDefault {
-			appendix = append(appendix, newDefaultContent)
+func collectAppendix(diff *manifestDiff) [][]byte {
+	var appendix [][]byte
+	for sect := range diff.newDefault.sections() {
+		isIncludedInCurrent := slices.Contains(diff.current.keys, sect.key)
+		isIncludedInOldDefault := slices.Contains(diff.oldDefault.keys, sect.key)
+		if !isIncludedInCurrent && !isIncludedInOldDefault {
+			appendix = append(appendix, sect.content)
 		}
 	}
 	return appendix
