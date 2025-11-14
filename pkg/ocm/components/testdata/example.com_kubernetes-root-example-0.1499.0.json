@@ -1,0 +1,653 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "example.com/kubernetes-root-example",
+    "version": "0.1499.0",
+    "labels": [
+      {
+        "name": "imagevector.gardener.cloud/application",
+        "value": "kubernetes"
+      }
+    ],
+    "provider": "test-resources",
+    "resources": [
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube:v1.31.10@sha256:54ba6d6336e7ce9585db3ec3bba789bfc0980e1e514b03eec6d69d193bd15c55",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.31.10"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube:v1.31.10"
+          }
+        ],
+        "name": "hyperkube",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.31.10"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-apiserver:v1.31.10@sha256:2c6ff489959a35a9a706d8538f65918f79a9d214c5f138f9f61d495bf2a8f0e1",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.31.10"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-apiserver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-apiserver:v1.31.10"
+          }
+        ],
+        "name": "kube-apiserver",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.31.10"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-controller-manager:v1.31.10@sha256:8e34a7a3d35335d8c58f091eb314e4a562109bf61bd1b717aabad5c91f37d619",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.31.10"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-controller-manager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-controller-manager:v1.31.10"
+          }
+        ],
+        "name": "kube-controller-manager",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.31.10"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-scheduler:v1.31.10@sha256:d160a4e9d3f977bb3ce958a28e6d3db5b978e1efe32e30aa56cbd2d7d28f7d3b",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.31.10"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-scheduler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-scheduler:v1.31.10"
+          }
+        ],
+        "name": "kube-scheduler",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.31.10"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-proxy:v1.31.10@sha256:98b02695eeac27bb751269c5ac6004c3f8a2a92127aacc7393fed5b8ebf93fb6",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.31.10"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-proxy:v1.31.10"
+          }
+        ],
+        "name": "kube-proxy",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.31.10"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube:v1.32.6@sha256:7ea3d70fa985db8b1577cbae3af775af304eec06432518cc4e69d1fb5e48459f",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.6"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube:v1.32.6"
+          }
+        ],
+        "name": "hyperkube",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.6"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-apiserver:v1.32.6@sha256:d3adf68fcac28c892371907aa7a379303625528793e58d827013e02094898d95",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.6"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-apiserver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-apiserver:v1.32.6"
+          }
+        ],
+        "name": "kube-apiserver",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.6"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-controller-manager:v1.32.6@sha256:6ee3e36b6bfbb0471030bc736b15de4776693874bb53f546a6b42996f4cdeb82",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.6"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-controller-manager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-controller-manager:v1.32.6"
+          }
+        ],
+        "name": "kube-controller-manager",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.6"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-scheduler:v1.32.6@sha256:7f98481d5d11acb38e9e0b02614a9c63201e7e86a2f7099464c2404c5d114fbe",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.6"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-scheduler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-scheduler:v1.32.6"
+          }
+        ],
+        "name": "kube-scheduler",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.6"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-proxy:v1.32.6@sha256:3bf4afb8d999cae2536c73728a1a15437d3d7a8b372115e1b866b734db130c97",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.6"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-proxy:v1.32.6"
+          }
+        ],
+        "name": "kube-proxy",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.6"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube:v1.32.8@sha256:6cd7f4cf3eaabfd34eb0c500b92c1bca0c88e23b851cca6e076f0e2b6f3a18e5",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.8"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube:v1.32.8"
+          }
+        ],
+        "name": "hyperkube",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.8"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-apiserver:v1.32.8@sha256:9609f1ac7b11c079e207f74565c1ef23ea7227c01f7219646bd0620639e23bcc",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.8"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-apiserver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-apiserver:v1.32.8"
+          }
+        ],
+        "name": "kube-apiserver",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.8"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-controller-manager:v1.32.8@sha256:968741dd383332f8e19bb350e599d29971114d7529f87c2a9049b0eab06311e8",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.8"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-controller-manager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-controller-manager:v1.32.8"
+          }
+        ],
+        "name": "kube-controller-manager",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.8"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-scheduler:v1.32.8@sha256:748b268d7a354fb4a50fa1c040458f5509701506840ed53dbf092dfc6e5fa9cd",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.8"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-scheduler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-scheduler:v1.32.8"
+          }
+        ],
+        "name": "kube-scheduler",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.8"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-proxy:v1.32.8@sha256:2db4afff6bdcb3f26f94677a2c2aa2466c01d8dffead802542776e6f94011b67",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.32.8"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-proxy:v1.32.8"
+          }
+        ],
+        "name": "kube-proxy",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.32.8"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube:v1.33.3@sha256:d22f43c3fd95c21cbe09ccae917693fb5f2bf67ce1a01cf00204c5dad4efe023",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.3"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube:v1.33.3"
+          }
+        ],
+        "name": "hyperkube",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.3"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-apiserver:v1.33.3@sha256:b858e0ab23377c6e62730fcf6bb61a04b448710685cfc778a73470e9e5389ab9",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.3"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-apiserver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-apiserver:v1.33.3"
+          }
+        ],
+        "name": "kube-apiserver",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.3"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-controller-manager:v1.33.3@sha256:8fb32e649c2f2d2270a98752b5d7fec8c909c254a62fdeedc6868d8fe7ca975b",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.3"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-controller-manager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-controller-manager:v1.33.3"
+          }
+        ],
+        "name": "kube-controller-manager",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.3"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-scheduler:v1.33.3@sha256:5a4350440bc7dcc0a1249c682cfd99101a1630e172ddab113c52f54828043a32",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.3"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-scheduler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-scheduler:v1.33.3"
+          }
+        ],
+        "name": "kube-scheduler",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.3"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-proxy:v1.33.3@sha256:d00c599ec0e198254d9c687b84e92032dbb31f82b0527f9d604fd87983cfe713",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.3"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-proxy:v1.33.3"
+          }
+        ],
+        "name": "kube-proxy",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.3"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube:v1.33.4@sha256:4b8fe01810f18ba6ae20b7d5e097ebdf8030ec068bef6573ff00e079fd5ab07b",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.4"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/hyperkube:v1.33.4"
+          }
+        ],
+        "name": "hyperkube",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.4"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-apiserver:v1.33.4@sha256:807e875bf32820630ce05c2f34ed81057c32b8e767e8c94ff9a5e8f038b86707",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.4"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-apiserver"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-apiserver:v1.33.4"
+          }
+        ],
+        "name": "kube-apiserver",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.4"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-controller-manager:v1.33.4@sha256:3dcda7ff24f6e15a472e70c361f671355fd9fadd8a2b5b898952da3f315e74a5",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.4"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-controller-manager"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-controller-manager:v1.33.4"
+          }
+        ],
+        "name": "kube-controller-manager",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.4"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-scheduler:v1.33.4@sha256:7a58dab39c717fc85d57cc0ec860852e35a1c3a6fdac9fa7345f70e7226b55df",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.4"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-scheduler"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-scheduler:v1.33.4"
+          }
+        ],
+        "name": "kube-scheduler",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.4"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/registry_k8s_io/kube-proxy:v1.33.4@sha256:a9c427c60651b033f3217ec55cb51424dcbb88de1a7bf4c528dad016693e28e2",
+          "type": "ociRegistry"
+        },
+        "extraIdentity": {
+          "version": "1.33.4"
+        },
+        "labels": [
+          {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "registry.k8s.io/kube-proxy"
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "registry.k8s.io/kube-proxy:v1.33.4"
+          }
+        ],
+        "name": "kube-proxy",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "1.33.4"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/ghcr_io/stackitcloud/gardener-extension-acl:v1.8.0@sha256:8552f8c6aef33106380334cf31cb2b6665b4ea59d2c564232e77aa0ec0d67581",
+          "type": "ociRegistry"
+        },
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "ghcr.io/stackitcloud/gardener-extension-acl:v1.8.0"
+          }
+        ],
+        "name": "extension-acl",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "v1.8.0"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/ghcr_io/stackitcloud/gardener-extension-admission-acl:v1.8.0@sha256:8c32838421760a93a35a7a9daaf5eaa22bef827597370a10f46257f99a4ae0f6",
+          "type": "ociRegistry"
+        },
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "ghcr.io/stackitcloud/gardener-extension-admission-acl:v1.8.0"
+          }
+        ],
+        "name": "extension-admission-acl",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "v1.8.0"
+      },
+      {
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/ghcr_io/stackitcloud/charts/gardener-extension-acl:v1.8.0@sha256:19e2f856ad65a1f1cfd28938b35ea05880b8ea4f8fc915fb3e7eef067de5b698",
+          "type": "ociRegistry"
+        },
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "ghcr.io/stackitcloud/charts/gardener-extension-acl:v1.8.0"
+          }
+        ],
+        "name": "helmchart-extension-acl",
+        "relation": "external",
+        "type": "ociImage",
+        "version": "v1.8.0"
+      }
+    ],
+    "componentReferences": [
+      {
+        "componentName": "github.com/gardener/gardener-extension-shoot-cert-service",
+        "name": "gardener-extensions_extension-shoot-cert-service",
+        "version": "v1.53.0"
+      },
+      {
+        "componentName": "github.com/gardener/gardener",
+        "name": "gardener",
+        "version": "v1.128.3"
+      }
+    ]
+  }
+}

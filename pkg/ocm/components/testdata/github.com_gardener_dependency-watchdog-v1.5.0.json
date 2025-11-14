@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/dependency-watchdog",
+    "version": "v1.5.0",
+    "labels": [
+      {
+        "name": "cloud.gardener/ocm/creation-date",
+        "value": "2025-05-30T14:12:55.221863+00:00"
+      }
+    ],
+    "creationTime": "2025-05-30T14:12:55.221925+00:00",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "dependency-watchdog",
+        "version": "v1.5.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/dependency-watchdog:v1.5.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v1.5.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/dependency-watchdog:v1.5.0@sha256:506ea4613bf32691b13972652f07db6dd552dd706ec94574814bc934ad6ed89d",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "check-build-step-log",
+        "version": "v1.5.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/data",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6c539d986cd91ec27191b92cf90f0629fd3543199fb696d0199d18a386caf7e9",
+          "mediaType": "application/gzip",
+          "referenceName": null,
+          "size": 6627,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v1.5.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:aa01366c2e9f65d42c9abb0eb79d506eafccc4f44cb9bc6537a30af38a82fe32",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 575,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "github_com_gardener_dependency-watchdog",
+        "version": "v1.5.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          },
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "2b8c67e0e79193e751aec7342aac8693f0845535",
+          "ref": "refs/tags/v1.5.0",
+          "repoUrl": "github.com/gardener/dependency-watchdog",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

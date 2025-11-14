@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/ingress-default-backend",
+    "version": "0.24.0",
+    "creationTime": "2025-09-12T10:19:39Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "gosec-report",
+        "version": "0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:7eeca183e744a59a5121e92d47cc319dcbaf68ab9a8a5225ce30e0ea5c618f8b",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 648,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "0.24.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4c474d86e0c4d7d8b30c5a19dc21d1e088714f19ec4c1f46adf80c4d516f42ee",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 981,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "ingress-default-backend",
+        "version": "0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/ingress-default-backend:0.24.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "0.24.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/ingress-default-backend:0.24.0@sha256:4c9b83da61f44d255d128c56421450de95fbdd2c9f77d8ff8e9a15b8ca41a924",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "0.24.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:4f8a4db858074d0b959df1d207a59754f1e630937015076f5c469fb37a8fbc48",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 358,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "0.24.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:069db1b24b3bf88fb9db26028b937805e4e6505f7bc74291635f452f395ba3f1",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 2560,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "0.24.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec for sast scanning. See attached log.\n"
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "f57861bd1cbc1d36e0fb35053484fd0c1df1ab48",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/ingress-default-backend",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}

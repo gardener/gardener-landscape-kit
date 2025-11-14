@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "schemaVersion": "v2"
+  },
+  "component": {
+    "name": "github.com/gardener/machine-controller-manager",
+    "version": "v0.60.0",
+    "creationTime": "2025-08-29T11:57:14Z",
+    "repositoryContexts": [
+      {
+        "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
+        "subPath": null,
+        "type": "ociRegistry"
+      }
+    ],
+    "provider": "SAP SE",
+    "resources": [
+      {
+        "name": "machine-controller-manager",
+        "version": "v0.60.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/cve-categorisation",
+            "value": {
+              "authentication_enforced": false,
+              "availability_requirement": "low",
+              "confidentiality_requirement": "high",
+              "integrity_requirement": "high",
+              "network_exposure": "protected",
+              "user_interaction": "gardener-operator"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/machine-controller-manager:v0.60.0"
+          }
+        ],
+        "extraIdentity": {
+          "version": "v0.60.0"
+        },
+        "type": "ociImage",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/machine-controller-manager:v0.60.0@sha256:5e122103eb074d4abed642679d70de5de44d511bacd6bfa3c10e49352ab581ec",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "gosec-report",
+        "version": "v0.60.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "lint",
+              "sast",
+              "gosec"
+            ]
+          },
+          {
+            "name": "gardener.cloud/comment",
+            "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:a0d8c3affdad1264a5264252ae0fe6c8323678e3e8175e1e39bde21a090fcbe0",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 4961,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "test-results",
+        "version": "v0.60.0",
+        "labels": [
+          {
+            "name": "gardener.cloud/purposes",
+            "value": [
+              "test"
+            ]
+          }
+        ],
+        "type": "application/gzip",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:47f0d1de222a949e1006ff1ed7d20be566599619f178d37bbf32d60134b96338",
+          "mediaType": "application/data",
+          "referenceName": null,
+          "size": 10532,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes",
+        "version": "v0.60.0",
+        "type": "text/markdown.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:6168999d8f7fea7943de6a37de8021b8db4f9ed6d4f8719259f54af2a7b1c276",
+          "mediaType": "text/markdown.release-notes",
+          "referenceName": null,
+          "size": 2257,
+          "type": "localBlob/v1"
+        }
+      },
+      {
+        "name": "release-notes-archive",
+        "version": "v0.60.0",
+        "type": "application/tar.release-notes",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:60969bcceb51c2885a2ad3eb71fc8d9e794bf764eaf7cf1f1bd5bc405f800bf9",
+          "mediaType": "application/tar.release-notes",
+          "referenceName": null,
+          "size": 5632,
+          "type": "localBlob/v1"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "name": "main-source",
+        "version": "v0.60.0",
+        "labels": [
+          {
+            "name": "cloud.gardener/cicd/source",
+            "value": {
+              "repository-classification": "main"
+            }
+          },
+          {
+            "name": "cloud.gardener.cnudie/dso/scanning-hints/source_analysis/v1",
+            "value": {
+              "comment": "we use gosec for sast scanning. See attached log.\n",
+              "policy": "skip"
+            }
+          }
+        ],
+        "type": "git",
+        "access": {
+          "commit": "798d8a03cdf7461df1983e37c11a6d3081546e5a",
+          "ref": "refs/heads/master",
+          "repoUrl": "github.com/gardener/machine-controller-manager",
+          "type": "github"
+        }
+      }
+    ],
+    "componentReferences": []
+  }
+}
