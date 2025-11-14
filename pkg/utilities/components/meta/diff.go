@@ -6,60 +6,26 @@ package meta
 
 import (
 	"bytes"
-	"os"
-	"path"
 
-	"github.com/spf13/afero"
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
-const (
-	// GLKSystemDirName is the name of the directory that contains system files for gardener-landscape-kit.
-	GLKSystemDirName = ".glk"
-
-	// DefaultDirName is the name of the directory within the GLK system directory that contains the default generated configuration files.
-	DefaultDirName = "defaults"
-)
-
-// CreateOrUpdateManifest creates or updates a manifest file at the given filePath within the baseDir based on a given YAML object.
-// If the manifest file already exists, it patches changes from the newDefaultYaml.
-// Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs afero.Afero) error {
-	filePathManifest := path.Join(baseDir, filePath)
-	oldManifest, err := fs.ReadFile(filePathManifest)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	filePathDefault := path.Join(baseDir, GLKSystemDirName, DefaultDirName, filePath)
-	oldDefaultYaml, err := fs.ReadFile(filePathDefault)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	for _, dir := range []string{
-		filePathManifest,
-		filePathDefault,
-	} {
-		if err := fs.MkdirAll(path.Dir(dir), 0700); err != nil {
-			return err
-		}
-	}
-
+// ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
+func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
-		return err
+		return nil, err
 	}
-	if err := yaml.Unmarshal(oldManifest, &current); err != nil {
-		return err
+	if err := yaml.Unmarshal(currentYaml, &current); err != nil {
+		return nil, err
 	}
 
 	// If no old default exists, use empty node (will cause all existing keys to be treated as user-added)
 	if len(oldDefaultYaml) > 0 {
 		if err := yaml.Unmarshal(oldDefaultYaml, &oldDefault); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -72,21 +38,10 @@ func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs 
 	defer encoder.Close()
 	encoder.SetIndent(2)
 	if err := encoder.Encode(merged); err != nil {
-		return err
+		return nil, err
 	}
 
-	mergedYaml := buf.Bytes()
-
-	if err := fs.WriteFile(filePathManifest, mergedYaml, 0600); err != nil {
-		return err
-	}
-
-	// Update the default
-	if err := fs.WriteFile(filePathDefault, newDefaultYaml, 0600); err != nil {
-		return err
-	}
-
-	return nil
+	return buf.Bytes(), nil
 }
 
 // threeWayMerge performs a three-way merge of YAML nodes
