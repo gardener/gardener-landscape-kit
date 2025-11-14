@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and Gardener contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
@@ -7,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -73,8 +78,7 @@ func (g *generator) Generate(targetDir string) error {
 		return fmt.Errorf("failed to create repo access: %w", err)
 	}
 
-	toBeProcessed := make([]Component, 0)
-	toBeProcessed = append(toBeProcessed, g.config.Components...)
+	toBeProcessed := slices.Clone(g.config.Components)
 	processedComponents := set.New[components.ComponentReference]()
 	for len(toBeProcessed) > 0 {
 		current := toBeProcessed[0]

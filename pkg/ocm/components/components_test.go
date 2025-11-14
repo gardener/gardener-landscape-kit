@@ -20,7 +20,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
-const resourcesDir = "../../../test/ocm/testdata"
+const resourcesDir = "testdata"
 
 const (
 	refShootCertService = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
@@ -62,7 +62,7 @@ var _ = Describe("Components", func() {
 		imageVector, err := c.GetImageVector(refShootCertService, false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(HaveLen(1))
-		Expect(imageVector, "").To(ConsistOf(
+		Expect(imageVector).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "cert-management",
 				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/cert-controller-manager"),
@@ -74,7 +74,7 @@ var _ = Describe("Components", func() {
 		imageVector, err = c.GetImageVector(refShootCertService, true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(HaveLen(1))
-		Expect(imageVector, "").To(ConsistOf(
+		Expect(imageVector).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "cert-management",
 				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager"),

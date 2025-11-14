@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestLandscape(t *testing.T) {
+func TestComponents(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "OCM Components Suite")
 }

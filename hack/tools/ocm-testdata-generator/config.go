@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and Gardener contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
@@ -12,9 +16,9 @@ type Config struct {
 	RootComponent Component `json:"rootComponent"`
 	// KubernetesVersions contains the list of Kubernetes versions to generate resources for.
 	KubernetesVersions []string `json:"kubernetesVersions"`
-	// ExternalResources are the list of external resources to add to the root component
+	// ExternalResources is a list of external resources to be added to the root component.
 	ExternalResources []ExternalResource `json:"externalResources"`
-	// Components contains the list of other components to add to the root component
+	// Components is a list of additional components to be added to the root component.
 	Components []Component `json:"components"`
 	// TargetRepositoryURL is the URL of the target repository containing the overwrites.
 	TargetRepositoryURL string `json:"targetRepositoryURL"`
