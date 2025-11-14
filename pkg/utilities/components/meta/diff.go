@@ -6,87 +6,78 @@ package meta
 
 import (
 	"bytes"
-	"os"
-	"path"
+	"slices"
 
-	"github.com/spf13/afero"
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
-const (
-	// GLKSystemDirName is the name of the directory that contains system files for gardener-landscape-kit.
-	GLKSystemDirName = ".glk"
+// ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
+func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
+	var (
+		output []byte
 
-	// DefaultDirName is the name of the directory within the GLK system directory that contains the default generated configuration files.
-	DefaultDirName = "defaults"
-)
+		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
+	)
 
-// CreateOrUpdateManifest creates or updates a manifest file at the given filePath within the baseDir based on a given YAML object.
-// If the manifest file already exists, it patches changes from the newDefaultYaml.
-// Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs afero.Afero) error {
-	filePathManifest := path.Join(baseDir, filePath)
-	oldManifest, err := fs.ReadFile(filePathManifest)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	filePathDefault := path.Join(baseDir, GLKSystemDirName, DefaultDirName, filePath)
-	oldDefaultYaml, err := fs.ReadFile(filePathDefault)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	for _, dir := range []string{
-		filePathManifest,
-		filePathDefault,
-	} {
-		if err := fs.MkdirAll(path.Dir(dir), 0700); err != nil {
-			return err
+	for sect := range diff.current.sections() {
+		if sect.isComment {
+			output = addWithSeparator(output, sect.content)
+			continue
 		}
+
+		current := sect.content
+		newDefault := diff.newDefault.splits[sect.key]
+		oldDefault := diff.oldDefault.splits[sect.key]
+		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
+		if err != nil {
+			return nil, err
+		}
+		output = addWithSeparator(output, merged)
 	}
 
+	appendix := collectAppendix(diff)
+	for _, extra := range appendix {
+		output = addWithSeparator(output, extra)
+	}
+
+	// Ensure output ends with a newline for readability
+	if len(output) > 0 && output[len(output)-1] != '\n' {
+		output = append(output, '\n')
+	}
+	return output, nil
+}
+
+func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
-		return err
+		return nil, err
 	}
-	if err := yaml.Unmarshal(oldManifest, &current); err != nil {
-		return err
+	if err := yaml.Unmarshal(currentYaml, &current); err != nil {
+		return nil, err
 	}
 
 	// If no old default exists, use empty node (will cause all existing keys to be treated as user-added)
 	if len(oldDefaultYaml) > 0 {
 		if err := yaml.Unmarshal(oldDefaultYaml, &oldDefault); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	// Perform three-way merge
-	merged := threeWayMerge(&oldDefault, &newDefault, &current)
+	return encodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
+}
 
-	// Write the merged result back
+func encodeResult(merged *yaml.Node) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	defer encoder.Close()
 	encoder.SetIndent(2)
 	if err := encoder.Encode(merged); err != nil {
-		return err
+		return nil, err
 	}
 
-	mergedYaml := buf.Bytes()
-
-	if err := fs.WriteFile(filePathManifest, mergedYaml, 0600); err != nil {
-		return err
-	}
-
-	// Update the default
-	if err := fs.WriteFile(filePathDefault, newDefaultYaml, 0600); err != nil {
-		return err
-	}
-
-	return nil
+	return buf.Bytes(), nil
 }
 
 // threeWayMerge performs a three-way merge of YAML nodes
@@ -339,4 +330,100 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 		return true
 	}
 	return true
+}
+
+type orderedMap struct {
+	keys   []string
+	splits map[string][]byte
+}
+
+type section struct {
+	key     string
+	content []byte
+
+	isComment bool
+}
+
+func (om *orderedMap) sections() func(yield func(*section) bool) {
+	return func(yield func(*section) bool) {
+		for _, key := range om.keys {
+			if !yield(&section{
+				key,
+				om.splits[key],
+				len(key) > 0 && key == string(om.splits[key]),
+			}) {
+				return
+			}
+		}
+	}
+}
+
+func splitManifestFile(combinedYaml []byte) *orderedMap {
+	var values [][]byte
+	if len(combinedYaml) > 0 { // Only split if there is content
+		values = bytes.Split(combinedYaml, []byte("\n---\n"))
+	}
+	om := &orderedMap{
+		keys:   make([]string, len(values)),
+		splits: make(map[string][]byte),
+	}
+	for i, v := range values {
+		var t map[string]interface{}
+		err := yaml.Unmarshal(v, &t)
+		key := buildKey(t)
+		if err != nil || key == "" {
+			key = string(v)
+		}
+		om.keys[i] = key
+		om.splits[key] = v
+	}
+	return om
+}
+
+type manifestDiff struct {
+	oldDefault, newDefault, current *orderedMap
+}
+
+func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
+	return &manifestDiff{
+		oldDefault: splitManifestFile(oldDefaultYaml),
+		newDefault: splitManifestFile(newDefaultYaml),
+		current:    splitManifestFile(currentYaml),
+	}
+}
+
+func addWithSeparator(output, content []byte) []byte {
+	if len(output) > 0 {
+		if output[len(output)-1] != '\n' {
+			output = append(output, '\n')
+		}
+		output = append(output, []byte("---\n")...)
+	}
+	return append(output, content...)
+}
+
+// collectAppendix gathers custom file content and keys not covered by current.
+func collectAppendix(diff *manifestDiff) [][]byte {
+	var appendix [][]byte
+	for sect := range diff.newDefault.sections() {
+		isIncludedInCurrent := slices.Contains(diff.current.keys, sect.key)
+		isIncludedInOldDefault := slices.Contains(diff.oldDefault.keys, sect.key)
+		if !isIncludedInCurrent && !isIncludedInOldDefault {
+			appendix = append(appendix, sect.content)
+		}
+	}
+	return appendix
+}
+
+func buildKey(t map[string]interface{}) string {
+	apiVersion, _ := t["apiVersion"].(string)
+	kind, _ := t["kind"].(string)
+	metadata, _ := t["metadata"].(map[string]interface{})
+	name, _ := metadata["name"].(string)
+	namespace, _ := metadata["namespace"].(string)
+	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
+		return ""
+	}
+
+	return apiVersion + "/" + kind + "/" + namespace + "/" + name
 }
