@@ -6,60 +6,11 @@ package meta
 
 import (
 	"bytes"
-	"os"
-	"path"
 	"slices"
 
-	"github.com/spf13/afero"
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
-
-const (
-	// GLKSystemDirName is the name of the directory that contains system files for gardener-landscape-kit.
-	GLKSystemDirName = ".glk"
-
-	// DefaultDirName is the name of the directory within the GLK system directory that contains the default generated configuration files.
-	DefaultDirName = "defaults"
-)
-
-// CreateOrUpdateManifest creates or updates a manifest file at the given filePath within the baseDir based on a given YAML object.
-// If the manifest file already exists, it patches changes from the newDefaultYaml.
-// Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func CreateOrUpdateManifest(newDefaultYaml []byte, baseDir, filePath string, fs afero.Afero) error {
-	manifestPath := path.Join(baseDir, filePath)
-	defaultPath := path.Join(baseDir, GLKSystemDirName, DefaultDirName, filePath)
-
-	oldManifest, err := fs.ReadFile(manifestPath)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-	oldDefaultYaml, err := fs.ReadFile(defaultPath)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	// Ensure directories exist
-	for _, d := range []string{manifestPath, defaultPath} {
-		if err := fs.MkdirAll(path.Dir(d), 0700); err != nil {
-			return err
-		}
-	}
-
-	diff := newManifestDiff(newDefaultYaml, oldManifest, oldDefaultYaml)
-	output, err := buildManifestOutput(diff)
-	if err != nil {
-		return err
-	}
-
-	if err := fs.WriteFile(manifestPath, output, 0600); err != nil {
-		return err
-	}
-	if err := fs.WriteFile(defaultPath, newDefaultYaml, 0600); err != nil {
-		return err
-	}
-	return nil
-}
 
 // buildManifestOutput constructs the merged manifest output from the diff.
 func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
@@ -87,7 +38,7 @@ func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
 			oldDefault = diff.oldDefaultYamlSections[oldDefaultIdx]
 		}
 
-		merged, err := threeWayMergeDocument(newDefault, current, oldDefault)
+		merged, err := threeWayMergeDocument(oldDefault, newDefault, current)
 		if err != nil {
 			return nil, err
 		}
@@ -106,13 +57,14 @@ func buildManifestOutput(diff *manifestDiff) ([]byte, error) {
 	return output, nil
 }
 
-func threeWayMergeDocument(newDefaultYaml, oldManifest, oldDefaultYaml []byte) ([]byte, error) {
+// threeWayMergeDocument creates or updates a manifest based on a given YAML object.
+func threeWayMergeDocument(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
 		return nil, err
 	}
-	if err := yaml.Unmarshal(oldManifest, &current); err != nil {
+	if err := yaml.Unmarshal(currentYaml, &current); err != nil {
 		return nil, err
 	}
 
