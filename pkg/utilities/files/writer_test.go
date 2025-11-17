@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package kustomization_test
+package files_test
 
 import (
 	_ "embed"
@@ -15,7 +15,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/components/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
 )
 
 var _ = Describe("Writer", func() {
@@ -46,8 +46,8 @@ var _ = Describe("Writer", func() {
 
 	Describe("#ComputeBasePath", func() {
 		It("should compute the base path correctly", func() {
-			Expect(kustomization.ComputeBasePath("/someBase/path", "/someLandscape/path")).To(Equal("/someBase/path"))
-			Expect(kustomization.ComputeBasePath("/sharedPrefix/base", "/sharedPrefix/landscape")).To(Equal("base"))
+			Expect(files.ComputeBasePath("/someBase/path", "/someLandscape/path")).To(Equal("/someBase/path"))
+			Expect(files.ComputeBasePath("/sharedPrefix/base", "/sharedPrefix/landscape")).To(Equal("base"))
 		})
 	})
 
@@ -60,7 +60,7 @@ var _ = Describe("Writer", func() {
 			baseDir := "/path/to"
 			path := "my/files"
 
-			Expect(kustomization.WriteObjectsToFilesystem(objects, baseDir, path, fs)).To(Succeed())
+			Expect(files.WriteObjectsToFilesystem(objects, baseDir, path, fs)).To(Succeed())
 
 			contents, err := fs.ReadFile("/path/to/my/files/file.txt")
 			Expect(err).NotTo(HaveOccurred())
@@ -74,7 +74,7 @@ var _ = Describe("Writer", func() {
 
 	Describe("#WriteObjectsToFilesystem", func() {
 		It("should overwrite the manifest file if no meta file is present yet", func() {
-			Expect(kustomization.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
 
 			content, err := fs.ReadFile("/landscape/.glk/defaults/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())
@@ -86,7 +86,7 @@ var _ = Describe("Writer", func() {
 		})
 
 		It("should patch only changed default values on subsequent generates and retain custom modifications", func() {
-			Expect(kustomization.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
 
 			content, err := fs.ReadFile("/landscape/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())
@@ -105,7 +105,7 @@ var _ = Describe("Writer", func() {
 			objYaml, err = yaml.Marshal(obj)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(kustomization.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
 
 			content, err = fs.ReadFile("/landscape/.glk/defaults/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())

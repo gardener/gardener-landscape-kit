@@ -10,7 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/components/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
 )
 
 const (
@@ -36,7 +36,7 @@ func GenerateFluxSystemCluster(log logr.Logger, baseDir, landscapeDir string, fs
 
 func logFluxFirstSteps(log logr.Logger, baseDir, landscapeDir string) {
 	fluxDir := path.Join(landscapeDir, DirName)
-	landscapePath := kustomization.ComputeBasePath(landscapeDir, baseDir)
+	landscapePath := files.ComputeBasePath(landscapeDir, baseDir)
 	log.Info(`Initialized the landscape for an expected Flux cluster at: ` + fluxDir + `
 
 Next steps:
