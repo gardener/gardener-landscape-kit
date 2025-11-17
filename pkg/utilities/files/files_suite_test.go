@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestKustomization(t *testing.T) {
+func TestFiles(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Kustomization Suite")
+	RunSpecs(t, "Files Suite")
 }
