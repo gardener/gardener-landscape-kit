@@ -14,6 +14,22 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
+func newSection(key string, content []byte) *section {
+	return &section{
+		key:     key,
+		content: content,
+	}
+}
+
+type section struct {
+	key     string
+	content []byte
+}
+
+func (s *section) isComment() bool {
+	return len(s.key) > 0 && s.key == string(s.content)
+}
+
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
 // It performs a three-way merge between the old default template, the new default template, and the current user-modified version.
 // It preserves user modifications while applying updates from the new default template.
@@ -25,15 +41,16 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
 	)
 
-	for sect := range diff.current.Sections() {
-		if sect.IsComment() {
-			output = addWithSeparator(output, sect.Content)
+	for key, value := range diff.current.Entries() {
+		sect := newSection(key, value)
+		if sect.isComment() {
+			output = addWithSeparator(output, sect.content)
 			continue
 		}
 
-		current := sect.Content
-		newDefault := diff.newDefault.Splits[sect.Key]
-		oldDefault := diff.oldDefault.Splits[sect.Key]
+		current := sect.content
+		newDefault := diff.newDefault.Splits[sect.key]
+		oldDefault := diff.oldDefault.Splits[sect.key]
 		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
 		if err != nil {
 			return nil, err
@@ -178,7 +195,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 		_, existedInOld := oldMap[key]
 
 		if !existsInNew && !existedInOld {
-			// Key exists only in current (user-added) - keep it at the end
+			// key exists only in current (user-added) - keep it at the end
 			result.Content = append(result.Content, keyNode, valueNode)
 		}
 	}
@@ -384,11 +401,12 @@ func addWithSeparator(output, content []byte) []byte {
 // collectAppendix gathers custom file content and keys not covered by current.
 func collectAppendix(diff *manifestDiff) [][]byte {
 	var appendix [][]byte
-	for sect := range diff.newDefault.Sections() {
-		isIncludedInCurrent := slices.Contains(diff.current.Keys, sect.Key)
-		isIncludedInOldDefault := slices.Contains(diff.oldDefault.Keys, sect.Key)
+	for key, value := range diff.newDefault.Entries() {
+		sect := newSection(key, value)
+		isIncludedInCurrent := slices.Contains(diff.current.Keys, sect.key)
+		isIncludedInOldDefault := slices.Contains(diff.oldDefault.Keys, sect.key)
 		if !isIncludedInCurrent && !isIncludedInOldDefault {
-			appendix = append(appendix, sect.Content)
+			appendix = append(appendix, sect.content)
 		}
 	}
 	return appendix
