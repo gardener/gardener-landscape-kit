@@ -10,9 +10,14 @@ import (
 
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
+// It performs a three-way merge between the old default template, the new default template, and the current user-modified version.
+// It preserves user modifications while applying updates from the new default template.
+// Contents from the current manifest are prioritized and sorted first.
 func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	var (
 		output []byte
@@ -20,15 +25,15 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
 	)
 
-	for sect := range diff.current.sections() {
-		if sect.isComment {
-			output = addWithSeparator(output, sect.content)
+	for sect := range diff.current.Sections() {
+		if sect.IsComment() {
+			output = addWithSeparator(output, sect.Content)
 			continue
 		}
 
-		current := sect.content
-		newDefault := diff.newDefault.splits[sect.key]
-		oldDefault := diff.oldDefault.splits[sect.key]
+		current := sect.Content
+		newDefault := diff.newDefault.Splits[sect.Key]
+		oldDefault := diff.oldDefault.Splits[sect.Key]
 		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
 		if err != nil {
 			return nil, err
@@ -332,40 +337,14 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-type orderedMap struct {
-	keys   []string
-	splits map[string][]byte
-}
-
-type section struct {
-	key     string
-	content []byte
-
-	isComment bool
-}
-
-func (om *orderedMap) sections() func(yield func(*section) bool) {
-	return func(yield func(*section) bool) {
-		for _, key := range om.keys {
-			if !yield(&section{
-				key,
-				om.splits[key],
-				len(key) > 0 && key == string(om.splits[key]),
-			}) {
-				return
-			}
-		}
-	}
-}
-
-func splitManifestFile(combinedYaml []byte) *orderedMap {
+func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap {
 	var values [][]byte
 	if len(combinedYaml) > 0 { // Only split if there is content
 		values = bytes.Split(combinedYaml, []byte("\n---\n"))
 	}
-	om := &orderedMap{
-		keys:   make([]string, len(values)),
-		splits: make(map[string][]byte),
+	om := &utilities.OrderedMap{
+		Keys:   make([]string, len(values)),
+		Splits: make(map[string][]byte),
 	}
 	for i, v := range values {
 		var t map[string]interface{}
@@ -374,14 +353,14 @@ func splitManifestFile(combinedYaml []byte) *orderedMap {
 		if err != nil || key == "" {
 			key = string(v)
 		}
-		om.keys[i] = key
-		om.splits[key] = v
+		om.Keys[i] = key
+		om.Splits[key] = v
 	}
 	return om
 }
 
 type manifestDiff struct {
-	oldDefault, newDefault, current *orderedMap
+	oldDefault, newDefault, current *utilities.OrderedMap
 }
 
 func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
@@ -405,11 +384,11 @@ func addWithSeparator(output, content []byte) []byte {
 // collectAppendix gathers custom file content and keys not covered by current.
 func collectAppendix(diff *manifestDiff) [][]byte {
 	var appendix [][]byte
-	for sect := range diff.newDefault.sections() {
-		isIncludedInCurrent := slices.Contains(diff.current.keys, sect.key)
-		isIncludedInOldDefault := slices.Contains(diff.oldDefault.keys, sect.key)
+	for sect := range diff.newDefault.Sections() {
+		isIncludedInCurrent := slices.Contains(diff.current.Keys, sect.Key)
+		isIncludedInOldDefault := slices.Contains(diff.oldDefault.Keys, sect.Key)
 		if !isIncludedInCurrent && !isIncludedInOldDefault {
-			appendix = append(appendix, sect.content)
+			appendix = append(appendix, sect.Content)
 		}
 	}
 	return appendix
