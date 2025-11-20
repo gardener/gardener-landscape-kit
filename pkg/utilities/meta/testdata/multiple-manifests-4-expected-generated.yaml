@@ -1,3 +1,4 @@
+---
 # Edited comment. The old default one will not be added again as it did not change against the initial.
 ---
 # First test object has been removed, added third test object below instead.
@@ -15,7 +16,6 @@ apiVersion: test/v1
 kind: ThirdTestObject # Instead of the first test object
 ---
 # Another comment at the end, added by the user.
----
 ---
 apiVersion: test/v1
 kind: FourthTestObject

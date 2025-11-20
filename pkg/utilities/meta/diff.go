@@ -58,8 +58,17 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	}
 
 	appendix := collectAppendix(diff)
-	for _, extra := range appendix {
-		output = addWithSeparator(output, extra)
+	for _, sect := range appendix {
+		if sect.isComment() {
+			output = addWithSeparator(output, sect.content)
+			continue
+		}
+		// Applying threeWayMergeSection with only the new section content to ensure proper formatting (idempotency).
+		merged, err := threeWayMergeSection(nil, sect.content, nil)
+		if err != nil {
+			return nil, err
+		}
+		output = addWithSeparator(output, merged)
 	}
 
 	// Ensure output ends with a newline for readability
@@ -394,14 +403,14 @@ func addWithSeparator(output, content []byte) []byte {
 }
 
 // collectAppendix gathers custom file content and keys not covered by current.
-func collectAppendix(diff *manifestDiff) [][]byte {
-	var appendix [][]byte
+func collectAppendix(diff *manifestDiff) []*section {
+	var appendix []*section
 	for key, value := range diff.newDefault.Entries() {
 		sect := newSection(key, value)
 		_, isIncludedInCurrent := diff.current.Get(sect.key)
 		_, isIncludedInOldDefault := diff.oldDefault.Get(sect.key)
 		if !isIncludedInCurrent && !isIncludedInOldDefault {
-			appendix = append(appendix, sect.content)
+			appendix = append(appendix, sect)
 		}
 	}
 	return appendix

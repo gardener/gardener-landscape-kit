@@ -109,7 +109,6 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			// New default manifest changes should be applied, while custom edits should be retained.
 			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsNewDefault), []byte(multipleManifestsEdited))
 			Expect(err).NotTo(HaveOccurred())
-			println(string(content))
 			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
 		})
 	})
