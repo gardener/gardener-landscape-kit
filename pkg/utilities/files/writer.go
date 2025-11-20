@@ -51,14 +51,6 @@ func WriteObjectsToFilesystem(objects map[string][]byte, baseDir, filePathDir st
 			continue
 		}
 
-		for _, dir := range []string{
-			filePathCurrent,
-			filePathDefault,
-		} {
-			if err := fs.MkdirAll(path.Dir(dir), 0700); err != nil {
-				return err
-			}
-		}
 		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml)
 		if err != nil {
 			return err

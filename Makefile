@@ -17,6 +17,7 @@ LD_FLAGS             := "-w $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags
 
 TOOLS_DIR := $(HACK_DIR)/tools
 include $(GARDENER_HACK_DIR)/tools.mk
+include $(HACK_DIR)/tools.mk
 
 #########################################
 # Targets                               #
@@ -42,10 +43,11 @@ format: $(GOIMPORTS) $(GOIMPORTSREVISER)
 	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg
 
 .PHONY: generate
-generate: $(GEN_CRD_API_REFERENCE_DOCS) $(VGOPATH)
+generate: $(GEN_CRD_API_REFERENCE_DOCS) $(VGOPATH) $(FLUX_CLI)
 	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./pkg/...
 	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-github-templates.sh
+	@FLUX_CLI=$(FLUX_CLI) $(HACK_DIR)/flux-gotk-generate.sh
 
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
