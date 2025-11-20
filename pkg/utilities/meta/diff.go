@@ -6,7 +6,6 @@ package meta
 
 import (
 	"bytes"
-	"slices"
 
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -49,8 +48,8 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		}
 
 		current := sect.content
-		newDefault := diff.newDefault.Splits[sect.key]
-		oldDefault := diff.oldDefault.Splits[sect.key]
+		newDefault, _ := diff.newDefault.Get(sect.key)
+		oldDefault, _ := diff.oldDefault.Get(sect.key)
 		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
 		if err != nil {
 			return nil, err
@@ -354,30 +353,26 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap {
+func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte] {
 	var values [][]byte
 	if len(combinedYaml) > 0 { // Only split if there is content
 		values = bytes.Split(combinedYaml, []byte("\n---\n"))
 	}
-	om := &utilities.OrderedMap{
-		Keys:   make([]string, len(values)),
-		Splits: make(map[string][]byte),
-	}
-	for i, v := range values {
+	om := utilities.NewOrderedMap[string, []byte]()
+	for _, v := range values {
 		var t map[string]interface{}
 		err := yaml.Unmarshal(v, &t)
 		key := buildKey(t)
 		if err != nil || key == "" {
 			key = string(v)
 		}
-		om.Keys[i] = key
-		om.Splits[key] = v
+		om.Insert(key, v)
 	}
 	return om
 }
 
 type manifestDiff struct {
-	oldDefault, newDefault, current *utilities.OrderedMap
+	oldDefault, newDefault, current *utilities.OrderedMap[string, []byte]
 }
 
 func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
@@ -403,8 +398,8 @@ func collectAppendix(diff *manifestDiff) [][]byte {
 	var appendix [][]byte
 	for key, value := range diff.newDefault.Entries() {
 		sect := newSection(key, value)
-		isIncludedInCurrent := slices.Contains(diff.current.Keys, sect.key)
-		isIncludedInOldDefault := slices.Contains(diff.oldDefault.Keys, sect.key)
+		_, isIncludedInCurrent := diff.current.Get(sect.key)
+		_, isIncludedInOldDefault := diff.oldDefault.Get(sect.key)
 		if !isIncludedInCurrent && !isIncludedInOldDefault {
 			appendix = append(appendix, sect.content)
 		}
