@@ -1,0 +1,10 @@
+---
+# This comment should be preserved.
+---
+# This comment is changed.
+---
+apiVersion: test/v1
+kind: FirstTestObject
+---
+apiVersion: test/v1
+kind: SecondTestObject

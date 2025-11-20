@@ -9,10 +9,76 @@ import (
 
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
+func newSection(key string, content []byte) *section {
+	return &section{
+		key:     key,
+		content: content,
+	}
+}
+
+type section struct {
+	key     string
+	content []byte
+}
+
+func (s *section) isComment() bool {
+	return len(s.key) > 0 && s.key == string(s.content)
+}
+
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
+// It performs a three-way merge between the old default template, the new default template, and the current user-modified version.
+// It preserves user modifications while applying updates from the new default template.
+// Contents from the current manifest are prioritized and sorted first.
 func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
+	var (
+		output []byte
+
+		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
+	)
+
+	for key, value := range diff.current.Entries() {
+		sect := newSection(key, value)
+		if sect.isComment() {
+			output = addWithSeparator(output, sect.content)
+			continue
+		}
+
+		current := sect.content
+		newDefault, _ := diff.newDefault.Get(sect.key)
+		oldDefault, _ := diff.oldDefault.Get(sect.key)
+		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
+		if err != nil {
+			return nil, err
+		}
+		output = addWithSeparator(output, merged)
+	}
+
+	appendix := collectAppendix(diff)
+	for _, sect := range appendix {
+		if sect.isComment() {
+			output = addWithSeparator(output, sect.content)
+			continue
+		}
+		// Applying threeWayMergeSection with only the new section content to ensure proper formatting (idempotency).
+		merged, err := threeWayMergeSection(nil, sect.content, nil)
+		if err != nil {
+			return nil, err
+		}
+		output = addWithSeparator(output, merged)
+	}
+
+	// Ensure output ends with a newline for readability
+	if len(output) > 0 && output[len(output)-1] != '\n' {
+		output = append(output, '\n')
+	}
+	return output, nil
+}
+
+func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
@@ -29,10 +95,10 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		}
 	}
 
-	// Perform three-way merge
-	merged := threeWayMerge(&oldDefault, &newDefault, &current)
+	return encodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
+}
 
-	// Write the merged result back
+func encodeResult(merged *yaml.Node) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	defer encoder.Close()
@@ -137,7 +203,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 		_, existedInOld := oldMap[key]
 
 		if !existsInNew && !existedInOld {
-			// Key exists only in current (user-added) - keep it at the end
+			// key exists only in current (user-added) - keep it at the end
 			result.Content = append(result.Content, keyNode, valueNode)
 		}
 	}
@@ -294,4 +360,71 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 		return true
 	}
 	return true
+}
+
+func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte] {
+	var values [][]byte
+	if len(combinedYaml) > 0 { // Only split if there is content
+		values = bytes.Split(combinedYaml, []byte("\n---\n"))
+	}
+	om := utilities.NewOrderedMap[string, []byte]()
+	for _, v := range values {
+		var t map[string]interface{}
+		err := yaml.Unmarshal(v, &t)
+		key := buildKey(t)
+		if err != nil || key == "" {
+			key = string(v)
+		}
+		om.Insert(key, v)
+	}
+	return om
+}
+
+type manifestDiff struct {
+	oldDefault, newDefault, current *utilities.OrderedMap[string, []byte]
+}
+
+func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
+	return &manifestDiff{
+		oldDefault: splitManifestFile(oldDefaultYaml),
+		newDefault: splitManifestFile(newDefaultYaml),
+		current:    splitManifestFile(currentYaml),
+	}
+}
+
+func addWithSeparator(output, content []byte) []byte {
+	if len(output) > 0 {
+		if output[len(output)-1] != '\n' {
+			output = append(output, '\n')
+		}
+		output = append(output, []byte("---\n")...)
+	}
+	return append(output, content...)
+}
+
+// collectAppendix gathers custom file content and keys not covered by current.
+func collectAppendix(diff *manifestDiff) []*section {
+	var appendix []*section
+	for key, value := range diff.newDefault.Entries() {
+		sect := newSection(key, value)
+		_, isIncludedInCurrent := diff.current.Get(sect.key)
+		_, isIncludedInOldDefault := diff.oldDefault.Get(sect.key)
+		if !isIncludedInCurrent && !isIncludedInOldDefault {
+			appendix = append(appendix, sect)
+		}
+	}
+	return appendix
+}
+
+func buildKey(t map[string]interface{}) string {
+	apiVersion, _ := t["apiVersion"].(string)
+	kind, _ := t["kind"].(string)
+	metadata, _ := t["metadata"].(map[string]interface{})
+	name, _ := metadata["name"].(string)
+	namespace, _ := metadata["namespace"].(string)
+	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
+		return ""
+	}
+
+	return apiVersion + "/" + kind + "/" + namespace + "/" + name
 }

@@ -1,0 +1,21 @@
+---
+# This comment should be preserved.
+---
+# This comment is changed.
+---
+apiVersion: test/v1
+kind: FirstTestObject
+data:
+  change_to_first_obj: "ignored_as_removed_by_user"
+---
+apiVersion: test/v1
+kind: SecondTestObject
+data:
+  edited: "true"
+  in: "default"
+---
+---
+apiVersion: test/v1
+kind: FourthTestObject
+---
+# Another comment at the end, added in the default.
