@@ -46,6 +46,7 @@ generate: $(GEN_CRD_API_REFERENCE_DOCS) $(VGOPATH)
 	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./pkg/...
 	@REPO_ROOT=$(REPO_ROOT) VGOPATH=$(VGOPATH) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-github-templates.sh
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) ./hack/generate-renovate-ignore-deps.sh
 
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
