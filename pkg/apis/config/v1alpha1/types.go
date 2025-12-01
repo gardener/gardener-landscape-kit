@@ -17,6 +17,45 @@ type LandscapeKitConfiguration struct {
 	// OCM is the configuration for the OCM version processing.
 	// +optional
 	OCM *OCMConfig `json:"ocm,omitempty"`
+	// Git is the configuration for the Git repository.
+	Git *GitRepository `json:"git,omitempty"`
+}
+
+// GitRepository contains information the Git repository containing landscape deployments and configurations.
+type GitRepository struct {
+	// URL specifies the Git repository URL, it can be an HTTP/S or SSH address.
+	// +required
+	URL string `json:"url"`
+	// Reference specifies the Git reference to resolve and monitor for
+	// changes, defaults to the 'master' branch.
+	// +required
+	Ref GitRepositoryRef `json:"ref"`
+	// Paths specifies the path configuration within the Git repository.
+	// +required
+	Paths PathConfiguration `json:"paths"`
+}
+
+// PathConfiguration contains path configuration within the Git repository.
+type PathConfiguration struct {
+	// Base is the relative path to the base directory within the Git repository.
+	// +required
+	Base string `json:"base"`
+	// Landscape is the relative path to the landscape directory within the Git repository.
+	// +required
+	Landscape string `json:"landscape"`
+}
+
+// GitRepositoryRef specifies the Git reference to resolve and checkout.
+type GitRepositoryRef struct {
+	// Branch to check out, defaults to 'main' if no other field is defined.
+	// +optional
+	Branch *string `json:"branch,omitempty"`
+	// Tag to check out, takes precedence over Branch.
+	// +optional
+	Tag *string `json:"tag,omitempty"`
+	// Commit SHA to check out, takes precedence over all reference fields.
+	// +optional
+	Commit *string `json:"commit,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
