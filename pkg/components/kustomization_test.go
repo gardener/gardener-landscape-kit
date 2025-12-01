@@ -5,6 +5,7 @@
 package components
 
 import (
+	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
@@ -18,7 +19,7 @@ var _ = Describe("Component Generation", func() {
 
 	BeforeEach(func() {
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-		opts = NewOptions("/baseDir", "/landscapeDir", fs)
+		opts = NewOptions("/baseDir", "/landscapeDir", fs, logr.Discard())
 	})
 
 	It("should generate kustomization files within a component directory", func() {

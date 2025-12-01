@@ -44,7 +44,7 @@ func (r *registry) generateLandscape(opts Options) error {
 			return err
 		}
 	}
-	return nil
+	return writeLandscapeComponentsKustomizations(opts)
 }
 
 // NewRegistry creates a new component registry.

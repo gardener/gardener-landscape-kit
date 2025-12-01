@@ -5,6 +5,7 @@
 package flux_test
 
 import (
+	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
@@ -21,7 +22,7 @@ var _ = Describe("Flux Component Generation", func() {
 
 	BeforeEach(func() {
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-		opts = components.NewOptions("/baseDir", "/landscapeDir", fs)
+		opts = components.NewOptions("/baseDir", "/landscapeDir", fs, logr.Discard())
 	})
 
 	Describe("#GenerateLandscape", func() {

@@ -5,6 +5,7 @@
 package components
 
 import (
+	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 )
 
@@ -21,6 +22,8 @@ type Options interface {
 	GetLandscapeDir() string
 	// GetFilesystem returns the filesystem to use.
 	GetFilesystem() afero.Afero
+	// GetLogger returns the logger instance.
+	GetLogger() logr.Logger
 }
 
 // Interface is the components interface that each component must implement.
@@ -35,6 +38,7 @@ type options struct {
 	baseDir      string
 	landscapeDir string
 	filesystem   afero.Afero
+	logger       logr.Logger
 }
 
 // GetBaseDir returns the base directory that serves as the foundation (base) for any landscape.
@@ -52,11 +56,17 @@ func (o options) GetFilesystem() afero.Afero {
 	return o.filesystem
 }
 
+// GetLogger returns the logger instance.
+func (o options) GetLogger() logr.Logger {
+	return o.logger
+}
+
 // NewOptions returns a new Options instance.
-func NewOptions(baseDir string, landscapeDir string, fs afero.Afero) Options {
+func NewOptions(baseDir string, landscapeDir string, fs afero.Afero, logger logr.Logger) Options {
 	return &options{
 		baseDir:      baseDir,
 		landscapeDir: landscapeDir,
 		filesystem:   fs,
+		logger:       logger,
 	}
 }

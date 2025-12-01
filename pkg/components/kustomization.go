@@ -10,27 +10,37 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/afero"
 	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
 )
 
+// writeLandscapeComponentsKustomizations traverses through the generated components directory and adds
+// Kustomize kustomization.yaml files for each level until each component leaf node containing a Flux Kustomization is reached.
 func writeLandscapeComponentsKustomizations(options Options) error {
-	baseComponentsDir := filepath.Join(options.GetLandscapeDir(), DirName)
 	fs := options.GetFilesystem()
+	landscapeDir := options.GetLandscapeDir()
+	baseComponentsDir := filepath.Join(landscapeDir, DirName)
 
+	return fs.Walk(baseComponentsDir, writeKustomizationsToFileTree(fs, landscapeDir))
+}
+
+func writeKustomizationsToFileTree(fs afero.Afero, landscapeDir string) func(dir string, info os.FileInfo, err error) error {
 	var completedPaths []string
 
-	return fs.Walk(baseComponentsDir, func(dir string, info os.FileInfo, err error) error {
+	return func(dir string, info os.FileInfo, err error) error {
 		if !info.IsDir() || err != nil {
 			return err
 		}
+
 		for _, p := range completedPaths {
 			if isCompleted, err := path.Match(p, dir); err != nil || isCompleted {
 				return err
 			}
 		}
+
 		exists, err := fs.Exists(path.Join(dir, kustomization.FluxKustomizationFileName))
 		if err != nil {
 			return err
@@ -39,6 +49,7 @@ func writeLandscapeComponentsKustomizations(options Options) error {
 			completedPaths = append(completedPaths, dir+"/*")
 			return nil
 		}
+
 		subDirs, err := fs.ReadDir(dir)
 		if err != nil {
 			return err
@@ -58,12 +69,22 @@ func writeLandscapeComponentsKustomizations(options Options) error {
 				}
 			}
 		}
-		objects := make(map[string][]byte)
-		objects[kustomization.KustomizationFileName], err = yaml.Marshal(kustomization.NewKustomization(directories, nil))
-		if err != nil {
-			return err
-		}
-		relativePath, _ := strings.CutPrefix(dir, options.GetLandscapeDir())
-		return files.WriteObjectsToFilesystem(objects, options.GetLandscapeDir(), relativePath, options.GetFilesystem())
-	})
+
+		relativePath, _ := strings.CutPrefix(dir, landscapeDir)
+		return writeKustomizationFile(fs, landscapeDir, relativePath, directories)
+	}
+}
+
+func writeKustomizationFile(fs afero.Afero, landscapeDir, relativePath string, directories []string) error {
+	var (
+		err     error
+		objects = make(map[string][]byte)
+	)
+
+	objects[kustomization.KustomizationFileName], err = yaml.Marshal(kustomization.NewKustomization(directories, nil))
+	if err != nil {
+		return err
+	}
+
+	return files.WriteObjectsToFilesystem(objects, landscapeDir, relativePath, fs)
 }

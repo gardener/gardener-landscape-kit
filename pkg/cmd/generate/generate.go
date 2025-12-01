@@ -13,7 +13,6 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	fluxcomponent "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
-	"github.com/gardener/gardener-landscape-kit/pkg/flux"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate.
@@ -51,12 +50,7 @@ gardener-landscape-kit generate --base-dir /path/to/base/dir --landscape-dir /pa
 }
 
 func run(_ context.Context, opts *Options) error {
-	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir, afero.Afero{Fs: afero.NewOsFs()})
-	if opts.LandscapeDir != "" {
-		if err := flux.GenerateFluxSystemCluster(opts.Log, opts.BaseDir, opts.LandscapeDir, componentOpts.GetFilesystem()); err != nil {
-			return err
-		}
-	}
+	componentOpts := components.NewOptions(opts.BaseDir, opts.LandscapeDir, afero.Afero{Fs: afero.NewOsFs()}, opts.Log)
 
 	reg := components.NewRegistry()
 

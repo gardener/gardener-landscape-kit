@@ -7,10 +7,10 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: <branch_name>
+    branch: <branch_name> # This value needs to be modified by the user
   secretRef:
     name: flux-system
-  url: https://github.com/<org>/<repo>
+  url: https://github.com/<org>/<repo> # This value needs to be modified by the user
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -19,7 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./landscape/flux
+  path: <landscape path within landscape repo, e.g. ./flux> # This value needs to be modified by the user
   prune: false
   sourceRef:
     kind: GitRepository
