@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package generate
+package options
 
 import (
 	"errors"
@@ -33,18 +33,16 @@ type Options struct {
 
 	configFilePath string
 
-	// BaseDir is the base directory containing the landscape configuration files.
-	BaseDir string
-	// LandscapeDir is the directory containing all landscape specific configuration files.
-	LandscapeDir string
+	// TargetDirPath is the target directory for generation.
+	TargetDirPath string
 	// Config is the path to the landscape kit configuration file.
 	Config *configv1alpha1.LandscapeKitConfiguration
 }
 
 // Validate validates the options.
-func (o *Options) validate() error {
-	if o.BaseDir == "" {
-		return fmt.Errorf("base dir is required")
+func (o *Options) Validate() error {
+	if o.TargetDirPath == "" {
+		return fmt.Errorf("target path is required")
 	}
 
 	if errs := configv1alpha1validation.ValidateLandscapeKitConfiguration(o.Config); len(errs) > 0 {
@@ -55,10 +53,11 @@ func (o *Options) validate() error {
 }
 
 // Complete completes the options.
-func (o *Options) complete() error {
-	if len(o.configFilePath) == 0 {
-		return errors.New("missing config file")
+func (o *Options) Complete(args []string) error {
+	if len(args) != 1 {
+		return errors.New("requires exactly one argument")
 	}
+	o.TargetDirPath = args[0]
 
 	data, err := os.ReadFile(o.configFilePath) // #nosec G304 -- Trusted file from CLI argument.
 	if err != nil {
@@ -73,8 +72,7 @@ func (o *Options) complete() error {
 	return nil
 }
 
-func (o *Options) addFlags(fs *pflag.FlagSet) {
-	fs.StringVarP(&o.BaseDir, "base-dir", "b", "", "Path to a directory containing the landscape base configuration files.")
-	fs.StringVarP(&o.LandscapeDir, "landscape-dir", "l", "", "Path to a directory containing the landscape specific configuration files, aka overlays.")
+// AddFlags adds flags for the options to the given FlagSet.
+func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
 }
