@@ -59,7 +59,7 @@ func (c *component) GenerateBase(_ components.Options) error {
 func (c *component) GenerateLandscape(options components.Options) error {
 	for _, op := range []func(components.Options) error{
 		writeFluxTemplateFilesAndKustomization,
-		writeGitignoreFileAndKustomization,
+		writeGitignoreFile,
 		writeGardenNamespaceManifest, // The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
 		writeFluxKustomization,
 		logFluxInitializationFirstSteps,
@@ -104,7 +104,7 @@ func writeFluxTemplateFilesAndKustomization(options components.Options) error {
 	return files.WriteObjectsToFilesystem(objects, options.GetLandscapeDir(), FluxComponentsDirName, options.GetFilesystem())
 }
 
-func writeGitignoreFileAndKustomization(options components.Options) error {
+func writeGitignoreFile(options components.Options) error {
 	gitignore, err := landscapeTemplates.ReadFile(path.Join(landscapeTemplateDir, gitignoreTemplateFile))
 	if err != nil {
 		return err
@@ -172,7 +172,7 @@ Next steps:
 
    $  kubectl create -f ` + path.Join(landscapeDir, FluxComponentsDirName, "git-sync-secret.yaml") + `
 
-5. Commit and push the changes in your landscape git repository.
+5. Commit and push the changes to your landscape git repository.
 
 6. Deploy Flux on the cluster:
 
