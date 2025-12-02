@@ -5,9 +5,14 @@
 package flux
 
 import (
+	"bytes"
 	"embed"
+	"fmt"
+	"html/template"
 	"path"
+	"strings"
 
+	"github.com/Masterminds/sprig/v3"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,6 +39,8 @@ const (
 	gitignoreFileName = ".gitignore"
 	// gitSecretFileName is the name of the template file for the Git sync secret which should be created manually and not checked into the landscape Git repo.
 	gitSecretFileName = "git-sync-secret.yaml"
+	// gotkSyncFileName is the name of the template file for the gotk sync manifest.
+	gotkSyncFileName = "gotk-sync.yaml.tpl"
 )
 
 var (
@@ -85,12 +92,21 @@ func writeFluxTemplateFilesAndKustomization(options components.LandscapeOptions)
 		if fileName == gitignoreTemplateFile {
 			continue
 		}
-		if fileName != gitSecretFileName {
-			kustomizationObjectEntries = append(kustomizationObjectEntries, fileName)
-		}
+
 		fileContents, err := landscapeTemplates.ReadFile(path.Join(landscapeTemplateDir, fileName))
 		if err != nil {
 			return err
+		}
+
+		if fileName == gotkSyncFileName {
+			fileContents, fileName, err = renderGOTKTemplate(options, fileContents, fileName)
+			if err != nil {
+				return err
+			}
+		}
+
+		if fileName != gitSecretFileName {
+			kustomizationObjectEntries = append(kustomizationObjectEntries, fileName)
 		}
 		objects[fileName] = fileContents
 	}
@@ -102,6 +118,42 @@ func writeFluxTemplateFilesAndKustomization(options components.LandscapeOptions)
 	}
 
 	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), FluxComponentsDirName, options.GetFilesystem())
+}
+
+func renderGOTKTemplate(options components.LandscapeOptions, fileContents []byte, fileName string) ([]byte, string, error) {
+	gotkTemplate, err := template.New("gotk-sync").Funcs(sprig.TxtFuncMap()).Parse(string(fileContents))
+	if err != nil {
+		return nil, "", fmt.Errorf("error parsing gotk sync template: %w", err)
+	}
+
+	// Only support setting the branch name. If
+	var repoRef string
+	switch {
+	case options.GetGitRepository().Ref.Commit != nil:
+		repoRef = "commit: " + *options.GetGitRepository().Ref.Commit
+	case options.GetGitRepository().Ref.Tag != nil:
+		repoRef = "tag: " + *options.GetGitRepository().Ref.Tag
+	case options.GetGitRepository().Ref.Branch != nil:
+		repoRef = "branch: " + *options.GetGitRepository().Ref.Branch
+	default:
+		repoRef = "branch: main"
+	}
+
+	fluxPath := path.Join(options.GetRelativeLandscapePath(), DirName)
+	fluxPath = strings.TrimPrefix(fluxPath, "./")
+
+	var gotkResult bytes.Buffer
+	if err := gotkTemplate.Execute(&gotkResult, map[string]any{
+		"repo_url":  options.GetGitRepository().URL,
+		"repo_ref":  repoRef,
+		"flux_path": fluxPath,
+	}); err != nil {
+		return nil, "", fmt.Errorf("error executing gotk sync template: %w", err)
+	}
+
+	fileContents = gotkResult.Bytes()
+	fileName = strings.TrimSuffix(fileName, ".tpl")
+	return fileContents, fileName, nil
 }
 
 func writeGitignoreFile(options components.LandscapeOptions) error {

@@ -7,6 +7,8 @@ package components
 import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 )
 
 const (
@@ -28,6 +30,8 @@ type Options interface {
 type LandscapeOptions interface {
 	Options
 
+	// GetGitRepository returns the git repository information.
+	GetGitRepository() *v1alpha1.GitRepository
 	// GetRelativeBasePath returns the base directory that is relative to the target path.
 	GetRelativeBasePath() string
 	// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
@@ -75,27 +79,30 @@ func NewOptions(targetPath string, fs afero.Afero, logger logr.Logger) Options {
 type landscapeOptions struct {
 	Options
 
-	relativeBasePath      string
-	relativeLandscapePath string
+	gitRepository *v1alpha1.GitRepository
+}
+
+// GetGitRepository returns the git repository information.
+func (l *landscapeOptions) GetGitRepository() *v1alpha1.GitRepository {
+	return l.gitRepository
 }
 
 // GetRelativeBasePath returns the base directory that is relative to the target path.
-func (o *landscapeOptions) GetRelativeBasePath() string {
-	return o.relativeBasePath
+func (l *landscapeOptions) GetRelativeBasePath() string {
+	return l.gitRepository.Paths.Base
 }
 
 // GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
-func (o *landscapeOptions) GetRelativeLandscapePath() string {
-	return o.relativeLandscapePath
+func (l *landscapeOptions) GetRelativeLandscapePath() string {
+	return l.gitRepository.Paths.Landscape
 }
 
 // NewLandscapeOptions returns a new LandscapeOptions instance.
-func NewLandscapeOptions(targetPath string, basePath string, landscapePath string, fs afero.Afero, logger logr.Logger) LandscapeOptions {
+func NewLandscapeOptions(targetPath string, gitRepository *v1alpha1.GitRepository, fs afero.Afero, logger logr.Logger) LandscapeOptions {
 	opts := NewOptions(targetPath, fs, logger)
 
 	return &landscapeOptions{
-		Options:               opts,
-		relativeBasePath:      basePath,
-		relativeLandscapePath: landscapePath,
+		Options:       opts,
+		gitRepository: gitRepository,
 	}
 }
