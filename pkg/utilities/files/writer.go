@@ -84,13 +84,3 @@ func WriteFileToFilesystem(contents []byte, filePathDir string, overwriteExistin
 
 	return nil
 }
-
-// ComputeBasePath determines the correct base directory reference for same-repo setups.
-func ComputeBasePath(baseDir, landscapeDir string) string {
-	landscapePrefix, _ := path.Split(landscapeDir)
-	basePrefix, shortBaseDir := path.Split(baseDir)
-	if landscapePrefix == basePrefix {
-		return shortBaseDir
-	}
-	return baseDir
-}

@@ -8,8 +8,10 @@ package components
 type Registry interface {
 	// RegisterComponent registers a component in the registry.
 	RegisterComponent(component Interface)
-	// Generate generates all registered components.
-	Generate(opts Options) error
+	// GenerateBase generates the base component.
+	GenerateBase(opts Options) error
+	// GenerateLandscape generates the landscape component.
+	GenerateLandscape(opts LandscapeOptions) error
 }
 
 type registry struct {
@@ -21,15 +23,8 @@ func (r *registry) RegisterComponent(component Interface) {
 	r.components = append(r.components, component)
 }
 
-// Generate generates all registered components. Generation happens serially in the order of registration.
-func (r *registry) Generate(opts Options) error {
-	if opts.GetLandscapeDir() == "" {
-		return r.generateBase(opts)
-	}
-	return r.generateLandscape(opts)
-}
-
-func (r *registry) generateBase(opts Options) error {
+// GenerateBase generates the base component.
+func (r *registry) GenerateBase(opts Options) error {
 	for _, component := range r.components {
 		if err := component.GenerateBase(opts); err != nil {
 			return err
@@ -38,7 +33,8 @@ func (r *registry) generateBase(opts Options) error {
 	return nil
 }
 
-func (r *registry) generateLandscape(opts Options) error {
+// GenerateLandscape generates the landscape component.
+func (r *registry) GenerateLandscape(opts LandscapeOptions) error {
 	for _, component := range r.components {
 		if err := component.GenerateLandscape(opts); err != nil {
 			return err

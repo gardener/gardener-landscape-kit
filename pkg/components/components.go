@@ -14,16 +14,24 @@ const (
 	DirName = "components"
 )
 
-// Options is an interface for options passed to components.
+// Options is an interface for options passed to components for generating.
 type Options interface {
-	// GetBaseDir returns the base directory that serves as the foundation (base) for any landscape.
-	GetBaseDir() string
-	// GetLandscapeDir returns the landscape directory. If the returned path is empty, only the base directory should be generated.
-	GetLandscapeDir() string
+	// GetTargetPath returns the target directory path the components should be generated into.
+	GetTargetPath() string
 	// GetFilesystem returns the filesystem to use.
 	GetFilesystem() afero.Afero
 	// GetLogger returns the logger instance.
 	GetLogger() logr.Logger
+}
+
+// LandscapeOptions is an interface for options passed to components for generating the landscape.
+type LandscapeOptions interface {
+	Options
+
+	// GetRelativeBasePath returns the base directory that is relative to the target path.
+	GetRelativeBasePath() string
+	// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
+	GetRelativeLandscapePath() string
 }
 
 // Interface is the components interface that each component must implement.
@@ -31,42 +39,63 @@ type Interface interface {
 	// GenerateBase generates the component base dir.
 	GenerateBase(Options) error
 	// GenerateLandscape generates the component landscape dir.
-	GenerateLandscape(Options) error
+	GenerateLandscape(LandscapeOptions) error
 }
 
 type options struct {
-	baseDir      string
-	landscapeDir string
-	filesystem   afero.Afero
-	logger       logr.Logger
+	targetPath string
+	filesystem afero.Afero
+	logger     logr.Logger
 }
 
-// GetBaseDir returns the base directory that serves as the foundation (base) for any landscape.
-func (o options) GetBaseDir() string {
-	return o.baseDir
-}
-
-// GetLandscapeDir returns the landscape directory. If the returned path is empty, only the base directory should be generated.
-func (o options) GetLandscapeDir() string {
-	return o.landscapeDir
+// GetTargetPath returns the target directory path the components should be generated into.
+func (o *options) GetTargetPath() string {
+	return o.targetPath
 }
 
 // GetFilesystem returns the filesystem to use.
-func (o options) GetFilesystem() afero.Afero {
+func (o *options) GetFilesystem() afero.Afero {
 	return o.filesystem
 }
 
 // GetLogger returns the logger instance.
-func (o options) GetLogger() logr.Logger {
+func (o *options) GetLogger() logr.Logger {
 	return o.logger
 }
 
 // NewOptions returns a new Options instance.
-func NewOptions(baseDir string, landscapeDir string, fs afero.Afero, logger logr.Logger) Options {
+func NewOptions(targetPath string, fs afero.Afero, logger logr.Logger) Options {
 	return &options{
-		baseDir:      baseDir,
-		landscapeDir: landscapeDir,
-		filesystem:   fs,
-		logger:       logger,
+		targetPath: targetPath,
+		filesystem: fs,
+		logger:     logger,
+	}
+}
+
+type landscapeOptions struct {
+	Options
+
+	relativeBasePath      string
+	relativeLandscapePath string
+}
+
+// GetRelativeBasePath returns the base directory that is relative to the target path.
+func (o *landscapeOptions) GetRelativeBasePath() string {
+	return o.relativeBasePath
+}
+
+// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
+func (o *landscapeOptions) GetRelativeLandscapePath() string {
+	return o.relativeLandscapePath
+}
+
+// NewLandscapeOptions returns a new LandscapeOptions instance.
+func NewLandscapeOptions(targetPath string, basePath string, landscapePath string, fs afero.Afero, logger logr.Logger) LandscapeOptions {
+	opts := NewOptions(targetPath, fs, logger)
+
+	return &landscapeOptions{
+		Options:               opts,
+		relativeBasePath:      basePath,
+		relativeLandscapePath: landscapePath,
 	}
 }

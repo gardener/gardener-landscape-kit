@@ -56,8 +56,8 @@ func (c *component) GenerateBase(_ components.Options) error {
 }
 
 // GenerateLandscape generates the component landscape directory.
-func (c *component) GenerateLandscape(options components.Options) error {
-	for _, op := range []func(components.Options) error{
+func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
+	for _, op := range []func(components.LandscapeOptions) error{
 		writeFluxTemplateFilesAndKustomization,
 		writeGitignoreFile,
 		writeGardenNamespaceManifest, // The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
@@ -71,7 +71,7 @@ func (c *component) GenerateLandscape(options components.Options) error {
 	return nil
 }
 
-func writeFluxTemplateFilesAndKustomization(options components.Options) error {
+func writeFluxTemplateFilesAndKustomization(options components.LandscapeOptions) error {
 	var (
 		objects                    = make(map[string][]byte)
 		kustomizationObjectEntries []string
@@ -101,18 +101,19 @@ func writeFluxTemplateFilesAndKustomization(options components.Options) error {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, options.GetLandscapeDir(), FluxComponentsDirName, options.GetFilesystem())
+	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), FluxComponentsDirName, options.GetFilesystem())
 }
 
-func writeGitignoreFile(options components.Options) error {
+func writeGitignoreFile(options components.LandscapeOptions) error {
 	gitignore, err := landscapeTemplates.ReadFile(path.Join(landscapeTemplateDir, gitignoreTemplateFile))
 	if err != nil {
 		return err
 	}
-	gitignoreDefaultPath := path.Join(options.GetLandscapeDir(), files.GLKSystemDirName, files.DefaultDirName, FluxComponentsDirName, gitignoreFileName)
+	gitignoreDefaultPath := path.Join(options.GetTargetPath(), files.GLKSystemDirName, files.DefaultDirName, FluxComponentsDirName, gitignoreFileName)
+
 	fileDefaultExists, err := options.GetFilesystem().Exists(gitignoreDefaultPath)
 	if err == nil && !fileDefaultExists {
-		if err := files.WriteFileToFilesystem(gitignore, path.Join(options.GetLandscapeDir(), FluxComponentsDirName, gitignoreFileName), false, options.GetFilesystem()); err != nil {
+		if err := files.WriteFileToFilesystem(gitignore, path.Join(options.GetTargetPath(), FluxComponentsDirName, gitignoreFileName), false, options.GetFilesystem()); err != nil {
 			return err
 		}
 	}
@@ -120,9 +121,8 @@ func writeGitignoreFile(options components.Options) error {
 	return files.WriteFileToFilesystem(gitignore, gitignoreDefaultPath, true, options.GetFilesystem())
 }
 
-func writeFluxKustomization(options components.Options) error {
-	relativeLandscapeDir := files.ComputeBasePath(options.GetLandscapeDir(), options.GetBaseDir())
-	k, err := yaml.Marshal(&kustomizev1.Kustomization{
+func writeFluxKustomization(options components.LandscapeOptions) error {
+	fluxKustomization, err := yaml.Marshal(&kustomizev1.Kustomization{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: kustomizev1.GroupVersion.String(),
 			Kind:       kustomizev1.KustomizationKind,
@@ -133,22 +133,25 @@ func writeFluxKustomization(options components.Options) error {
 		},
 		Spec: kustomizev1.KustomizationSpec{
 			SourceRef: SourceRef,
-			Path:      path.Join(relativeLandscapeDir, components.DirName),
+			Path:      path.Join(options.GetRelativeLandscapePath(), components.DirName),
 		},
 	})
 	if err != nil {
 		return err
 	}
+
 	return files.WriteObjectsToFilesystem(
-		map[string][]byte{glkComponentsName + ".yaml": k},
-		options.GetLandscapeDir(),
+		map[string][]byte{
+			glkComponentsName + ".yaml": fluxKustomization,
+		},
+		options.GetTargetPath(),
 		DirName,
 		options.GetFilesystem(),
 	)
 }
 
-func logFluxInitializationFirstSteps(options components.Options) error {
-	landscapeDir := options.GetLandscapeDir()
+func logFluxInitializationFirstSteps(options components.LandscapeOptions) error {
+	landscapeDir := options.GetTargetPath()
 	if instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, FluxComponentsDirName)); err != nil || instanceFileExisted {
 		return err
 	}
@@ -191,7 +194,7 @@ const (
 )
 
 // writeGardenNamespaceManifest generates the garden namespace in the given landscape directory.
-func writeGardenNamespaceManifest(options components.Options) error {
+func writeGardenNamespaceManifest(options components.LandscapeOptions) error {
 	objects := make(map[string][]byte)
 
 	var err error
@@ -208,5 +211,5 @@ func writeGardenNamespaceManifest(options components.Options) error {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, options.GetLandscapeDir(), DirName, options.GetFilesystem())
+	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), DirName, options.GetFilesystem())
 }

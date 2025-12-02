@@ -46,12 +46,14 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 
 func run(_ context.Context, opts *options.Options) error {
 	//TODO(timuthy): Adjust usage in next commit
-	componentOpts := components.NewOptions(opts.TargetDirPath, "", afero.Afero{Fs: afero.NewOsFs()}, opts.Log)
+	componentOpts := components.NewOptions(opts.TargetDirPath, afero.Afero{Fs: afero.NewOsFs()}, opts.Log)
 
 	reg := components.NewRegistry()
 
 	// Register all components here
-	reg.RegisterComponent(fluxcomponent.NewComponent())
+	reg.RegisterComponent(
+		fluxcomponent.NewComponent(),
+	)
 
-	return reg.Generate(componentOpts)
+	return reg.GenerateBase(componentOpts)
 }

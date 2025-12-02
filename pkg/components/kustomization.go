@@ -21,13 +21,13 @@ import (
 // Kustomize kustomization.yaml files for each level until each component leaf node containing a Flux Kustomization is reached.
 func writeLandscapeComponentsKustomizations(options Options) error {
 	fs := options.GetFilesystem()
-	landscapeDir := options.GetLandscapeDir()
-	baseComponentsDir := filepath.Join(landscapeDir, DirName)
+	targetDir := options.GetTargetPath()
+	componentsDir := filepath.Join(targetDir, DirName)
 
-	return fs.Walk(baseComponentsDir, writeKustomizationsToFileTree(fs, landscapeDir))
+	return fs.Walk(componentsDir, writeKustomizationsToFileTree(fs, targetDir))
 }
 
-func writeKustomizationsToFileTree(fs afero.Afero, landscapeDir string) func(dir string, info os.FileInfo, err error) error {
+func writeKustomizationsToFileTree(fs afero.Afero, targetDir string) func(dir string, info os.FileInfo, err error) error {
 	var completedPaths []string
 
 	return func(dir string, info os.FileInfo, err error) error {
@@ -70,8 +70,8 @@ func writeKustomizationsToFileTree(fs afero.Afero, landscapeDir string) func(dir
 			}
 		}
 
-		relativePath, _ := strings.CutPrefix(dir, landscapeDir)
-		return writeKustomizationFile(fs, landscapeDir, relativePath, directories)
+		relativePath, _ := strings.CutPrefix(dir, targetDir)
+		return writeKustomizationFile(fs, targetDir, relativePath, directories)
 	}
 }
 

@@ -17,12 +17,12 @@ import (
 var _ = Describe("Flux Component Generation", func() {
 	var (
 		fs   afero.Afero
-		opts components.Options
+		opts components.LandscapeOptions
 	)
 
 	BeforeEach(func() {
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-		opts = components.NewOptions("/baseDir", "/landscapeDir", fs, logr.Discard())
+		opts = components.NewLandscapeOptions("/landscapeDir", "/baseDir", "/landscapeDir", fs, logr.Discard())
 	})
 
 	Describe("#GenerateLandscape", func() {
