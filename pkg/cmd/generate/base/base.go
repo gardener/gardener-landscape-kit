@@ -13,6 +13,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/registry"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate base.
@@ -46,8 +47,8 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 func run(_ context.Context, opts *options.Options) error {
 	componentOpts := components.NewOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
 
-	reg := components.NewRegistry()
-	components.RegisterAllComponents(reg)
+	reg := registry.New()
+	registry.RegisterAllComponents(reg)
 
 	return reg.GenerateBase(componentOpts)
 }
