@@ -8,7 +8,7 @@ kind: LandscapeKitConfiguration
 #     version: <component-version>
 #   originalRefs: true
 # git:
-#   url: https://github.com/<org>/<repo>.git
+#   url: https://github.com/<org>/<repo>
 #   ref:
 #     branch: <branch-name>
 #   paths:

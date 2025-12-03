@@ -59,12 +59,7 @@ func validate(opts *options.Options) error {
 }
 
 func run(_ context.Context, opts *options.Options) error {
-	componentOpts := components.NewLandscapeOptions(
-		opts.TargetDirPath,
-		opts.Config.Git,
-		afero.Afero{Fs: afero.NewOsFs()},
-		opts.Log,
-	)
+	componentOpts := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
 
 	reg := components.NewRegistry()
 

@@ -87,7 +87,7 @@ git:
 ```
 
 ```bash
-glk generate -c config-file /path/to/landscape-repo
+glk generate landscape -c config-file /path/to/landscape-repo
 ```
 
 In the example above, the landscape repository is located in `/path/to/landscape-repo` and the base repository is in a subdirectory `/path/to/landscape-repo/base` of the landscape repository.

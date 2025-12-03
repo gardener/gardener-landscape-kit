@@ -9,6 +9,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 )
 
 var _ = Describe("Kustomization", func() {
@@ -19,7 +22,12 @@ var _ = Describe("Kustomization", func() {
 
 	BeforeEach(func() {
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-		opts = NewOptions("/landscapeDir", fs, logr.Discard())
+		opts = NewOptions(&generateoptions.Options{
+			Options: &cmd.Options{
+				Log: logr.Discard(),
+			},
+			TargetDirPath: "/landscapeDir",
+		}, fs)
 	})
 
 	Describe("#writeLandscapeComponentsKustomizations", func() {

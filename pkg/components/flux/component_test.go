@@ -22,6 +22,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 )
@@ -53,15 +55,21 @@ var _ = Describe("Flux Component Generation", func() {
 
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
 		opts = components.NewLandscapeOptions(
-			targetPath,
-			&v1alpha1.GitRepository{
-				URL: repoURL,
-				Paths: v1alpha1.PathConfiguration{
-					Landscape: relativeLandscapePath,
+			&generateoptions.Options{
+				Options: &cmd.Options{
+					Log: logr.Discard(),
+				},
+				TargetDirPath: targetPath,
+				Config: &v1alpha1.LandscapeKitConfiguration{
+					Git: &v1alpha1.GitRepository{
+						URL: repoURL,
+						Paths: v1alpha1.PathConfiguration{
+							Landscape: relativeLandscapePath,
+						},
+					},
 				},
 			},
 			fs,
-			logr.Discard(),
 		)
 	})
 

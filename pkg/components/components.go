@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 )
 
 const (
@@ -68,11 +69,11 @@ func (o *options) GetLogger() logr.Logger {
 }
 
 // NewOptions returns a new Options instance.
-func NewOptions(targetPath string, fs afero.Afero, logger logr.Logger) Options {
+func NewOptions(opts *generateoptions.Options, fs afero.Afero) Options {
 	return &options{
-		targetPath: targetPath,
+		targetPath: opts.TargetDirPath,
 		filesystem: fs,
-		logger:     logger,
+		logger:     opts.Log,
 	}
 }
 
@@ -98,11 +99,11 @@ func (l *landscapeOptions) GetRelativeLandscapePath() string {
 }
 
 // NewLandscapeOptions returns a new LandscapeOptions instance.
-func NewLandscapeOptions(targetPath string, gitRepository *v1alpha1.GitRepository, fs afero.Afero, logger logr.Logger) LandscapeOptions {
-	opts := NewOptions(targetPath, fs, logger)
+func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) LandscapeOptions {
+	options := NewOptions(opts, fs)
 
 	return &landscapeOptions{
-		Options:       opts,
-		gitRepository: gitRepository,
+		Options:       options,
+		gitRepository: opts.Config.Git,
 	}
 }

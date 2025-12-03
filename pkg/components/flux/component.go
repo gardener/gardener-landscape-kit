@@ -126,7 +126,6 @@ func renderGOTKTemplate(options components.LandscapeOptions, fileContents []byte
 		return nil, "", fmt.Errorf("error parsing gotk sync template: %w", err)
 	}
 
-	// Only support setting the branch name. If
 	var repoRef string
 	switch {
 	case options.GetGitRepository().Ref.Commit != nil:
