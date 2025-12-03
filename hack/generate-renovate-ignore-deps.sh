@@ -52,4 +52,4 @@ ignore_deps=$(printf ',"%s"' "${common_dependencies[@]}") # Add a comma to the b
 ignore_deps="[${ignore_deps:1}]" # Remove the leading comma and wrap the string in square brackets to format it as a JSON array.
 
 # Format the JSON array as a string, indent it, and use sed to replace the lines between the markers
-echo "$ignore_deps" | yq -o json '.[]' | sed 's/^/    /; s/$/,/' | sed -i -e '  /  ignoreDeps: \[/,  /\]/{//!d;}' -e '  /  ignoreDeps: \[/r /dev/stdin' $RENOVATE_CONFIG
+echo "$ignore_deps" | yq -o json '.[]' | sed 's/^/        /; s/$/,/' | sed -i -e '  /  matchPackageNames: \[/,  /\]/{//!d;}' -e '  /  matchPackageNames: \[/r /dev/stdin' $RENOVATE_CONFIG
