@@ -10,7 +10,13 @@ import (
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
+	fluxcomponent "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 )
+
+// RegisterAllComponents registers all available components.
+func RegisterAllComponents(registry Registry) {
+	registry.RegisterComponent(fluxcomponent.NewComponent())
+}
 
 const (
 	// DirName is the directory name where components are stored.

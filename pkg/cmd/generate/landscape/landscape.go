@@ -14,7 +14,6 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	fluxcomponent "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate landscape.
@@ -62,11 +61,7 @@ func run(_ context.Context, opts *options.Options) error {
 	componentOpts := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
 
 	reg := components.NewRegistry()
-
-	// Register all components here
-	reg.RegisterComponent(
-		fluxcomponent.NewComponent(),
-	)
+	components.RegisterAllComponents(reg)
 
 	return reg.GenerateLandscape(componentOpts)
 }
