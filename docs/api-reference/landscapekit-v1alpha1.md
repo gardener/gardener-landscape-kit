@@ -158,6 +158,7 @@ GitRepository
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Git is the configuration for the Git repository.</p>
 </td>
 </tr>

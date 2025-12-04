@@ -18,6 +18,7 @@ type LandscapeKitConfiguration struct {
 	// +optional
 	OCM *OCMConfig `json:"ocm,omitempty"`
 	// Git is the configuration for the Git repository.
+	// +optional
 	Git *GitRepository `json:"git,omitempty"`
 }
 
