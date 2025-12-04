@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
-	github.com/fluxcd/kustomize-controller/api v1.7.2
+	github.com/fluxcd/kustomize-controller/api v1.7.3
 	github.com/fluxcd/source-controller/api v1.7.3
 	github.com/gardener/gardener v1.133.0
 	github.com/go-logr/logr v1.4.3
@@ -41,8 +41,8 @@ require (
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fluxcd/pkg/apis/acl v0.9.0 // indirect
-	github.com/fluxcd/pkg/apis/kustomize v1.13.0 // indirect
-	github.com/fluxcd/pkg/apis/meta v1.22.0 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.14.0 // indirect
+	github.com/fluxcd/pkg/apis/meta v1.23.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-logr/zapr v1.3.0 // indirect
