@@ -19,7 +19,8 @@ The following dependencies have been updated:\n\
   // DO NOT EDIT THIS SECTION MANUALLY.
   packageRules: [
     {
-      allowedVersions: ["patch"],
+      matchUpdateTypes: ["major", "minor"],
+      enabled: false,
       matchPackageNames: [
         "github.com/ahmetb/gen-crd-api-reference-docs",
         "github.com/go-logr/logr",
