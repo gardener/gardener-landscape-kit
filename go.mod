@@ -24,7 +24,7 @@ require (
 	k8s.io/code-generator v0.34.2
 	k8s.io/component-base v0.34.2
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
-	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20251204121648-0188eaee25f1
+	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20251205083928-393f4d02b6ba
 	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha4
 	ocm.software/open-component-model/bindings/go/oci v0.0.9-0.20251005214347-de41d9d78cc0
 	ocm.software/open-component-model/bindings/go/runtime v0.0.4
