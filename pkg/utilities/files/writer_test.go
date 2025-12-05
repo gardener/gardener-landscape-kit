@@ -44,13 +44,6 @@ var _ = Describe("Writer", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Describe("#ComputeBasePath", func() {
-		It("should compute the base path correctly", func() {
-			Expect(files.ComputeBasePath("/someBase/path", "/someLandscape/path")).To(Equal("/someBase/path"))
-			Expect(files.ComputeBasePath("/sharedPrefix/base", "/sharedPrefix/landscape")).To(Equal("base"))
-		})
-	})
-
 	Describe("#WriteObjectsToFilesystem", func() {
 		It("should ensure the directories within the path and write the objects", func() {
 			objects := map[string][]byte{

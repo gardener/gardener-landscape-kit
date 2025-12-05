@@ -21,6 +21,59 @@ func ValidateLandscapeKitConfiguration(conf *configv1alpha1.LandscapeKitConfigur
 		allErrs = append(allErrs, ValidateOCMConfig(conf.OCM, field.NewPath("ocm"))...)
 	}
 
+	if conf.Git != nil {
+		allErrs = append(allErrs, validateGitRepository(conf.Git, field.NewPath("git"))...)
+	}
+
+	return allErrs
+}
+
+func validateGitRepository(repo *configv1alpha1.GitRepository, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	u, err := url.Parse(repo.URL)
+	if err != nil {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("url"), repo.URL, "must be a valid URL"))
+	}
+	if u.Scheme != "https" && u.Scheme != "http" && u.Scheme != "ssh" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("url"), repo.URL, "must have http(s) or ssh scheme"))
+	}
+
+	allErrs = append(allErrs, validateGitRepositoryRef(&repo.Ref, fldPath.Child("ref"))...)
+	allErrs = append(allErrs, validatePathConfiguration(&repo.Paths, fldPath.Child("paths"))...)
+
+	return allErrs
+}
+
+func validateGitRepositoryRef(ref *configv1alpha1.GitRepositoryRef, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if ref.Branch != nil && strings.TrimSpace(*ref.Branch) == "" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("branch"), *ref.Branch, "branch must not be empty"))
+	}
+
+	if ref.Tag != nil && strings.TrimSpace(*ref.Tag) == "" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("tag"), *ref.Tag, "tag must not be empty"))
+	}
+
+	if ref.Commit != nil && strings.TrimSpace(*ref.Commit) == "" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("commit"), *ref.Commit, "commit SHA must not be empty"))
+	}
+
+	return allErrs
+}
+
+func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if strings.TrimSpace(paths.Base) == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("base"), "base path must be specified"))
+	}
+
+	if strings.TrimSpace(paths.Landscape) == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("landscape"), "landscape path must be specified"))
+	}
+
 	return allErrs
 }
 

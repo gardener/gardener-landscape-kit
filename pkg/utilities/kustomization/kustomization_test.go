@@ -8,6 +8,7 @@ import (
 	_ "embed"
 	"path/filepath"
 
+	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
@@ -15,7 +16,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
+	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
 )
 
 var _ = Describe("Kustomization", func() {
@@ -55,7 +59,7 @@ var _ = Describe("Kustomization", func() {
 				}
 			)
 
-			Expect(kustomization.WriteKustomizationComponent(objects, landscapeDir, componentDir, fs)).To(Succeed())
+			Expect(WriteKustomizationComponent(objects, landscapeDir, componentDir, fs)).To(Succeed())
 
 			contents, err := fs.ReadFile(filepath.Join(landscapeDir, componentDir, "configmap.yaml"))
 			Expect(err).NotTo(HaveOccurred())
@@ -66,4 +70,52 @@ var _ = Describe("Kustomization", func() {
 			Expect(string(contents)).To(ContainSubstring("- configmap.yaml"))
 		})
 	})
+
+	Describe("#writeLandscapeComponentsKustomizations", func() {
+		var (
+			fs   afero.Afero
+			opts components.Options
+		)
+
+		BeforeEach(func() {
+			fs = afero.Afero{Fs: afero.NewMemMapFs()}
+			opts = components.NewOptions(&generateoptions.Options{
+				Options: &cmd.Options{
+					Log: logr.Discard(),
+				},
+				TargetDirPath: "/landscapeDir",
+			}, fs)
+		})
+
+		It("should generate kustomization files within a component directory", func() {
+			generateExampleComponentsDirectory(fs, opts)
+
+			Expect(WriteLandscapeComponentsKustomizations(opts)).To(Succeed())
+
+			content, err := fs.ReadFile(opts.GetTargetPath() + "/components/kustomization.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(ContainSubstring("- gardener\n"))
+
+			content, err = fs.ReadFile(opts.GetTargetPath() + "/components/gardener/kustomization.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(ContainSubstring("- operator/flux-kustomization.yaml\n"))
+
+			exists, err := fs.Exists("/components/gardener/operator/kustomization.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(exists).To(BeFalse())
+
+			content, err = fs.ReadFile(opts.GetTargetPath() + "/components/gardener/operator/resources/kustomization.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal("apiVersion: dummy"))
+		})
+	})
 })
+
+func generateExampleComponentsDirectory(fs afero.Afero, opts components.Options) {
+	operatorDir := opts.GetTargetPath() + "/components/gardener/operator"
+	ExpectWithOffset(1, fs.MkdirAll(operatorDir, 0700)).To(Succeed())
+	ExpectWithOffset(1, fs.WriteFile(operatorDir+"/flux-kustomization.yaml", []byte(`apiVersion: kustomize.config.k8s.io/v1beta1`), 0600)).To(Succeed())
+
+	ExpectWithOffset(1, fs.MkdirAll(operatorDir+"/resources", 0700)).To(Succeed())
+	ExpectWithOffset(1, fs.WriteFile(operatorDir+"/resources/kustomization.yaml", []byte(`apiVersion: dummy`), 0600)).To(Succeed())
+}

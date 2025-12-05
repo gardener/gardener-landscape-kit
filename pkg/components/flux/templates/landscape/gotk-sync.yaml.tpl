@@ -7,10 +7,10 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: <branch_name>
+    {{ .repo_ref }}
   secretRef:
     name: flux-system
-  url: https://github.com/<org>/<repo>
+  url: {{ .repo_url }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -19,7 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./<landscape_path_to_flux>
+  path: ./{{ .flux_path }}
   prune: false
   sourceRef:
     kind: GitRepository

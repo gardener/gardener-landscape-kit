@@ -21,25 +21,25 @@ const (
 	DefaultDirName = "defaults"
 )
 
-// WriteObjectsToFilesystem writes the given objects to the filesystem at the specified baseDir and filePathDir.
+// WriteObjectsToFilesystem writes the given objects to the filesystem at the specified rootDir and relativeFilePath.
 // If the manifest file already exists, it patches changes from the new default.
 // Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func WriteObjectsToFilesystem(objects map[string][]byte, baseDir, filePathDir string, fs afero.Afero) error {
-	if err := fs.MkdirAll(path.Join(baseDir, filePathDir), 0700); err != nil {
+func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero) error {
+	if err := fs.MkdirAll(path.Join(rootDir, relativeFilePath), 0700); err != nil {
 		return err
 	}
 
 	for fileName, object := range objects {
-		filePath := path.Join(filePathDir, fileName)
+		filePath := path.Join(relativeFilePath, fileName)
 
-		filePathCurrent := path.Join(baseDir, filePath)
+		filePathCurrent := path.Join(rootDir, filePath)
 		currentYaml, err := fs.ReadFile(filePathCurrent)
 		isCurrentNotExistsErr := os.IsNotExist(err)
 		if err != nil && !isCurrentNotExistsErr {
 			return err
 		}
 
-		filePathDefault := path.Join(baseDir, GLKSystemDirName, DefaultDirName, filePath)
+		filePathDefault := path.Join(rootDir, GLKSystemDirName, DefaultDirName, filePath)
 		oldDefaultYaml, err := fs.ReadFile(filePathDefault)
 		isDefaultNotExistsErr := os.IsNotExist(err)
 		if err != nil && !isDefaultNotExistsErr {
@@ -68,7 +68,7 @@ func WriteObjectsToFilesystem(objects map[string][]byte, baseDir, filePathDir st
 	return nil
 }
 
-// WriteFileToFilesystem writes the given file to the filesystem at the specified baseDir and filePathDir.
+// WriteFileToFilesystem writes the given file to the filesystem at the specified filePathDir.
 // If overwriteExisting is false and the file already exists, it does nothing.
 func WriteFileToFilesystem(contents []byte, filePathDir string, overwriteExisting bool, fs afero.Afero) error {
 	exists, err := fs.Exists(filePathDir)
@@ -83,14 +83,4 @@ func WriteFileToFilesystem(contents []byte, filePathDir string, overwriteExistin
 	}
 
 	return nil
-}
-
-// ComputeBasePath determines the correct base directory reference for same-repo setups.
-func ComputeBasePath(baseDir, landscapeDir string) string {
-	landscapePrefix, _ := path.Split(landscapeDir)
-	basePrefix, shortBaseDir := path.Split(baseDir)
-	if landscapePrefix == basePrefix {
-		return shortBaseDir
-	}
-	return baseDir
 }

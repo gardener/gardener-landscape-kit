@@ -5,10 +5,13 @@
 package validation_test
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
@@ -16,7 +19,7 @@ import (
 
 var _ = Describe("Validation", func() {
 	Describe("#ValidateLandscapeKitConfiguration", func() {
-		It("should pass if no OCM config is provided", func() {
+		It("should pass if no OCM or Git config is provided", func() {
 			conf := &v1alpha1.LandscapeKitConfiguration{}
 
 			errList := validation.ValidateLandscapeKitConfiguration(conf)
@@ -32,178 +35,277 @@ var _ = Describe("Validation", func() {
 						Version: "1.0.0",
 					},
 				},
+				Git: &v1alpha1.GitRepository{
+					URL: "https://github.com/gardener/gardener-landscape-kit",
+					Ref: v1alpha1.GitRepositoryRef{
+						Branch: ptr.To("main"),
+					},
+					Paths: v1alpha1.PathConfiguration{
+						Base:      "base",
+						Landscape: "landscape",
+					},
+				},
 			}
 
 			errList := validation.ValidateLandscapeKitConfiguration(conf)
 			Expect(errList).To(BeEmpty())
 		})
 
-		It("should fail if OCM config is invalid", func() {
-			conf := &v1alpha1.LandscapeKitConfiguration{
-				OCM: &v1alpha1.OCMConfig{
-					Repositories: []string{}, // empty repositories
-					RootComponent: v1alpha1.OCMComponent{
-						Name:    "", // missing name
-						Version: "", // missing version
+		Context("Git Configuration", func() {
+			It("should fail if Git config is invalid", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Git: &v1alpha1.GitRepository{
+						URL: "invalid-url",
+						Ref: v1alpha1.GitRepositoryRef{},
+						Paths: v1alpha1.PathConfiguration{
+							Base:      "",
+							Landscape: "",
+						},
 					},
-				},
-			}
+				}
 
-			errList := validation.ValidateLandscapeKitConfiguration(conf)
-			Expect(errList).To(HaveLen(3))
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeInvalid),
+						"Field": Equal("git.url"),
+					})),
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("git.paths.base"),
+					})),
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("git.paths.landscape"),
+					})),
+				))
+			})
+
+			Context("URL", func() {
+				test := func(url string) field.ErrorList {
+					conf := &v1alpha1.LandscapeKitConfiguration{
+						Git: &v1alpha1.GitRepository{
+							URL: url,
+							Paths: v1alpha1.PathConfiguration{
+								Base:      "base",
+								Landscape: "landscape",
+							},
+						},
+					}
+
+					return validation.ValidateLandscapeKitConfiguration(conf)
+				}
+
+				It("should pass with valid URL", func() {
+					for _, urlScheme := range []string{
+						"http://github.com/gardener/gardener-landscape-kit",
+						"https://github.com/gardener/gardener-landscape-kit",
+						"ssh://github.com/gardener/gardener-landscape-kit",
+					} {
+						Expect(test(urlScheme)).To(BeEmpty(), fmt.Sprintf("URL scheme %s should be valid", urlScheme))
+					}
+				})
+
+				It("should fail with invalid URL scheme", func() {
+					Expect(test("ftp://github.com/gardener/gardener-landscape-kit")).To(ConsistOf(
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeInvalid),
+							"Field": Equal("git.url"),
+						}))))
+				})
+			})
+
+			Context("Reference", func() {
+				test := func(ref v1alpha1.GitRepositoryRef) field.ErrorList {
+					conf := &v1alpha1.LandscapeKitConfiguration{
+						Git: &v1alpha1.GitRepository{
+							URL: "https://github.com/gardener/gardener-landscape-kit",
+							Ref: ref,
+							Paths: v1alpha1.PathConfiguration{
+								Base:      "base",
+								Landscape: "landscape",
+							},
+						},
+					}
+
+					return validation.ValidateLandscapeKitConfiguration(conf)
+				}
+
+				It("should pass with valid refs", func() {
+					for _, ref := range []v1alpha1.GitRepositoryRef{
+						{Branch: ptr.To("main")},
+						{Tag: ptr.To("v1.0.0")},
+						{Commit: ptr.To("abc123def456")},
+					} {
+						Expect(test(ref)).To(BeEmpty(), fmt.Sprintf("Git ref %+v should be valid", ref))
+					}
+				})
+
+				It("should fail with empty refs", func() {
+					for _, ref := range []v1alpha1.GitRepositoryRef{
+						{Branch: ptr.To("")},
+						{Tag: ptr.To("")},
+						{Commit: ptr.To("")},
+					} {
+						Expect(test(ref)).To(ConsistOf(
+							PointTo(MatchFields(IgnoreExtras, Fields{
+								"Type": Equal(field.ErrorTypeInvalid),
+							}))))
+					}
+				})
+			})
+		})
+
+		Context("OCM Configuration", func() {
+			setupOCMConfigTests(func(ocmConf *v1alpha1.OCMConfig) field.ErrorList {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					OCM: ocmConf,
+				}
+				return validation.ValidateLandscapeKitConfiguration(conf)
+			}, field.NewPath("ocm"))
 		})
 	})
 
 	Describe("#ValidateOCMConfiguration", func() {
-		It("should pass with a valid configuration", func() {
+		setupOCMConfigTests(func(ocmConf *v1alpha1.OCMConfig) field.ErrorList {
 			conf := &v1alpha1.OCMConfiguration{
-				OCMConfig: &v1alpha1.OCMConfig{
-					Repositories: []string{"https://example.com/repo"},
-					RootComponent: v1alpha1.OCMComponent{
-						Name:    "example.com/org/component",
-						Version: "1.0.0",
-					},
-				},
+				OCMConfig: ocmConf,
 			}
-
-			errList := validation.ValidateOCMConfiguration(conf)
-			Expect(errList).To(BeEmpty())
-		})
-
-		It("should fail if config is invalid", func() {
-			conf := &v1alpha1.OCMConfiguration{
-				OCMConfig: &v1alpha1.OCMConfig{
-					Repositories: []string{}, // empty repositories
-					RootComponent: v1alpha1.OCMComponent{
-						Name:    "", // missing name
-						Version: "", // missing version
-					},
-				},
-			}
-
-			errList := validation.ValidateOCMConfiguration(conf)
-			Expect(errList).To(HaveLen(3))
-		})
-	})
-
-	Describe("#ValidateOCMConfig", func() {
-		It("should pass with a valid configuration", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"https://example.com/repo"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "example.com/org/component",
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(BeEmpty())
-		})
-
-		It("should fail if root component name is missing", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"https://example.com/repo"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "", // missing name
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-				"Type":  Equal(field.ErrorTypeRequired),
-				"Field": Equal("ocm.rootComponent.name"),
-			}))))
-		})
-
-		It("should fail if root component name is unqualified", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"https://example.com/repo"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "component", // unqualified name
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-				"Type":     Equal(field.ErrorTypeInvalid),
-				"Field":    Equal("ocm.rootComponent.name"),
-				"BadValue": Equal("component"),
-			}))))
-		})
-
-		It("should fail if root component version is missing", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"https://example.com/repo"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "example.com/org/component",
-					Version: "", // missing version
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-				"Type":  Equal(field.ErrorTypeRequired),
-				"Field": Equal("ocm.rootComponent.version"),
-			}))))
-		})
-
-		It("should fail if no repositories are provided", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{}, // empty repositories
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "example.com/org/component",
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-				"Type":  Equal(field.ErrorTypeRequired),
-				"Field": Equal("ocm.repositories"),
-			}))))
-		})
-
-		It("should fail if a repository URL is invalid", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"invalid-url"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "example.com/org/component",
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-				"Type":     Equal(field.ErrorTypeInvalid),
-				"Field":    Equal("ocm.repositories[0]"),
-				"BadValue": Equal("invalid-url"),
-			}))))
-		})
-
-		It("should fail with multiple invalid repositories", func() {
-			conf := &v1alpha1.OCMConfig{
-				Repositories: []string{"invalid-url", "another-invalid"},
-				RootComponent: v1alpha1.OCMComponent{
-					Name:    "example.com/org/component",
-					Version: "1.0.0",
-				},
-			}
-
-			errList := validation.ValidateOCMConfig(conf, field.NewPath("ocm"))
-			Expect(errList).To(ConsistOf(
-				PointTo(MatchFields(IgnoreExtras, Fields{
-					"Type":     Equal(field.ErrorTypeInvalid),
-					"Field":    Equal("ocm.repositories[0]"),
-					"BadValue": Equal("invalid-url"),
-				})),
-				PointTo(MatchFields(IgnoreExtras, Fields{
-					"Type":     Equal(field.ErrorTypeInvalid),
-					"Field":    Equal("ocm.repositories[1]"),
-					"BadValue": Equal("another-invalid"),
-				})),
-			))
-		})
+			return validation.ValidateOCMConfiguration(conf)
+		}, field.NewPath(""))
 	})
 })
+
+func setupOCMConfigTests(test func(conf *v1alpha1.OCMConfig) field.ErrorList, baseFldPath *field.Path) {
+	It("should fail if OCM config is invalid", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{}, // empty repositories
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "", // missing name
+				Version: "", // missing version
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(HaveLen(3))
+	})
+
+	It("should pass with a valid configuration", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"https://example.com/repo"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "example.com/org/component",
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(BeEmpty())
+	})
+
+	It("should fail if root component name is missing", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"https://example.com/repo"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "", // missing name
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Type":  Equal(field.ErrorTypeRequired),
+			"Field": Equal(baseFldPath.Child("rootComponent.name").String()),
+		}))))
+	})
+
+	It("should fail if root component name is unqualified", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"https://example.com/repo"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "component", // unqualified name
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Type":     Equal(field.ErrorTypeInvalid),
+			"Field":    Equal(baseFldPath.Child("rootComponent.name").String()),
+			"BadValue": Equal("component"),
+		}))))
+	})
+
+	It("should fail if root component version is missing", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"https://example.com/repo"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "example.com/org/component",
+				Version: "", // missing version
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Type":  Equal(field.ErrorTypeRequired),
+			"Field": Equal(baseFldPath.Child("rootComponent.version").String()),
+		}))))
+	})
+
+	It("should fail if no repositories are provided", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{}, // empty repositories
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "example.com/org/component",
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Type":  Equal(field.ErrorTypeRequired),
+			"Field": Equal(baseFldPath.Child("repositories").String()),
+		}))))
+	})
+
+	It("should fail if a repository URL is invalid", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"invalid-url"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "example.com/org/component",
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+			"Type":     Equal(field.ErrorTypeInvalid),
+			"Field":    Equal(baseFldPath.Child("repositories[0]").String()),
+			"BadValue": Equal("invalid-url"),
+		}))))
+	})
+
+	It("should fail with multiple invalid repositories", func() {
+		conf := &v1alpha1.OCMConfig{
+			Repositories: []string{"invalid-url", "another-invalid"},
+			RootComponent: v1alpha1.OCMComponent{
+				Name:    "example.com/org/component",
+				Version: "1.0.0",
+			},
+		}
+
+		errList := test(conf)
+		Expect(errList).To(ConsistOf(
+			PointTo(MatchFields(IgnoreExtras, Fields{
+				"Type":     Equal(field.ErrorTypeInvalid),
+				"Field":    Equal(baseFldPath.Child("repositories[0]").String()),
+				"BadValue": Equal("invalid-url"),
+			})),
+			PointTo(MatchFields(IgnoreExtras, Fields{
+				"Type":     Equal(field.ErrorTypeInvalid),
+				"Field":    Equal(baseFldPath.Child("repositories[1]").String()),
+				"BadValue": Equal("another-invalid"),
+			})),
+		))
+	})
+}
