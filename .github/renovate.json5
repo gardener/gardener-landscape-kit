@@ -15,13 +15,18 @@ The following dependencies have been updated:\n\
 - `{{upgrade.depName}}` from `{{upgrade.currentVersion}}` to `{{upgrade.newVersion}}`. {{#if (equals upgrade.datasource 'github-releases')}}[Release Notes](https://github.com/{{upgrade.depName}}/releases/tag/{{upgrade.newVersion}}){{/if}}\n\
 {{/each}}\n\
 ```",
-  // The following list of dependencies is updated by `make generate` and restricts updates to type `patch`.
-  // DO NOT EDIT THIS SECTION MANUALLY.
   packageRules: [
+    {
+      matchDatasources: ['go'],
+      groupName: "open-component-model",
+      matchPackageNames: ["/ocm.software/open-component-model/"],
+    },
+    // The following list of dependencies is updated by `make generate` and restricts updates to type `patch`.
+    // DO NOT EDIT THIS SECTION MANUALLY.
     {
       matchUpdateTypes: ["major", "minor"],
       enabled: false,
-      matchPackageNames: [
+      matchPackageNames: [ // GENERATOR-PIN
         "github.com/Masterminds/sprig/v3",
         "github.com/ahmetb/gen-crd-api-reference-docs",
         "github.com/go-logr/logr",
