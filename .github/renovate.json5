@@ -18,8 +18,14 @@ The following dependencies have been updated:\n\
   packageRules: [
     {
       matchDatasources: ['go'],
+      groupName: "open-component-model-bindings-go-descriptor-runtime",
+      matchPackageNames: ["ocm.software/open-component-model/bindings/go/descriptor/runtime"],
+      enabled: false,
+    },
+    {
+      matchDatasources: ['go'],
       groupName: "open-component-model",
-      matchPackageNames: ["/ocm.software/open-component-model/"],
+      matchPackageNames: ["ocm.software/open-component-model/"],
     },
     // The following list of dependencies is updated by `make generate` and restricts updates to type `patch`.
     // DO NOT EDIT THIS SECTION MANUALLY.
