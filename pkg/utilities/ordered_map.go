@@ -56,11 +56,22 @@ func (om *OrderedMap[T, V]) Get(key T) (V, bool) {
 	return value, found
 }
 
-// Entries returns a generator function that yields all entries of the ordered map.
+// Entries returns an iterator function that yields all entries of the ordered map.
 func (om *OrderedMap[T, V]) Entries() iter.Seq2[T, V] {
 	return func(yield func(T, V) bool) {
 		for _, key := range om.keys {
 			if !yield(key, om.splits[key]) {
+				return
+			}
+		}
+	}
+}
+
+// Keys returns an iterator function that yields all keys of the ordered map.
+func (om *OrderedMap[T, V]) Keys() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, key := range om.keys {
+			if !yield(key) {
 				return
 			}
 		}
