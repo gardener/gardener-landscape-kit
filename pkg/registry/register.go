@@ -5,10 +5,15 @@
 package registry
 
 import (
-	fluxcomponent "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
+	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 )
 
 // RegisterAllComponents registers all available components.
 func RegisterAllComponents(registry Interface) {
-	registry.RegisterComponent(fluxcomponent.NewComponent())
+	for _, component := range []components.Interface{
+		flux.NewComponent(),
+	} {
+		registry.RegisterComponent(component.Name(), component)
+	}
 }

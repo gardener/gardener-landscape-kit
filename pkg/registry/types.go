@@ -6,12 +6,13 @@ package registry
 
 import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
 // Interface is the interface for a component registry.
 type Interface interface {
 	// RegisterComponent registers a component in the registry.
-	RegisterComponent(component components.Interface)
+	RegisterComponent(name string, component components.Interface)
 	// GenerateBase generates the base component.
 	GenerateBase(opts components.Options) error
 	// GenerateLandscape generates the landscape component.
@@ -19,17 +20,17 @@ type Interface interface {
 }
 
 type registry struct {
-	components []components.Interface
+	components *utilities.OrderedMap[string, components.Interface]
 }
 
 // RegisterComponent registers a component in the registry.
-func (r *registry) RegisterComponent(component components.Interface) {
-	r.components = append(r.components, component)
+func (r *registry) RegisterComponent(name string, component components.Interface) {
+	r.components.Insert(name, component)
 }
 
 // GenerateBase generates the base component.
 func (r *registry) GenerateBase(opts components.Options) error {
-	for _, component := range r.components {
+	for _, component := range r.components.Entries() {
 		if err := component.GenerateBase(opts); err != nil {
 			return err
 		}
@@ -40,7 +41,7 @@ func (r *registry) GenerateBase(opts components.Options) error {
 
 // GenerateLandscape generates the landscape component.
 func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
-	for _, component := range r.components {
+	for _, component := range r.components.Entries() {
 		if err := component.GenerateLandscape(opts); err != nil {
 			return err
 		}
@@ -52,6 +53,6 @@ func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
 // New creates a new component registry.
 func New() Interface {
 	return &registry{
-		components: []components.Interface{},
+		components: utilities.NewOrderedMap[string, components.Interface](),
 	}
 }
