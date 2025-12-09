@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericiooptions"
-	"k8s.io/component-base/version/verflag"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate"
@@ -53,7 +52,6 @@ func NewCommand() *cobra.Command {
 
 	flags := cmd.PersistentFlags()
 	opts.AddFlags(flags)
-	verflag.AddFlags(flags)
 
 	return cmd
 }
