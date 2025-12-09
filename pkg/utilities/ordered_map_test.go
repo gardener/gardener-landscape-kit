@@ -6,6 +6,7 @@ package utilities_test
 
 import (
 	_ "embed"
+	"slices"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -81,6 +82,15 @@ var _ = Describe("Utilities", func() {
 					{key: "c", value: 3},
 					{key: "d", value: 40},
 				}))
+			})
+
+			It("#Keys", func() {
+				om.Insert("a", 1)
+				om.Insert("b", 2)
+				om.Insert("c", 3)
+				om.Insert("d", 4)
+
+				Expect(slices.Collect(om.Keys())).To(ConsistOf("a", "b", "c", "d"))
 			})
 		})
 	})

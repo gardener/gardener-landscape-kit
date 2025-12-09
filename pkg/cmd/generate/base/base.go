@@ -6,6 +6,7 @@ package base
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -47,7 +48,9 @@ func run(_ context.Context, opts *options.Options) error {
 	componentOpts := components.NewOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
 
 	reg := registry.New()
-	registry.RegisterAllComponents(reg)
+	if err := registry.RegisterAllComponents(reg, opts.Config); err != nil {
+		return fmt.Errorf("failed to register components: %w", err)
+	}
 
 	return reg.GenerateBase(componentOpts)
 }

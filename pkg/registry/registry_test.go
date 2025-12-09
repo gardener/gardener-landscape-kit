@@ -7,6 +7,7 @@ package registry_test
 import (
 	"errors"
 
+	"github.com/gardener/gardener/pkg/utils/test"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,6 +24,7 @@ var _ = Describe("Registry", func() {
 	var (
 		reg registry.Interface
 
+		config           *v1alpha1.LandscapeKitConfiguration
 		options          components.Options
 		landscapeOptions components.LandscapeOptions
 	)
@@ -30,6 +32,9 @@ var _ = Describe("Registry", func() {
 	BeforeEach(func() {
 		reg = registry.New()
 
+		config = &v1alpha1.LandscapeKitConfiguration{
+			Git: &v1alpha1.GitRepository{},
+		}
 		options = components.NewOptions(
 			&generateoptions.Options{Options: &cmd.Options{Log: logr.Discard()}},
 			afero.Afero{Fs: afero.NewMemMapFs()},
@@ -37,9 +42,7 @@ var _ = Describe("Registry", func() {
 		landscapeOptions = components.NewLandscapeOptions(
 			&generateoptions.Options{
 				Options: &cmd.Options{Log: logr.Discard()},
-				Config: &v1alpha1.LandscapeKitConfiguration{
-					Git: &v1alpha1.GitRepository{},
-				},
+				Config:  config,
 			},
 			afero.Afero{Fs: afero.NewMemMapFs()},
 		)
@@ -299,6 +302,76 @@ var _ = Describe("Registry", func() {
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(callOrder).To(Equal([]string{"comp1-base", "comp2-base", "comp3-base"}))
+		})
+	})
+
+	Describe("#RegisterAllComponents", func() {
+		var (
+			mockComp1, mockComp2, mockComp3 *mockComponent
+
+			mockComponents []func() components.Interface
+		)
+
+		BeforeEach(func() {
+			mockComp1 = &mockComponent{
+				name: "mockComp1",
+				generateBaseFunc: func(_ components.Options) error {
+					return nil
+				},
+			}
+
+			mockComp2 = &mockComponent{
+				name: "mockComp2",
+				generateBaseFunc: func(_ components.Options) error {
+					return nil
+				},
+			}
+
+			mockComp3 = &mockComponent{
+				name: "mockComp3",
+				generateBaseFunc: func(_ components.Options) error {
+					return nil
+				},
+			}
+
+			mockComponents = []func() components.Interface{
+				func() components.Interface {
+					return mockComp1
+				},
+				func() components.Interface {
+					return mockComp2
+				},
+				func() components.Interface {
+					return mockComp3
+				},
+			}
+
+			DeferCleanup(test.WithVars(&registry.ComponentList, mockComponents))
+		})
+
+		It("should register all components except excluded ones", func() {
+			config.Components = &v1alpha1.ComponentConfiguration{
+				Exclude: []string{"mockComp2"},
+			}
+
+			Expect(registry.RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(reg.GenerateBase(options)).To(Succeed())
+
+			Expect(mockComp1.generateBaseCalled).To(BeTrue())
+			Expect(mockComp2.generateBaseCalled).To(BeFalse())
+			Expect(mockComp3.generateBaseCalled).To(BeTrue())
+		})
+
+		It("should return an error if an unknown component is excluded", func() {
+			config.Components = &v1alpha1.ComponentConfiguration{
+				Exclude: []string{"unknown"},
+			}
+
+			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(`config includes invalid component excludes: unknown - available component names are: mockComp1, mockComp2, mockComp3`))
+		})
+
+		It("should succeed when config is nil", func() {
+			Expect(registry.RegisterAllComponents(reg, nil)).To((Succeed()))
 		})
 	})
 })

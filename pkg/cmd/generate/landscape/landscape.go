@@ -62,7 +62,9 @@ func run(_ context.Context, opts *options.Options) error {
 	componentOpts := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
 
 	reg := registry.New()
-	registry.RegisterAllComponents(reg)
+	if err := registry.RegisterAllComponents(reg, opts.Config); err != nil {
+		return fmt.Errorf("failed to register components: %w", err)
+	}
 
 	if err := reg.GenerateLandscape(componentOpts); err != nil {
 		return fmt.Errorf("failed to generate landscape components: %w", err)
