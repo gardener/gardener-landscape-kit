@@ -57,6 +57,11 @@ func NewComponent() components.Interface {
 	return &component{}
 }
 
+// Name returns the component name.
+func (*component) Name() string {
+	return "flux"
+}
+
 // GenerateBase generates the component base directory.
 func (c *component) GenerateBase(_ components.Options) error {
 	return nil
