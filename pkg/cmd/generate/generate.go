@@ -16,7 +16,7 @@ import (
 func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "generate",
-		Short: "Generates or updates the landscape directories",
+		Short: "Generate or update the landscape directories",
 	}
 
 	for _, subcommand := range []*cobra.Command{

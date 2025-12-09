@@ -9,11 +9,11 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericiooptions"
-	"k8s.io/component-base/version/verflag"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/resolveocm"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd/version"
 )
 
 // Name is a const for the name of this component.
@@ -47,13 +47,13 @@ func NewCommand() *cobra.Command {
 	for _, subcommand := range []*cobra.Command{
 		generate.NewCommand(opts),
 		resolveocm.NewCommand(opts),
+		version.NewCommand(opts),
 	} {
 		cmd.AddCommand(subcommand)
 	}
 
 	flags := cmd.PersistentFlags()
 	opts.AddFlags(flags)
-	verflag.AddFlags(flags)
 
 	return cmd
 }
