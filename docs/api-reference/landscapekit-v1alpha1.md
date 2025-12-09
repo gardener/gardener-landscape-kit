@@ -9,6 +9,37 @@
 </p>
 Resource Types:
 <ul></ul>
+<h3 id="landscape.config.gardener.cloud/v1alpha1.ComponentConfiguration">ComponentConfiguration
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>)
+</p>
+<p>
+<p>ComponentConfiguration contains configuration for components.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>exclude</code></br>
+<em>
+[]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Exclude is a list of component names to exclude.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.GitRepository">GitRepository
 </h3>
 <p>
@@ -160,6 +191,20 @@ GitRepository
 <td>
 <em>(Optional)</em>
 <p>Git is the configuration for the Git repository.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>components</code></br>
+<em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.ComponentConfiguration">
+ComponentConfiguration
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Components is the configuration for the components.</p>
 </td>
 </tr>
 </tbody>

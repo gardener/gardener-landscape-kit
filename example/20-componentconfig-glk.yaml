@@ -14,4 +14,7 @@ kind: LandscapeKitConfiguration
 #   paths:
 #     base: ./base
 #     landscape: ./
+# components:
+#   exclude:
+#   - component-name
 
