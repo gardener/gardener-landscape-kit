@@ -22,8 +22,7 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "base (-c CONFIG_FILE) TARGET_DIR",
-		Short:   "base generates or updates the base directory",
-		Long:    "Generates or updates base specific directories.",
+		Short:   "Generate or update the base directory",
 		Example: "gardener-landscape-kit generate base -c ./example/20-componentconfig-glk.yaml ./base",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

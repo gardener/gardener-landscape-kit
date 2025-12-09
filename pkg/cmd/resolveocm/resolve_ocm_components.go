@@ -19,9 +19,9 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "resolve-ocm-components",
-		Short: "Collects all OCM components and their versions and generates component list and image vector files.",
-		Long: "Collects all OCM components by walking all dependencies of the root component descriptor. " +
-			"It outputs the component list and generates the imagevector overwrites for each component.",
+		Short: "Collect all OCM components and their versions and generate component list and image vector files",
+		Long: "Collect all OCM components by walking all dependencies of the root component descriptor. " +
+			"Produce the component list and generate the image vector overwrites for each component.",
 
 		Example: `# Resolve all components starting at the root component. Writes component list, imagevector overwrite files for each component, and dumps all component descriptors.
 

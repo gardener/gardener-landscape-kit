@@ -24,8 +24,7 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "landscape (-c CONFIG_FILE) TARGET_DIR",
-		Short:   "landscape generates or updates the landscape directory",
-		Long:    "Generates or updates landscape specific directories.",
+		Short:   "Generate or update landscape specific directories",
 		Example: "gardener-landscape-kit generate landscape -c ./example/20-componentconfig-glk.yaml ./",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
