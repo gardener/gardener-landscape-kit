@@ -20,6 +20,16 @@ type LandscapeKitConfiguration struct {
 	// Git is the configuration for the Git repository.
 	// +optional
 	Git *GitRepository `json:"git,omitempty"`
+	// Components is the configuration for the components.
+	// +optional
+	Components *ComponentsConfiguration `json:"components,omitempty"`
+}
+
+// ComponentsConfiguration contains configuration for components.
+type ComponentsConfiguration struct {
+	// Exclude is a list of component names to exclude.
+	// +optional
+	Exclude []string `json:"exclude,omitempty"`
 }
 
 // GitRepository contains information the Git repository containing landscape deployments and configurations.

@@ -41,6 +41,8 @@ type LandscapeOptions interface {
 
 // Interface is the components interface that each component must implement.
 type Interface interface {
+	// Name returns the component name.
+	Name() string
 	// GenerateBase generates the component base dir.
 	GenerateBase(Options) error
 	// GenerateLandscape generates the component landscape dir.
