@@ -9,14 +9,14 @@
 </p>
 Resource Types:
 <ul></ul>
-<h3 id="landscape.config.gardener.cloud/v1alpha1.ComponentConfiguration">ComponentConfiguration
+<h3 id="landscape.config.gardener.cloud/v1alpha1.ComponentsConfiguration">ComponentsConfiguration
 </h3>
 <p>
 (<em>Appears on:</em>
 <a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>)
 </p>
 <p>
-<p>ComponentConfiguration contains configuration for components.</p>
+<p>ComponentsConfiguration contains configuration for components.</p>
 </p>
 <table>
 <thead>
@@ -197,8 +197,8 @@ GitRepository
 <td>
 <code>components</code></br>
 <em>
-<a href="#landscape.config.gardener.cloud/v1alpha1.ComponentConfiguration">
-ComponentConfiguration
+<a href="#landscape.config.gardener.cloud/v1alpha1.ComponentsConfiguration">
+ComponentsConfiguration
 </a>
 </em>
 </td>

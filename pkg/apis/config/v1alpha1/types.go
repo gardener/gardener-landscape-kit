@@ -22,11 +22,11 @@ type LandscapeKitConfiguration struct {
 	Git *GitRepository `json:"git,omitempty"`
 	// Components is the configuration for the components.
 	// +optional
-	Components *ComponentConfiguration `json:"components,omitempty"`
+	Components *ComponentsConfiguration `json:"components,omitempty"`
 }
 
-// ComponentConfiguration contains configuration for components.
-type ComponentConfiguration struct {
+// ComponentsConfiguration contains configuration for components.
+type ComponentsConfiguration struct {
 	// Exclude is a list of component names to exclude.
 	// +optional
 	Exclude []string `json:"exclude,omitempty"`

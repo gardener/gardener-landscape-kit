@@ -44,7 +44,7 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 
 	if len(invalidComponentNames) > 0 {
 		return fmt.Errorf(
-			"config includes invalid component excludes: %s - available component names are: %s",
+			"configuration contains invalid component excludes: %s - available component names are: %s",
 			strings.Join(invalidComponentNames, ", "),
 			strings.Join(slices.Collect(orderedComponents.Keys()), ", "),
 		)

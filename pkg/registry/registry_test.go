@@ -350,7 +350,7 @@ var _ = Describe("Registry", func() {
 		})
 
 		It("should register all components except excluded ones", func() {
-			config.Components = &v1alpha1.ComponentConfiguration{
+			config.Components = &v1alpha1.ComponentsConfiguration{
 				Exclude: []string{"mockComp2"},
 			}
 
@@ -363,11 +363,11 @@ var _ = Describe("Registry", func() {
 		})
 
 		It("should return an error if an unknown component is excluded", func() {
-			config.Components = &v1alpha1.ComponentConfiguration{
+			config.Components = &v1alpha1.ComponentsConfiguration{
 				Exclude: []string{"unknown"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(`config includes invalid component excludes: unknown - available component names are: mockComp1, mockComp2, mockComp3`))
+			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(`configuration contains invalid component excludes: unknown - available component names are: mockComp1, mockComp2, mockComp3`))
 		})
 
 		It("should succeed when config is nil", func() {
