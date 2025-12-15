@@ -74,7 +74,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 		writeGitignoreFile,
 		writeGardenNamespaceManifest, // The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
 		writeFluxKustomization,
-		logFluxInitializationFirstSteps,
+		logFluxInitializationFirstSteps(options),
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -94,7 +94,7 @@ func writeFluxTemplateFilesAndKustomization(options components.LandscapeOptions)
 	}
 	for _, file := range dir {
 		fileName := file.Name()
-		if fileName == gitignoreTemplateFile {
+		if fileName == gitignoreTemplateFile || strings.HasSuffix(fileName, ".go") {
 			continue
 		}
 
@@ -206,13 +206,15 @@ func writeFluxKustomization(options components.LandscapeOptions) error {
 	)
 }
 
-func logFluxInitializationFirstSteps(options components.LandscapeOptions) error {
+func logFluxInitializationFirstSteps(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
 	landscapeDir := options.GetTargetPath()
-	if instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, FluxComponentsDirName)); err != nil || instanceFileExisted {
-		return err
-	}
-	fluxDir := path.Join(landscapeDir, DirName)
-	options.GetLogger().Info(`Initialized the landscape for an expected Flux cluster at: ` + fluxDir + `
+	instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, FluxComponentsDirName))
+	return func(options components.LandscapeOptions) error {
+		if err != nil || instanceFileExisted {
+			return err
+		}
+		fluxDir := path.Join(landscapeDir, DirName)
+		options.GetLogger().Info(`Initialized the landscape for an expected Flux cluster at: ` + fluxDir + `
 
 Next steps:
 1. Adjust the generated manifests to your environment, especially the Git repository reference:
@@ -237,7 +239,8 @@ Next steps:
 
   $  kubectl apply -k ` + path.Join(landscapeDir, FluxComponentsDirName) + `
 `)
-	return nil
+		return nil
+	}
 }
 
 const (
