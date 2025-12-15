@@ -73,7 +73,7 @@ func writeKustomizationsToFileTree(fs afero.Afero, targetDir string) func(dir st
 	var completedPaths []string
 
 	return func(dir string, info os.FileInfo, err error) error {
-		if !info.IsDir() || err != nil {
+		if err != nil || !info.IsDir() {
 			return err
 		}
 
