@@ -4,9 +4,9 @@ metadata:
   name: gardener-operator
   namespace: garden
 spec:
-  interval: 0s
+  interval: 30m
   path: {{ .landscapeComponentPath }}
-  prune: false
+  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system

@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/Masterminds/sprig/v3"
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
@@ -189,6 +190,8 @@ func writeFluxKustomization(options components.LandscapeOptions) error {
 		Spec: kustomizev1.KustomizationSpec{
 			SourceRef: SourceRef,
 			Path:      path.Join(options.GetRelativeLandscapePath(), components.DirName),
+			Prune:     true,
+			Interval:  metav1.Duration{Duration: 30 * time.Minute},
 		},
 	})
 	if err != nil {
