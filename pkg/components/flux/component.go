@@ -40,7 +40,7 @@ const (
 	// gitSecretFileName is the name of the template file for the Git sync secret which should be created manually and not checked into the landscape Git repo.
 	gitSecretFileName = "git-sync-secret.yaml"
 	// gotkSyncFileName is the name of the template file for the gotk sync manifest.
-	gotkSyncFileName = "gotk-sync.yaml.tpl"
+	gotkSyncFileName = "gotk-sync.yaml"
 )
 
 var (
@@ -156,7 +156,6 @@ func renderGOTKTemplate(options components.LandscapeOptions, fileContents []byte
 	}
 
 	fileContents = gotkResult.Bytes()
-	fileName = strings.TrimSuffix(fileName, ".tpl")
 	return fileContents, fileName, nil
 }
 

@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"html/template"
 	"path"
-	"strings"
 
 	"github.com/Masterminds/sprig/v3"
 
@@ -23,8 +22,6 @@ const (
 	ComponentName = "gardener-operator"
 	// ComponentDirectory is the directory of the gardener-operator component within the base components directory.
 	ComponentDirectory = "gardener/operator"
-
-	templateSuffix = ".tpl"
 )
 
 var (
@@ -140,7 +137,5 @@ func renderTemplate(fileContents []byte, fileName string, vars map[string]any) (
 		return nil, "", fmt.Errorf("error executing '%s' template: %w", fileName, err)
 	}
 
-	fileContents = templatedResult.Bytes()
-	fileName = strings.TrimSuffix(fileName, templateSuffix)
-	return fileContents, fileName, nil
+	return templatedResult.Bytes(), fileName, nil
 }
