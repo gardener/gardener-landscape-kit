@@ -97,3 +97,8 @@ func RelativePathFromDirDepth(relativePath string) string {
 	}
 	return relativePath
 }
+
+// CalculatePathToComponentBase calculates the relative path from the given path splits (from the repository root) to a component base directory.
+func CalculatePathToComponentBase(pathSplitsFromRepoRoot ...string) string {
+	return RelativePathFromDirDepth(path.Join(pathSplitsFromRepoRoot...))
+}

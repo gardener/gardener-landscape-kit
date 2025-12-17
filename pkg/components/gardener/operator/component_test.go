@@ -33,7 +33,7 @@ var _ = Describe("Component Generation", func() {
 		}
 	})
 
-	Describe("Base", func() {
+	Describe("#GenerateBase", func() {
 		var opts components.Options
 
 		BeforeEach(func() {
@@ -71,7 +71,7 @@ var _ = Describe("Component Generation", func() {
 		})
 	})
 
-	Describe("Landscape", func() {
+	Describe("#GenerateLandscape", func() {
 		BeforeEach(func() {
 			generateOpts.TargetDirPath = "/repo/landscapeDir"
 			generateOpts.Config = &v1alpha1.LandscapeKitConfiguration{

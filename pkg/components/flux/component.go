@@ -74,7 +74,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 		writeGitignoreFile,
 		writeGardenNamespaceManifest, // The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
 		writeFluxKustomization,
-		logFluxInitializationFirstSteps(options),
+		generateFirstStepsMessageIfRequired(options),
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -206,7 +206,7 @@ func writeFluxKustomization(options components.LandscapeOptions) error {
 	)
 }
 
-func logFluxInitializationFirstSteps(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
+func generateFirstStepsMessageIfRequired(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
 	landscapeDir := options.GetTargetPath()
 	instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, FluxComponentsDirName))
 	return func(options components.LandscapeOptions) error {

@@ -13,14 +13,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/sprig/v3"
-	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
 )
 
 const (
@@ -28,11 +23,6 @@ const (
 	ComponentName = "gardener-operator"
 	// ComponentDirectory is the directory of the gardener-operator component within the base components directory.
 	ComponentDirectory = "gardener/operator"
-
-	// HelmReleaseFileName is the name of the helm release manifest file.
-	HelmReleaseFileName = "helm-release.yaml"
-	// OciRepoFileName is the name of the oci repository manifest file.
-	OciRepoFileName = "oci-repository.yaml"
 
 	templateSuffix = ".tpl"
 )
@@ -45,6 +35,11 @@ var (
 	baseTemplateDir = "templates/base"
 	//go:embed templates/base
 	baseTemplates embed.FS
+
+	// landscapeTemplateDir is the directory where the landscape templates are stored.
+	landscapeTemplateDir = "templates/landscape"
+	//go:embed templates/landscape
+	landscapeTemplates embed.FS
 )
 
 type component struct{}
@@ -62,7 +57,7 @@ func (c *component) Name() string {
 // GenerateBase generates the component base directory.
 func (c *component) GenerateBase(options components.Options) error {
 	for _, op := range []func(components.Options) error{
-		writeTemplateFilesAndKustomization,
+		writeBaseTemplateFiles,
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -74,8 +69,7 @@ func (c *component) GenerateBase(options components.Options) error {
 // GenerateLandscape generates the component landscape directory.
 func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
-		writeResourcesKustomization,
-		writeFluxKustomization,
+		writeLandscapeTemplateFiles,
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -84,98 +78,69 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func writeTemplateFilesAndKustomization(opts components.Options) error {
-	var objects = make(map[string][]byte)
-
-	dir, err := baseTemplates.ReadDir(baseTemplateDir)
+func writeBaseTemplateFiles(opts components.Options) error {
+	objects, err := renderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
+		"version": fallbackComponentVersion, // TODO(LucaBernstein): Get actual version from the versions handling component once available.
+	})
 	if err != nil {
 		return err
 	}
+
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
+	var (
+		relativeOverrideDir = path.Join(components.DirName, ComponentDirectory)
+		relativeRepoRoot    = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeOverrideDir)
+	)
+
+	objects, err := renderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeOverrideDir),
+		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeOverrideDir),
+	})
+	if err != nil {
+		return err
+	}
+
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func renderTemplateFiles(templateFS embed.FS, templateDir string, vars map[string]any) (map[string][]byte, error) {
+	var objects = make(map[string][]byte)
+
+	dir, err := templateFS.ReadDir(templateDir)
+	if err != nil {
+		return nil, err
+	}
 	for _, file := range dir {
 		fileName := file.Name()
-		fileContents, err := baseTemplates.ReadFile(path.Join(baseTemplateDir, fileName))
+		fileContents, err := templateFS.ReadFile(path.Join(templateDir, fileName))
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		switch fileName {
-		case HelmReleaseFileName + templateSuffix:
-			if fileContents, fileName, err = renderTemplate(opts, fileContents, fileName); err != nil {
-				return err
-			}
-		case OciRepoFileName + templateSuffix:
-			if fileContents, fileName, err = renderTemplate(opts, fileContents, fileName); err != nil {
-				return err
-			}
+		if fileContents, fileName, err = renderTemplate(fileContents, fileName, vars); err != nil {
+			return nil, err
 		}
 		objects[fileName] = fileContents
 	}
 
-	return kustomization.WriteKustomizationComponent(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+	return objects, nil
 }
 
-func renderTemplate(_ components.Options, fileContents []byte, fileName string) ([]byte, string, error) {
+func renderTemplate(fileContents []byte, fileName string, vars map[string]any) ([]byte, string, error) {
 	fileTemplate, err := template.New(fileName).Funcs(sprig.TxtFuncMap()).Parse(string(fileContents))
 	if err != nil {
 		return nil, "", fmt.Errorf("error parsing template '%s': %w", fileName, err)
 	}
 
 	var templatedResult bytes.Buffer
-	if err := fileTemplate.Execute(&templatedResult, map[string]any{
-		"version": fallbackComponentVersion, // TODO(LucaBernstein): Get actual version from the versions handling component once available.
-	}); err != nil {
+	if err := fileTemplate.Execute(&templatedResult, vars); err != nil {
 		return nil, "", fmt.Errorf("error executing '%s' template: %w", fileName, err)
 	}
 
 	fileContents = templatedResult.Bytes()
 	fileName = strings.TrimSuffix(fileName, templateSuffix)
 	return fileContents, fileName, nil
-}
-
-func writeResourcesKustomization(options components.LandscapeOptions) error {
-	var (
-		err error
-
-		objects = make(map[string][]byte)
-	)
-
-	relativeOverrideDir := path.Join(components.DirName, ComponentDirectory)
-	relativeRoot := files.RelativePathFromDirDepth(path.Join(options.GetRelativeLandscapePath(), relativeOverrideDir))
-	objects[kustomization.KustomizationFileName], err = yaml.Marshal(kustomization.NewKustomization([]string{
-		path.Join(relativeRoot, options.GetRelativeBasePath(), relativeOverrideDir),
-	}, nil))
-	if err != nil {
-		return err
-	}
-
-	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), relativeOverrideDir, options.GetFilesystem())
-}
-
-func writeFluxKustomization(options components.LandscapeOptions) error {
-	fluxKustomization, err := yaml.Marshal(&kustomizev1.Kustomization{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: kustomizev1.GroupVersion.String(),
-			Kind:       kustomizev1.KustomizationKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      ComponentName,
-			Namespace: flux.GardenNamespaceName,
-		},
-		Spec: kustomizev1.KustomizationSpec{
-			SourceRef: flux.SourceRef,
-			Path:      path.Join(options.GetRelativeLandscapePath(), components.DirName, ComponentDirectory),
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	return files.WriteObjectsToFilesystem(
-		map[string][]byte{
-			kustomization.FluxKustomizationFileName: fluxKustomization,
-		},
-		options.GetTargetPath(),
-		path.Join(components.DirName, ComponentDirectory),
-		options.GetFilesystem(),
-	)
 }

@@ -13,5 +13,5 @@ import (
 
 func TestOperator(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gardener Operator Component Suite")
+	RunSpecs(t, "Components Gardener Operator Suite")
 }
