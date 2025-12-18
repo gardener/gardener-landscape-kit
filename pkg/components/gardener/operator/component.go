@@ -83,13 +83,13 @@ func writeBaseTemplateFiles(opts components.Options) error {
 
 func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	var (
-		relativeOverrideDir = path.Join(components.DirName, ComponentDirectory)
-		relativeRepoRoot    = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeOverrideDir)
+		relativeComponentPath = path.Join(components.DirName, ComponentDirectory)
+		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
-		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeOverrideDir),
-		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeOverrideDir),
+		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
+		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
 	if err != nil {
 		return err
