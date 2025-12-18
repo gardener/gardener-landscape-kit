@@ -5,13 +5,8 @@
 package operator
 
 import (
-	"bytes"
 	"embed"
-	"fmt"
-	"html/template"
 	"path"
-
-	"github.com/Masterminds/sprig/v3"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
@@ -76,7 +71,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
-	objects, err := renderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
+	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
 		"version": fallbackComponentVersion, // TODO(LucaBernstein): Get actual version from the versions handling component once available.
 	})
 	if err != nil {
@@ -92,7 +87,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot    = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeOverrideDir)
 	)
 
-	objects, err := renderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeOverrideDir),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeOverrideDir),
 	})
@@ -101,41 +96,4 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
-}
-
-func renderTemplateFiles(templateFS embed.FS, templateDir string, vars map[string]any) (map[string][]byte, error) {
-	var objects = make(map[string][]byte)
-
-	dir, err := templateFS.ReadDir(templateDir)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range dir {
-		fileName := file.Name()
-		fileContents, err := templateFS.ReadFile(path.Join(templateDir, fileName))
-		if err != nil {
-			return nil, err
-		}
-
-		if fileContents, fileName, err = renderTemplate(fileContents, fileName, vars); err != nil {
-			return nil, err
-		}
-		objects[fileName] = fileContents
-	}
-
-	return objects, nil
-}
-
-func renderTemplate(fileContents []byte, fileName string, vars map[string]any) ([]byte, string, error) {
-	fileTemplate, err := template.New(fileName).Funcs(sprig.TxtFuncMap()).Parse(string(fileContents))
-	if err != nil {
-		return nil, "", fmt.Errorf("error parsing template '%s': %w", fileName, err)
-	}
-
-	var templatedResult bytes.Buffer
-	if err := fileTemplate.Execute(&templatedResult, vars); err != nil {
-		return nil, "", fmt.Errorf("error executing '%s' template: %w", fileName, err)
-	}
-
-	return templatedResult.Bytes(), fileName, nil
 }
