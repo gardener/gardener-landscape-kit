@@ -1,0 +1,5 @@
+# The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: garden

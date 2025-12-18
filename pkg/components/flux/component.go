@@ -5,23 +5,12 @@
 package flux
 
 import (
-	"bytes"
 	"embed"
-	"fmt"
-	"html/template"
 	"path"
 	"strings"
-	"time"
-
-	"github.com/Masterminds/sprig/v3"
-	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
 )
 
 const (
@@ -31,17 +20,10 @@ const (
 	// FluxComponentsDirName is the directory name where the Flux cli generates the flux-system components into.
 	FluxComponentsDirName = DirName + "/flux-system"
 
-	// glkComponentsName is the name of the Flux Kustomize component that serves as the root for all subsequent components.
-	glkComponentsName = "glk-components"
-
 	// gitignoreTemplateFile is the name of the .gitignore template file.
-	gitignoreTemplateFile = "gitignore"
+	gitignoreTemplateFile = "flux-system/gitignore"
 	// gitignoreFileName is the name of the .gitignore file.
 	gitignoreFileName = ".gitignore"
-	// gitSecretFileName is the name of the template file for the Git sync secret which should be created manually and not checked into the landscape Git repo.
-	gitSecretFileName = "git-sync-secret.yaml"
-	// gotkSyncFileName is the name of the template file for the gotk sync manifest.
-	gotkSyncFileName = "gotk-sync.yaml"
 )
 
 var (
@@ -71,10 +53,8 @@ func (c *component) GenerateBase(_ components.Options) error {
 // GenerateLandscape generates the component landscape directory.
 func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
-		writeFluxTemplateFilesAndKustomization,
+		writeLandscapeTemplateFiles,
 		writeGitignoreFile,
-		writeGardenNamespaceManifest, // The `garden` namespace will hold all Flux resources (related to gardener components) in the cluster and must be created as soon as possible.
-		writeFluxKustomization,
 		generateFirstStepsMessageIfRequired(options),
 	} {
 		if err := op(options); err != nil {
@@ -84,80 +64,36 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func writeFluxTemplateFilesAndKustomization(options components.LandscapeOptions) error {
-	var (
-		objects                    = make(map[string][]byte)
-		kustomizationObjectEntries []string
-	)
-	dir, err := landscapeTemplates.ReadDir(landscapeTemplateDir)
-	if err != nil {
-		return err
-	}
-	for _, file := range dir {
-		fileName := file.Name()
-		if fileName == gitignoreTemplateFile || strings.HasSuffix(fileName, ".go") {
-			continue
-		}
-
-		fileContents, err := landscapeTemplates.ReadFile(path.Join(landscapeTemplateDir, fileName))
-		if err != nil {
-			return err
-		}
-
-		if fileName == gotkSyncFileName {
-			fileContents, fileName, err = renderGOTKTemplate(options, fileContents, fileName)
-			if err != nil {
-				return err
-			}
-		}
-
-		if fileName != gitSecretFileName {
-			kustomizationObjectEntries = append(kustomizationObjectEntries, fileName)
-		}
-		objects[fileName] = fileContents
-	}
-
-	kustomizationManifest := kustomization.NewKustomization(kustomizationObjectEntries, nil)
-	objects[kustomization.KustomizationFileName], err = yaml.Marshal(kustomizationManifest)
-	if err != nil {
-		return err
-	}
-
-	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), FluxComponentsDirName, options.GetFilesystem())
-}
-
-func renderGOTKTemplate(options components.LandscapeOptions, fileContents []byte, fileName string) ([]byte, string, error) {
-	gotkTemplate, err := template.New("gotk-sync").Funcs(sprig.TxtFuncMap()).Parse(string(fileContents))
-	if err != nil {
-		return nil, "", fmt.Errorf("error parsing gotk sync template: %w", err)
-	}
-
+func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	var repoRef string
 	switch {
-	case options.GetGitRepository().Ref.Commit != nil:
-		repoRef = "commit: " + *options.GetGitRepository().Ref.Commit
-	case options.GetGitRepository().Ref.Tag != nil:
-		repoRef = "tag: " + *options.GetGitRepository().Ref.Tag
-	case options.GetGitRepository().Ref.Branch != nil:
-		repoRef = "branch: " + *options.GetGitRepository().Ref.Branch
+	case opts.GetGitRepository().Ref.Commit != nil:
+		repoRef = "commit: " + *opts.GetGitRepository().Ref.Commit
+	case opts.GetGitRepository().Ref.Tag != nil:
+		repoRef = "tag: " + *opts.GetGitRepository().Ref.Tag
+	case opts.GetGitRepository().Ref.Branch != nil:
+		repoRef = "branch: " + *opts.GetGitRepository().Ref.Branch
 	default:
 		repoRef = "branch: main"
 	}
 
-	fluxPath := path.Join(options.GetRelativeLandscapePath(), DirName)
+	fluxPath := path.Join(opts.GetRelativeLandscapePath(), DirName)
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
-	var gotkResult bytes.Buffer
-	if err := gotkTemplate.Execute(&gotkResult, map[string]any{
-		"repo_url":  options.GetGitRepository().URL,
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+		"repo_url":  opts.GetGitRepository().URL,
 		"repo_ref":  repoRef,
 		"flux_path": fluxPath,
-	}); err != nil {
-		return nil, "", fmt.Errorf("error executing gotk sync template: %w", err)
+	})
+	if err != nil {
+		return err
 	}
 
-	fileContents = gotkResult.Bytes()
-	return fileContents, fileName, nil
+	// Remove files: gitignore is handled separately, doc.go is not needed in the filesystem.
+	delete(objects, "flux-system/gitignore")
+	delete(objects, "flux-system/doc.go")
+
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), DirName, opts.GetFilesystem())
 }
 
 func writeGitignoreFile(options components.LandscapeOptions) error {
@@ -175,37 +111,6 @@ func writeGitignoreFile(options components.LandscapeOptions) error {
 	}
 	// Write the default gitignore file to the .glk defaults system directory.
 	return files.WriteFileToFilesystem(gitignore, gitignoreDefaultPath, true, options.GetFilesystem())
-}
-
-func writeFluxKustomization(options components.LandscapeOptions) error {
-	fluxKustomization, err := yaml.Marshal(&kustomizev1.Kustomization{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: kustomizev1.GroupVersion.String(),
-			Kind:       kustomizev1.KustomizationKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      glkComponentsName,
-			Namespace: FluxSystemNamespaceName,
-		},
-		Spec: kustomizev1.KustomizationSpec{
-			SourceRef: SourceRef,
-			Path:      path.Join(options.GetRelativeLandscapePath(), components.DirName),
-			Prune:     true,
-			Interval:  metav1.Duration{Duration: 30 * time.Minute},
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	return files.WriteObjectsToFilesystem(
-		map[string][]byte{
-			glkComponentsName + ".yaml": fluxKustomization,
-		},
-		options.GetTargetPath(),
-		DirName,
-		options.GetFilesystem(),
-	)
 }
 
 func generateFirstStepsMessageIfRequired(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
@@ -243,34 +148,4 @@ Next steps:
 `)
 		return nil
 	}
-}
-
-const (
-	// NamespaceKind is the kind of the namespace resource.
-	NamespaceKind = "Namespace"
-	// GardenNamespaceFileName is the name of the namespace manifest file.
-	GardenNamespaceFileName = "garden-namespace.yaml"
-	// GardenNamespaceName is the name of the namespace created by this component.
-	GardenNamespaceName = "garden"
-)
-
-// writeGardenNamespaceManifest generates the garden namespace in the given landscape directory.
-func writeGardenNamespaceManifest(options components.LandscapeOptions) error {
-	objects := make(map[string][]byte)
-
-	var err error
-	objects[GardenNamespaceFileName], err = yaml.Marshal(&corev1.Namespace{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: corev1.SchemeGroupVersion.String(),
-			Kind:       NamespaceKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: GardenNamespaceName,
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	return files.WriteObjectsToFilesystem(objects, options.GetTargetPath(), DirName, options.GetFilesystem())
 }
