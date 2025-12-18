@@ -233,9 +233,9 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Nod
 		oldSet[nodeToString(item)] = true
 	}
 
-	currentMap := make(map[string]*yaml.Node)
+	currentMap := make(map[string]bool)
 	for _, item := range current.Content {
-		currentMap[nodeToString(item)] = item
+		currentMap[nodeToString(item)] = true
 	}
 
 	newSet := make(map[string]bool)
@@ -243,24 +243,21 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Nod
 		newSet[nodeToString(item)] = true
 	}
 
-	// Process items in newDefault order to preserve order
-	for _, newItem := range newDefault.Content {
-		key := nodeToString(newItem)
-		if !oldSet[key] {
-			// New template item - add from newDefault
-			result.Content = append(result.Content, newItem)
-		} else if currentItem, exists := currentMap[key]; exists {
-			// Unchanged item - use current version for comments
+	// Process items in current order first to preserve order.
+	for _, currentItem := range current.Content {
+		key := nodeToString(currentItem)
+		if !oldSet[key] || newSet[key] {
+			// Add item if it has not been removed in newDefault
 			result.Content = append(result.Content, currentItem)
 		}
-		// If item was in oldSet but not in currentMap, it was removed by user - skip it
 	}
 
-	// Add user-added items (items in current but not in oldDefault) at the end
-	for _, item := range current.Content {
-		key := nodeToString(item)
-		if !oldSet[key] && !newSet[key] {
-			result.Content = append(result.Content, item)
+	// Add new items from newDefault that don't exist in current or old.
+	for _, newItem := range newDefault.Content {
+		key := nodeToString(newItem)
+		if !oldSet[key] && !currentMap[key] {
+			// New template item - add from newDefault
+			result.Content = append(result.Content, newItem)
 		}
 	}
 

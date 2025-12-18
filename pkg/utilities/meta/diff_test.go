@@ -5,7 +5,7 @@
 package meta_test
 
 import (
-	_ "embed"
+	"embed"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -18,6 +18,9 @@ import (
 )
 
 var (
+	//go:embed testdata
+	testdata embed.FS
+
 	//go:embed testdata/expected_configmap_output_default.yaml
 	expectedDefaultConfigMapOutput string
 	//go:embed testdata/expected_configmap_output_newkey.yaml
@@ -110,6 +113,21 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsNewDefault), []byte(multipleManifestsEdited))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
+		})
+
+		It("should retain the sequence order in a currently written file", func() {
+			oldDefault, err := testdata.ReadFile("testdata/order-1-old-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			newDefault, err := testdata.ReadFile("testdata/order-2-new-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			current, err := testdata.ReadFile("testdata/order-3-current.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			expected, err := testdata.ReadFile("testdata/order-4-expected.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(expected)))
 		})
 	})
 })
