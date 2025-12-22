@@ -121,3 +121,7 @@ kind-up: registry-up git-server-up $(KIND) $(KUBECTL) $(HELM)
 .PHONY: kind-down
 kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
+
+.PHONY: e2e-prepare
+e2e-prepare:
+	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh $(REPO_ROOT)/dev/e2e
