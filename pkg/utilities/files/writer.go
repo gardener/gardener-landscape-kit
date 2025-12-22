@@ -5,8 +5,10 @@
 package files
 
 import (
+	"log"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/spf13/afero"
 
@@ -83,4 +85,20 @@ func WriteFileToFilesystem(contents []byte, filePathDir string, overwriteExistin
 	}
 
 	return nil
+}
+
+// RelativePathFromDirDepth returns a relative path that goes up the directory tree
+// based on the depth of the given relativePath.
+// If the passed path is already a relative path, it will log a fatal error.
+func RelativePathFromDirDepth(relativePath string) string {
+	relativePath, err := filepath.Rel("./"+relativePath, "./")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return relativePath
+}
+
+// CalculatePathToComponentBase calculates the relative path from the given path splits (from the repository root) to a component base directory.
+func CalculatePathToComponentBase(pathSplitsFromRepoRoot ...string) string {
+	return RelativePathFromDirDepth(path.Join(pathSplitsFromRepoRoot...))
 }
