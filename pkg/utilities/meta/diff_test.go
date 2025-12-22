@@ -5,7 +5,7 @@
 package meta_test
 
 import (
-	_ "embed"
+	"embed"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -18,28 +18,8 @@ import (
 )
 
 var (
-	//go:embed testdata/expected_configmap_output_default.yaml
-	expectedDefaultConfigMapOutput string
-	//go:embed testdata/expected_configmap_output_newkey.yaml
-	expectedConfigMapOutputWithNewKey string
-
-	//go:embed testdata/manifest-1-default.yaml
-	manifestDefault string
-	//go:embed testdata/manifest-2-edited.yaml
-	manifestEdited string
-	//go:embed testdata/manifest-3-new-default.yaml
-	manifestDefaultNew string
-	//go:embed testdata/manifest-4-expected-generated.yaml
-	manifestGenerated string
-
-	//go:embed testdata/multiple-manifests-1-initial.yaml
-	multipleManifestsInitial string
-	//go:embed testdata/multiple-manifests-2-edited.yaml
-	multipleManifestsEdited string
-	//go:embed testdata/multiple-manifests-3-new-default.yaml
-	multipleManifestsNewDefault string
-	//go:embed testdata/multiple-manifests-4-expected-generated.yaml
-	multipleManifestsExpectedGenerated string
+	//go:embed testdata
+	testdata embed.FS
 )
 
 var _ = Describe("Meta Dir Config Diff", func() {
@@ -77,39 +57,80 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			content, err = meta.ThreeWayMergeManifest(objYaml, newObjYaml, content)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(string(content)).To(MatchYAML(strings.ReplaceAll(expectedConfigMapOutputWithNewKey, "key: value", "key: changedValue")))
+			expectedConfigMapOutputWithNewKey, err := testdata.ReadFile("testdata/expected_configmap_output_newkey.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(string(content)).To(MatchYAML(strings.ReplaceAll(string(expectedConfigMapOutputWithNewKey), "key: value", "key: changedValue")))
 		})
 
 		It("should support patching raw yaml manifests with comments", func() {
-			mergedManifest, err := meta.ThreeWayMergeManifest([]byte(manifestDefault), []byte(manifestDefaultNew), []byte(manifestEdited))
+			manifestDefault, err := testdata.ReadFile("testdata/manifest-1-default.yaml")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(mergedManifest)).To(Equal(manifestGenerated))
+			manifestEdited, err := testdata.ReadFile("testdata/manifest-2-edited.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			manifestDefaultNew, err := testdata.ReadFile("testdata/manifest-3-new-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			manifestGenerated, err := testdata.ReadFile("testdata/manifest-4-expected-generated.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			mergedManifest, err := meta.ThreeWayMergeManifest(manifestDefault, manifestDefaultNew, manifestEdited)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(mergedManifest)).To(Equal(string(manifestGenerated)))
 		})
 
 		It("should handle a non-existent default file gracefully", func() {
-			content, err := meta.ThreeWayMergeManifest(nil, []byte(expectedConfigMapOutputWithNewKey), []byte(strings.ReplaceAll(expectedDefaultConfigMapOutput, "key: value", "key: newDefaultValue")))
+			expectedDefaultConfigMapOutput, err := testdata.ReadFile("testdata/expected_configmap_output_default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			expectedConfigMapOutputWithNewKey, err := testdata.ReadFile("testdata/expected_configmap_output_newkey.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			content, err := meta.ThreeWayMergeManifest(nil, expectedConfigMapOutputWithNewKey, []byte(strings.ReplaceAll(string(expectedDefaultConfigMapOutput), "key: value", "key: newDefaultValue")))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(Equal(strings.ReplaceAll(expectedConfigMapOutputWithNewKey, "key: value", "key: newDefaultValue") + "\n"))
+			Expect(string(content)).To(Equal(strings.ReplaceAll(string(expectedConfigMapOutputWithNewKey), "key: value", "key: newDefaultValue") + "\n"))
 		})
 
 		It("should handle multiple manifests within a single yaml file correctly", func() {
-			content, err := meta.ThreeWayMergeManifest(nil, []byte(multipleManifestsInitial), nil)
+			multipleManifestsInitial, err := testdata.ReadFile("testdata/multiple-manifests-1-initial.yaml")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).To(Equal(multipleManifestsInitial))
+			multipleManifestsEdited, err := testdata.ReadFile("testdata/multiple-manifests-2-edited.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			multipleManifestsNewDefault, err := testdata.ReadFile("testdata/multiple-manifests-3-new-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			multipleManifestsExpectedGenerated, err := testdata.ReadFile("testdata/multiple-manifests-4-expected-generated.yaml")
+			Expect(err).NotTo(HaveOccurred())
 
-			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsInitial))
+			content, err := meta.ThreeWayMergeManifest(nil, multipleManifestsInitial, nil)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).To(Equal(multipleManifestsInitial))
+			Expect(string(content)).To(Equal(string(multipleManifestsInitial)))
+
+			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsInitial)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(multipleManifestsInitial)))
 
 			// Editing the written manifest and updating the manifest with the same default content should not overwrite anything
-			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsInitial), []byte(multipleManifestsEdited))
+			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsEdited)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).To(Equal(multipleManifestsEdited))
+			Expect(string(content)).To(Equal(string(multipleManifestsEdited)))
 
 			// New default manifest changes should be applied, while custom edits should be retained.
-			content, err = meta.ThreeWayMergeManifest([]byte(multipleManifestsInitial), []byte(multipleManifestsNewDefault), []byte(multipleManifestsEdited))
+			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsNewDefault, multipleManifestsEdited)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).To(Equal(multipleManifestsExpectedGenerated))
+			Expect(string(content)).To(Equal(string(multipleManifestsExpectedGenerated)))
+		})
+
+		It("should retain the sequence order in a currently written file", func() {
+			oldDefault, err := testdata.ReadFile("testdata/order-1-old-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			newDefault, err := testdata.ReadFile("testdata/order-2-new-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			current, err := testdata.ReadFile("testdata/order-3-current.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			expected, err := testdata.ReadFile("testdata/order-4-expected.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(expected)))
 		})
 	})
 })
