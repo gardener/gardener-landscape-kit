@@ -105,3 +105,19 @@ git-server-down:
 .PHONY: git-server-cleanup # cleanup git server data
 git-server-cleanup: git-server-down $(YQ)
 	@rm -rf $(REPO_ROOT)/dev/git-server/data
+
+.PHONY: registry-up
+registry-up:
+	@$(REPO_ROOT)/dev-setup/registry/registry-up.sh
+
+.PHONY: registry-down
+registry-down:
+	@$(REPO_ROOT)/dev-setup/registry/registry-down.sh
+
+.PHONY: kind-up ## create single kind cluster for hosting glk and runtime
+kind-up: registry-up git-server-up $(KIND) $(KUBECTL) $(HELM)
+	@$(REPO_ROOT)/dev-setup/kind/kind-create-cluster.sh single
+
+.PHONY: kind-down
+kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
+	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
