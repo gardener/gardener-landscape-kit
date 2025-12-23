@@ -125,3 +125,4 @@ kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
 .PHONY: e2e-prepare
 e2e-prepare:
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh $(REPO_ROOT)/dev/e2e
+	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh $(REPO_ROOT)/dev/e2e
