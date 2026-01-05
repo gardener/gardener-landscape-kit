@@ -123,6 +123,7 @@ kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
 
 .PHONY: e2e-prepare
-e2e-prepare:
+e2e-prepare: $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh $(REPO_ROOT)/dev/e2e
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh $(REPO_ROOT)/dev/e2e
+	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh $(REPO_ROOT)/dev/e2e

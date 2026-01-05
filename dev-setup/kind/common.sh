@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and Gardener contributors
+#
+# SPDX-License-Identifier: Apache-2.0
+
 export REPO_ROOT="$(readlink -f "$(dirname ${0})/../..")"
 
 if [ -z "$GLK_KIND_CLUSTER_PREFIX" ]; then
@@ -15,6 +19,12 @@ mkdir -p "${WORK_DIR}"
 glk() {
   pushd $REPO_ROOT >/dev/null
   go run ./cmd/gardener-landscape-kit "$@"
+  popd >/dev/null
+}
+
+prettify() {
+  pushd $REPO_ROOT >/dev/null
+  go run ./pkg/utils/meta/prettify -i "$1"
   popd >/dev/null
 }
 
