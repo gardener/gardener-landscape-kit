@@ -3,10 +3,10 @@ kind: Garden
 metadata:
   name: garden
 spec:
-#  dns:
-#    providers:
+  # dns:
+  #   providers:
   runtimeCluster:
-#    ingress:
+    # ingress:
     networking:
       ipFamilies:
       - IPv4
@@ -16,37 +16,37 @@ spec:
       - 10.1.0.0/16
       services:
       - 10.2.0.0/16
-#    provider:
+    # provider:
   virtualCluster:
     dns:
       domains:
-#        etcd:
-#          events:
-#          main:
-#            backup:
-#              provider:
-#              secretRef:
-#                name:
+        # etcd:
+        #   events:
+        #   main:
+        #     backup:
+        #       provider:
+        #       secretRef:
+        #         name:
     gardener:
       clusterIdentity:  # Must be set
-#      gardenerAPIServer:
-#        featureGates:
-#          CloudProfileCapabilities: true
-#          InPlaceNodeUpdates: true
-#          gardenerDashboard:
-#            enableTokenLogin: true
-#            logLevel: info
-#        kubernetes:
-#          kubeAPIServer:
-#            eventTTL: 1h0m0s
-#            logging:
-#              verbosity: 2
-#            requests:
-#              maxMutatingInflight: 200
-#              maxNonMutatingInflight: 400
-#          kubeControllerManager:
-#            certificateSigningDuration: 48h0m0s
-#          version: 1.33.6
+      # gardenerAPIServer:
+      #   featureGates:
+      #     CloudProfileCapabilities: true
+      #     InPlaceNodeUpdates: true
+      #     gardenerDashboard:
+      #       enableTokenLogin: true
+      #       logLevel: info
+      #   kubernetes:
+      #     kubeAPIServer:
+      #       eventTTL: 1h0m0s
+      #       logging:
+      #         verbosity: 2
+      #       requests:
+      #         maxMutatingInflight: 200
+      #         maxNonMutatingInflight: 400
+      #     kubeControllerManager:
+      #       certificateSigningDuration: 48h0m0s
+      #     version: 1.33.6
     networking:
       services:
       - 100.64.0.0/13
