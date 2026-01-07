@@ -37,7 +37,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	var (
 		output []byte
 
-		diff = newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml)
+		diff = newManifestDiff(preProcess(oldDefaultYaml), preProcess(newDefaultYaml), preProcess(currentYaml))
 	)
 
 	for key, value := range diff.current.Entries() {
@@ -75,7 +75,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	if len(output) > 0 && output[len(output)-1] != '\n' {
 		output = append(output, '\n')
 	}
-	return output, nil
+	return postProcess(output), nil
 }
 
 func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
@@ -424,4 +424,43 @@ func buildKey(t map[string]interface{}) string {
 	}
 
 	return apiVersion + "/" + kind + "/" + namespace + "/" + name
+}
+
+const keepLeftAlignedMarker = "###KEEP_LEFT_ALIGNED###"
+
+func preProcess(yamlContent []byte) []byte {
+	if len(yamlContent) == 0 {
+		return yamlContent
+	}
+	buf := bytes.Buffer{}
+	lines := bytes.Split(yamlContent, []byte("\n"))
+	for i, line := range lines {
+		buf.Write(line)
+		if bytes.HasPrefix(line, []byte("#")) {
+			buf.Write([]byte(keepLeftAlignedMarker))
+		}
+		if i < len(lines)-1 {
+			buf.Write([]byte("\n"))
+		}
+	}
+	return buf.Bytes()
+}
+
+func postProcess(yamlContent []byte) []byte {
+	if len(yamlContent) == 0 {
+		return yamlContent
+	}
+	buf := bytes.Buffer{}
+	lines := bytes.Split(yamlContent, []byte("\n"))
+	for i, line := range lines {
+		if bytes.HasSuffix(line, []byte(keepLeftAlignedMarker)) {
+			line = bytes.TrimSuffix(line, []byte(keepLeftAlignedMarker))
+			line = bytes.TrimLeft(line, " ")
+		}
+		buf.Write(line)
+		if i < len(lines)-1 {
+			buf.Write([]byte("\n"))
+		}
+	}
+	return buf.Bytes()
 }
