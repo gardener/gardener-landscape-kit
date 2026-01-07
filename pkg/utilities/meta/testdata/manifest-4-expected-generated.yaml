@@ -15,19 +15,19 @@ data:
   # add new value in between with comments
   keyInBetween: added_by_user # with a comment
 enumeration:
-  - item0_new
-  # Comment for item2
-  - item2 # Comment besides item2
-  - item4_new
-  - item17 # Very new
+- item0_new
+# Comment for item2
+- item2 # Comment besides item2
+- item4_new
+- item17 # Very new
 complex_array:
-  - name: itemC_new
-  - name: itemA
-    # need >99
-    value: 100
-    # Comment for itemA
-    description: This is item A
-  # This is complex - updated
-  - name: itemB
-    value: 25
-    description: This is item B (modified in default)
+- name: itemC_new
+- name: itemA
+  # need >99
+  value: 100
+  # Comment for itemA
+  description: This is item A
+# This is complex - updated
+- name: itemB
+  value: 25
+  description: This is item B (modified in default)

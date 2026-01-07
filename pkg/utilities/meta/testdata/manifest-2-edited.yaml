@@ -14,19 +14,19 @@ data:
   # New comment for key4
   key4: value3
 enumeration:
-  - item0_new
-  - item1
-  # Comment for item2
-  - item2 # Comment besides item2
-  - item3
-  - item4_new
+- item0_new
+- item1
+# Comment for item2
+- item2 # Comment besides item2
+- item3
+- item4_new
 complex_array:
-  - name: itemA
-    value: 10
-    # Comment for itemA
-    description: This is item A
-  # This is complex
-  - name: itemB
-    value: 20
-    description: This is item B
-  - name: itemC_new
+- name: itemA
+  value: 10
+  # Comment for itemA
+  description: This is item A
+# This is complex
+- name: itemB
+  value: 20
+  description: This is item B
+- name: itemC_new

@@ -94,7 +94,7 @@ var _ = Describe("Component Generation", func() {
 
 			content, err = fs.ReadFile("/repo/landscapeDir/components/gardener/operator/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring(" - ../../../../baseDir/components/gardener/operator"))
+			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener/operator"))
 		})
 	})
 })

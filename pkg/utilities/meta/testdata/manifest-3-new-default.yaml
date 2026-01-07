@@ -17,18 +17,18 @@ data:
   # New default comment for key4 will be used as the user did not modify the value.
   key4: value4
 enumeration:
-  # Comment for item2
-  - item2 # Comment besides item2
-  # Please remove the following item:
-  - should_be_removed
-  - item17 # Very new
+# Comment for item2
+- item2 # Comment besides item2
+# Please remove the following item:
+- should_be_removed
+- item17 # Very new
 complex_array:
-  - name: itemA
-    # need >99
-    value: 100
-    # Comment for itemA
-    description: This is item A
-  # This is complex - updated
-  - name: itemB
-    value: 25
-    description: This is item B (modified in default)
+- name: itemA
+  # need >99
+  value: 100
+  # Comment for itemA
+  description: This is item A
+# This is complex - updated
+- name: itemB
+  value: 25
+  description: This is item B (modified in default)
