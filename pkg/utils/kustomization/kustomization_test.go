@@ -19,7 +19,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	. "github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utils/kustomization"
 )
 
 var _ = Describe("Kustomization", func() {

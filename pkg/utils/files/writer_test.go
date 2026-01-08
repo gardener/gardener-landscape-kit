@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var _ = Describe("Writer", func() {

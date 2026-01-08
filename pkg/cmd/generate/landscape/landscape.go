@@ -15,7 +15,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/kustomization"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate landscape.

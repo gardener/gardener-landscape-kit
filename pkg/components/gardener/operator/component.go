@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/files"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 const (
