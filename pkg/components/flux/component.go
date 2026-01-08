@@ -84,6 +84,8 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		"repo_url":  opts.GetGitRepository().URL,
 		"repo_ref":  repoRef,
 		"flux_path": fluxPath,
+
+		"components_path": path.Join(opts.GetRelativeLandscapePath(), components.DirName),
 	})
 	if err != nil {
 		return err

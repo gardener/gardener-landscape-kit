@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m0s
-  path: landscape/components
+  path: {{ .components_path }}
   prune: true
   sourceRef:
     kind: GitRepository
