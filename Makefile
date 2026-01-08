@@ -93,3 +93,15 @@ verify-extended: check-generate check format test-cov sast-report
 .PHONY: generate-ocm-testdata
 generate-ocm-testdata:
 	@go run ./hack/tools/ocm-testdata-generator -config $(REPO_ROOT)/pkg/ocm/components/testdata/config.yaml
+
+.PHONY: git-server-up
+git-server-up:
+	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-up.sh
+
+.PHONY: git-server-down
+git-server-down:
+	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-down.sh
+
+.PHONY: git-server-cleanup # cleanup git server data
+git-server-cleanup: git-server-down $(YQ)
+	@rm -rf $(REPO_ROOT)/dev/git-server/data
