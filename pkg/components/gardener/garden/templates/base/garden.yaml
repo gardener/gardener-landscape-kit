@@ -3,9 +3,9 @@ kind: Garden
 metadata:
   name: garden
 spec:
-  # extensions:
+# extensions:
   runtimeCluster:
-    # ingress:
+#   ingress:
     settings:
       topologyAwareRouting:
         enabled: false
@@ -20,10 +20,10 @@ spec:
         storage:
           capacity: 25Gi
     gardener:
-      # gardenerAPIServer:
-      #   featureGates:
-      #     CloudProfileCapabilities: true
-      #     InPlaceNodeUpdates: true
+#     gardenerAPIServer:
+#       featureGates:
+#         CloudProfileCapabilities: true
+#         InPlaceNodeUpdates: true
       gardenerDashboard:
         enableTokenLogin: true
         logLevel: info
