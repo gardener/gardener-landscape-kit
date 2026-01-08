@@ -6,6 +6,7 @@ package validation
 
 import (
 	"net/url"
+	"path"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -70,8 +71,16 @@ func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath 
 		allErrs = append(allErrs, field.Required(fldPath.Child("base"), "base path must be specified"))
 	}
 
+	if path.IsAbs(paths.Base) {
+		allErrs = append(allErrs, field.Required(fldPath.Child("base"), "base path must be a relative path to the base dir within the git repository"))
+	}
+
 	if strings.TrimSpace(paths.Landscape) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("landscape"), "landscape path must be specified"))
+	}
+
+	if path.IsAbs(paths.Landscape) {
+		allErrs = append(allErrs, field.Required(fldPath.Child("landscape"), "landscape path must be a relative path to the landscape dir within the git repository"))
 	}
 
 	return allErrs
