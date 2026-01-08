@@ -428,17 +428,18 @@ func buildKey(t map[string]interface{}) string {
 
 const keepLeftAlignedMarker = "###KEEP_LEFT_ALIGNED###"
 
-func preProcess(yamlContent []byte) []byte {
+type lineProcessor func([]byte, *bytes.Buffer)
+
+func process(yamlContent []byte, processLine lineProcessor) []byte {
 	if len(yamlContent) == 0 {
 		return yamlContent
 	}
 	buf := bytes.Buffer{}
 	lines := bytes.Split(yamlContent, []byte("\n"))
 	for i, line := range lines {
-		buf.Write(line)
-		if bytes.HasPrefix(line, []byte("#")) {
-			buf.Write([]byte(keepLeftAlignedMarker))
-		}
+
+		processLine(line, &buf)
+
 		if i < len(lines)-1 {
 			buf.Write([]byte("\n"))
 		}
@@ -446,21 +447,25 @@ func preProcess(yamlContent []byte) []byte {
 	return buf.Bytes()
 }
 
+func preProcessLine(line []byte, buf *bytes.Buffer) {
+	buf.Write(line)
+	if bytes.HasPrefix(line, []byte("#")) {
+		buf.Write([]byte(keepLeftAlignedMarker))
+	}
+}
+
+func postProcessLine(line []byte, buf *bytes.Buffer) {
+	if bytes.HasSuffix(line, []byte(keepLeftAlignedMarker)) {
+		line = bytes.TrimSuffix(line, []byte(keepLeftAlignedMarker))
+		line = bytes.TrimLeft(line, " ")
+	}
+	buf.Write(line)
+}
+
+func preProcess(yamlContent []byte) []byte {
+	return process(yamlContent, preProcessLine)
+}
+
 func postProcess(yamlContent []byte) []byte {
-	if len(yamlContent) == 0 {
-		return yamlContent
-	}
-	buf := bytes.Buffer{}
-	lines := bytes.Split(yamlContent, []byte("\n"))
-	for i, line := range lines {
-		if bytes.HasSuffix(line, []byte(keepLeftAlignedMarker)) {
-			line = bytes.TrimSuffix(line, []byte(keepLeftAlignedMarker))
-			line = bytes.TrimLeft(line, " ")
-		}
-		buf.Write(line)
-		if i < len(lines)-1 {
-			buf.Write([]byte("\n"))
-		}
-	}
-	return buf.Bytes()
+	return process(yamlContent, postProcessLine)
 }
