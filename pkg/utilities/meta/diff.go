@@ -437,9 +437,7 @@ func process(yamlContent []byte, processLine lineProcessor) []byte {
 	buf := bytes.Buffer{}
 	lines := bytes.Split(yamlContent, []byte("\n"))
 	for i, line := range lines {
-
 		processLine(line, &buf)
-
 		if i < len(lines)-1 {
 			buf.Write([]byte("\n"))
 		}
