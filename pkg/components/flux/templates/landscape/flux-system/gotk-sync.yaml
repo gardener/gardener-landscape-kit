@@ -10,6 +10,7 @@ spec:
     {{ .repo_ref }}
   secretRef:
     name: flux-system
+  recurseSubmodules: true # required if Git submodules are used, e.g. to include the base repo in the landscape repo.
   url: {{ .repo_url }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
