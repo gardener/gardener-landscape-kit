@@ -9,48 +9,64 @@ spec:
 #     type: aws-route53 # azure-dns, google-clouddns, openstack-designate - see provider extension for further values.
 #     secretRef:
 #       name: dns-secret
+# extensions:
+# - type: foobar
+#   providerConfig:
+#     <some-provider-specific-config-for-extension>
   runtimeCluster:
 #   ingress:
+#     domains:
+#       - name: ingress.runtime-garden.local.gardener.cloud # To be replaced with actual domain
+#         provider: primary
+#     controller:
+#       kind: nginx
+#       providerConfig:
+#         <some-optional-config-for-the-nginx-ingress-controller>
     networking:
+      # These CIDRs have to match the CIRDs of the runtime cluster.
       ipFamilies:
       - IPv4
-      nodes:
-      - 172.18.0.0/24
       pods:
       - 10.1.0.0/16
+      nodes:
+      - 172.18.0.0/24
       services:
       - 10.2.0.0/16
+#     blockCIDRs:
+#     - <CIDR>
 #   provider:
+#     region: <region name>
+#     zones:
+#       - "<zone name>"
   virtualCluster:
     dns:
       domains:
-#       etcd:
-#         events:
-#         main:
-#           backup:
-#             provider:
-#             secretRef:
-#               name:
+#     - name: virtual-garden.local.gardener.cloud
+#       provider: primary
+#   etcd:
+#     main:
+#       backup:
+#         provider:
+#         bucketName:
+#         secretRef:
+#           name:
+#     events:
     gardener:
-      clusterIdentity:  # Must be set
+      clusterIdentity: <identity-of-garden-cluster> # Must be set. Uniquely identifies this garden cluster.
 #     gardenerAPIServer:
 #       featureGates:
-#         CloudProfileCapabilities: true
-#         InPlaceNodeUpdates: true
-#         gardenerDashboard:
-#           enableTokenLogin: true
-#           logLevel: info
-#       kubernetes:
-#         kubeAPIServer:
-#           eventTTL: 1h0m0s
-#           logging:
-#             verbosity: 2
-#           requests:
-#             maxMutatingInflight: 200
-#             maxNonMutatingInflight: 400
-#         kubeControllerManager:
-#           certificateSigningDuration: 48h0m0s
-#         version: 1.33.6
-    networking:
-      services:
-      - 100.64.0.0/13
+#         <featureGateName>: true
+#     gardenerDashboard:
+#       enableTokenLogin: true
+#       logLevel: info
+#   kubernetes:
+#     kubeAPIServer:
+#       eventTTL: 1h0m0s
+#       logging:
+#         verbosity: 2
+#       requests:
+#         maxMutatingInflight: 200
+#         maxNonMutatingInflight: 400
+#     kubeControllerManager:
+#       certificateSigningDuration: 48h0m0s
+#     version: <override k8s version> # to override from base

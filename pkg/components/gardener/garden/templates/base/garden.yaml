@@ -3,30 +3,76 @@ kind: Garden
 metadata:
   name: garden
 spec:
-# extensions:
   runtimeCluster:
-#   ingress:
     settings:
       topologyAwareRouting:
         enabled: false
       verticalPodAutoscaler:
         enabled: true
+#   volume:
+#     minimumSize: 20Gi
   virtualCluster:
+    controlPlane:
+      highAvailability: {}
     etcd:
-      events:
-        storage:
-          capacity: 10Gi
       main:
         storage:
           capacity: 25Gi
+      events:
+        storage:
+          capacity: 10Gi
     gardener:
-#     gardenerAPIServer:
+      gardenerAPIServer:
+        watchCacheSizes:
+          resources:
+          - apiGroup: core.gardener.cloud
+            resource: shoots
+            size: 500
+          - apiGroup: core.gardener.cloud
+            resource: shootstates
+            size: 500
 #       featureGates:
-#         CloudProfileCapabilities: true
-#         InPlaceNodeUpdates: true
+#         <featureGateName>: true
       gardenerDashboard:
         enableTokenLogin: true
         logLevel: info
+      gardenerAdmissionController:
+        resourceAdmissionConfiguration:
+          operationMode: block
+          limits:
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "shoots" ]
+            size: 750Ki
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "projects" ]
+            size: 300Ki
+            count: 5000
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "secretbindings","quotas" ]
+            size: 100Ki
+          - apiGroups: [ "settings.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "*" ]
+            size: 100Ki
+          - apiGroups: [ "dashboard.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "terminals" ]
+            size: 20Ki
+          - apiGroups: [ "" ]
+            apiVersions: [ "v1" ]
+            resources: [ "secrets","configmaps","serviceaccounts" ]
+            size: 100Ki
+          unrestrictedSubjects:
+          - kind: ServiceAccount
+            name: gardener-controller-manager
+            namespace: kube-system
+          # User group used by Gardenlet
+          - kind: Group
+            name: gardener.cloud:system:seeds
+            apiGroup: rbac.authorization.k8s.io
     kubernetes:
       kubeAPIServer:
         eventTTL: 1h0m0s
@@ -35,10 +81,19 @@ spec:
         requests:
           maxMutatingInflight: 200
           maxNonMutatingInflight: 400
+        watchCacheSizes:
+          resources:
+          - resource: secrets
+            size: 500
+          - resource: configmaps
+            size: 500
       kubeControllerManager:
         certificateSigningDuration: 48h0m0s
       version: 1.33.6
     maintenance:
       timeWindow:
-        begin: 220000+0100
-        end: 230000+0100
+        begin: 200000+0100
+        end: 210000+0100
+    networking:
+      services:
+        - 100.64.0.0/13
