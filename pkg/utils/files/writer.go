@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/meta"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
 const (
