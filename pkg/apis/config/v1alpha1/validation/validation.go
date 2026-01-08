@@ -90,15 +90,6 @@ func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath 
 	return allErrs
 }
 
-// ValidateOCMConfiguration validates the given OCMConfiguration.
-func ValidateOCMConfiguration(conf *configv1alpha1.OCMConfiguration) field.ErrorList {
-	allErrs := field.ErrorList{}
-
-	allErrs = append(allErrs, ValidateOCMConfig(conf.OCMConfig, field.NewPath(""))...)
-
-	return allErrs
-}
-
 // ValidateOCMConfig validates the given OCMConfig.
 func ValidateOCMConfig(conf *configv1alpha1.OCMConfig, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}

@@ -72,15 +72,6 @@ type GitRepositoryRef struct {
 	Commit *string `json:"commit,omitempty"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
-// OCMConfiguration contains information about root component.
-type OCMConfiguration struct {
-	metav1.TypeMeta `json:",inline"`
-
-	*OCMConfig `json:",inline"`
-}
-
 // OCMConfig contains information about root component.
 type OCMConfig struct {
 	// Repositories is a map from repository name to URL.

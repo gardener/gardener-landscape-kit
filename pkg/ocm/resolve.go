@@ -23,7 +23,7 @@ import (
 
 type ocmComponentsResolver struct {
 	log        logr.Logger
-	cfg        *configv1alpha1.OCMConfiguration
+	cfg        *configv1alpha1.OCMConfig
 	outputDir  string
 	components *components.Components
 	repos      []*ociaccess.RepoAccess
@@ -31,7 +31,7 @@ type ocmComponentsResolver struct {
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
-func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.OCMConfiguration, outputDir string) error {
+func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.OCMConfig, outputDir string) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
@@ -212,13 +212,13 @@ func writeObject(outputDir string, cref components.ComponentReference, obj any) 
 	return os.WriteFile(outputFile, output, 0600)
 }
 
-func createRepoAccesses(cfg *configv1alpha1.OCMConfiguration) ([]*ociaccess.RepoAccess, error) {
+func createRepoAccesses(cfg *configv1alpha1.OCMConfig) ([]*ociaccess.RepoAccess, error) {
 	var repos []*ociaccess.RepoAccess
 
 	for _, url := range cfg.Repositories {
 		repo, err := ociaccess.NewRepoAccess(url)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create RepoAccess for %s repository", url)
+			return nil, fmt.Errorf("failed to create RepoAccess for %s repository: %w", url, err)
 		}
 		repos = append(repos, repo)
 	}

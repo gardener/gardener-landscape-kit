@@ -49,7 +49,7 @@ gardner-landscape-kit resolve-ocm-components \
 }
 
 func run(_ context.Context, opts *Options) error {
-	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", opts.effectiveOutputDir(""), "rootComponent", opts.Config.RootComponent)
+	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", opts.effectiveOutputDir(""), "rootComponent", opts.Config.OCM.RootComponent)
 
-	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.effectiveOutputDir(""))
+	return ocm.ResolveOCMComponents(opts.Log, opts.Config.OCM, opts.effectiveOutputDir(""))
 }
