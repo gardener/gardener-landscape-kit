@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package utilities_test
+package utils_test
 
 import (
 	"testing"

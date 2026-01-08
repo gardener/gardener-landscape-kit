@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package utilities_test
+package utils_test
 
 import (
 	_ "embed"
@@ -11,16 +11,16 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils"
 )
 
 var _ = Describe("Utilities", func() {
 	Describe("OrderedMap", func() {
 		Describe("CRUD operations", Ordered, func() {
-			var om *utilities.OrderedMap[string, int]
+			var om *utils.OrderedMap[string, int]
 
 			BeforeAll(func() {
-				om = utilities.NewOrderedMap[string, int]()
+				om = utils.NewOrderedMap[string, int]()
 			})
 
 			It("#Insert", func() {
@@ -101,7 +101,7 @@ type kvPair[T comparable, V any] struct {
 	value V
 }
 
-func collect[T comparable, V any](om *utilities.OrderedMap[T, V]) []kvPair[T, V] {
+func collect[T comparable, V any](om *utils.OrderedMap[T, V]) []kvPair[T, V] {
 	var result []kvPair[T, V]
 	entries := om.Entries()
 	entries(func(k T, v V) bool {

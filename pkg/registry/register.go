@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils"
 )
 
 // ComponentList contains all available components.
@@ -31,7 +31,7 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 		excludedComponents = slices.Clone(config.Components.Exclude)
 	}
 
-	orderedComponents := utilities.NewOrderedMap[string, components.Interface]()
+	orderedComponents := utils.NewOrderedMap[string, components.Interface]()
 	for _, newComponent := range ComponentList {
 		component := newComponent()
 		orderedComponents.Insert(component.Name(), component)

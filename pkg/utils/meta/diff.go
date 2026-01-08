@@ -10,7 +10,7 @@ import (
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils"
 )
 
 func newSection(key string, content []byte) *section {
@@ -360,12 +360,12 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte] {
+func splitManifestFile(combinedYaml []byte) *utils.OrderedMap[string, []byte] {
 	var values [][]byte
 	if len(combinedYaml) > 0 { // Only split if there is content
 		values = bytes.Split(combinedYaml, []byte("\n---\n"))
 	}
-	om := utilities.NewOrderedMap[string, []byte]()
+	om := utils.NewOrderedMap[string, []byte]()
 	for _, v := range values {
 		var t map[string]any
 		err := yaml.Unmarshal(v, &t)
@@ -379,7 +379,7 @@ func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte
 }
 
 type manifestDiff struct {
-	oldDefault, newDefault, current *utilities.OrderedMap[string, []byte]
+	oldDefault, newDefault, current *utils.OrderedMap[string, []byte]
 }
 
 func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
