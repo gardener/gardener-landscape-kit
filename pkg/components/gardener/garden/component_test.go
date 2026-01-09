@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package operator_test
+package garden_test
 
 import (
 	"github.com/go-logr/logr"
@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -41,33 +41,16 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := operator.NewComponent()
+			component := garden.NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
-			for _, file := range []string{
-				"/repo/baseDir/.glk/defaults/components/gardener/operator/oci-repository.yaml",
-				"/repo/baseDir/components/gardener/operator/oci-repository.yaml",
-			} {
-				content, err := fs.ReadFile(file)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(content)).To(ContainSubstring("OCIRepository"))
-			}
-
-			for _, file := range []string{
-				"/repo/baseDir/.glk/defaults/components/gardener/operator/helm-release.yaml",
-				"/repo/baseDir/components/gardener/operator/helm-release.yaml",
-			} {
-				content, err := fs.ReadFile(file)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(content)).To(ContainSubstring("HelmRelease"))
-			}
-
-			content, err := fs.ReadFile("/repo/baseDir/components/gardener/operator/kustomization.yaml")
+			content, err := fs.ReadFile("/repo/baseDir/components/gardener/garden/garden.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(And(
-				ContainSubstring("- oci-repository.yaml"),
-				ContainSubstring("- helm-release.yaml"),
-			))
+			Expect(string(content)).To(ContainSubstring("apiVersion: operator.gardener.cloud/v1alpha1"))
+
+			content, err = fs.ReadFile("/repo/baseDir/components/gardener/garden/kustomization.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(content)).To(ContainSubstring("- garden.yaml"))
 		})
 	})
 
@@ -80,7 +63,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := operator.NewComponent()
+			component := garden.NewComponent()
 			landscapeOpts := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
 
@@ -88,13 +71,13 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(exists).To(BeFalse())
 
-			content, err := fs.ReadFile("/repo/landscapeDir/components/gardener/operator/flux-kustomization.yaml")
+			content, err := fs.ReadFile("/repo/landscapeDir/components/gardener/garden/flux-kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/gardener/operator"))
+			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/gardener/garden"))
 
-			content, err = fs.ReadFile("/repo/landscapeDir/components/gardener/operator/kustomization.yaml")
+			content, err = fs.ReadFile("/repo/landscapeDir/components/gardener/garden/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener/operator"))
+			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener/garden"))
 		})
 	})
 })

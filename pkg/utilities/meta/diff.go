@@ -103,6 +103,7 @@ func encodeResult(merged *yaml.Node) ([]byte, error) {
 	encoder := yaml.NewEncoder(&buf)
 	defer encoder.Close()
 	encoder.SetIndent(2)
+	encoder.CompactSeqIndent()
 	if err := encoder.Encode(merged); err != nil {
 		return nil, err
 	}
