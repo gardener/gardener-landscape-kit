@@ -5,6 +5,8 @@ metadata:
   labels:
     bar: baz
 data:
+# optionalSection:
+#   keyOptional: optionalValue
   # This is the key. Please change it.
   key: valueChanged
   key2: value1_new

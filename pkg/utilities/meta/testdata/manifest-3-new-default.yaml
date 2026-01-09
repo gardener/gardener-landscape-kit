@@ -10,6 +10,8 @@ metadata:
     newLabel: newValue
 # Please fill in your data here:
 data:
+# optionalSection:
+#   keyOptional: optionalValue
   # This is the key. Please change it.
   # New default comment for key will be ignored as the user modified the value.
   key: value

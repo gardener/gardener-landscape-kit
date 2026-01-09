@@ -8,6 +8,8 @@ metadata:
     foo: bar
 # Please fill in your data here:
 data:
+# optionalSection:
+#   keyOptional: optionalValue
   # This is the key. Please change it.
   key: value
   key2: value1
