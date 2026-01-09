@@ -59,7 +59,10 @@ func validate(opts *options.Options) error {
 }
 
 func run(_ context.Context, opts *options.Options) error {
-	componentOpts := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
+	componentOpts, err := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
+	if err != nil {
+		return fmt.Errorf("failed to create component options: %w", err)
+	}
 
 	reg := registry.New()
 	if err := registry.RegisterAllComponents(reg, opts.Config); err != nil {

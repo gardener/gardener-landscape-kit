@@ -5,11 +5,16 @@
 package components
 
 import (
+	_ "embed"
+	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 const (
@@ -19,6 +24,8 @@ const (
 
 // Options is an interface for options passed to components for generating.
 type Options interface {
+	// GetComponentVector returns the component vector.
+	GetComponentVector() utilscomponentvector.Interface
 	// GetTargetPath returns the target directory path the components should be generated into.
 	GetTargetPath() string
 	// GetFilesystem returns the filesystem to use.
@@ -50,9 +57,15 @@ type Interface interface {
 }
 
 type options struct {
-	targetPath string
-	filesystem afero.Afero
-	logger     logr.Logger
+	componentVector utilscomponentvector.Interface
+	targetPath      string
+	filesystem      afero.Afero
+	logger          logr.Logger
+}
+
+// GetComponentVector returns the component vector.
+func (o *options) GetComponentVector() utilscomponentvector.Interface {
+	return o.componentVector
 }
 
 // GetTargetPath returns the target directory path the components should be generated into.
@@ -71,12 +84,29 @@ func (o *options) GetLogger() logr.Logger {
 }
 
 // NewOptions returns a new Options instance.
-func NewOptions(opts *generateoptions.Options, fs afero.Afero) Options {
-	return &options{
-		targetPath: opts.TargetDirPath,
-		filesystem: fs,
-		logger:     opts.Log,
+func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
+	componentVectorBytes := componentvector.DefaultComponentsYAML
+	if opts.Config != nil && opts.Config.VersionConfig != nil && opts.Config.VersionConfig.ComponentsVectorFile != nil {
+		opts.Log.Info("Using custom component vector file", "file", *opts.Config.VersionConfig.ComponentsVectorFile)
+
+		var err error
+		componentVectorBytes, err = fs.ReadFile(*opts.Config.VersionConfig.ComponentsVectorFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read component vector file: %w", err)
+		}
 	}
+
+	componentVector, err := utilscomponentvector.New(componentVectorBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create component vector: %w", err)
+	}
+
+	return &options{
+		componentVector: componentVector,
+		targetPath:      opts.TargetDirPath,
+		filesystem:      fs,
+		logger:          opts.Log,
+	}, nil
 }
 
 type landscapeOptions struct {
@@ -101,11 +131,14 @@ func (l *landscapeOptions) GetRelativeLandscapePath() string {
 }
 
 // NewLandscapeOptions returns a new LandscapeOptions instance.
-func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) LandscapeOptions {
-	options := NewOptions(opts, fs)
+func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (LandscapeOptions, error) {
+	options, err := NewOptions(opts, fs)
+	if err != nil {
+		return nil, err
+	}
 
 	return &landscapeOptions{
 		Options:       options,
 		gitRepository: opts.Config.Git,
-	}
+	}, nil
 }

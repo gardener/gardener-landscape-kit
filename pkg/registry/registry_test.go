@@ -35,17 +35,22 @@ var _ = Describe("Registry", func() {
 		config = &v1alpha1.LandscapeKitConfiguration{
 			Git: &v1alpha1.GitRepository{},
 		}
-		options = components.NewOptions(
+
+		var err error
+		options, err = components.NewOptions(
 			&generateoptions.Options{Options: &cmd.Options{Log: logr.Discard()}},
 			afero.Afero{Fs: afero.NewMemMapFs()},
 		)
-		landscapeOptions = components.NewLandscapeOptions(
+		Expect(err).NotTo(HaveOccurred())
+
+		landscapeOptions, err = components.NewLandscapeOptions(
 			&generateoptions.Options{
 				Options: &cmd.Options{Log: logr.Discard()},
 				Config:  config,
 			},
 			afero.Afero{Fs: afero.NewMemMapFs()},
 		)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("#RegisterComponent", func() {

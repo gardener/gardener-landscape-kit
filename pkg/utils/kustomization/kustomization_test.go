@@ -79,12 +79,15 @@ var _ = Describe("Kustomization", func() {
 
 		BeforeEach(func() {
 			fs = afero.Afero{Fs: afero.NewMemMapFs()}
-			opts = components.NewOptions(&generateoptions.Options{
+
+			var err error
+			opts, err = components.NewOptions(&generateoptions.Options{
 				Options: &cmd.Options{
 					Log: logr.Discard(),
 				},
 				TargetDirPath: "/landscapeDir",
 			}, fs)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should generate kustomization files within a component directory", func() {

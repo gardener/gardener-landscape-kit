@@ -207,6 +207,20 @@ ComponentsConfiguration
 <p>Components is the configuration for the components.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>versionConfig</code></br>
+<em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.VersionConfiguration">
+VersionConfiguration
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>VersionConfig is the configuration for versioning.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.OCMComponent">OCMComponent
@@ -370,6 +384,37 @@ string
 </td>
 <td>
 <p>Landscape is the relative path to the landscape directory within the Git repository.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="landscape.config.gardener.cloud/v1alpha1.VersionConfiguration">VersionConfiguration
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>)
+</p>
+<p>
+<p>VersionConfiguration contains configuration for versioning.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>componentsVectorFile</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.</p>
 </td>
 </tr>
 </tbody>
