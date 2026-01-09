@@ -6,6 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m0s
+  recurseSubmodules: true # required if Git submodules are used, e.g. to include the base repo in the landscape repo.
   ref:
     {{ .repo_ref }}
   secretRef:

@@ -154,6 +154,44 @@ var _ = Describe("Validation", func() {
 					}
 				})
 			})
+
+			Context("Paths", func() {
+				test := func(basePath, landscapePath string) field.ErrorList {
+					conf := &v1alpha1.LandscapeKitConfiguration{
+						Git: &v1alpha1.GitRepository{
+							URL: "https://github.com/gardener/gardener-landscape-kit",
+							Ref: v1alpha1.GitRepositoryRef{},
+							Paths: v1alpha1.PathConfiguration{
+								Base:      basePath,
+								Landscape: landscapePath,
+							},
+						},
+					}
+
+					return validation.ValidateLandscapeKitConfiguration(conf)
+				}
+
+				It("should pass with valid relative paths", func() {
+					Expect(test("base", "landscape")).To(BeEmpty())
+					Expect(test("base/path", "landscape/path")).To(BeEmpty())
+					Expect(test("./base", "./landscape")).To(BeEmpty())
+					Expect(test("./", "./")).To(BeEmpty())
+					Expect(test(".", ".")).To(BeEmpty())
+				})
+
+				It("should fail with absolute paths", func() {
+					Expect(test("/base", "/landscape")).To(ConsistOf(
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeInvalid),
+							"Field": Equal("git.paths.base"),
+						})),
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeInvalid),
+							"Field": Equal("git.paths.landscape"),
+						})),
+					))
+				})
+			})
 		})
 
 		Context("OCM Configuration", func() {
