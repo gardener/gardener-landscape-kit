@@ -23,6 +23,9 @@ type LandscapeKitConfiguration struct {
 	// Components is the configuration for the components.
 	// +optional
 	Components *ComponentsConfiguration `json:"components,omitempty"`
+	// VersionConfig is the configuration for versioning.
+	// +optional
+	VersionConfig *VersionConfiguration `json:"versionConfig,omitempty"`
 }
 
 // ComponentsConfiguration contains configuration for components.
@@ -97,4 +100,11 @@ type OCMComponent struct {
 // String returns the string representation of the OCM component.
 func (nv *OCMComponent) String() string {
 	return nv.Name + ":" + nv.Version
+}
+
+// VersionConfiguration contains configuration for versioning.
+type VersionConfiguration struct {
+	// ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.
+	// +optional
+	ComponentsVectorFile *string `json:"componentsVectorFile,omitempty"`
 }

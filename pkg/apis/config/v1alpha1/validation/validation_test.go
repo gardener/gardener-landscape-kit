@@ -45,6 +45,9 @@ var _ = Describe("Validation", func() {
 						Landscape: "landscape",
 					},
 				},
+				VersionConfig: &v1alpha1.VersionConfiguration{
+					ComponentsVectorFile: ptr.To("components.yaml"),
+				},
 			}
 
 			errList := validation.ValidateLandscapeKitConfiguration(conf)
@@ -201,6 +204,51 @@ var _ = Describe("Validation", func() {
 				}
 				return validation.ValidateLandscapeKitConfiguration(conf)
 			}, field.NewPath("ocm"))
+		})
+
+		Context("VersionConfig Configuration", func() {
+			It("should fail if ComponentsVectorFile is empty", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To(""),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("versionConfig.componentsVectorFile"),
+					})),
+				))
+			})
+
+			It("should fail if ComponentsVectorFile is whitespace only", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To("   "),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("versionConfig.componentsVectorFile"),
+					})),
+				))
+			})
+
+			It("should pass with a valid ComponentsVectorFile", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To("path/to/components.yaml"),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
 		})
 	})
 

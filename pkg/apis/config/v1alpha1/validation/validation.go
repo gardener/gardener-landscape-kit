@@ -26,6 +26,10 @@ func ValidateLandscapeKitConfiguration(conf *configv1alpha1.LandscapeKitConfigur
 		allErrs = append(allErrs, validateGitRepository(conf.Git, field.NewPath("git"))...)
 	}
 
+	if conf.VersionConfig != nil {
+		allErrs = append(allErrs, ValidateVersionConfig(conf.VersionConfig, field.NewPath("versionConfig"))...)
+	}
+
 	return allErrs
 }
 
@@ -118,13 +122,24 @@ func ValidateOCMConfig(conf *configv1alpha1.OCMConfig, fldPath *field.Path) fiel
 func validateOCMComponent(conf configv1alpha1.OCMComponent, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	if conf.Name == "" {
+	if strings.TrimSpace(conf.Name) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "component name is required in config file"))
 	} else if len(strings.Split(conf.Name, "/")) == 1 {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), conf.Name, "component name must be qualified (format 'example.com/my-org/my-root-component:1.23.4')"))
 	}
-	if conf.Version == "" {
+	if strings.TrimSpace(conf.Version) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("version"), "component version is required in config file"))
+	}
+
+	return allErrs
+}
+
+// ValidateVersionConfig validates the given VersionConfiguration.
+func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if conf.ComponentsVectorFile != nil && strings.TrimSpace(*conf.ComponentsVectorFile) == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("componentsVectorFile"), "components vector file path must be specified"))
 	}
 
 	return allErrs
