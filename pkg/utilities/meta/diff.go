@@ -426,6 +426,7 @@ func buildKey(t map[string]interface{}) string {
 	return apiVersion + "/" + kind + "/" + namespace + "/" + name
 }
 
+// keepLeftAlignedMarker is a marker to identify left-aligned comment lines during pre- and post-processing.
 const keepLeftAlignedMarker = "###KEEP_LEFT_ALIGNED###"
 
 type lineProcessor func([]byte, *bytes.Buffer)
@@ -445,6 +446,9 @@ func process(yamlContent []byte, processLine lineProcessor) []byte {
 	return buf.Bytes()
 }
 
+// preProcessLine adds a marker to a left aligned comment line.
+// As the "go.yaml.in/yaml/v4" package does not store the original indentation of comments in the node model,
+// they are indented during marshaling. This marker helps to identify such lines for left-alignment during post-processing.
 func preProcessLine(line []byte, buf *bytes.Buffer) {
 	buf.Write(line)
 	if bytes.HasPrefix(line, []byte("#")) {
@@ -452,6 +456,7 @@ func preProcessLine(line []byte, buf *bytes.Buffer) {
 	}
 }
 
+// postProcessLine removes the marker added during pre-processing and left-aligns the comment line again after marshaling.
 func postProcessLine(line []byte, buf *bytes.Buffer) {
 	if bytes.HasSuffix(line, []byte(keepLeftAlignedMarker)) {
 		line = bytes.TrimSuffix(line, []byte(keepLeftAlignedMarker))
