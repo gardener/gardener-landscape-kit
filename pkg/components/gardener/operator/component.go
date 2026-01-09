@@ -8,6 +8,7 @@ import (
 	"embed"
 	"path"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
@@ -20,9 +21,6 @@ const (
 )
 
 var (
-	//go:embed version
-	fallbackComponentVersion string
-
 	// baseTemplateDir is the directory where the base templates are stored.
 	baseTemplateDir = "templates/base"
 	//go:embed templates/base
@@ -71,8 +69,13 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
+	gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
+	if !exists {
+		opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
+	}
+
 	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
-		"version": fallbackComponentVersion, // TODO(LucaBernstein): Get actual version from the versions handling component once available.
+		"version": gardenerVersion,
 	})
 	if err != nil {
 		return err
