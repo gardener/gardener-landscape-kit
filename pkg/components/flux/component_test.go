@@ -115,7 +115,7 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				objects := make([]client.Object, 0, 2)
-				for _, objRaw := range strings.Split(string(gotkData), "---\n") {
+				for objRaw := range strings.SplitSeq(string(gotkData), "---\n") {
 					if objRaw == "" {
 						continue
 					}

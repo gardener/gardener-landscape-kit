@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"k8s.io/component-base/version"
@@ -142,7 +143,7 @@ func loadLocalBlobs(ctx context.Context, repo *RepoAccess, descriptor *descripto
 	}
 	localBlobs := make(map[NameVersionType][]byte)
 	for _, res := range descriptor.Component.Resources {
-		if !stringSliceContains(localBlobResourceTypes, res.Type) {
+		if !slices.Contains(localBlobResourceTypes, res.Type) {
 			continue
 		}
 		data, err := repo.GetLocalResource(ctx, descriptor.Component.Name, descriptor.Component.Version, res.ToIdentity())
@@ -161,15 +162,6 @@ func ResourceToBlobKey(res descriptorruntime.Resource) NameVersionType {
 		Version: res.Version,
 		Type:    res.Type,
 	}
-}
-
-func stringSliceContains(slice []string, s string) bool {
-	for _, v := range slice {
-		if v == s {
-			return true
-		}
-	}
-	return false
 }
 
 // CreateAuthClient creates an authenticated client for accessing OCI repositories.

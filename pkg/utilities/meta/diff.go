@@ -366,7 +366,7 @@ func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte
 	}
 	om := utilities.NewOrderedMap[string, []byte]()
 	for _, v := range values {
-		var t map[string]interface{}
+		var t map[string]any
 		err := yaml.Unmarshal(v, &t)
 		key := buildKey(t)
 		if err != nil || key == "" {
@@ -413,10 +413,10 @@ func collectAppendix(diff *manifestDiff) []*section {
 	return appendix
 }
 
-func buildKey(t map[string]interface{}) string {
+func buildKey(t map[string]any) string {
 	apiVersion, _ := t["apiVersion"].(string)
 	kind, _ := t["kind"].(string)
-	metadata, _ := t["metadata"].(map[string]interface{})
+	metadata, _ := t["metadata"].(map[string]any)
 	name, _ := metadata["name"].(string)
 	namespace, _ := metadata["namespace"].(string)
 	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
@@ -458,8 +458,8 @@ func preProcessLine(line []byte, buf *bytes.Buffer) {
 
 // postProcessLine removes the marker added during pre-processing and left-aligns the comment line again after marshaling.
 func postProcessLine(line []byte, buf *bytes.Buffer) {
-	if bytes.HasSuffix(line, []byte(keepLeftAlignedMarker)) {
-		line = bytes.TrimSuffix(line, []byte(keepLeftAlignedMarker))
+	if before, ok := bytes.CutSuffix(line, []byte(keepLeftAlignedMarker)); ok {
+		line = before
 		line = bytes.TrimLeft(line, " ")
 	}
 	buf.Write(line)
