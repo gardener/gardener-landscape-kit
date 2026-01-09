@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"slices"
 
 	"github.com/go-logr/logr"
 	"k8s.io/component-base/version"
@@ -164,12 +165,7 @@ func ResourceToBlobKey(res descriptorruntime.Resource) NameVersionType {
 }
 
 func stringSliceContains(slice []string, s string) bool {
-	for _, v := range slice {
-		if v == s {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, s)
 }
 
 // CreateAuthClient creates an authenticated client for accessing OCI repositories.
