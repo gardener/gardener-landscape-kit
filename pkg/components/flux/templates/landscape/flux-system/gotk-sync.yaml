@@ -6,11 +6,11 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m0s
+  recurseSubmodules: true # required if Git submodules are used, e.g. to include the base repo in the landscape repo.
   ref:
     {{ .repo_ref }}
   secretRef:
     name: flux-system
-  recurseSubmodules: true # required if Git submodules are used, e.g. to include the base repo in the landscape repo.
   url: {{ .repo_url }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
