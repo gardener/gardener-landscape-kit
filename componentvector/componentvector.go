@@ -5,3 +5,12 @@
 //go:generate ../hack/generate-componentname-constants.sh
 
 package componentvector
+
+import (
+	_ "embed"
+)
+
+var (
+	//go:embed components.yaml
+	DefaultComponentsYAML []byte
+)

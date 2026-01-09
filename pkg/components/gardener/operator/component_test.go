@@ -37,7 +37,9 @@ var _ = Describe("Component Generation", func() {
 		var opts components.Options
 
 		BeforeEach(func() {
-			opts = components.NewOptions(generateOpts, fs)
+			var err error
+			opts, err = components.NewOptions(generateOpts, fs)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should generate the component base", func() {
@@ -81,7 +83,8 @@ var _ = Describe("Component Generation", func() {
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
 			component := operator.NewComponent()
-			landscapeOpts := components.NewLandscapeOptions(generateOpts, fs)
+			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
 
 			exists, err := fs.DirExists("/repo/baseDir")

@@ -49,7 +49,7 @@ components:
   invalid yaml syntax here!!!
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(`error converting YAML to JSON: yaml: line 7: could not find expected ':'`))
 			Expect(cv).To(BeNil())
 		})
 
@@ -58,8 +58,7 @@ components:
 components: []
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("components"))
+			Expect(err).To(MatchError("[].components: Required value: at least one component must be specified"))
 			Expect(cv).To(BeNil())
 		})
 
@@ -71,8 +70,7 @@ components:
     version: 1.0.0
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("name"))
+			Expect(err).To(MatchError("[].components[0].name: Required value: component name must not be empty"))
 			Expect(cv).To(BeNil())
 		})
 
@@ -84,8 +82,7 @@ components:
     version: 1.0.0
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("sourceRepository"))
+			Expect(err).To(MatchError("[].components[0].sourceRepository: Required value: source repository must not be empty"))
 			Expect(cv).To(BeNil())
 		})
 
@@ -97,8 +94,7 @@ components:
     version: ""
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("version"))
+			Expect(err).To(MatchError("[].components[0].version: Required value: component version must not be empty"))
 			Expect(cv).To(BeNil())
 		})
 
@@ -113,8 +109,7 @@ components:
     version: 2.0.0
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("duplicate"))
+			Expect(err).To(MatchError(`[].components[1].name: Duplicate value: "duplicate"`))
 			Expect(cv).To(BeNil())
 		})
 
@@ -126,8 +121,7 @@ components:
     version: 1.0.0
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("sourceRepository"))
+			Expect(err).To(MatchError(`[].components[0].sourceRepository: Invalid value: "not-a-valid-url": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
 
@@ -139,8 +133,7 @@ components:
     version: 1.0.0
 `
 			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("sourceRepository"))
+			Expect(err).To(MatchError(`[].components[0].sourceRepository: Invalid value: "github.com/org/repo": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
 
@@ -162,10 +155,9 @@ components:
 			Expect(cv).To(BeNil())
 		})
 
-		It("should handle empty input", func() {
-			yaml := ``
-			cv, err := New([]byte(yaml))
-			Expect(err).To(HaveOccurred())
+		It("should fail with empty input", func() {
+			cv, err := New([]byte{})
+			Expect(err).To(MatchError("[].components: Required value: at least one component must be specified"))
 			Expect(cv).To(BeNil())
 		})
 	})
