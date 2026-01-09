@@ -6,7 +6,7 @@ package registry
 
 import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils"
 )
 
 // Interface is the interface for a component registry.
@@ -20,7 +20,7 @@ type Interface interface {
 }
 
 type registry struct {
-	components *utilities.OrderedMap[string, components.Interface]
+	components *utils.OrderedMap[string, components.Interface]
 }
 
 // RegisterComponent registers a component in the registry.
@@ -53,6 +53,6 @@ func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
 // New creates a new component registry.
 func New() Interface {
 	return &registry{
-		components: utilities.NewOrderedMap[string, components.Interface](),
+		components: utils.NewOrderedMap[string, components.Interface](),
 	}
 }

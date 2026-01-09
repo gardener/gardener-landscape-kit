@@ -15,7 +15,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/kustomization"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate landscape.
@@ -59,7 +59,10 @@ func validate(opts *options.Options) error {
 }
 
 func run(_ context.Context, opts *options.Options) error {
-	componentOpts := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
+	componentOpts, err := components.NewLandscapeOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
+	if err != nil {
+		return fmt.Errorf("failed to create component options: %w", err)
+	}
 
 	reg := registry.New()
 	if err := registry.RegisterAllComponents(reg, opts.Config); err != nil {

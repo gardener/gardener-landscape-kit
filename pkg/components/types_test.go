@@ -42,24 +42,27 @@ var _ = Describe("Types", func() {
 			It("should return the target path", func() {
 				opts.TargetDirPath = "/path/to/target"
 
-				componentOpts := components.NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/target"))
 			})
 
 			It("should return empty path when not set", func() {
 				opts.TargetDirPath = ""
 
-				componentOpts := components.NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(BeEmpty())
 			})
 		})
 
 		Describe("#GetFilesystem", func() {
 			It("should return the filesystem", func() {
-				componentOpts := components.NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetFilesystem()).To(Equal(fs))
 			})
 		})
@@ -70,9 +73,118 @@ var _ = Describe("Types", func() {
 					Log: logger,
 				}
 
-				componentOpts := components.NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetLogger()).To(Equal(logger))
+			})
+		})
+
+		Describe("#GetComponentVector", func() {
+			It("should return an empty component vector when no component vector file is provided", func() {
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+
+				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
+				Expect(exists).To(BeFalse())
+			})
+
+			It("should return an empty component vector when config is nil", func() {
+				opts.Config = nil
+
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+			})
+
+			It("should return an empty component vector when VersionConfig is nil", func() {
+				opts.Config = &v1alpha1.LandscapeKitConfiguration{}
+
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+			})
+
+			It("should return a valid component vector when a valid component vector file is provided", func() {
+				componentVectorYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.134.0
+- name: github.com/gardener/gardener-extension-networking-cilium
+  sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
+  version: v1.45.0
+`
+				componentVectorFile := "/tmp/component-vector.yaml"
+				err := fs.WriteFile(componentVectorFile, []byte(componentVectorYAML), 0644)
+				Expect(err).NotTo(HaveOccurred())
+
+				opts.Config = &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To(componentVectorFile),
+					},
+				}
+
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+
+				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				Expect(exists).To(BeTrue())
+				Expect(version).To(Equal("v1.134.0"))
+
+				version, exists = componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
+				Expect(exists).To(BeTrue())
+				Expect(version).To(Equal("v1.45.0"))
+			})
+
+			It("should return an error when component vector file does not exist", func() {
+				opts.Config = &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To("/non/existent/file.yaml"),
+					},
+				}
+
+				_, err := components.NewOptions(opts, fs)
+
+				Expect(err).To(MatchError("failed to read component vector file: open /non/existent/file.yaml: file does not exist"))
+			})
+
+			It("should return an error when component vector file contains invalid YAML", func() {
+				componentVectorFile := "/tmp/invalid-component-vector.yaml"
+				err := fs.WriteFile(componentVectorFile, []byte("invalid: yaml: content: [[["), 0644)
+				Expect(err).NotTo(HaveOccurred())
+
+				opts.Config = &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To(componentVectorFile),
+					},
+				}
+
+				_, err = components.NewOptions(opts, fs)
+
+				Expect(err).To(MatchError("failed to create component vector: error converting YAML to JSON: yaml: mapping values are not allowed in this context"))
+			})
+
+			It("should return an error when component vector file is empty but file exists", func() {
+				componentVectorFile := "/tmp/empty-component-vector.yaml"
+				err := fs.WriteFile(componentVectorFile, []byte(""), 0644)
+				Expect(err).NotTo(HaveOccurred())
+
+				opts.Config = &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile: ptr.To(componentVectorFile),
+					},
+				}
+
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).To(MatchError("failed to create component vector: [].components: Required value: at least one component must be specified"))
+				Expect(componentOpts).To(BeNil())
 			})
 		})
 
@@ -85,8 +197,9 @@ var _ = Describe("Types", func() {
 					TargetDirPath: "/path/to/target",
 				}
 
-				result := components.NewOptions(opts, fs)
+				result, err := components.NewOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
 				Expect(result.GetTargetPath()).To(Equal("/path/to/target"))
 				Expect(result.GetFilesystem()).To(Equal(fs))
@@ -119,8 +232,9 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetGitRepository", func() {
 			It("should return the git repository", func() {
-				landscapeOpts := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetGitRepository()).To(Equal(opts.Config.Git))
 			})
 		})
@@ -129,8 +243,9 @@ var _ = Describe("Types", func() {
 			It("should return the base path", func() {
 				opts.Config.Git.Paths.Base = "./base"
 
-				landscapeOpts := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("./base"))
 			})
 		})
@@ -139,8 +254,9 @@ var _ = Describe("Types", func() {
 			It("should return the landscape path", func() {
 				opts.Config.Git.Paths.Landscape = "./landscape"
 
-				landscapeOpts := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeLandscapePath()).To(Equal("./landscape"))
 			})
 		})
@@ -166,8 +282,9 @@ var _ = Describe("Types", func() {
 					},
 				}
 
-				result := components.NewLandscapeOptions(opts, fs)
+				result, err := components.NewLandscapeOptions(opts, fs)
 
+				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
 				Expect(result.GetTargetPath()).To(Equal("/path/to/target"))
 				Expect(result.GetFilesystem()).To(Equal(fs))
