@@ -81,10 +81,9 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
-		"repo_url":  opts.GetGitRepository().URL,
-		"repo_ref":  repoRef,
-		"flux_path": fluxPath,
-
+		"repo_url":        opts.GetGitRepository().URL,
+		"repo_ref":        repoRef,
+		"flux_path":       fluxPath,
 		"components_path": path.Join(opts.GetRelativeLandscapePath(), components.DirName),
 	})
 	if err != nil {

@@ -72,7 +72,7 @@ func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath 
 	}
 
 	if path.IsAbs(paths.Base) {
-		allErrs = append(allErrs, field.Required(fldPath.Child("base"), "base path must be a relative path to the base dir within the git repository"))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("base"), paths.Base, "base path must be a relative path to the base dir within the git repository"))
 	}
 
 	if strings.TrimSpace(paths.Landscape) == "" {
@@ -80,7 +80,7 @@ func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath 
 	}
 
 	if path.IsAbs(paths.Landscape) {
-		allErrs = append(allErrs, field.Required(fldPath.Child("landscape"), "landscape path must be a relative path to the landscape dir within the git repository"))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("landscape"), paths.Landscape, "landscape path must be a relative path to the landscape dir within the git repository"))
 	}
 
 	return allErrs
