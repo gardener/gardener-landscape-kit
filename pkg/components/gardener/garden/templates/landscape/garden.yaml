@@ -16,8 +16,8 @@ spec:
   runtimeCluster:
 #   ingress:
 #     domains:
-#       - name: ingress.runtime-garden.local.gardener.cloud # To be replaced with actual domain
-#         provider: primary
+#     - name: ingress.runtime-garden.local.gardener.cloud # To be replaced with actual domain
+#       provider: primary
 #     controller:
 #       kind: nginx
 #       providerConfig:
@@ -27,17 +27,17 @@ spec:
       ipFamilies:
       - IPv4
       pods:
-      - 10.1.0.0/16
+      - <CIDR> # e.g. 10.1.0.0/16
       nodes:
-      - 172.18.0.0/24
+      - <CIDR> # e.g. 172.18.0.0/24
       services:
-      - 10.2.0.0/16
+      - <CIDR> # e.g. 10.2.0.0/16
 #     blockCIDRs:
 #     - <CIDR>
 #   provider:
 #     region: <region name>
 #     zones:
-#       - "<zone name>"
+#     - "<zone name>"
   virtualCluster:
     dns:
       domains:
@@ -46,13 +46,20 @@ spec:
 #   etcd:
 #     main:
 #       backup:
-#         provider:
-#         bucketName:
+#         provider: <provider-name> # e.g. aws, gcp, azure
+#         providerConfig:
+#           <some-provider-specific-config-for-backup>
+#         bucketName: <bucket-name>
 #         secretRef:
-#           name:
+#           name: etcd-main-backup-secret
 #     events:
+#       autoscaling:
+#         minAllowed: 1
+#       storage:
+#         capacity: 10Gi
+#         className: storage-class-name
     gardener:
-      clusterIdentity: <identity-of-garden-cluster> # Must be set. Uniquely identifies this garden cluster.
+      clusterIdentity: # e.g. 'my-evaluation-landscape-gardener'. Must be set. Uniquely identifies this garden cluster.
 #     gardenerAPIServer:
 #       featureGates:
 #         <featureGateName>: true

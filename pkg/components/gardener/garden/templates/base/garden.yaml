@@ -23,14 +23,6 @@ spec:
           capacity: 10Gi
     gardener:
       gardenerAPIServer:
-        watchCacheSizes:
-          resources:
-          - apiGroup: core.gardener.cloud
-            resource: shoots
-            size: 500
-          - apiGroup: core.gardener.cloud
-            resource: shootstates
-            size: 500
 #       featureGates:
 #         <featureGateName>: true
       gardenerDashboard:
@@ -81,12 +73,6 @@ spec:
         requests:
           maxMutatingInflight: 200
           maxNonMutatingInflight: 400
-        watchCacheSizes:
-          resources:
-          - resource: secrets
-            size: 500
-          - resource: configmaps
-            size: 500
       kubeControllerManager:
         certificateSigningDuration: 48h0m0s
       version: 1.33.6
