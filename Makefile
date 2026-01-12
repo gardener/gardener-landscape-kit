@@ -42,8 +42,11 @@ tidy:
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
 	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg
 
+tools-for-generate:
+	@go mod download
+
 .PHONY: generate
-generate: $(GEN_CRD_API_REFERENCE_DOCS) $(FLUX_CLI) $(YQ)
+generate: tools-for-generate $(GEN_CRD_API_REFERENCE_DOCS) $(FLUX_CLI) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./pkg/...
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-github-templates.sh
