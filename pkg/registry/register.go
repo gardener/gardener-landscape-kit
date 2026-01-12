@@ -9,11 +9,12 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/elliotchance/orderedmap/v3"
+
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
 // ComponentList contains all available components.
@@ -29,10 +30,10 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 		excludedComponents = slices.Clone(config.Components.Exclude)
 	}
 
-	orderedComponents := utilities.NewOrderedMap[string, components.Interface]()
+	orderedComponents := orderedmap.NewOrderedMap[string, components.Interface]()
 	for _, newComponent := range ComponentList {
 		component := newComponent()
-		orderedComponents.Insert(component.Name(), component)
+		orderedComponents.Set(component.Name(), component)
 	}
 
 	var invalidComponentNames []string
@@ -52,7 +53,7 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 		)
 	}
 
-	for _, component := range orderedComponents.Entries() {
+	for _, component := range orderedComponents.AllFromFront() {
 		registry.RegisterComponent(component.Name(), component)
 	}
 
