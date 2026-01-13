@@ -1,0 +1,79 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Garden
+metadata:
+  name: garden
+spec:
+# dns:
+#   providers:
+#   - name: primary
+#     type: aws-route53 # azure-dns, google-clouddns, openstack-designate - see provider extension for further values.
+#     secretRef:
+#       name: dns-secret
+# extensions:
+# - type: foobar
+#   providerConfig:
+#     <some-provider-specific-config-for-extension>
+  runtimeCluster:
+#   ingress:
+#     domains:
+#     - name: ingress.runtime-garden.local.gardener.cloud # To be replaced with actual domain
+#       provider: primary
+#     controller:
+#       kind: nginx
+#       providerConfig:
+#         <some-optional-config-for-the-nginx-ingress-controller>
+    networking:
+      # These CIDRs have to match the CIRDs of the runtime cluster.
+      ipFamilies:
+      - IPv4
+      pods:
+      - <CIDR> # e.g. 10.1.0.0/16
+      nodes:
+      - <CIDR> # e.g. 172.18.0.0/24
+      services:
+      - <CIDR> # e.g. 10.2.0.0/16
+#     blockCIDRs:
+#     - <CIDR>
+#   provider:
+#     region: <region name>
+#     zones:
+#     - "<zone name>"
+  virtualCluster:
+    dns:
+      domains:
+#     - name: virtual-garden.local.gardener.cloud
+#       provider: primary
+#   etcd:
+#     main:
+#       backup:
+#         provider: <provider-name> # e.g. aws, gcp, azure
+#         providerConfig:
+#           <some-provider-specific-config-for-backup>
+#         bucketName: <bucket-name>
+#         secretRef:
+#           name: etcd-main-backup-secret
+#     events:
+#       autoscaling:
+#         minAllowed: 1
+#       storage:
+#         capacity: 10Gi
+#         className: storage-class-name
+    gardener:
+      clusterIdentity: # e.g. 'my-evaluation-landscape-gardener'. Must be set. Uniquely identifies this garden cluster.
+#     gardenerAPIServer:
+#       featureGates:
+#         <featureGateName>: true
+#     gardenerDashboard:
+#       enableTokenLogin: true
+#       logLevel: info
+#   kubernetes:
+#     kubeAPIServer:
+#       eventTTL: 1h0m0s
+#       logging:
+#         verbosity: 2
+#       requests:
+#         maxMutatingInflight: 200
+#         maxNonMutatingInflight: 400
+#     kubeControllerManager:
+#       certificateSigningDuration: 48h0m0s
+#     version: <override k8s version> # to override from base

@@ -12,6 +12,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
+	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
@@ -20,6 +21,7 @@ import (
 var ComponentList = []func() components.Interface{
 	flux.NewComponent,
 	operator.NewComponent,
+	garden.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.

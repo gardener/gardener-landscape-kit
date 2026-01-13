@@ -1,0 +1,85 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Garden
+metadata:
+  name: garden
+spec:
+  runtimeCluster:
+    settings:
+      topologyAwareRouting:
+        enabled: false
+      verticalPodAutoscaler:
+        enabled: true
+#   volume:
+#     minimumSize: 20Gi
+  virtualCluster:
+    controlPlane:
+      highAvailability: {}
+    etcd:
+      main:
+        storage:
+          capacity: 25Gi
+      events:
+        storage:
+          capacity: 10Gi
+    gardener:
+      gardenerAPIServer:
+#       featureGates:
+#         <featureGateName>: true
+      gardenerDashboard:
+        enableTokenLogin: true
+        logLevel: info
+      gardenerAdmissionController:
+        resourceAdmissionConfiguration:
+          operationMode: block
+          limits:
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "shoots" ]
+            size: 750Ki
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "projects" ]
+            size: 300Ki
+            count: 5000
+          - apiGroups: [ "core.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "secretbindings","quotas" ]
+            size: 100Ki
+          - apiGroups: [ "settings.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "*" ]
+            size: 100Ki
+          - apiGroups: [ "dashboard.gardener.cloud" ]
+            apiVersions: [ "*" ]
+            resources: [ "terminals" ]
+            size: 20Ki
+          - apiGroups: [ "" ]
+            apiVersions: [ "v1" ]
+            resources: [ "secrets","configmaps","serviceaccounts" ]
+            size: 100Ki
+          unrestrictedSubjects:
+          - kind: ServiceAccount
+            name: gardener-controller-manager
+            namespace: kube-system
+          # User group used by Gardenlet
+          - kind: Group
+            name: gardener.cloud:system:seeds
+            apiGroup: rbac.authorization.k8s.io
+    kubernetes:
+      kubeAPIServer:
+        eventTTL: 1h0m0s
+        logging:
+          verbosity: 2
+        requests:
+          maxMutatingInflight: 200
+          maxNonMutatingInflight: 400
+      kubeControllerManager:
+        certificateSigningDuration: 48h0m0s
+      version: 1.33.6
+    maintenance:
+      timeWindow:
+        begin: 200000+0100
+        end: 210000+0100
+    networking:
+      services:
+        - 100.64.0.0/13
