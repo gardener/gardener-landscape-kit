@@ -98,6 +98,9 @@ var _ = Describe("Types", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+
+				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
+				Expect(exists).To(BeFalse())
 			})
 
 			It("should return an empty component vector when VersionConfig is nil", func() {
@@ -107,6 +110,9 @@ var _ = Describe("Types", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+
+				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
+				Expect(exists).To(BeFalse())
 			})
 
 			It("should return a valid component vector when a valid component vector file is provided", func() {
