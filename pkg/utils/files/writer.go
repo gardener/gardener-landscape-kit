@@ -5,6 +5,7 @@
 package files
 
 import (
+	"bytes"
 	"log"
 	"os"
 	"path"
@@ -21,7 +22,23 @@ const (
 
 	// DefaultDirName is the name of the directory within the GLK system directory that contains the default generated configuration files.
 	DefaultDirName = "defaults"
+
+	secretEncryptionDisclaimer = `#
+# SECURITY ADVISORY
+#
+# Gardener-Landscape-Kit has detected that this manifest may contain sensitive data (e.g., a Kubernetes Secret).
+# It is strongly recommended not to store unencrypted sensitive data in Git repositories.
+# Please ensure that you:
+# - Either create the secrets manually in the target cluster and store them securely (e.g., in a vault or password manager),
+# - Or use an encryption provider supported by Flux, such as [SOPS](https://fluxcd.io/flux/guides/mozilla-sops/) or [Sealed Secrets](https://fluxcd.io/flux/guides/sealed-secrets/),
+# - Or use your own encryption solution.
+#
+` // #nosec G101 -- No credential.
 )
+
+func isSecret(contents []byte) bool {
+	return bytes.Contains(contents, []byte("kind: Secret\n"))
+}
 
 // WriteObjectsToFilesystem writes the given objects to the filesystem at the specified rootDir and relativeFilePath.
 // If the manifest file already exists, it patches changes from the new default.
@@ -51,6 +68,10 @@ func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePa
 		if !isDefaultNotExistsErr && len(oldDefaultYaml) > 0 && isCurrentNotExistsErr {
 			// File has been deleted by the user. Do not recreate until the default file within the .glk directory is deleted.
 			continue
+		}
+
+		if isSecret(object) {
+			object = append([]byte(secretEncryptionDisclaimer), object...)
 		}
 
 		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml)

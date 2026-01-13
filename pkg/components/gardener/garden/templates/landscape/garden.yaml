@@ -8,7 +8,7 @@ spec:
 #   - name: primary
 #     type: aws-route53 # azure-dns, google-clouddns, openstack-designate - see provider extension for further values.
 #     secretRef:
-#       name: dns-secret
+#       name: dns-garden
 # extensions:
 # - type: foobar
 #   providerConfig:
@@ -51,7 +51,7 @@ spec:
 #           <some-provider-specific-config-for-backup>
 #         bucketName: <bucket-name>
 #         secretRef:
-#           name: etcd-main-backup-secret
+#           name: virtual-garden-etcd-main-backup
 #     events:
 #       autoscaling:
 #         minAllowed: 1
