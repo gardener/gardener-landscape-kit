@@ -27,7 +27,7 @@ func main() {
 	}
 
 	filename := flag.Args()[0]
-	content, err := os.ReadFile(filename)
+	content, err := os.ReadFile(filename) // #nosec: G304 -- using any file is a feature
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
 	}

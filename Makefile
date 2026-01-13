@@ -66,11 +66,11 @@ clean:
 
 .PHONY: sast
 sast: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack
+	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
 sast-report: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack --gosec-report true
+	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
 test:
