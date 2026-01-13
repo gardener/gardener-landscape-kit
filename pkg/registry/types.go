@@ -5,8 +5,9 @@
 package registry
 
 import (
+	"github.com/elliotchance/orderedmap/v3"
+
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
 // Interface is the interface for a component registry.
@@ -20,17 +21,17 @@ type Interface interface {
 }
 
 type registry struct {
-	components *utilities.OrderedMap[string, components.Interface]
+	components *orderedmap.OrderedMap[string, components.Interface]
 }
 
 // RegisterComponent registers a component in the registry.
 func (r *registry) RegisterComponent(name string, component components.Interface) {
-	r.components.Insert(name, component)
+	r.components.Set(name, component)
 }
 
 // GenerateBase generates the base component.
 func (r *registry) GenerateBase(opts components.Options) error {
-	for _, component := range r.components.Entries() {
+	for _, component := range r.components.AllFromFront() {
 		if err := component.GenerateBase(opts); err != nil {
 			return err
 		}
@@ -41,7 +42,7 @@ func (r *registry) GenerateBase(opts components.Options) error {
 
 // GenerateLandscape generates the landscape component.
 func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
-	for _, component := range r.components.Entries() {
+	for _, component := range r.components.AllFromFront() {
 		if err := component.GenerateLandscape(opts); err != nil {
 			return err
 		}
@@ -53,6 +54,6 @@ func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
 // New creates a new component registry.
 func New() Interface {
 	return &registry{
-		components: utilities.NewOrderedMap[string, components.Interface](),
+		components: orderedmap.NewOrderedMap[string, components.Interface](),
 	}
 }

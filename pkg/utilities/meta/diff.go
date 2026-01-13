@@ -7,10 +7,9 @@ package meta
 import (
 	"bytes"
 
+	"github.com/elliotchance/orderedmap/v3"
 	"go.yaml.in/yaml/v4"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-
-	"github.com/gardener/gardener-landscape-kit/pkg/utilities"
 )
 
 func newSection(key string, content []byte) *section {
@@ -40,7 +39,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		diff = newManifestDiff(preProcess(oldDefaultYaml), preProcess(newDefaultYaml), preProcess(currentYaml))
 	)
 
-	for key, value := range diff.current.Entries() {
+	for key, value := range diff.current.AllFromFront() {
 		sect := newSection(key, value)
 		if sect.isComment() {
 			output = addWithSeparator(output, sect.content)
@@ -360,12 +359,12 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte] {
+func splitManifestFile(combinedYaml []byte) *orderedmap.OrderedMap[string, []byte] {
 	var values [][]byte
 	if len(combinedYaml) > 0 { // Only split if there is content
 		values = bytes.Split(combinedYaml, []byte("\n---\n"))
 	}
-	om := utilities.NewOrderedMap[string, []byte]()
+	om := orderedmap.NewOrderedMap[string, []byte]()
 	for _, v := range values {
 		var t map[string]any
 		err := yaml.Unmarshal(v, &t)
@@ -373,13 +372,13 @@ func splitManifestFile(combinedYaml []byte) *utilities.OrderedMap[string, []byte
 		if err != nil || key == "" {
 			key = string(v)
 		}
-		om.Insert(key, v)
+		om.Set(key, v)
 	}
 	return om
 }
 
 type manifestDiff struct {
-	oldDefault, newDefault, current *utilities.OrderedMap[string, []byte]
+	oldDefault, newDefault, current *orderedmap.OrderedMap[string, []byte]
 }
 
 func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
@@ -403,7 +402,7 @@ func addWithSeparator(output, content []byte) []byte {
 // collectAppendix gathers custom file content and keys not covered by current.
 func collectAppendix(diff *manifestDiff) []*section {
 	var appendix []*section
-	for key, value := range diff.newDefault.Entries() {
+	for key, value := range diff.newDefault.AllFromFront() {
 		sect := newSection(key, value)
 		_, isIncludedInCurrent := diff.current.Get(sect.key)
 		_, isIncludedInOldDefault := diff.oldDefault.Get(sect.key)
