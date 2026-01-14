@@ -51,6 +51,7 @@ generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-github-templates.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) ./hack/generate-renovate-ignore-deps.sh
+	$(MAKE) format
 
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
