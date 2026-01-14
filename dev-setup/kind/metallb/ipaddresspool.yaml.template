@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+ name: example
+ namespace: metallb-system
+spec:
+ addresses:
+ - #range_start-#range_end

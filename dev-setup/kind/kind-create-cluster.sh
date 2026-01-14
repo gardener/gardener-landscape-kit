@@ -19,6 +19,28 @@ fi
 
 clusterName="$GLK_KIND_CLUSTER_PREFIX-$clusterNameSuffix"
 
+install_metallb() {
+  echo "🚀 install metal loadbalance on kind cluster $clusterName"
+  # install metal loadbalancer (see https://kind.sigs.k8s.io/docs/user/loadbalancer/)
+  kubectl apply -k "$REPO_ROOT/dev-setup/kind/metallb" --server-side
+  kubectl wait --namespace metallb-system --for=condition=available deployment --selector=app=metallb --timeout=90s
+
+  kindIPAM=$(docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}} {{end}}' kind)
+  if [[ "$kindIPAM" =~ ([0-9]+\.[0-9]+)(".0.0/24 ") ]]; then
+    cidrPrefix=${BASH_REMATCH[1]}
+    cidr="$cidrPrefix.0.0/24"
+    echo "kind network cidr: $cidr"
+  else
+    echo "cannot extract IPv4 CIDR from '$kindIPAM'"
+  fi
+
+  start_range=$cidrPrefix.255.100
+  end_range=$cidrPrefix.255.254
+
+  sed -e "s/#range_start/$start_range/g" -e "s/#range_end/$end_range/g" "$REPO_ROOT/dev-setup/kind/metallb/ipaddresspool.yaml.template" | \
+    kubectl apply -f -
+}
+
 # setup_kind_network is similar to kind's network creation logic, ref https://github.com/kubernetes-sigs/kind/blob/23d2ac0e9c41028fa252dd1340411d70d46e2fd4/pkg/cluster/internal/providers/docker/network.go#L50
 # In addition to kind's logic, we ensure stable CIDRs that we can rely on in our local setup manifests and code.
 setup_kind_network() {
@@ -71,6 +93,7 @@ create_kind_cluster() {
 setup_kind_network
 build_kind_node_image
 create_kind_cluster
+install_metallb
 
 echo "ℹ️ To access $clusterName cluster, use:"
 echo "export KUBECONFIG=$KUBECONFIG"
