@@ -17,4 +17,5 @@ kind: LandscapeKitConfiguration
 # components:
 #   exclude:
 #   - component-name
-
+# versionConfig:
+#   componentsVectorFile: ./versions.yaml

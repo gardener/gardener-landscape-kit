@@ -19,7 +19,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	. "github.com/gardener/gardener-landscape-kit/pkg/utilities/kustomization"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utils/kustomization"
 )
 
 var _ = Describe("Kustomization", func() {
@@ -79,12 +79,15 @@ var _ = Describe("Kustomization", func() {
 
 		BeforeEach(func() {
 			fs = afero.Afero{Fs: afero.NewMemMapFs()}
-			opts = components.NewOptions(&generateoptions.Options{
+
+			var err error
+			opts, err = components.NewOptions(&generateoptions.Options{
 				Options: &cmd.Options{
 					Log: logr.Discard(),
 				},
 				TargetDirPath: "/landscapeDir",
 			}, fs)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should generate kustomization files within a component directory", func() {

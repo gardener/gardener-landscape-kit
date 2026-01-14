@@ -54,7 +54,9 @@ var _ = Describe("Flux Component Generation", func() {
 		repoURL = "https://github.com/gardener/gardener-ref-landscape"
 
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-		opts = components.NewLandscapeOptions(
+
+		var err error
+		opts, err = components.NewLandscapeOptions(
 			&generateoptions.Options{
 				Options: &cmd.Options{
 					Log: logr.Discard(),
@@ -71,6 +73,8 @@ var _ = Describe("Flux Component Generation", func() {
 			},
 			fs,
 		)
+
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("#GenerateLandscape", func() {
