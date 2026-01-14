@@ -37,7 +37,8 @@ const (
 )
 
 func isSecret(contents []byte) bool {
-	return bytes.Contains(contents, []byte("kind: Secret\n"))
+	kindSecret := "kind: Secret"
+	return bytes.HasPrefix(contents, []byte(kindSecret)) || bytes.Contains(contents, []byte("\n"+kindSecret))
 }
 
 // WriteObjectsToFilesystem writes the given objects to the filesystem at the specified rootDir and relativeFilePath.

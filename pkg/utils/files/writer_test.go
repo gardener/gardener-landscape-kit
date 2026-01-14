@@ -121,6 +121,23 @@ var _ = Describe("Writer", func() {
 				ContainSubstring(`# SECURITY ADVISORY`),
 			))
 		})
+
+		It("should not add an encryption advisory disclaimer for only secret references", func() {
+			objYaml := []byte(`kind: CustomObject
+spec:
+  secretRef:
+    kind: Secret
+    name: my-secret`)
+
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"secret.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+
+			content, err := fs.ReadFile("/landscape/manifest/secret.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(And(
+				ContainSubstring(`    kind: Secret`),
+				Not(ContainSubstring(`# SECURITY ADVISORY`)),
+			))
+		})
 	})
 
 	Describe("#RelativePathFromDirDepth", func() {
