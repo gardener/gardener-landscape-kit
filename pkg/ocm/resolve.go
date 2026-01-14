@@ -14,6 +14,7 @@ import (
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	"ocm.software/open-component-model/bindings/go/descriptor/runtime"
+	"sigs.k8s.io/yaml"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
@@ -22,32 +23,34 @@ import (
 )
 
 type ocmComponentsResolver struct {
-	log        logr.Logger
-	cfg        *configv1alpha1.OCMConfig
-	outputDir  string
-	components *components.Components
-	repos      []*ociaccess.RepoAccess
+	log          logr.Logger
+	cfg          *configv1alpha1.LandscapeKitConfiguration
+	landscapeDir string
+	outputDir    string
+	components   *components.Components
+	repos        []*ociaccess.RepoAccess
 }
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
-func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.OCMConfig, outputDir string) error {
+func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
 	}
 
-	repos, err := createRepoAccesses(cfg)
+	repos, err := createRepoAccesses(cfg.OCM)
 	if err != nil {
 		return err
 	}
 
 	resolver := &ocmComponentsResolver{
-		log:        log,
-		cfg:        cfg,
-		outputDir:  outputDir,
-		components: components.NewComponents(),
-		repos:      repos,
+		log:          log,
+		cfg:          cfg,
+		landscapeDir: landscapeDir,
+		outputDir:    outputDir,
+		components:   components.NewComponents(),
+		repos:        repos,
 	}
 
 	ctx := context.Background()
@@ -74,6 +77,10 @@ func (r *ocmComponentsResolver) resolve(ctx context.Context) error {
 	}
 
 	if err := r.writeComponentList(); err != nil {
+		return err
+	}
+
+	if err := r.writeLandscapeKitComponents(); err != nil {
 		return err
 	}
 
@@ -124,7 +131,7 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 	}
 
 	walker := components.NewComponentWalker(r.log, r.components, 5, itemFunc)
-	rootComponentReference := components.ComponentReferenceFromNameAndVersion(r.cfg.RootComponent.Name, r.cfg.RootComponent.Version)
+	rootComponentReference := components.ComponentReferenceFromNameAndVersion(r.cfg.OCM.RootComponent.Name, r.cfg.OCM.RootComponent.Version)
 
 	if err := walker.Walk(rootComponentReference); err != nil {
 		return fmt.Errorf("failed to walk components: %w", err)
@@ -137,7 +144,7 @@ func (r *ocmComponentsResolver) writeAllImageVectors() error {
 	imagevectorDir := path.Join(r.outputDir, "imagevectors")
 	r.log.Info("Writing image vectors to directory", "dir", imagevectorDir)
 	for _, cref := range r.components.GetSortedComponents() {
-		images, err := r.components.GetImageVector(cref, r.cfg.OriginalRefs)
+		images, err := r.components.GetImageVector(cref, r.cfg.OCM.OriginalRefs)
 		if len(images) == 0 {
 			continue
 		}
@@ -178,6 +185,23 @@ func (r *ocmComponentsResolver) writeComponentList() error {
 		return fmt.Errorf("failed to write component list file %s: %w", listFilename, err)
 	}
 	r.log.Info(fmt.Sprintf("Wrote component list to %s", listFilename))
+	return nil
+}
+
+func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
+	componentVersions, err := r.components.GetGLKComponents(false)
+	if err != nil {
+		return err
+	}
+	data, err := yaml.Marshal(componentVersions)
+	if err != nil {
+		return fmt.Errorf("failed to marshal component versions to YAML: %w", err)
+	}
+	filename := path.Join(r.landscapeDir, "ocm-components.yaml")
+	if err := os.WriteFile(filename, data, 0600); err != nil {
+		return fmt.Errorf("failed to write components file %s: %w", filename, err)
+	}
+	r.log.Info(fmt.Sprintf("Wrote components file to %s", filename))
 	return nil
 }
 
