@@ -86,13 +86,22 @@ func (o *options) GetLogger() logr.Logger {
 // NewOptions returns a new Options instance.
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
 	componentVectorBytes := componentvector.DefaultComponentsYAML
-	if opts.Config != nil && opts.Config.VersionConfig != nil && opts.Config.VersionConfig.ComponentsVectorFile != nil {
-		opts.Log.Info("Using custom component vector file", "file", *opts.Config.VersionConfig.ComponentsVectorFile)
+	if opts.Config != nil && opts.Config.VersionConfig != nil {
+		if opts.Config.VersionConfig.ComponentsVectorFile != nil {
+			opts.Log.Info("Using custom component vector file", "file", *opts.Config.VersionConfig.ComponentsVectorFile)
 
-		var err error
-		componentVectorBytes, err = fs.ReadFile(*opts.Config.VersionConfig.ComponentsVectorFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read component vector file: %w", err)
+			var err error
+			componentVectorBytes, err = fs.ReadFile(*opts.Config.VersionConfig.ComponentsVectorFile)
+			if err != nil {
+				return nil, fmt.Errorf("failed to read component vector file: %w", err)
+			}
+		} else if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
+			opts.Log.Info("Updating default component vector file from the release branch")
+			var err error
+			componentVectorBytes, err = utilscomponentvector.GetDefaultComponentVectorFromGitRepository()
+			if err != nil {
+				return nil, fmt.Errorf("failed to update default component vector file: %w", err)
+			}
 		}
 	}
 

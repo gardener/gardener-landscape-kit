@@ -249,6 +249,17 @@ var _ = Describe("Validation", func() {
 				errList := validation.ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
+
+			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						DefaultVersionsUpdateStrategy: ptr.To("ReleaseBranch"),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
 		})
 	})
 
