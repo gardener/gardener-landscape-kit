@@ -122,7 +122,7 @@ var _ = Describe("Writer", func() {
 			))
 		})
 
-		It("should not add an encryption advisory disclaimer for only secret references", func() {
+		It("should not add an encryption advisory disclaimer for secret references only", func() {
 			objYaml := []byte(`kind: CustomObject
 spec:
   secretRef:
