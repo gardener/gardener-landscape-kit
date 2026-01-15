@@ -63,9 +63,7 @@ var _ = Describe("Writer", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(contents)).To(Equal("Some other content\n"))
 		})
-	})
 
-	Describe("#WriteObjectsToFilesystem", func() {
 		It("should overwrite the manifest file if no meta file is present yet", func() {
 			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"config.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
 
@@ -107,6 +105,38 @@ var _ = Describe("Writer", func() {
 			content, err = fs.ReadFile("/landscape/manifest/config.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(MatchYAML(strings.ReplaceAll(string(objYaml), "key: value", "key: changedValue")))
+		})
+
+		It("should add a disclaimer to files containing manifests of kind secret", func() {
+			obj.Kind = "Secret"
+			objYaml, err := yaml.Marshal(obj)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"secret.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+
+			content, err := fs.ReadFile("/landscape/manifest/secret.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(And(
+				ContainSubstring(`kind: Secret`),
+				ContainSubstring(`# SECURITY ADVISORY`),
+			))
+		})
+
+		It("should not add an encryption advisory disclaimer for secret references only", func() {
+			objYaml := []byte(`kind: CustomObject
+spec:
+  secretRef:
+    kind: Secret
+    name: my-secret`)
+
+			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"secret.yaml": objYaml}, "/landscape", "manifest", fs)).To(Succeed())
+
+			content, err := fs.ReadFile("/landscape/manifest/secret.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(content).To(And(
+				ContainSubstring(`    kind: Secret`),
+				Not(ContainSubstring(`# SECURITY ADVISORY`)),
+			))
 		})
 	})
 
