@@ -20,7 +20,7 @@ fi
 clusterName="$GLK_KIND_CLUSTER_PREFIX-$clusterNameSuffix"
 
 install_metallb() {
-  echo "🚀 install metal loadbalance on kind cluster $clusterName"
+  echo "🚀 install metal loadbalancer on kind cluster $clusterName"
   # install metal loadbalancer (see https://kind.sigs.k8s.io/docs/user/loadbalancer/)
   kubectl apply -k "$REPO_ROOT/dev-setup/kind/metallb" --server-side
   kubectl wait --namespace metallb-system --for=condition=available deployment --selector=app=metallb --timeout=90s

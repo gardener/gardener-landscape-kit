@@ -9,7 +9,6 @@ set -o pipefail
 
 source $(dirname ${0})/common.sh
 
-gardenerComponentBaseDir="${WORK_DIR}/test-landscape/base/components/gardener"
 devDir="${REPO_ROOT}/dev"
 
 ensure_gardener_dir() {

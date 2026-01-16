@@ -57,7 +57,7 @@ create_repo_call() {
 
 create_repo() {
   repo="$1"
-  if [[ $(curl --silent -u test:testtest --fail-with-body ${GIT_SERVER_URL}/api/v1/user/repos | yq ".[].name | select(. == \"$repo\")") == "" ]]; then
+  if [[ $(curl --silent -u $USER --fail-with-body ${GIT_SERVER_URL}/api/v1/user/repos | yq ".[].name | select(. == \"$repo\")") == "" ]]; then
     echo "Create git repository '$repo'"
     created="false"
     for i in {1..10}; do
@@ -91,7 +91,7 @@ for i in {1..150}; do
   sleep 0.1
 done
 
-echo "🚀 git-server is up and running"
+echo "🚀 git-server is up and running at $GIT_SERVER_URL"
 
 for repo_name in ${REPO_NAMES:-}; do
   create_repo $repo_name
