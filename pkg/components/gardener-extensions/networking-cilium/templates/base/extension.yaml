@@ -20,5 +20,5 @@ spec:
         ociRepository:
           ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:{{ .version }}
   resources:
-    - kind: Network
-      type: cilium
+  - kind: Network
+    type: cilium

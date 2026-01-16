@@ -20,5 +20,5 @@ spec:
         ociRepository:
           ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico:{{ .version }}
   resources:
-    - kind: Network
-      type: calico
+  - kind: Network
+    type: calico

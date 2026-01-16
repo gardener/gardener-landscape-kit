@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGarden(t *testing.T) {
+func TestNetworkingCilium(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Components Networking Cilium Suite")
 }
