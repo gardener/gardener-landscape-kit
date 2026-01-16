@@ -20,11 +20,16 @@ const (
 	filePath        = "componentvector/components.yaml"
 )
 
+// GetReleaseBranchName returns the release branch name based on the current GLK version.
+func GetReleaseBranchName() string {
+	glkVersion := version.Get()
+	return fmt.Sprintf("release-v%s.%s", glkVersion.Major, glkVersion.Minor)
+}
+
 // GetDefaultComponentVectorFromGitRepository fetches the latest default component vector file
 // from the release branch of the gardener-landscape-kit GitHub repository based on the current GLK version.
 func GetDefaultComponentVectorFromGitRepository() ([]byte, error) {
-	glkVersion := version.Get()
-	branch := fmt.Sprintf("release-v%s.%s", glkVersion.Major, glkVersion.Minor)
+	branch := GetReleaseBranchName()
 	return getFileFromGitRepository(githubUrlPrefix+"/"+glkRepository, branch, filePath)
 }
 
