@@ -19,3 +19,4 @@ kind: LandscapeKitConfiguration
 #   - component-name
 # versionConfig:
 #   componentsVectorFile: ./versions.yaml
+#   defaultVersionsUpdateStrategy: ReleaseBranch

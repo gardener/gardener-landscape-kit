@@ -102,9 +102,24 @@ func (nv *OCMComponent) String() string {
 	return nv.Name + ":" + nv.Version
 }
 
+const (
+	// DefaultVersionsUpdateStrategyReleaseBranch indicates that the versions in the default vector should be updated from the release branch on generate.
+	DefaultVersionsUpdateStrategyReleaseBranch = "ReleaseBranch"
+	// DefaultVersionsUpdateStrategyDisabled indicates that the versions in the default vector should not be updated on generate.
+	DefaultVersionsUpdateStrategyDisabled = "Disabled"
+)
+
+// AllowedDefaultVersionsUpdateStrategies lists all allowed strategies for updating versions in the default components vector.
+var AllowedDefaultVersionsUpdateStrategies = []string{DefaultVersionsUpdateStrategyReleaseBranch, DefaultVersionsUpdateStrategyDisabled}
+
 // VersionConfiguration contains configuration for versioning.
 type VersionConfiguration struct {
 	// ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.
 	// +optional
 	ComponentsVectorFile *string `json:"componentsVectorFile,omitempty"`
+	// UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on generate.
+	// Possible values are "Disabled" (default) and "ReleaseBranch".
+	// Only used if no ComponentsVectorFile is specified.
+	// +optional
+	DefaultVersionsUpdateStrategy *string `json:"defaultVersionsUpdateStrategy,omitempty"`
 }

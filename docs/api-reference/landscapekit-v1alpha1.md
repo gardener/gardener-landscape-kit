@@ -417,6 +417,20 @@ string
 <p>ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>defaultVersionsUpdateStrategy</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on generate.
+Possible values are &ldquo;Disabled&rdquo; (default) and &ldquo;ReleaseBranch&rdquo;.
+Only used if no ComponentsVectorFile is specified.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <hr/>
