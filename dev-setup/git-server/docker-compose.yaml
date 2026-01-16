@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and Gardener contributors
+#
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  git:
+    container_name: glk-git-server
+    build: .
+    ports:
+      - "6080:6080"
+    volumes:
+      - ./forgejo.conf:/app.ini.sample:ro
+      - ../../dev/git-server/data:/data
+    networks:
+      kind:
+        aliases:
+          - git.local.gardener.cloud
+
+networks:
+  kind:
+    external: true
+    name: kind

@@ -55,6 +55,8 @@ linters:
         - name: exported
   exclusions:
     generated: lax
+    paths:
+      - dev$
     rules:
       - linters:
           - staticcheck
