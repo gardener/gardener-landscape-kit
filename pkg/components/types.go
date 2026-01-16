@@ -96,7 +96,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 				return nil, fmt.Errorf("failed to read component vector file: %w", err)
 			}
 		} else if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
-			opts.Log.Info("Updating default component vector file from the release branch")
+			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
 			var err error
 			componentVectorBytes, err = utilscomponentvector.GetDefaultComponentVectorFromGitRepository()
 			if err != nil {
