@@ -251,15 +251,6 @@ var _ = Describe("Validation", func() {
 			})
 		})
 	})
-
-	Describe("#ValidateOCMConfiguration", func() {
-		setupOCMConfigTests(func(ocmConf *v1alpha1.OCMConfig) field.ErrorList {
-			conf := &v1alpha1.OCMConfiguration{
-				OCMConfig: ocmConf,
-			}
-			return validation.ValidateOCMConfiguration(conf)
-		}, field.NewPath(""))
-	})
 })
 
 func setupOCMConfigTests(test func(conf *v1alpha1.OCMConfig) field.ErrorList, baseFldPath *field.Path) {

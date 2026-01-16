@@ -214,4 +214,58 @@ components:
 			Expect(version).To(Equal(""))
 		})
 	})
+
+	Describe("#FindComponentVector", func() {
+		var cv Interface
+
+		BeforeEach(func() {
+			yaml := `
+components:
+  - name: component1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.0.0
+`
+			var err error
+			cv, err = New([]byte(yaml))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(cv).NotTo(BeNil())
+		})
+
+		It("should find the ComponentVector of an existing component", func() {
+			component := cv.FindComponentVector("component1")
+			Expect(component).NotTo(BeNil())
+			Expect(component.Name).To(Equal("component1"))
+			Expect(component.SourceRepository).To(Equal("https://github.com/org/repo1"))
+			Expect(component.Version).To(Equal("1.0.0"))
+		})
+
+		It("should return nil when component does not exist", func() {
+			component := cv.FindComponentVector("non-existent-component")
+			Expect(component).To(BeNil())
+		})
+	})
+
+	Describe("#ComponentNames", func() {
+		var cv Interface
+
+		BeforeEach(func() {
+			yaml := `
+components:
+  - name: component2
+    sourceRepository: https://github.com/org/repo2
+    version: 2.5.3
+  - name: component1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.0.0
+`
+			var err error
+			cv, err = New([]byte(yaml))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(cv).NotTo(BeNil())
+		})
+
+		It("should return the sorted component names", func() {
+			Expect(cv.ComponentNames()).To(Equal([]string{"component1", "component2"}))
+		})
+	})
 })

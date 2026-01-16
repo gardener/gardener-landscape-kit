@@ -264,6 +264,10 @@ var _ = Describe("Components", func() {
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11",
 			},
 		))
+		componentVersions, err := c.GetGLKComponents(true)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(componentVersions.Components).To(HaveLen(1))
+		Expect(componentVersions.Components[0].Version).To(Equal("v1.128.3"))
 	})
 
 	It("should produce correct image vector for gardener/gardener with original reference", func() {

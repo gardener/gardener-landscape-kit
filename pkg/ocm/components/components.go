@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -18,8 +19,10 @@ import (
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
 	accessv1 "ocm.software/open-component-model/bindings/go/oci/spec/access/v1"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
 	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 // ComponentReference is a reference to a component in the format "name:version".
@@ -322,6 +325,47 @@ func (c *Components) DumpComponentRefListAsYAML() (string, error) {
 		sb.WriteString("  versions: [" + strings.Join(m[name], ", ") + "]\n")
 	}
 	return sb.String(), nil
+}
+
+// GetGLKComponents returns the components as fetched from the OCM component descriptors.
+func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector.Components, error) {
+	componentVectorBytes := componentvector.DefaultComponentsYAML
+	defaultComponentVector, err := utilscomponentvector.New(componentVectorBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create component vector: %w", err)
+	}
+
+	result := &utilscomponentvector.Components{}
+	foundNames := sets.New[string]()
+	for _, component := range c.GetSortedComponents() {
+		ocmName, version, err := component.ExtractNameAndVersion()
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract name and version from component reference %s: %w", component, err)
+		}
+		if vector := defaultComponentVector.FindComponentVector(ocmName); vector != nil {
+			vector.Version = version
+			result.Components = append(result.Components, &utilscomponentvector.ComponentVector{
+				Name:             ocmName,
+				Version:          version,
+				SourceRepository: vector.SourceRepository,
+			})
+			foundNames.Insert(ocmName)
+		}
+	}
+
+	if !ignoreMissing {
+		missingNames := sets.New[string](defaultComponentVector.ComponentNames()...)
+		missingNames.Delete(foundNames.UnsortedList()...)
+		if len(missingNames) > 0 {
+			missing := missingNames.UnsortedList()
+			sort.Strings(missing)
+			return nil, fmt.Errorf("missing components in OCM descriptors: %s", strings.Join(missing, ", "))
+		}
+	}
+	slices.SortFunc(result.Components, func(a, b *utilscomponentvector.ComponentVector) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+	return result, nil
 }
 
 // GetDependents returns all components that depend on the given component.

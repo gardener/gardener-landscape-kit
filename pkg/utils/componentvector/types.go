@@ -24,4 +24,8 @@ type ComponentVector struct {
 type Interface interface {
 	// FindComponentVersion finds the version of the component with the given name.
 	FindComponentVersion(string) (string, bool)
+	// FindComponentVector finds the ComponentVector of the component with the given name.
+	FindComponentVector(string) *ComponentVector
+	// ComponentNames returns the sorted list of component names in the component vector.
+	ComponentNames() []string
 }

@@ -266,8 +266,7 @@ string
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>, 
-<a href="#landscape.config.gardener.cloud/v1alpha1.OCMConfiguration">OCMConfiguration</a>)
+<a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>)
 </p>
 <p>
 <p>OCMConfig contains information about root component.</p>
@@ -313,36 +312,6 @@ bool
 </td>
 <td>
 <p>OriginalRefs is a flag to output original image references in the image vectors.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="landscape.config.gardener.cloud/v1alpha1.OCMConfiguration">OCMConfiguration
-</h3>
-<p>
-<p>OCMConfiguration contains information about root component.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>OCMConfig</code></br>
-<em>
-<a href="#landscape.config.gardener.cloud/v1alpha1.OCMConfig">
-OCMConfig
-</a>
-</em>
-</td>
-<td>
-<p>
-(Members of <code>OCMConfig</code> are embedded into this type.)
-</p>
 </td>
 </tr>
 </tbody>
