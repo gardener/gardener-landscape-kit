@@ -8,6 +8,10 @@
     commands: ['make generate'],
     fileFilters: ['.github/**', 'pkg/**', 'docs/**'],
   },
+  baseBranchPatterns: [
+    'main',
+    '/^release-v\\d+\\.\\d+$/',
+  ],
   prFooter: "**Release note**:\n\
 ```other dependency\n\
 The following dependencies have been updated:\n\
@@ -15,7 +19,28 @@ The following dependencies have been updated:\n\
 - `{{upgrade.depName}}` from `{{upgrade.currentVersion}}` to `{{upgrade.newVersion}}`. {{#if (equals upgrade.datasource 'github-releases')}}[Release Notes](https://github.com/{{upgrade.depName}}/releases/tag/{{upgrade.newVersion}}){{/if}}\n\
 {{/each}}\n\
 ```",
+  regexManagers: [
+    {
+      managerFilePatterns: ['/^componentvector/components\\.yaml$/'],
+      matchStrings: [
+        // Match default versions in components.yaml, regardless of the order of the fields.
+        '- (?:(?:name: (?<depName>[^\\s]+)|sourceRepository: https://github\\.com/(?<packageName>[^\\s]+)|version: (?<currentValue>v?[^\\s]+))\\s*\\n?\\s*){3}',
+      ],
+      datasourceTemplate: 'github-releases',
+    },
+  ],
   packageRules: [
+    {
+      matchFileNames: ['!componentvector/components.yaml'],
+      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
+      enabled: false,
+    },
+    {
+      matchFileNames: ['componentvector/components.yaml'],
+      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
+      matchUpdateTypes: ['minor', 'major'],
+      enabled: false,
+    },
     {
       matchDatasources: ['go'],
       groupName: "open-component-model-bindings-go-descriptor-runtime",
