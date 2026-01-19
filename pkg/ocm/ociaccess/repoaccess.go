@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"k8s.io/component-base/version"
@@ -46,7 +47,11 @@ type RepoAccess struct {
 
 // NewRepoAccess creates a new RepoAccess instance for accessing an OCI repository.
 func NewRepoAccess(repositoryURL string) (*RepoAccess, error) {
-	resolver, err := urlresolver.New(urlresolver.WithBaseURL(repositoryURL))
+	parts := strings.SplitN(repositoryURL, "://", 2)
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid repository URL %q, expected format oci://<repository>", repositoryURL)
+	}
+	resolver, err := urlresolver.New(urlresolver.WithBaseURL(parts[1]))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create URL resolver: %w", err)
 	}

@@ -37,8 +37,8 @@ type Options struct {
 	// It is used as output directory.
 	LandscapeDir string
 
-	// ConfigPath is the configuration file containing repositories and/or the root component.
-	Config *configv1alpha1.OCMConfiguration
+	// Config is the path to the landscape kit configuration file.
+	Config *configv1alpha1.LandscapeKitConfiguration
 }
 
 // Validate validates the options.
@@ -47,7 +47,11 @@ func (o *Options) validate() error {
 		return fmt.Errorf("landscape dir is required")
 	}
 
-	if errs := configv1alpha1validation.ValidateOCMConfiguration(o.Config); len(errs) > 0 {
+	if o.Config == nil || o.Config.OCM == nil {
+		return fmt.Errorf("OCM configuration is required")
+	}
+
+	if errs := configv1alpha1validation.ValidateLandscapeKitConfiguration(o.Config); len(errs) > 0 {
 		return fmt.Errorf("invalid configuration: %v", errs.ToAggregate())
 	}
 
@@ -69,11 +73,11 @@ func (o *Options) complete() error {
 
 func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.LandscapeDir, "landscape-dir", "l", "", "Path to a directory containing the landscape specific configuration files, aka overlays.")
-	fs.StringVarP(&o.configFilePath, "config", "c", "", "Optional config file with repositories and other configuration.")
+	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
 }
 
 func (o *Options) effectiveOutputDir(subdir string) string {
-	outputDir := path.Join(o.LandscapeDir, "ocm", o.Config.RootComponent.Name, o.Config.RootComponent.Version)
+	outputDir := path.Join(o.LandscapeDir, "ocm", o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
 	if subdir != "" {
 		outputDir = path.Join(outputDir, subdir)
 	}
@@ -86,7 +90,7 @@ func (o *Options) loadConfigFile(filename string) error {
 		return err
 	}
 
-	o.Config = &configv1alpha1.OCMConfiguration{}
+	o.Config = &configv1alpha1.LandscapeKitConfiguration{}
 	if err = runtime.DecodeInto(configDecoder, data, o.Config); err != nil {
 		return fmt.Errorf("error decoding config: %w", err)
 	}

@@ -5,6 +5,9 @@
 package componentvector
 
 import (
+	"maps"
+	"slices"
+
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/yaml"
 )
@@ -20,6 +23,21 @@ func (c *components) FindComponentVersion(name string) (string, bool) {
 		return component.Version, exists
 	}
 	return "", false
+}
+
+// FindComponentVector finds the ComponentVector of the component with the given name.
+// Returns the ComponentVector if found, otherwise nil.
+func (c *components) FindComponentVector(name string) *ComponentVector {
+	if component, exists := c.nameToComponentVector[name]; exists {
+		h := *component
+		return &h
+	}
+	return nil
+}
+
+// ComponentNames returns the sorted list of component names in the component vector.
+func (c *components) ComponentNames() []string {
+	return slices.Sorted(maps.Keys(c.nameToComponentVector))
 }
 
 // New creates a new component vector from the given YAML input.

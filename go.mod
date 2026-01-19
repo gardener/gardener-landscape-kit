@@ -1,6 +1,6 @@
 module github.com/gardener/gardener-landscape-kit
 
-go 1.25.0
+go 1.25.5
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
@@ -24,10 +24,10 @@ require (
 	k8s.io/code-generator v0.34.3
 	k8s.io/component-base v0.34.3
 	k8s.io/utils v0.0.0-20260108192941-914a6e750570
-	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20251208004126-3af08b0b88d0
-	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha4
-	ocm.software/open-component-model/bindings/go/oci v0.0.18
-	ocm.software/open-component-model/bindings/go/runtime v0.0.4
+	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260107102143-2796cd3fe478
+	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha8
+	ocm.software/open-component-model/bindings/go/oci v0.0.25
+	ocm.software/open-component-model/bindings/go/runtime v0.0.5
 	oras.land/oras-go/v2 v2.6.0
 	sigs.k8s.io/controller-runtime v0.22.4
 	sigs.k8s.io/controller-tools v0.19.0
