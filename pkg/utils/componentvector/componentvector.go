@@ -5,7 +5,8 @@
 package componentvector
 
 import (
-	"sort"
+	"maps"
+	"slices"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/yaml"
@@ -36,12 +37,7 @@ func (c *components) FindComponentVector(name string) *ComponentVector {
 
 // ComponentNames returns the sorted list of component names in the component vector.
 func (c *components) ComponentNames() []string {
-	names := make([]string, 0, len(c.nameToComponentVector))
-	for name := range c.nameToComponentVector {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	return names
+	return slices.Sorted(maps.Keys(c.nameToComponentVector))
 }
 
 // New creates a new component vector from the given YAML input.
