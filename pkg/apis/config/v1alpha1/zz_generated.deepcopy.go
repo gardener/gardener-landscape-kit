@@ -190,6 +190,11 @@ func (in *VersionConfiguration) DeepCopyInto(out *VersionConfiguration) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.DefaultVersionsUpdateStrategy != nil {
+		in, out := &in.DefaultVersionsUpdateStrategy, &out.DefaultVersionsUpdateStrategy
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
