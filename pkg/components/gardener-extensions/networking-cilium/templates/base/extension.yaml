@@ -1,0 +1,24 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: networking-cilium
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime:{{ .version }}
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application:{{ .version }}
+    extension:
+      helm:
+        ociRepository:
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:{{ .version }}
+  resources:
+  - kind: Network
+    type: cilium

@@ -9,4 +9,8 @@ package componentvector
 const (
 	// NameGardenerGardener is a constant for a component in the component vector with name 'github.com/gardener/gardener'.
 	NameGardenerGardener = "github.com/gardener/gardener"
+	// NameGardenerGardenerExtensionNetworkingCalico is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-networking-calico'.
+	NameGardenerGardenerExtensionNetworkingCalico = "github.com/gardener/gardener-extension-networking-calico"
+	// NameGardenerGardenerExtensionNetworkingCilium is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-networking-cilium'.
+	NameGardenerGardenerExtensionNetworkingCilium = "github.com/gardener/gardener-extension-networking-cilium"
 )
