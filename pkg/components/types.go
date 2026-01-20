@@ -98,7 +98,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		} else if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
 			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
 			var err error
-			componentVectorBytes, err = utilscomponentvector.GetDefaultComponentVectorFromGitRepository()
+			componentVectorBytes, err = utilscomponentvector.GetDefaultComponentVectorFromGitHub()
 			if err != nil {
 				return nil, fmt.Errorf("failed to update default component vector file: %w", err)
 			}

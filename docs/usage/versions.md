@@ -22,6 +22,21 @@ components:
   version: v1.134.1
 ```
 
+#### Updating Default Component Vector from GLK Release Branch
+
+The included default component vector can be updated from the GLK release branch, where patch updates are regularly applied.
+GLK can automatically retrieve the updated `components.yaml` file and use the latest versions from the release branch if a specific configuration flag is set in your GLK configuration.
+This allows you to keep your component versions up-to-date with the latest patches provided by the maintainers.
+
+You can enable this feature by adding the following configuration to your `LandscapeKitConfiguration`:
+
+```yaml
+apiVersion: landscape.config.gardener.cloud/v1alpha1
+kind: LandscapeKitConfiguration
+versionConfig:
+  defaultVersionsUpdateStrategy: ReleaseBranch
+```
+
 ### Custom Component Vector
 
 You can override the default component vector by specifying a custom vector file in your GLK configuration:

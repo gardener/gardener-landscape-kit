@@ -26,18 +26,14 @@ func GetReleaseBranchName() string {
 	return fmt.Sprintf("release-v%s.%s", glkVersion.Major, glkVersion.Minor)
 }
 
-// GetDefaultComponentVectorFromGitRepository fetches the latest default component vector file
+// GetDefaultComponentVectorFromGitHub fetches the latest default component vector file
 // from the release branch of the gardener-landscape-kit GitHub repository based on the current GLK version.
-func GetDefaultComponentVectorFromGitRepository() ([]byte, error) {
-	branch := GetReleaseBranchName()
-	return getFileFromGitRepository(githubUrlPrefix+"/"+glkRepository, branch, filePath)
+func GetDefaultComponentVectorFromGitHub() ([]byte, error) {
+	return getFileFromGitRepository(githubUrlPrefix+"/"+glkRepository, GetReleaseBranchName(), filePath)
 }
 
 func getFileFromGitRepository(repositoryUrl, branch, filePath string) ([]byte, error) {
-	rawURL := repositoryUrl
-	if rawURL[len(rawURL)-1] == '/' {
-		rawURL = rawURL[:len(rawURL)-1]
-	}
+	rawURL := strings.TrimSuffix(repositoryUrl, "/")
 
 	if !strings.HasPrefix(rawURL, githubUrlPrefix) {
 		return nil, fmt.Errorf("unsupported Git provider for URL: %s", rawURL)
