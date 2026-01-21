@@ -48,7 +48,7 @@ spec:
       clusterIdentity: test-landscape-123456
 EOF
 )
-  prettify "${gardenComponentDir}/garden.yaml"
+  prettify -i "${gardenComponentDir}/garden.yaml"
 }
 
 patch_kustomization_yaml() {
@@ -62,7 +62,7 @@ EOF
 )
   # Ensure resources are unique after patching using "*+" (deep merge) operator
   yq eval --inplace '.resources |= unique' "${gardenComponentDir}/kustomization.yaml"
-  prettify "${gardenComponentDir}/kustomization.yaml"
+  prettify -i "${gardenComponentDir}/kustomization.yaml"
 }
 
 write_secret_garden_dns_local_yaml() {
@@ -76,7 +76,7 @@ metadata:
 type: Opaque
 data:
 EOF
-  prettify "${gardenComponentDir}/secret-garden-dns-local.yaml"
+  prettify -i "${gardenComponentDir}/secret-garden-dns-local.yaml"
 }
 
 commit_changes() {

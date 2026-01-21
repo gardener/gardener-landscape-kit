@@ -17,15 +17,7 @@ WORK_DIR="$REPO_ROOT/dev/e2e"
 mkdir -p "${WORK_DIR}"
 
 glk() {
-  pushd $REPO_ROOT >/dev/null
-  go run ./cmd/gardener-landscape-kit "$@"
-  popd >/dev/null
-}
-
-prettify() {
-  pushd $REPO_ROOT >/dev/null
-  go run ./hack/tools/prettify -i "$1"
-  popd >/dev/null
+  gardener-landscape-kit "$@"
 }
 
 kubectl_glk() {
