@@ -5,7 +5,7 @@
 services:
   git:
     container_name: glk-git-server
-    image: codeberg.org/forgejo/forgejo:13.0.3
+    image: codeberg.org/forgejo/forgejo:13.0.5
     ports:
       - "6080:6080"
     volumes:
