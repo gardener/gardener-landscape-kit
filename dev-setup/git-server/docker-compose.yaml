@@ -5,12 +5,14 @@
 services:
   git:
     container_name: glk-git-server
-    build: .
+    image: codeberg.org/forgejo/forgejo:13.0.3
     ports:
       - "6080:6080"
     volumes:
       - ./forgejo.conf:/app.ini.sample:ro
       - ../../dev/git-server/data:/data
+      - ./entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       kind:
         aliases:
