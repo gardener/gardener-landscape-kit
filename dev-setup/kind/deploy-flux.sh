@@ -24,7 +24,7 @@ metadata:
   namespace: flux-system
 stringData:
   password: testtest
-  username: test
+  username: gitops
 EOF
 }
 

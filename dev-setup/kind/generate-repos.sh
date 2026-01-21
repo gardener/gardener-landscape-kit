@@ -10,7 +10,7 @@ set -o pipefail
 SCRIPT_DIR=$(dirname ${0})
 source $(dirname ${0})/common.sh
 
-GIT_SERVER_BASE_URL="http://test:testtest@git.local.gardener.cloud:6080"
+GIT_SERVER_BASE_URL="http://gitops:testtest@git.local.gardener.cloud:6080"
 
 ensure_glk_configuration() {
   echo "⚙️  Ensuring GLK configuration"
@@ -21,7 +21,7 @@ clone_or_update_repo() {
   repoName=$1
   destSubDir=$2
 
-  repoUrl=$GIT_SERVER_BASE_URL/test/${repoName}.git
+  repoUrl=$GIT_SERVER_BASE_URL/gitops/${repoName}.git
   destDir="${WORK_DIR}/${destSubDir}"
 
   if [ -d "${destDir}/.git" ]; then
@@ -60,7 +60,7 @@ ensure_base_as_submodule() {
   cd "${WORK_DIR}/test-landscape"
 
   if [ ! -f .gitmodules ] || ! grep -q "\[submodule \"base\"\]" .gitmodules; then
-    git submodule add $GIT_SERVER_BASE_URL/test/base.git base
+    git submodule add $GIT_SERVER_BASE_URL/gitops/base.git base
     git add .gitmodules base
     git commit -m "Add base as submodule"
     git push

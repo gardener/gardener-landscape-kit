@@ -24,7 +24,7 @@ glk() {
 
 prettify() {
   pushd $REPO_ROOT >/dev/null
-  go run ./pkg/utils/meta/prettify -i "$1"
+  go run ./hack/tools/prettify -i "$1"
   popd >/dev/null
 }
 

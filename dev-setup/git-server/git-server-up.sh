@@ -12,7 +12,7 @@ REGISTRY_HOSTNAME="glk-registry.local.gardener.cloud"
 
 GIT_SERVER_HOSTNAME="git.local.gardener.cloud"
 GIT_SERVER_URL="http://$GIT_SERVER_HOSTNAME:6080"
-USER="test:testtest"
+USER="gitops:testtest"
 REPO_NAMES="base test-landscape"
 
 check_local_dns_record() {

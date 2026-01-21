@@ -6,10 +6,10 @@ make git-server-up
 
 ## Access Web UI
 
-http://git.local.gardener.cloud:6080/test
+http://git.local.gardener.cloud:6080/gitops
 
 ```txt
-> User: `test`  
+> User: `gitops`  
 > Password: `testtest`
 ```
 
@@ -20,12 +20,12 @@ http://git.local.gardener.cloud:6080/test
 
 - Base repo
 ```bash
-git clone http://test:testtest@git.local.gardener.cloud:6080/test/base.git
+git clone http://gitops:testtest@git.local.gardener.cloud:6080/gitops/base.git
 ```
 
 - Test landscape repo
 ```bash
-git clone http://test:testtest@git.local.gardener.cloud:6080/test/test-landscape.git
+git clone http://gitops:testtest@git.local.gardener.cloud:6080/gitops/test-landscape.git
 ```
 
 ## Configure Git Remote in Landscape Repo
@@ -34,12 +34,12 @@ git clone http://test:testtest@git.local.gardener.cloud:6080/test/test-landscape
 ```yaml
 stringData:
   password: testtest
-  username: test
+  username: gitops
 ```
 
 `gotk-sync.yaml`:
 ```yaml
-  url: http://git.local.gardener.cloud:6080/test/test-landscape
+  url: http://git.local.gardener.cloud:6080/gitops/test-landscape
 ```
 
 ## Gardener Local Configurations
