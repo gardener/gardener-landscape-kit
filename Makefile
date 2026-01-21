@@ -67,11 +67,11 @@ clean:
 
 .PHONY: sast
 sast: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack
+	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
 sast-report: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack --gosec-report true
+	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
 test:
@@ -94,3 +94,38 @@ verify-extended: check-generate check format test-cov sast-report
 .PHONY: generate-ocm-testdata
 generate-ocm-testdata:
 	@go run ./hack/tools/ocm-testdata-generator -config $(REPO_ROOT)/pkg/ocm/components/testdata/config.yaml
+
+.PHONY: git-server-up
+git-server-up:
+	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-up.sh
+
+.PHONY: git-server-down
+git-server-down:
+	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-down.sh
+
+.PHONY: git-server-cleanup # cleanup git server data
+git-server-cleanup: git-server-down $(YQ)
+	@rm -rf $(REPO_ROOT)/dev/git-server/data
+
+.PHONY: registry-up
+registry-up:
+	@$(REPO_ROOT)/dev-setup/registry/registry-up.sh
+
+.PHONY: registry-down
+registry-down:
+	@$(REPO_ROOT)/dev-setup/registry/registry-down.sh
+
+.PHONY: kind-up ## create single kind cluster for hosting glk and runtime
+kind-up: registry-up git-server-up $(KIND) $(KUBECTL) $(HELM)
+	@$(REPO_ROOT)/dev-setup/kind/kind-create-cluster.sh single
+
+.PHONY: kind-down
+kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
+	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
+
+.PHONY: e2e-prepare
+e2e-prepare: $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY) $(GLK_GLK)
+	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
+	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
+	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh
+	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh

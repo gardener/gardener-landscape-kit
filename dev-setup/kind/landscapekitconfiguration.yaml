@@ -1,0 +1,20 @@
+apiVersion: landscape.config.gardener.cloud/v1alpha1
+kind: LandscapeKitConfiguration
+# ocm:
+#   repositories:
+#   - <repo-url>
+#   rootComponent:
+#     name: <component-name>
+#     version: <component-version>
+#   originalRefs: true
+git:
+  url: http://gitops:testtest@git.local.gardener.cloud:6080/gitops/test-landscape.git
+  ref:
+    branch: main
+  paths:
+    base: ./base
+    landscape: ./
+# components:
+#   exclude:
+#   - component-name
+
