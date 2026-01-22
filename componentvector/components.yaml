@@ -7,4 +7,4 @@ components:
   version: v1.55.0
 - name: github.com/gardener/gardener-extension-networking-cilium
   sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
-  version: v1.45.2
+  version: v1.46.0
