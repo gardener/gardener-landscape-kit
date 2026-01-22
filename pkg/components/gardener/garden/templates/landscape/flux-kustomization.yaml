@@ -4,13 +4,22 @@ metadata:
   name: garden
   namespace: garden
 spec:
-  interval: 30m
-  path: {{ .landscapeComponentPath }}
-  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  path: {{ .landscapeComponentPath }}
+  prune: true
   dependsOn:
   - name: gardener-operator
     namespace: garden
+  interval: 30m
+  timeout: 10m
+  retryInterval: 2m
+  wait: true
+  healthCheckExprs:
+  - apiVersion: operator.gardener.cloud/v1alpha1
+    kind: Garden
+    inProgress: "status.lastOperation.state == 'Processing'"
+    failed: "status.lastOperation.state != 'Succeeded'"
+    current: "status.conditions.all(c, c.status == 'True')"
