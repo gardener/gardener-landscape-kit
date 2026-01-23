@@ -48,9 +48,9 @@ tools-for-generate: $(GEN_CRD_API_REFERENCE_DOCS)
 .PHONY: generate
 generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./componentvector/... ./pkg/...
-	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-codegen.sh
-	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/update-github-templates.sh
-	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) ./hack/generate-renovate-ignore-deps.sh
+	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-codegen.sh
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-github-templates.sh
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/generate-renovate-ignore-deps.sh
 	$(MAKE) format
 
 .PHONY: check
@@ -93,7 +93,7 @@ verify-extended: check-generate check format test-cov sast-report
 
 .PHONY: generate-ocm-testdata
 generate-ocm-testdata:
-	@go run ./hack/tools/ocm-testdata-generator -config $(REPO_ROOT)/pkg/ocm/components/testdata/config.yaml
+	@go run $(HACK_DIR)/tools/ocm-testdata-generator -config $(REPO_ROOT)/pkg/ocm/components/testdata/config.yaml
 
 .PHONY: git-server-up
 git-server-up:
@@ -127,6 +127,13 @@ kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
 # E2E Tests                             #
 #########################################
 
+KIND_LOCAL_KUBECONFIG ?= $(REPO_ROOT)/dev/kind-glk-single-kubeconfig.yaml
+PARALLEL_E2E_TESTS    ?= 5
+
+ifndef ARTIFACTS
+	export ARTIFACTS=/tmp/artifacts
+endif
+
 .PHONY: e2e-prepare
 e2e-prepare: $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY) $(GLK_GLK)
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
@@ -136,4 +143,8 @@ e2e-prepare: $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY) $(GLK_GLK)
 
 .PHONY: ci-e2e-kind
 ci-e2e-kind:
-	@echo "Temporary dummy target until e2e tests are implemented."
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/ci-e2e-kind.sh
+
+.PHONY: test-e2e-local
+test-e2e-local: $(GINKGO)
+	KUBECONFIG=$(KIND_LOCAL_KUBECONFIG) $(REPO_ROOT)/dev/gardener/hack/test-e2e-local.sh --procs=$(PARALLEL_E2E_TESTS) --label-filter="default" ./test/e2e/...
