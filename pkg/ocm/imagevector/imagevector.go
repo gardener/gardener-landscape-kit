@@ -20,6 +20,7 @@ type ExtendedImageSource struct {
 	ReferencedComponent *string
 	LookupOnly          bool
 	OriginalRef         *string
+	Local               bool
 }
 
 // EffectiveResourceName returns the ResourceName if set, otherwise the Name.

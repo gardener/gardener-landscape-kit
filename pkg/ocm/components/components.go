@@ -12,12 +12,14 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/ptr"
 	descriptorruntime "ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
 	accessv1 "ocm.software/open-component-model/bindings/go/oci/spec/access/v1"
+	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
@@ -68,6 +70,8 @@ type Blobs map[ociaccess.NameVersionType][]byte
 type Resource struct {
 	// Name is the name of the resource.
 	Name string `json:"name"`
+	// Alias is an optional alias name of the resource.
+	Alias string `json:"alias,omitempty"`
 	// Version is the version of the resource.
 	Version string `json:"version"`
 	// Type is the type of the resource (e.g., "ociImage", "helmChart/v1").
@@ -75,6 +79,8 @@ type Resource struct {
 	// Value is the reference or URL of the resource (for types like "ociImage", "helmChart/v1")
 	// or other relevant information depending on the resource type.
 	Value string `json:"value"`
+	// Local indicates whether the resource is a local blob.
+	Local bool `json:"local,omitempty"`
 }
 
 // ResourcesOutput is the output format for the resources JSON output.
@@ -181,12 +187,17 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 				if reference == "" {
 					return nil, fmt.Errorf("could not determine reference for resource %s", res.Name)
 				}
-				resources = append(resources, Resource{
+				resource := Resource{
 					Name:    src.Name,
 					Version: res.Version,
 					Type:    res.Type,
 					Value:   reference,
-				})
+					Local:   src.Local,
+				}
+				if src.ResourceName != src.Name {
+					resource.Alias = src.ResourceName
+				}
+				resources = append(resources, resource)
 			}
 		case ResourceTypeHelmChart:
 			var spec accessv1.OCIImage
@@ -337,18 +348,24 @@ func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector
 
 	result := &utilscomponentvector.Components{}
 	foundNames := sets.New[string]()
-	for _, component := range c.GetSortedComponents() {
-		ocmName, version, err := component.ExtractNameAndVersion()
+	for _, cref := range c.GetSortedComponents() {
+		ocmName, version, err := cref.ExtractNameAndVersion()
 		if err != nil {
-			return nil, fmt.Errorf("failed to extract name and version from component reference %s: %w", component, err)
+			return nil, fmt.Errorf("failed to extract name and version from component reference %s: %w", cref, err)
 		}
-		if vector := defaultComponentVector.FindComponentVector(ocmName); vector != nil {
-			vector.Version = version
-			result.Components = append(result.Components, &utilscomponentvector.ComponentVector{
+		if def := defaultComponentVector.FindComponentVector(ocmName); def != nil {
+			cv := &utilscomponentvector.ComponentVector{
 				Name:             ocmName,
 				Version:          version,
-				SourceRepository: vector.SourceRepository,
-			})
+				SourceRepository: def.SourceRepository,
+			}
+			result.Components = append(result.Components, cv)
+			if err := c.addGLKComponentResources(cref, cv); err != nil {
+				return nil, fmt.Errorf("could not add component resources for component %s: %w", cref, err)
+			}
+			if err := c.addGLKImageVectorOverwrite(cref, cv); err != nil {
+				return nil, fmt.Errorf("could not add image vector overwrite for component %s: %w", cref, err)
+			}
 			foundNames.Insert(ocmName)
 		}
 	}
@@ -366,6 +383,69 @@ func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector
 		return strings.Compare(a.Name, b.Name)
 	})
 	return result, nil
+}
+
+func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utilscomponentvector.ComponentVector) error {
+	m := make(map[string]any)
+	ociImageRefs := make(map[string]string)
+	imageMaps := make(map[string]string)
+	if resources := c.GetResources(cref); len(resources) > 0 {
+		for _, res := range resources {
+			switch res.Type {
+			case ResourceTypeOCIImage:
+				if !res.Local {
+					// external images are only relevant for imageVectorOverwrite
+					continue
+				}
+				addEntry(res.Value, m, res.Name, "ociImage", "ref")
+				ociImageRefs[res.Name] = res.Value
+				if res.Alias != "" {
+					addEntry(res.Value, m, res.Alias, "ociImage", "ref")
+					ociImageRefs[res.Alias] = res.Value
+				}
+			case ResourceTypeHelmChart:
+				addEntry(res.Value, m, res.Name, "helmChart", "ref")
+			case ResourceTypeHelmChartImageMap:
+				imageMaps[res.Name] = res.Value
+			default:
+				continue
+			}
+		}
+	}
+
+	for name, value := range imageMaps {
+		if m[name] == nil {
+			m[name] = map[string]any{}
+		}
+		subMap, ok := m[name].(map[string]any)
+		if !ok {
+			return fmt.Errorf("expected map for inserting helm chart image map %s for component %s", name, cref)
+		}
+		if err := insertDataFromHelmChartImageMap(subMap, value, ociImageRefs); err != nil {
+			return fmt.Errorf("could not insert data from helm chart image map %s for component %s: %w", name, cref, err)
+		}
+	}
+
+	cv.Resources = helpers.DashToCamelCaseForMapKeys(m)
+
+	return nil
+}
+
+func (c *Components) addGLKImageVectorOverwrite(cref ComponentReference, cv *utilscomponentvector.ComponentVector) error {
+	imageSources, err := c.GetImageVector(cref, false)
+	if err != nil {
+		return fmt.Errorf("could not get image vector for component %s: %w", cref, err)
+	}
+	if len(imageSources) > 0 {
+		data, err := yaml.Marshal(ocmimagevector.ImageVectorOutput{
+			Images: imageSources,
+		})
+		if err != nil {
+			return fmt.Errorf("could not marshal image vector for component %s: %w", cref, err)
+		}
+		cv.ImageVectorOverwrite = string(data)
+	}
+	return nil
 }
 
 // GetDependents returns all components that depend on the given component.
@@ -605,6 +685,7 @@ func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.Exte
 	if res.Version != "" {
 		src.Version = &res.Version
 	}
+	src.Local = res.Relation == descriptorruntime.LocalRelation
 	return &src, nil
 }
 
@@ -654,4 +735,49 @@ func SortImageSources(images []imagevector.ImageSource) {
 		}
 		return strings.Compare(ptr.Deref(a.TargetVersion, ""), ptr.Deref(b.TargetVersion, ""))
 	})
+}
+
+func insertDataFromHelmChartImageMap(resourceMap map[string]any, value string, ociImageReferences map[string]string) error {
+	data, err := helpers.ParseHelmChartImageMap([]byte(value))
+	if err != nil {
+		return err
+	}
+	result := map[string]any{}
+	for _, imgMapping := range data.ImageMapping {
+		current := map[string]any{}
+		result[imgMapping.Resource.Name] = current
+		ref := ociImageReferences[imgMapping.Resource.Name]
+		if ref == "" {
+			return fmt.Errorf("OCI image reference for resource '%s' not found", imgMapping.Resource.Name)
+		}
+		refParts := strings.SplitN(ref, ":", 2)
+		if len(refParts) != 2 {
+			return fmt.Errorf("invalid OCI image reference '%s' for resource '%s'", ref, imgMapping.Resource.Name)
+		}
+		repository := refParts[0]
+		tag := refParts[1]
+		addEntryWithDotKey(current, imgMapping.Repository, repository)
+		addEntryWithDotKey(current, imgMapping.Tag, tag)
+	}
+	resourceMap[ResourceTypeHelmChartImageMap] = result
+	return nil
+}
+
+func addEntryWithDotKey(m map[string]any, key, value string) {
+	parts := strings.Split(key, ".")
+	addEntry(value, m, parts...)
+}
+
+func addEntry(value string, m map[string]any, keys ...string) {
+	if len(keys) < 1 {
+		return
+	}
+	current := m
+	for _, key := range keys[:len(keys)-1] {
+		if _, exists := current[key]; !exists {
+			current[key] = make(map[string]any)
+		}
+		current = current[key].(map[string]any)
+	}
+	current[keys[len(keys)-1]] = value
 }

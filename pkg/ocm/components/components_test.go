@@ -6,6 +6,7 @@ package components_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 	descriptorruntime "ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
+	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
@@ -22,9 +24,10 @@ import (
 const resourcesDir = "testdata"
 
 const (
-	refShootCertService = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
-	refGardener         = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
-	refRoot             = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
+	refShootCertService               = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
+	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
+	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
+	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
 
 var _ = Describe("Components", func() {
@@ -90,6 +93,7 @@ var _ = Describe("Components", func() {
 				Version: "v1.53.0",
 				Type:    "ociImage",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
+				Local:   true,
 			},
 			components.Resource{
 				Name:    "extension-test",
@@ -101,7 +105,7 @@ var _ = Describe("Components", func() {
 				Name:    "extension-test",
 				Version: "v1.53.0",
 				Type:    "helmchart-imagemap",
-				Value:   "fake content",
+				Value:   "{\"helmchartResource\": {\"name\": \"extension-test\"}, \"imageMapping\": []}",
 			},
 			components.Resource{
 				Name:    "cert-management",
@@ -242,7 +246,7 @@ var _ = Describe("Components", func() {
 				Name:    "resource-manager",
 				Version: "v1.128.3",
 				Type:    "helmchart-imagemap",
-				Value:   "fake content",
+				Value:   "{\"helmchartResource\": {\"name\": \"resource-manager\"}, \"imageMapping\": []}",
 			},
 			components.Resource{
 				Name:    "gardenlet",
@@ -254,19 +258,94 @@ var _ = Describe("Components", func() {
 				Name:    "gardenlet",
 				Version: "v1.128.3",
 				Type:    "helmchart-imagemap",
-				Value:   "fake content",
+				Value:   gardenletHelmChartImageMapContent,
 			},
 			components.Resource{
 				Name:    "gardenlet",
 				Version: "v1.128.3",
 				Type:    "ociImage",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11",
+				Local:   true,
 			},
 		))
+
+		By("GLK componentvector")
 		componentVersions, err := c.GetGLKComponents(true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(componentVersions.Components).To(HaveLen(1))
 		Expect(componentVersions.Components[0].Version).To(Equal("v1.128.3"))
+
+		data, err := yaml.Marshal(componentVersions.Components[0].Resources)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(data)).To(Equal(`admissionController:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
+apiserver:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
+controllerManager:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
+controlplane:
+  helmChart:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/controlplane:v1.128.3@sha256:9916e1dbe8de5bcc354c41adc52b51fe7ef67cc2e1f34d44d1ec51ff06d962e5
+  helmchartImagemap: {}
+gardenerAdmissionController:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
+gardenerApiserver:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
+gardenerControllerManager:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
+gardenerNodeAgent:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
+gardenerResourceManager:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+gardenerScheduler:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
+gardenlet:
+  helmChart:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
+  helmchartImagemap:
+    gardenlet:
+      image:
+        repository: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet
+        tag: v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
+nodeAgent:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
+operator:
+  helmChart:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
+  helmchartImagemap: {}
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
+resourceManager:
+  helmChart:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+  helmchartImagemap: {}
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+scheduler:
+  ociImage:
+    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
+`))
+		Expect(componentVersions.Components[0].ImageVectorOverwrite).To(ContainSubstring(`images:
+- name: alertmanager
+  repository: registry.example.com/path/to/repo/quay_io/prometheus/alertmanager
+  tag: v0.28.1@sha256:ec1de8cc83bac6ec73b7c8bd0530341d70d8407e5749d561681654731881f351
+  version: v0.28.1
+- name: alpine-conntrack
+  repository: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack
+  tag: 3.21.3@sha256:d776104e96516887cd33abb4fc4786fb6c1872cf3e03bd2d53b93c1652b947fa
+  version: 3.21.3`))
 	})
 
 	It("should produce correct image vector for gardener/gardener with original reference", func() {
@@ -411,7 +490,11 @@ func addFakeLocalBlobs(desc *descriptorruntime.Descriptor) components.Blobs {
 			if blobs == nil {
 				blobs = components.Blobs{}
 			}
-			blobs[ociaccess.ResourceToBlobKey(res)] = []byte("fake content")
+			json := fmt.Sprintf(`{"helmchartResource": {"name": %q}, "imageMapping": []}`, res.Name)
+			if res.Name == "gardenlet" {
+				json = gardenletHelmChartImageMapContent
+			}
+			blobs[ociaccess.ResourceToBlobKey(res)] = []byte(json)
 		}
 	}
 	return blobs
