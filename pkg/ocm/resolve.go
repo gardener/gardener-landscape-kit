@@ -26,13 +26,16 @@ type ocmComponentsResolver struct {
 	cfg          *configv1alpha1.LandscapeKitConfiguration
 	landscapeDir string
 	outputDir    string
+	debug        bool
+	workers      int
 	components   *components.Components
 	repos        []*ociaccess.RepoAccess
 }
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
-func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string) error {
+func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string,
+	workers int, debug bool) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
@@ -48,6 +51,8 @@ func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfi
 		cfg:          cfg,
 		landscapeDir: landscapeDir,
 		outputDir:    outputDir,
+		debug:        debug,
+		workers:      workers,
 		components:   components.NewComponents(),
 		repos:        repos,
 	}
@@ -67,12 +72,14 @@ func (r *ocmComponentsResolver) resolve(ctx context.Context) error {
 		return err
 	}
 
-	if err := r.writeAllImageVectors(); err != nil {
-		return err
-	}
-
-	if err := r.writeComponentResources(); err != nil {
-		return err
+	if r.debug {
+		r.log.Info("Debug mode is enabled, writing additional debug files.")
+		if err := r.writeAllImageVectors(); err != nil {
+			return err
+		}
+		if err := r.writeComponentResources(); err != nil {
+			return err
+		}
 	}
 
 	if err := r.writeComponentList(); err != nil {
@@ -129,7 +136,7 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 		return r.components.AddComponentDependencies(descriptor, blobs)
 	}
 
-	walker := components.NewComponentWalker(r.log, r.components, 5, itemFunc)
+	walker := components.NewComponentWalker(r.log, r.components, r.workers, itemFunc)
 	rootComponentReference := components.ComponentReferenceFromNameAndVersion(r.cfg.OCM.RootComponent.Name, r.cfg.OCM.RootComponent.Version)
 
 	if err := walker.Walk(rootComponentReference); err != nil {
