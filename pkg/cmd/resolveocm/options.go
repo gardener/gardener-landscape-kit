@@ -17,6 +17,7 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	configv1alpha1validation "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var configDecoder runtime.Decoder
@@ -76,12 +77,12 @@ func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
 }
 
-func (o *Options) effectiveOutputDir(subdir string) string {
-	outputDir := path.Join(o.LandscapeDir, "ocm", o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
-	if subdir != "" {
-		outputDir = path.Join(outputDir, subdir)
-	}
-	return outputDir
+func (o *Options) effectiveOutputDir() string {
+	return path.Join(o.baseDir(), o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
+}
+
+func (o *Options) baseDir() string {
+	return path.Join(o.LandscapeDir, files.GLKSystemDirName, "ocm")
 }
 
 func (o *Options) loadConfigFile(filename string) error {
