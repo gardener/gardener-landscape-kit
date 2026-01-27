@@ -6,6 +6,9 @@ package resolveocm
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 
@@ -49,7 +52,23 @@ gardner-landscape-kit resolve-ocm-components \
 }
 
 func run(_ context.Context, opts *Options) error {
-	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", opts.effectiveOutputDir(""), "rootComponent", opts.Config.OCM.RootComponent)
+	outputDir := opts.effectiveOutputDir()
+	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", outputDir, "rootComponent", opts.Config.OCM.RootComponent)
 
-	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.LandscapeDir, opts.effectiveOutputDir(""))
+	if err := writeGitIgnoreFile(opts); err != nil {
+		return err
+	}
+
+	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.LandscapeDir, outputDir)
+}
+
+func writeGitIgnoreFile(opts *Options) error {
+	baseDir := opts.baseDir()
+	if err := os.MkdirAll(baseDir, 0700); err != nil {
+		return fmt.Errorf("failed to create output base directory %s: %w", baseDir, err)
+	}
+	if err := os.WriteFile(path.Join(baseDir, ".gitignore"), []byte("/*"), 0600); err != nil {
+		return fmt.Errorf("failed to write .gitignore file to output base directory %s: %w", baseDir, err)
+	}
+	return nil
 }
