@@ -18,6 +18,10 @@ type ComponentVector struct {
 	SourceRepository string `json:"sourceRepository"`
 	// Version is the version of the component.
 	Version string `json:"version"`
+	// Resources is an optional list of values representing resources of the component.
+	Resources map[string]any `json:"resources,omitempty"`
+	// ImageVectorOverwrite is an optional image vector overwrite for the component.
+	ImageVectorOverwrite string `json:"imageVectorOverwrite,omitempty"`
 }
 
 // Interface is a marker interface for component vectors.
