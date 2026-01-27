@@ -1,7 +1,7 @@
 components:
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
-  version: v1.134.3
+  version: v1.135.0
 - name: github.com/gardener/gardener-extension-networking-calico
   sourceRepository: https://github.com/gardener/gardener-extension-networking-calico
   version: v1.55.0
