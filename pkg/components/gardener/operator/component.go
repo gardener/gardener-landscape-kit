@@ -6,10 +6,14 @@ package operator
 
 import (
 	"embed"
+	"fmt"
 	"path"
+
+	"github.com/gardener/gardener/pkg/utils"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	ocmcomponents "github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -69,19 +73,44 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
-	gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
-	if !exists {
-		opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
-	}
-
-	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
-		"version": gardenerVersion,
-	})
+	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, nil)
 	if err != nil {
 		return err
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func getRenderValues(opts components.Options) (map[string]any, error) {
+	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardener)
+	if cv == nil || len(cv.Resources) == 0 {
+		gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
+		if !exists {
+			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
+		}
+		return map[string]any{
+			"repository": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/operator",
+			"tag":        gardenerVersion,
+		}, nil
+	}
+
+	ref := cv.GetTemplateResourceValue("operator", "ociImage", "ref")
+	if ref == nil {
+		return nil, fmt.Errorf("failed to get operator OCI image reference from component resources")
+	}
+	refStr, ok := ref.(string)
+	if !ok {
+		return nil, fmt.Errorf("operator OCI image reference is not a string")
+	}
+	repository, tag, err := ocmcomponents.SplitOCIImageReference(refStr)
+	if err != nil {
+		return nil, err
+	}
+
+	values := cv.TemplateValues()
+	values["repository"] = repository
+	values["tag"] = tag
+	return values, nil
 }
 
 func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
@@ -90,10 +119,16 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+	values, err := getRenderValues(opts)
+	if err != nil {
+		return err
+	}
+
+	values = utils.MergeMaps(values, map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
 		return err
 	}
