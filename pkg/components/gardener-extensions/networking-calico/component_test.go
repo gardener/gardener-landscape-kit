@@ -5,6 +5,8 @@
 package calico_test
 
 import (
+	"os"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,6 +17,7 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	networking_calico "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-calico"
+	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -84,4 +87,59 @@ var _ = Describe("Component Generation", func() {
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/networking-calico"))
 		})
 	})
+
+	DescribeTable("Kustomize",
+		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+			component := networking_calico.NewComponent()
+			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			Expect(err).ToNot(HaveOccurred())
+			result, err := testutils.KustomizeComponent(fs, component, "components/gardener-extensions/networking-calico", componentsVectorFile)
+			Expect(err).ToNot(HaveOccurred())
+			expected, err := os.ReadFile(expectedFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(result)).To(Equal(string(expected)))
+		},
+		Entry("plain",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-networking-calico", "v1.2.3").Build(),
+			"testdata/expected-kustomize-plain.yaml"),
+		Entry("ocm",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-networking-calico", "v1.2.3").
+				WithImageVectorOverwrite("imageVectorOverwriteContent").
+				WithResourcesYAML(`
+admissionCalicoApplication:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionAdmissionCalico:
+      image:
+        repository: test-repo/path/gardener/extensions/admission-calico
+        tag: v1.2.3
+admissionCalicoRuntime:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionAdmissionCalico:
+      image:
+        repository: test-repo/path/gardener/extensions/admission-calico
+        tag: v1.2.3
+cniPlugins:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/cni-plugins:v1.2.3
+gardenerExtensionAdmissionCalico:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-calico:v1.2.3
+gardenerExtensionNetworkingCalico:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/networking-calico:v1.2.3
+networkingCalico:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionNetworkingCalico:
+      image:
+        repository: test-repo/path/gardener/extensions/networking-calico
+        tag: v1.2.3
+`).Build(),
+			"testdata/expected-kustomize-ocm.yaml"),
+	)
 })
