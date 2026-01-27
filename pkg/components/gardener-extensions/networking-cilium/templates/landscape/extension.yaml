@@ -5,6 +5,27 @@ metadata:
 spec:
   deployment:
     admission:
-      values: {}
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionCiliumRuntime.helmChart.ref }}
+      values:
+        {{- if .resources.admissionCiliumRuntime.helmchartImagemap }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionCiliumRuntime.helmchartImagemap.gardenerExtensionAdmissionCilium) }}
+        {{- end }}
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionCiliumApplication.helmChart.ref }}
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.networkingCilium.helmChart.ref }}
+      values:
+        {{- if .resources.networkingCilium.helmchartImagemap }}
+{{ indent 8 (toIndentYAML 2 .resources.networkingCilium.helmchartImagemap.gardenerExtensionNetworkingCilium) }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+  {{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
