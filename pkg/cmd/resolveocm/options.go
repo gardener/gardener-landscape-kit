@@ -40,6 +40,12 @@ type Options struct {
 
 	// Config is the path to the landscape kit configuration file.
 	Config *configv1alpha1.LandscapeKitConfiguration
+
+	// Debug enables additional debug output files like resources and image vectors.
+	Debug bool
+
+	// Workers is the number of concurrent workers to use for resolving OCM components.
+	Workers int
 }
 
 // Validate validates the options.
@@ -75,6 +81,8 @@ func (o *Options) complete() error {
 func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.LandscapeDir, "landscape-dir", "l", "", "Path to a directory containing the landscape specific configuration files, aka overlays.")
 	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
+	fs.BoolVar(&o.Debug, "debug", false, "Enable debug output files like resources and imagevectors.")
+	fs.IntVar(&o.Workers, "workers", 10, "Number of concurrent workers to use for resolving OCM components.")
 }
 
 func (o *Options) effectiveOutputDir() string {
