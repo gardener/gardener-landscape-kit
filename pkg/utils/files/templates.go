@@ -8,10 +8,10 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
-	"html/template"
 	"path"
+	"text/template"
 
-	"github.com/Masterminds/sprig/v3"
+	"github.com/go-sprout/sprout/sprigin"
 )
 
 // RenderTemplateFiles renders all template files in the given templateDir from the provided embed.FS using the provided vars.
@@ -54,7 +54,7 @@ func renderFilesInDir(templateFS embed.FS, templateDir, currentDir string, vars 
 }
 
 func renderTemplate(fileContents []byte, fileName string, vars map[string]any) ([]byte, string, error) {
-	fileTemplate, err := template.New(fileName).Funcs(sprig.TxtFuncMap()).Parse(string(fileContents))
+	fileTemplate, err := template.New(fileName).Funcs(sprigin.TxtFuncMap()).Parse(string(fileContents))
 	if err != nil {
 		return nil, "", fmt.Errorf("error parsing template '%s': %w", fileName, err)
 	}
