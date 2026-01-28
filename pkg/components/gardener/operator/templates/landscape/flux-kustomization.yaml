@@ -4,10 +4,11 @@ metadata:
   name: gardener-operator
   namespace: garden
 spec:
-  interval: 30m
-  path: {{ .landscapeComponentPath }}
-  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  path: {{ .landscapeComponentPath }}
+  prune: true
+  interval: 30m
+  wait: true
