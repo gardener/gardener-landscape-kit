@@ -62,7 +62,6 @@ The following dependencies have been updated:\n\
       matchUpdateTypes: ["major", "minor"],
       enabled: false,
       matchPackageNames: [ // GENERATOR-PIN
-        "github.com/Masterminds/sprig/v3",
         "github.com/ahmetb/gen-crd-api-reference-docs",
         "github.com/elliotchance/orderedmap/v3",
         "github.com/go-logr/logr",
@@ -89,6 +88,7 @@ The following dependencies have been updated:\n\
         "github.com/BurntSushi/toml",
         "github.com/Masterminds/goutils",
         "github.com/Masterminds/semver/v3",
+        "github.com/Masterminds/sprig/v3",
         "github.com/PaesslerAG/gval",
         "github.com/PaesslerAG/jsonpath",
         "github.com/andybalholm/brotli",
