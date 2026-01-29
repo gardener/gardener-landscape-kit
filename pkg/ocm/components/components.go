@@ -358,7 +358,7 @@ func (c *Components) DumpComponentRefListAsYAML() (string, error) {
 }
 
 // GetGLKComponents returns the components as fetched from the OCM component descriptors.
-func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector.Components, error) {
+func (c *Components) GetGLKComponents(customComponents sets.Set[string], ignoreMissing bool) (*utilscomponentvector.Components, error) {
 	componentVectorBytes := componentvector.DefaultComponentsYAML
 	defaultComponentVector, err := utilscomponentvector.New(componentVectorBytes)
 	if err != nil {
@@ -372,12 +372,21 @@ func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract name and version from component reference %s: %w", cref, err)
 		}
+		var cv *utilscomponentvector.ComponentVector
 		if def := defaultComponentVector.FindComponentVector(ocmName); def != nil {
-			cv := &utilscomponentvector.ComponentVector{
+			cv = &utilscomponentvector.ComponentVector{
 				Name:             ocmName,
 				Version:          version,
 				SourceRepository: def.SourceRepository,
 			}
+		} else if customComponents.Has(ocmName) {
+			cv = &utilscomponentvector.ComponentVector{
+				Name:             ocmName,
+				Version:          version,
+				SourceRepository: "https://some.where/unknown/custom/repo", // TODO(MartinWeindel) SourceRepository is mandatory, but we don't have it for custom components
+			}
+		}
+		if cv != nil {
 			result.Components = append(result.Components, cv)
 			if err := c.addGLKComponentResources(cref, cv); err != nil {
 				return nil, fmt.Errorf("could not add component resources for component %s: %w", cref, err)
@@ -394,6 +403,7 @@ func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector
 
 	if !ignoreMissing {
 		missingNames := sets.New[string](defaultComponentVector.ComponentNames()...)
+		missingNames.Insert(customComponents.UnsortedList()...)
 		missingNames.Delete(foundNames.UnsortedList()...)
 		if len(missingNames) > 0 {
 			missing := missingNames.UnsortedList()

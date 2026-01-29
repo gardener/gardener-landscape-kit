@@ -83,11 +83,11 @@ func (cv *ComponentVector) TemplateValues() map[string]any {
 func (cv *ComponentVector) GetTemplateResourceValue(keys ...string) any {
 	var current any = cv.Resources
 	for _, key := range keys {
-		if currentMap, ok := current.(map[string]any); ok {
-			current = currentMap[key]
-		} else {
+		currentMap, ok := current.(map[string]any)
+		if !ok {
 			return nil
 		}
+		current = currentMap[key]
 	}
 	return current
 }
