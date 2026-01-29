@@ -14,11 +14,11 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
-	networkingCalico "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-calico"
-	networkingCilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
+	calico "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-calico"
+	cilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
 	gardenlinux "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-gardenlinux"
 	suse "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-suse-chost"
-	providerAWS "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
+	aws "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -28,9 +28,9 @@ var ComponentList = []func() components.Interface{
 	flux.NewComponent,
 	operator.NewComponent,
 	garden.NewComponent,
-	networkingCalico.NewComponent,
-	networkingCilium.NewComponent,
-	providerAWS.NewComponent,
+	calico.NewComponent,
+	cilium.NewComponent,
+	aws.NewComponent,
 	gardenlinux.NewComponent,
 	suse.NewComponent,
 }
