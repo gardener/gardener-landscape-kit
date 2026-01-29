@@ -13,6 +13,10 @@ const (
 	NameGardenerGardenerExtensionNetworkingCalico = "github.com/gardener/gardener-extension-networking-calico"
 	// NameGardenerGardenerExtensionNetworkingCilium is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-networking-cilium'.
 	NameGardenerGardenerExtensionNetworkingCilium = "github.com/gardener/gardener-extension-networking-cilium"
+	// NameGardenerGardenerExtensionOsGardenlinux is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-os-gardenlinux'.
+	NameGardenerGardenerExtensionOsGardenlinux = "github.com/gardener/gardener-extension-os-gardenlinux"
+	// NameGardenerGardenerExtensionOsSuseChost is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-os-suse-chost'.
+	NameGardenerGardenerExtensionOsSuseChost = "github.com/gardener/gardener-extension-os-suse-chost"
 	// NameGardenerGardenerExtensionProviderAws is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-aws'.
 	NameGardenerGardenerExtensionProviderAws = "github.com/gardener/gardener-extension-provider-aws"
 )
