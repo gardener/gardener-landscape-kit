@@ -63,3 +63,31 @@ func New(input []byte) (Interface, error) {
 
 	return components, nil
 }
+
+// TemplateValues returns the template values for the component vector.
+func (cv *ComponentVector) TemplateValues() map[string]any {
+	m := map[string]any{
+		"resources": cv.Resources,
+	}
+	if cv.ImageVectorOverwrite != "" {
+		m["imageVectorOverwrite"] = cv.ImageVectorOverwrite
+	}
+	if cv.ComponentImageVectorOverwrites != "" {
+		m["componentImageVectorOverwrites"] = cv.ComponentImageVectorOverwrites
+	}
+	return m
+}
+
+// GetTemplateResourceValue retrieves a nested value from the Resources map using the provided keys.
+// It returns nil if any key in the path does not exist.
+func (cv *ComponentVector) GetTemplateResourceValue(keys ...string) any {
+	var current any = cv.Resources
+	for _, key := range keys {
+		if currentMap, ok := current.(map[string]any); ok {
+			current = currentMap[key]
+		} else {
+			return nil
+		}
+	}
+	return current
+}

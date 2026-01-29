@@ -40,8 +40,3 @@ type ResourceID struct {
 type ExtendedImageVector struct {
 	Images []*ExtendedImageSource `json:"images"`
 }
-
-// ImageVectorOutput is the output format for the image vector JSON output.
-type ImageVectorOutput struct {
-	Images []imagevector.ImageSource `json:"images"`
-}

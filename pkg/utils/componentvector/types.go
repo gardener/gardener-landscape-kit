@@ -22,6 +22,8 @@ type ComponentVector struct {
 	Resources map[string]any `json:"resources,omitempty"`
 	// ImageVectorOverwrite is an optional image vector overwrite for the component.
 	ImageVectorOverwrite string `json:"imageVectorOverwrite,omitempty"`
+	// ComponentImageVectorOverwrites are optional component image vector overwrites for components deployed with this component.
+	ComponentImageVectorOverwrites string `json:"componentImageVectorOverwrites,omitempty"`
 }
 
 // Interface is a marker interface for component vectors.
