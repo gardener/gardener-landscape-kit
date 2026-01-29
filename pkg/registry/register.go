@@ -16,6 +16,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	networking_calico "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-calico"
 	networking_cilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
+	providerAws "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -27,6 +28,7 @@ var ComponentList = []func() components.Interface{
 	garden.NewComponent,
 	networking_calico.NewComponent,
 	networking_cilium.NewComponent,
+	providerAws.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.
