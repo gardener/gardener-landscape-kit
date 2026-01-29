@@ -27,3 +27,12 @@ func (cr ComponentReference) ExtractNameAndVersion() (string, string, error) {
 func (cr ComponentReference) HasName(name string) bool {
 	return strings.HasPrefix(string(cr), name+":")
 }
+
+// SplitOCIImageReference splits an OCI image reference into repository and tag.
+func SplitOCIImageReference(ref string) (string, string, error) {
+	parts := strings.SplitN(ref, ":", 2)
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
+	}
+	return parts[0], parts[1], nil
+}
