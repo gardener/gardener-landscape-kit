@@ -12,7 +12,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/utils/ptr"
@@ -22,6 +21,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
+	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
@@ -48,6 +48,8 @@ func ComponentReferenceFromNameAndVersion(name, version string) ComponentReferen
 // Dependency represents a dependency of a component, including its image vector.
 type Dependency struct {
 	ComponentReference
+
+	LocalName string
 
 	ImageVector []ocmimagevector.ExtendedImageSource
 }
@@ -86,6 +88,22 @@ type Resource struct {
 // ResourcesOutput is the output format for the resources JSON output.
 type ResourcesOutput struct {
 	Resources []Resource `json:"resources"`
+}
+
+// ComponentImageOverwritesOutput is the output format for multiple components' image vector overwrites.
+type ComponentImageOverwritesOutput struct {
+	Components []ComponentImageOverwriteOutput `json:"components"`
+}
+
+// ComponentImageOverwriteOutput is the output format for a single component's image vector overwrite.
+type ComponentImageOverwriteOutput struct {
+	Name                 string                     `json:"name"`
+	ImageVectorOverwrite ImageVectorOverwriteOutput `json:"imageVectorOverwrite"`
+}
+
+// ImageVectorOverwriteOutput is the output format for the image vector overwrite.
+type ImageVectorOverwriteOutput struct {
+	Images []imagevector.ImageSource `json:"images"`
 }
 
 // NewComponents creates a new instance of Components.
@@ -273,6 +291,7 @@ func (c *Components) AddComponentDependencies(descriptor *descriptorruntime.Desc
 		if dependency == nil {
 			dependency = &Dependency{
 				ComponentReference: cref,
+				LocalName:          ref.Name,
 			}
 			dependencies[cref] = dependency
 		}
@@ -366,6 +385,9 @@ func (c *Components) GetGLKComponents(ignoreMissing bool) (*utilscomponentvector
 			if err := c.addGLKImageVectorOverwrite(cref, cv); err != nil {
 				return nil, fmt.Errorf("could not add image vector overwrite for component %s: %w", cref, err)
 			}
+			if err := c.addGLKComponentsImageOverwrites(cref, cv); err != nil {
+				return nil, fmt.Errorf("could not add components image overwrites for component %s: %w", cref, err)
+			}
 			foundNames.Insert(ocmName)
 		}
 	}
@@ -437,13 +459,45 @@ func (c *Components) addGLKImageVectorOverwrite(cref ComponentReference, cv *uti
 		return fmt.Errorf("could not get image vector for component %s: %w", cref, err)
 	}
 	if len(imageSources) > 0 {
-		data, err := yaml.Marshal(ocmimagevector.ImageVectorOutput{
+		data, err := yaml.Marshal(ImageVectorOverwriteOutput{
 			Images: imageSources,
 		})
 		if err != nil {
 			return fmt.Errorf("could not marshal image vector for component %s: %w", cref, err)
 		}
 		cv.ImageVectorOverwrite = string(data)
+	}
+
+	return nil
+}
+
+func (c *Components) addGLKComponentsImageOverwrites(cref ComponentReference, cv *utilscomponentvector.ComponentVector) error {
+	var componentsImageOverwrites ComponentImageOverwritesOutput
+	for _, dep := range c.dependencies[cref] {
+		if dep.ComponentReference == cref {
+			continue
+		}
+		componentImageSources, err := c.GetImageVector(dep.ComponentReference, false)
+		if err != nil {
+			return fmt.Errorf("could not get image vector for dependent component %s of component %s: %w", dep.ComponentReference, cref, err)
+		}
+		if len(componentImageSources) == 0 {
+			continue
+		}
+		componentsImageOverwrites.Components = append(componentsImageOverwrites.Components, ComponentImageOverwriteOutput{
+			Name: dep.LocalName,
+			ImageVectorOverwrite: ImageVectorOverwriteOutput{
+				Images: componentImageSources,
+			},
+		})
+	}
+
+	if len(componentsImageOverwrites.Components) > 0 {
+		data, err := yaml.Marshal(componentsImageOverwrites)
+		if err != nil {
+			return fmt.Errorf("could not marshal dependent components image vector for component %s: %w", cref, err)
+		}
+		cv.ComponentImageVectorOverwrites = string(data)
 	}
 	return nil
 }
@@ -750,12 +804,10 @@ func insertDataFromHelmChartImageMap(resourceMap map[string]any, value string, o
 		if ref == "" {
 			return fmt.Errorf("OCI image reference for resource '%s' not found", imgMapping.Resource.Name)
 		}
-		refParts := strings.SplitN(ref, ":", 2)
-		if len(refParts) != 2 {
+		repository, tag, err := SplitOCIImageReference(ref)
+		if err != nil {
 			return fmt.Errorf("invalid OCI image reference '%s' for resource '%s'", ref, imgMapping.Resource.Name)
 		}
-		repository := refParts[0]
-		tag := refParts[1]
 		addEntryWithDotKey(current, imgMapping.Repository, repository)
 		addEntryWithDotKey(current, imgMapping.Tag, tag)
 	}

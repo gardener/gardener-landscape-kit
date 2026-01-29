@@ -18,7 +18,6 @@ import (
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
-	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
@@ -209,7 +208,7 @@ func writeImageVector(outputDir string, cref components.ComponentReference, imag
 	if len(images) == 0 {
 		return nil
 	}
-	return writeObject(outputDir, cref, ocmimagevector.ImageVectorOutput{
+	return writeObject(outputDir, cref, components.ImageVectorOverwriteOutput{
 		Images: images,
 	})
 }
