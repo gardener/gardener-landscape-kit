@@ -10,4 +10,4 @@ components:
   version: v1.46.0
 - name: github.com/gardener/gardener-extension-provider-aws
   sourceRepository: https://github.com/gardener/gardener-extension-provider-aws
-  version: v1.67.0
+  version: v1.67.2
