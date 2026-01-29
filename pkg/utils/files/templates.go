@@ -44,7 +44,7 @@ func renderFilesInDir(templateFS embed.FS, templateDir, currentDir string, vars 
 			return nil, err
 		}
 
-		if fileContents, fileName, err = renderTemplate(fileContents, fileName, vars); err != nil {
+		if fileContents, fileName, err = RenderTemplate(fileContents, fileName, vars); err != nil {
 			return nil, err
 		}
 		objects[fileName] = fileContents
@@ -53,7 +53,8 @@ func renderFilesInDir(templateFS embed.FS, templateDir, currentDir string, vars 
 	return objects, nil
 }
 
-func renderTemplate(fileContents []byte, fileName string, vars map[string]any) ([]byte, string, error) {
+// RenderTemplate renders the given fileContents as a Go text/template using the provided vars.
+func RenderTemplate(fileContents []byte, fileName string, vars map[string]any) ([]byte, string, error) {
 	fileTemplate, err := template.New(fileName).Funcs(sprigin.TxtFuncMap()).Parse(string(fileContents))
 	if err != nil {
 		return nil, "", fmt.Errorf("error parsing template '%s': %w", fileName, err)

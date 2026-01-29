@@ -270,7 +270,7 @@ var _ = Describe("Components", func() {
 		))
 
 		By("GLK componentvector")
-		componentVersions, err := c.GetGLKComponents(true)
+		componentVersions, err := c.GetGLKComponents(nil, true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(componentVersions.Components).To(HaveLen(1))
 		Expect(componentVersions.Components[0].Version).To(Equal("v1.128.3"))
