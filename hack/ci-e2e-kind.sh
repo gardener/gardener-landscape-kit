@@ -9,10 +9,11 @@ set -o pipefail
 set -o errexit
 
 source $GARDENER_HACK_DIR/ci-common.sh
+source $(dirname $0)/ci-common.sh
 
 clamp_mss_to_pmtu
 
-ensure_local_gardener_cloud_hosts
+glk_ensure_local_gardener_cloud_hosts
 
 # test setup
 make kind-up e2e-prepare
