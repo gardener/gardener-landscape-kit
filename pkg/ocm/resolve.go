@@ -10,15 +10,23 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	"sigs.k8s.io/yaml"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
+)
+
+const (
+	// CustomOCMComponentNameFilename is the filename containing a custom OCM component name.
+	CustomOCMComponentNameFilename = "ocm-component-name"
 )
 
 type ocmComponentsResolver struct {
@@ -195,7 +203,11 @@ func (r *ocmComponentsResolver) writeComponentList() error {
 }
 
 func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
-	componentVersions, err := r.components.GetGLKComponents(false)
+	customComponents, err := r.findCustomComponents()
+	if err != nil {
+		return err
+	}
+	componentVersions, err := r.components.GetGLKComponents(customComponents, false)
 	if err != nil {
 		return err
 	}
@@ -209,6 +221,27 @@ func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
 	}
 	r.log.Info(fmt.Sprintf("Wrote components file to %s", filename))
 	return nil
+}
+
+func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error) {
+	customComponents := sets.New[string]()
+
+	if err := filepath.WalkDir(r.landscapeDir, func(path string, d os.DirEntry, err error) error {
+		if d.IsDir() || d.Name() != CustomOCMComponentNameFilename {
+			return nil
+		}
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("failed to read custom OCM component name file %s: %w", path, err)
+		}
+		name := strings.TrimSpace(string(content))
+		customComponents.Insert(name)
+		r.log.Info("Found custom OCM component", "name", name, "file", path)
+		return nil
+	}); err != nil {
+		return nil, fmt.Errorf("failed to walk landscape directory %s: %w", r.landscapeDir, err)
+	}
+	return customComponents, nil
 }
 
 func writeImageVector(outputDir string, cref components.ComponentReference, images []imagevector.ImageSource) error {
