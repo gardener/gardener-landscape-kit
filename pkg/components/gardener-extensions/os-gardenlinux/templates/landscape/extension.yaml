@@ -1,0 +1,10 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  name: os-gardenlinux
+spec:
+  deployment:
+    admission:
+      values:
+    extension:
+      values:

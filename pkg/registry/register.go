@@ -16,6 +16,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	networkingCalico "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-calico"
 	networkingCilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
+	gardenlinux "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-gardenlinux"
 	suse "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-suse-chost"
 	providerAWS "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
@@ -30,6 +31,7 @@ var ComponentList = []func() components.Interface{
 	networkingCalico.NewComponent,
 	networkingCilium.NewComponent,
 	providerAWS.NewComponent,
+	gardenlinux.NewComponent,
 	suse.NewComponent,
 }
 
