@@ -60,7 +60,14 @@ var _ = Describe("Garden Reconciliation", Label("Garden", "default"), Ordered, f
 			extOps             operatorv1alpha1.ExtensionList
 			expectedExtensions []types.GomegaMatcher
 		)
-		for _, extOpName := range []string{"provider-local", "networking-calico", "networking-cilium"} {
+		for _, extOpName := range []string{
+			"networking-calico",
+			"networking-cilium",
+			"os-gardenlinux",
+			"os-suse-chost",
+			"provider-aws",
+			"provider-local",
+		} {
 			expectedExtensions = append(expectedExtensions, MatchFields(IgnoreExtras, Fields{
 				"ObjectMeta": MatchFields(IgnoreExtras, Fields{
 					"Name": Equal(extOpName),
