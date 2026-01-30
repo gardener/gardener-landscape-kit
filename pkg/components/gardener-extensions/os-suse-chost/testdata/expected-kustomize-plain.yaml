@@ -1,0 +1,19 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: os-gardenlinux
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux:v1.2.3
+  resources:
+  - kind: OperatingSystemConfig
+    type: gardenlinux
+  - kind: OperatingSystemConfig
+    type: gardenlinux-fips
+  - kind: OperatingSystemConfig
+    type: memoryone-gardenlinux
