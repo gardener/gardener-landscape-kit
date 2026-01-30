@@ -41,15 +41,33 @@ jobs:
             name: gardener-landscape-kit
             os: darwin
             architecture: amd64
+        - name: gardener-landscape-kit-darwin-arm64
+          type: ocm-resource
+          id:
+            name: gardener-landscape-kit
+            os: darwin
+            architecture: arm64
         - name: gardener-landscape-kit-linux-amd64
           type: ocm-resource
           id:
             name: gardener-landscape-kit
             os: linux
             architecture: amd64
+        - name: gardener-landscape-kit-linux-arm64
+          type: ocm-resource
+          id:
+            name: gardener-landscape-kit
+            os: linux
+            architecture: arm64
         - name: gardener-landscape-kit-windows-amd64
           type: ocm-resource
           id:
             name: gardener-landscape-kit
             os: windows
             architecture: amd64
+        - name: gardener-landscape-kit-windows-arm64
+          type: ocm-resource
+          id:
+            name: gardener-landscape-kit
+            os: windows
+            architecture: arm64
