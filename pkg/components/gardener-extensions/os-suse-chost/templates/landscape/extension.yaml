@@ -5,4 +5,14 @@ metadata:
 spec:
   deployment:
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.osSuseChost.helmChart.ref }}
+      values:
+        {{- if .resources.osSuseChost.helmchartImagemap }}
+{{ indent 8 (toIndentYAML 2 .resources.osSuseChost.helmchartImagemap.gardenerExtensionOsSuseChost) }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}

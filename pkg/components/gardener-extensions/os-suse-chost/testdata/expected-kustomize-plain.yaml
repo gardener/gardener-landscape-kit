@@ -3,17 +3,15 @@ kind: Extension
 metadata:
   annotations:
     security.gardener.cloud/pod-security-enforce: baseline
-  name: os-gardenlinux
+  name: os-suse-chost
 spec:
   deployment:
     extension:
       helm:
         ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux:v1.2.3
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost:v1.2.3
   resources:
   - kind: OperatingSystemConfig
-    type: gardenlinux
+    type: suse-chost
   - kind: OperatingSystemConfig
-    type: gardenlinux-fips
-  - kind: OperatingSystemConfig
-    type: memoryone-gardenlinux
+    type: memoryone-chost

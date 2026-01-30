@@ -5,6 +5,8 @@
 package suse_test
 
 import (
+	"os"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,6 +17,7 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	os_suse_chost "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-suse-chost"
+	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -84,4 +87,37 @@ var _ = Describe("Component Generation", func() {
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/os-suse-chost"))
 		})
 	})
+
+	DescribeTable("Kustomize",
+		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+			component := os_suse_chost.NewComponent()
+			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			Expect(err).ToNot(HaveOccurred())
+			result, err := testutils.KustomizeComponent(fs, component, "components/gardener-extensions/os-suse-chost", componentsVectorFile)
+			Expect(err).ToNot(HaveOccurred())
+			expected, err := os.ReadFile(expectedFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(result)).To(Equal(string(expected)))
+		},
+		Entry("plain",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").Build(),
+			"testdata/expected-kustomize-plain.yaml"),
+		Entry("ocm",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").
+				WithImageVectorOverwrite("imageVectorOverwriteContent").
+				WithResourcesYAML(`
+gardenerExtensionOsSuseChost:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/os-suse-chost:v1.2.3
+osSuseChost:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/os-suse-chost:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionOsSuseChost:
+      image:
+        repository: test-repo/path/gardener/extensions/os-suse-chost
+        tag: v1.2.3
+`).Build(),
+			"testdata/expected-kustomize-ocm.yaml"),
+	)
 })
