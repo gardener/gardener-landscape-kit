@@ -60,6 +60,9 @@ func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
 
 func (r *registry) findAndRenderCustomComponents(opts components.Options) error {
 	return opts.GetFilesystem().Walk(opts.GetTargetPath(), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() || info.Name() != ocm.CustomOCMComponentNameFilename {
 			return nil
 		}
@@ -82,6 +85,9 @@ func (r *registry) renderCustomComponents(ocmComponentName, componentDir string,
 	}
 
 	return opts.GetFilesystem().Walk(componentDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() || !strings.HasSuffix(info.Name(), ".template") {
 			return nil
 		}
