@@ -4,7 +4,5 @@ metadata:
   name: os-suse-chost
 spec:
   deployment:
-    admission:
-      values:
     extension:
       values:
