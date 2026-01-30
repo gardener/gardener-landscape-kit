@@ -6,11 +6,12 @@ on:
       next-version:
         type: choice
         options:
-          - bump-patch
+        - bump-minor
+        - bump-patch
+        description: 'Select the type of version bump for the next release.'
 
 jobs:
   build:
-    if: startsWith(github.ref, 'refs/heads/release-v')
     uses: ./.github/workflows/build.yaml
     permissions:
       contents: write
@@ -20,7 +21,6 @@ jobs:
       mode: release
 
   release-to-github-and-bump:
-    if: startsWith(github.ref, 'refs/heads/release-v')
     uses: gardener/cc-utils/.github/workflows/release.yaml@master
     needs:
       - build
