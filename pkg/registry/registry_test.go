@@ -369,10 +369,41 @@ var _ = Describe("Registry", func() {
 
 		It("should return an error if an unknown component is excluded", func() {
 			config.Components = &v1alpha1.ComponentsConfiguration{
-				Exclude: []string{"unknown"},
+				Exclude: []string{"unknown", "mockComp2", "unknown2"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(`configuration contains invalid component excludes: unknown - available component names are: mockComp1, mockComp2, mockComp3`))
+			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(And(
+				ContainSubstring(`configuration contains invalid component excludes`),
+				ContainSubstring(`unknown`),
+				ContainSubstring(`unknown2`),
+				ContainSubstring(`available component names are: mockComp1, mockComp2, mockComp3`),
+			)))
+		})
+
+		It("should register only included components", func() {
+			config.Components = &v1alpha1.ComponentsConfiguration{
+				Include: []string{"mockComp2", "mockComp3"},
+			}
+
+			Expect(registry.RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(reg.GenerateBase(options)).To(Succeed())
+
+			Expect(mockComp1.generateBaseCalled).To(BeFalse())
+			Expect(mockComp2.generateBaseCalled).To(BeTrue())
+			Expect(mockComp3.generateBaseCalled).To(BeTrue())
+		})
+
+		It("should return an error if an unknown component is included", func() {
+			config.Components = &v1alpha1.ComponentsConfiguration{
+				Include: []string{"unknown", "mockComp1", "unknown2"},
+			}
+
+			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(And(
+				ContainSubstring(`configuration contains invalid component includes`),
+				ContainSubstring(`unknown`),
+				ContainSubstring(`unknown2`),
+				ContainSubstring(`available component names are: mockComp1, mockComp2, mockComp3`),
+			)))
 		})
 
 		It("should succeed when config is nil", func() {

@@ -33,6 +33,9 @@ type ComponentsConfiguration struct {
 	// Exclude is a list of component names to exclude.
 	// +optional
 	Exclude []string `json:"exclude,omitempty"`
+	// Include is a list of component names to include.
+	// +optional
+	Include []string `json:"include,omitempty"`
 }
 
 // GitRepository contains information the Git repository containing landscape deployments and configurations.

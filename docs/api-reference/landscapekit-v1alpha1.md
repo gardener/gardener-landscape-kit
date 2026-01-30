@@ -38,6 +38,18 @@ Resource Types:
 <p>Exclude is a list of component names to exclude.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>include</code></br>
+<em>
+[]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Include is a list of component names to include.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.GitRepository">GitRepository
