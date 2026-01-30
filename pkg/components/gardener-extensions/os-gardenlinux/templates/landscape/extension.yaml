@@ -4,7 +4,5 @@ metadata:
   name: os-gardenlinux
 spec:
   deployment:
-    admission:
-      values:
     extension:
       values:
