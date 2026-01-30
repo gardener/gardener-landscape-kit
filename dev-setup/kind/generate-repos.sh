@@ -29,6 +29,11 @@ clone_or_update_repo() {
   else
     git clone ${repoUrl} "${destDir}"
   fi
+
+  pushd "${destDir}"
+  git config user.name 'Gitops'
+  git config user.email 'gitops@gardener'
+  popd > /dev/null
 }
 
 generate_base() {
