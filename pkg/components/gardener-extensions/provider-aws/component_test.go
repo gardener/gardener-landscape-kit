@@ -5,6 +5,8 @@
 package aws_test
 
 import (
+	"os"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,6 +17,7 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	provider_aws "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
+	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -84,4 +87,56 @@ var _ = Describe("Component Generation", func() {
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/provider-aws"))
 		})
 	})
+
+	DescribeTable("Kustomize",
+		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+			component := provider_aws.NewComponent()
+			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			Expect(err).ToNot(HaveOccurred())
+			result, err := testutils.KustomizeComponent(fs, component, "components/gardener-extensions/provider-aws", componentsVectorFile)
+			Expect(err).ToNot(HaveOccurred())
+			expected, err := os.ReadFile(expectedFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(result)).To(Equal(string(expected)))
+		},
+		Entry("plain",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-provider-aws", "v1.2.3").Build(),
+			"testdata/expected-kustomize-plain.yaml"),
+		Entry("ocm",
+			testutils.ComponentVector("github.com/gardener/gardener-extension-provider-aws", "v1.2.3").
+				WithImageVectorOverwrite("imageVectorOverwriteContent").
+				WithResourcesYAML(`
+admissionAwsApplication:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-aws-application:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionAdmissionAws:
+      image:
+        repository: test-repo/path/gardener/extensions/admission-aws
+        tag: v1.2.3
+admissionAwsRuntime:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-aws-runtime:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionAdmissionAws:
+      image:
+        repository: test-repo/path/gardener/extensions/admission-aws
+        tag: v1.2.3
+gardenerExtensionAdmissionAws:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-aws:v1.2.3
+gardenerExtensionProviderAws:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/provider-aws:v1.2.3
+providerAws:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
+  helmchartImagemap:
+    gardenerExtensionProviderAws:
+      image:
+        repository: test-repo/path/gardener/extensions/provider-aws
+        tag: v1.2.3
+`).Build(),
+			"testdata/expected-kustomize-ocm.yaml"),
+	)
 })
