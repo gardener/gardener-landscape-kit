@@ -116,8 +116,9 @@ registry-down:
 	@$(REPO_ROOT)/dev-setup/registry/registry-down.sh
 
 .PHONY: kind-up ## create single kind cluster for hosting glk and runtime
-kind-up: registry-up git-server-up $(KIND) $(KUBECTL) $(HELM)
+kind-up: $(KIND) $(KUBECTL) $(HELM)
 	@$(REPO_ROOT)/dev-setup/kind/kind-create-cluster.sh single
+	@$(MAKE) registry-up git-server-up
 
 .PHONY: kind-down
 kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
