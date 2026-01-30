@@ -123,9 +123,17 @@ kind-up: registry-up git-server-up $(KIND) $(KUBECTL) $(HELM)
 kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
 
+#########################################
+# E2E Tests                             #
+#########################################
+
 .PHONY: e2e-prepare
 e2e-prepare: $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY) $(GLK_GLK)
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
 	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh
 	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh
+
+.PHONY: ci-e2e-kind
+ci-e2e-kind:
+	@echo "Temporary dummy target until e2e tests are implemented."
