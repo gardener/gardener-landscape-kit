@@ -1,0 +1,17 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: os-suse-chost
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost:v1.2.3
+  resources:
+  - kind: OperatingSystemConfig
+    type: suse-chost
+  - kind: OperatingSystemConfig
+    type: memoryone-chost
