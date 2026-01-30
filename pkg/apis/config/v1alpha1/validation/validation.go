@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -27,8 +28,38 @@ func ValidateLandscapeKitConfiguration(conf *configv1alpha1.LandscapeKitConfigur
 		allErrs = append(allErrs, validateGitRepository(conf.Git, field.NewPath("git"))...)
 	}
 
+	if conf.Components != nil {
+		allErrs = append(allErrs, validateComponentsConfiguration(conf.Components, field.NewPath("components"))...)
+	}
+
 	if conf.VersionConfig != nil {
 		allErrs = append(allErrs, ValidateVersionConfig(conf.VersionConfig, field.NewPath("versionConfig"))...)
+	}
+
+	return allErrs
+}
+
+func validateComponentsConfiguration(compConf *configv1alpha1.ComponentsConfiguration, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if len(compConf.Exclude) > 0 && len(compConf.Include) > 0 {
+		allErrs = append(allErrs, field.Forbidden(fldPath, "only one of 'exclude' or 'include' can be specified"))
+	}
+
+	foundComponents := sets.New[string]()
+	for i, comp := range compConf.Exclude {
+		if foundComponents.Has(comp) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("exclude").Index(i), comp))
+		}
+		foundComponents.Insert(comp)
+	}
+
+	foundComponents = sets.New[string]()
+	for i, comp := range compConf.Include {
+		if foundComponents.Has(comp) {
+			allErrs = append(allErrs, field.Duplicate(fldPath.Child("include").Index(i), comp))
+		}
+		foundComponents.Insert(comp)
 	}
 
 	return allErrs

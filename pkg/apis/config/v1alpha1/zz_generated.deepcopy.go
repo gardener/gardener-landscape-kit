@@ -21,6 +21,11 @@ func (in *ComponentsConfiguration) DeepCopyInto(out *ComponentsConfiguration) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.Include != nil {
+		in, out := &in.Include, &out.Include
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	return
 }
 

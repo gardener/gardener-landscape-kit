@@ -197,6 +197,86 @@ var _ = Describe("Validation", func() {
 			})
 		})
 
+		Context("Components Configuration", func() {
+			It("should pass with empty include and exclude lists", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should pass with exclude list", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Components: &v1alpha1.ComponentsConfiguration{
+						Exclude: []string{"excluded-component-1", "excluded-component-2"},
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should fail with duplicate elements in exclude list", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Components: &v1alpha1.ComponentsConfiguration{
+						Exclude: []string{"excluded-component-1", "excluded-component-2", "excluded-component-1"},
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeDuplicate),
+						"Field": Equal("components.exclude[2]"),
+					})),
+				))
+			})
+
+			It("should pass with include list", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Components: &v1alpha1.ComponentsConfiguration{
+						Include: []string{"include-component-1", "include-component-2"},
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should fail with duplicate elements in include list", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Components: &v1alpha1.ComponentsConfiguration{
+						Include: []string{"include-component-1", "include-component-2", "include-component-1"},
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeDuplicate),
+						"Field": Equal("components.include[2]"),
+					})),
+				))
+			})
+
+			It("should fail if both include and exclude lists are provided", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Components: &v1alpha1.ComponentsConfiguration{
+						Exclude: []string{"exclude-component-1", "exclude-component-2"},
+						Include: []string{"include-component-1", "include-component-2"},
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeForbidden),
+						"Field": Equal("components"),
+					})),
+				))
+			})
+		})
+
 		Context("OCM Configuration", func() {
 			setupOCMConfigTests(func(ocmConf *v1alpha1.OCMConfig) field.ErrorList {
 				conf := &v1alpha1.LandscapeKitConfiguration{
