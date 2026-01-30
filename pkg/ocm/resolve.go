@@ -227,6 +227,9 @@ func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error)
 	customComponents := sets.New[string]()
 
 	if err := filepath.WalkDir(r.landscapeDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if d.IsDir() || d.Name() != CustomOCMComponentNameFilename {
 			return nil
 		}
