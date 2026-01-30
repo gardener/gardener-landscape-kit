@@ -8,6 +8,8 @@ import (
 	"embed"
 	"path"
 
+	"github.com/gardener/gardener/pkg/utils"
+
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
@@ -66,15 +68,28 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func writeBaseTemplateFiles(opts components.Options) error {
-	version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionOsGardenlinux)
-	if !exists {
-		opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardenerExtensionOsGardenlinux)
+func getRenderValues(opts components.Options) map[string]any {
+	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardenerExtensionOsGardenlinux)
+	if cv == nil || len(cv.Resources) == 0 {
+		version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionOsGardenlinux)
+		if !exists {
+			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardenerExtensionOsGardenlinux)
+		}
+		return map[string]any{
+			"resources": map[string]any{
+				"osGardenlinux": map[string]any{
+					"helmChart": map[string]any{
+						"ref": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux:" + version,
+					},
+				},
+			},
+		}
 	}
+	return cv.TemplateValues()
+}
 
-	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
-		"version": version,
-	})
+func writeBaseTemplateFiles(opts components.Options) error {
+	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, nil)
 	if err != nil {
 		return err
 	}
@@ -88,10 +103,11 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+	values := utils.MergeMaps(getRenderValues(opts), map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
 		return err
 	}

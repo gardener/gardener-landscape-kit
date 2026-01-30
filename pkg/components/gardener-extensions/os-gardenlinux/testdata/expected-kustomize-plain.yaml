@@ -3,22 +3,17 @@ kind: Extension
 metadata:
   annotations:
     security.gardener.cloud/pod-security-enforce: baseline
-  name: networking-cilium
+  name: os-gardenlinux
 spec:
   deployment:
-    admission:
-      runtimeCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime:v1.2.3
-      virtualCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application:v1.2.3
     extension:
       helm:
         ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:v1.2.3
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux:v1.2.3
   resources:
-  - kind: Network
-    type: cilium
+  - kind: OperatingSystemConfig
+    type: gardenlinux
+  - kind: OperatingSystemConfig
+    type: gardenlinux-fips
+  - kind: OperatingSystemConfig
+    type: memoryone-gardenlinux
