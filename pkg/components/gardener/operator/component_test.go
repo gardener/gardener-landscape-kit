@@ -5,9 +5,12 @@
 package operator_test
 
 import (
+	"os"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	"github.com/spf13/afero"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -15,6 +18,7 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -25,6 +29,7 @@ var _ = Describe("Component Generation", func() {
 	)
 
 	BeforeEach(func() {
+		format.CharactersAroundMismatchToInclude = 100
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
 		cmdOpts = &cmd.Options{Log: logr.Discard()}
 		generateOpts = &generateoptions.Options{
@@ -100,4 +105,37 @@ var _ = Describe("Component Generation", func() {
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener/operator"))
 		})
 	})
+
+	DescribeTable("Kustomize",
+		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+			component := operator.NewComponent()
+			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			Expect(err).ToNot(HaveOccurred())
+			result, err := testutils.KustomizeComponent(fs, component, "components/gardener/operator", componentsVectorFile)
+			Expect(err).ToNot(HaveOccurred())
+			expected, err := os.ReadFile(expectedFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(result)).To(Equal(string(expected)))
+		},
+		Entry("plain",
+			testutils.ComponentVector("github.com/gardener/gardener", "v1.2.3").Build(),
+			"testdata/expected-kustomize-plain.yaml"),
+		Entry("ocm",
+			testutils.ComponentVector("github.com/gardener/gardener", "v1.2.3").
+				WithImageVectorOverwrite("imageVectorOverwriteContent").
+				WithComponentImageVectorOverwrites("componentImageVectorOverwritesContent").
+				WithResourcesYAML(`
+operator:
+  helmChart:
+    ref: test.repo/path/charts/gardener/operator:v1.2.3
+  helmchartImagemap:
+    operator:
+      image:
+        repository: test.repo/path/gardener/operator
+        tag: v1.2.3
+  ociImage:
+     ref: test.repo/path/gardener/operator:v1.2.3
+`).Build(),
+			"testdata/expected-kustomize-ocm.yaml"),
+	)
 })

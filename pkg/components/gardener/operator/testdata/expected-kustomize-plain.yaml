@@ -1,0 +1,31 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: gardener-operator
+  namespace: garden
+spec:
+  interval: 10m0s
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: v1.2.3
+  url: oci://europe-docker.pkg.dev/gardener-project/releases/charts/gardener/operator
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gardener-operator
+  namespace: garden
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: gardener-operator
+    namespace: garden
+  install:
+    crds: CreateReplace
+  interval: 10m0s
+  upgrade:
+    crds: CreateReplace
+  values:
+    replicaCount: 2
