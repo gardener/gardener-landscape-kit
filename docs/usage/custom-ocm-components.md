@@ -79,7 +79,3 @@ spec:
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
 ```
-
-
-
-
