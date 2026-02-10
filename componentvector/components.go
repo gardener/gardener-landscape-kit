@@ -21,4 +21,6 @@ const (
 	NameGardenerGardenerExtensionProviderAws = "github.com/gardener/gardener-extension-provider-aws"
 	// NameGardenerGardenerExtensionProviderAzure is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-azure'.
 	NameGardenerGardenerExtensionProviderAzure = "github.com/gardener/gardener-extension-provider-azure"
+	// NameGardenerGardenerExtensionProviderGcp is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-gcp'.
+	NameGardenerGardenerExtensionProviderGcp = "github.com/gardener/gardener-extension-provider-gcp"
 )

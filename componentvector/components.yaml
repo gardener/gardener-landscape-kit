@@ -20,3 +20,6 @@ components:
 - name: github.com/gardener/gardener-extension-provider-azure
   sourceRepository: https://github.com/gardener/gardener-extension-provider-azure
   version: v1.58.1
+- name: github.com/gardener/gardener-extension-provider-gcp
+  sourceRepository: https://github.com/gardener/gardener-extension-provider-gcp
+  version: v1.49.2
