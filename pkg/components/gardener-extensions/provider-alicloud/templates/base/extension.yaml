@@ -1,0 +1,52 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: provider-alicloud
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-alicloud-runtime:{{ .version }}
+      values:
+        image:
+          repository: europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/admission-alicloud
+          tag: {{ .version }}
+#       replicaCount: 1
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-alicloud-application:{{ .version }}
+    extension:
+      helm:
+        ociRepository:
+          ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-alicloud:{{ .version }}
+      injectGardenKubeconfig: true
+      runtimeClusterValues:
+        image:
+          repository: europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/provider-alicloud
+          tag: {{ .version }}
+      values:
+        controllers:
+        image:
+          repository: europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/provider-alicloud
+          tag: {{ .version }}
+#       replicaCount: 1
+  resources:
+  - kind: BackupBucket
+    type: alicloud
+  - kind: BackupEntry
+    type: alicloud
+  - kind: Bastion
+    type: alicloud
+  - kind: ControlPlane
+    type: alicloud
+  - kind: DNSRecord
+    type: alicloud-dns
+  - kind: Infrastructure
+    type: alicloud
+  - kind: Worker
+    type: alicloud

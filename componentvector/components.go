@@ -17,6 +17,8 @@ const (
 	NameGardenerGardenerExtensionOsGardenlinux = "github.com/gardener/gardener-extension-os-gardenlinux"
 	// NameGardenerGardenerExtensionOsSuseChost is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-os-suse-chost'.
 	NameGardenerGardenerExtensionOsSuseChost = "github.com/gardener/gardener-extension-os-suse-chost"
+	// NameGardenerGardenerExtensionProviderAlicloud is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-alicloud'.
+	NameGardenerGardenerExtensionProviderAlicloud = "github.com/gardener/gardener-extension-provider-alicloud"
 	// NameGardenerGardenerExtensionProviderAws is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-aws'.
 	NameGardenerGardenerExtensionProviderAws = "github.com/gardener/gardener-extension-provider-aws"
 	// NameGardenerGardenerExtensionProviderAzure is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-azure'.

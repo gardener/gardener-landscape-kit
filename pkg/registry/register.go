@@ -19,6 +19,7 @@ import (
 	cilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
 	gardenlinux "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-gardenlinux"
 	suse "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-suse-chost"
+	alicloud "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-alicloud"
 	aws "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
 	azure "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-azure"
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
@@ -34,6 +35,7 @@ var ComponentList = []func() components.Interface{
 	garden.NewComponent,
 	calico.NewComponent,
 	cilium.NewComponent,
+	alicloud.NewComponent,
 	aws.NewComponent,
 	azure.NewComponent,
 	gcp.NewComponent,
