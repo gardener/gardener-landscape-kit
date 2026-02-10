@@ -17,3 +17,6 @@ components:
 - name: github.com/gardener/gardener-extension-provider-aws
   sourceRepository: https://github.com/gardener/gardener-extension-provider-aws
   version: v1.67.2
+- name: github.com/gardener/gardener-extension-provider-azure
+  sourceRepository: https://github.com/gardener/gardener-extension-provider-azure
+  version: v1.58.1
