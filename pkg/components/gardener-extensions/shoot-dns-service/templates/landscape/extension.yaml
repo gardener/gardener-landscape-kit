@@ -1,0 +1,13 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  name: shoot-dns-service
+spec:
+  deployment:
+    admission: {}
+    extension:
+      values: {}
+#       resources:
+#         requests:
+#           cpu: 100m
+#           memory: 64Mi

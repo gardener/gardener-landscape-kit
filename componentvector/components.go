@@ -29,4 +29,6 @@ const (
 	NameGardenerGardenerExtensionProviderOpenstack = "github.com/gardener/gardener-extension-provider-openstack"
 	// NameGardenerGardenerExtensionShootCertService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-cert-service'.
 	NameGardenerGardenerExtensionShootCertService = "github.com/gardener/gardener-extension-shoot-cert-service"
+	// NameGardenerGardenerExtensionShootDnsService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-dns-service'.
+	NameGardenerGardenerExtensionShootDnsService = "github.com/gardener/gardener-extension-shoot-dns-service"
 )

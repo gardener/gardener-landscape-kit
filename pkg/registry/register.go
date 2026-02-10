@@ -25,6 +25,7 @@ import (
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
 	openstack "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-openstack"
 	cert "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-cert-service"
+	dns "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-dns-service"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -44,6 +45,7 @@ var ComponentList = []func() components.Interface{
 	gardenlinux.NewComponent,
 	suse.NewComponent,
 	cert.NewComponent,
+	dns.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.
