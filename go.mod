@@ -23,7 +23,7 @@ require (
 	k8s.io/client-go v0.34.3
 	k8s.io/code-generator v0.34.3
 	k8s.io/component-base v0.34.3
-	k8s.io/utils v0.0.0-20260108192941-914a6e750570
+	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2
 	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260107102143-2796cd3fe478
 	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha8
 	ocm.software/open-component-model/bindings/go/oci v0.0.25
