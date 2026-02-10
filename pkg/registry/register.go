@@ -22,6 +22,7 @@ import (
 	aws "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-aws"
 	azure "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-azure"
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
+	openstack "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-openstack"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -36,6 +37,7 @@ var ComponentList = []func() components.Interface{
 	aws.NewComponent,
 	azure.NewComponent,
 	gcp.NewComponent,
+	openstack.NewComponent,
 	gardenlinux.NewComponent,
 	suse.NewComponent,
 }

@@ -23,3 +23,6 @@ components:
 - name: github.com/gardener/gardener-extension-provider-gcp
   sourceRepository: https://github.com/gardener/gardener-extension-provider-gcp
   version: v1.49.2
+- name: github.com/gardener/gardener-extension-provider-openstack
+  sourceRepository: https://github.com/gardener/gardener-extension-provider-openstack
+  version: v1.52.0
