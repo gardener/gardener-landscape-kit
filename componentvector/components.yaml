@@ -29,3 +29,6 @@ components:
 - name: github.com/gardener/gardener-extension-provider-alicloud
   sourceRepository: https://github.com/gardener/gardener-extension-provider-alicloud
   version: v1.68.2
+- name: github.com/gardener/gardener-extension-shoot-cert-service
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-cert-service
+  version: v1.56.0

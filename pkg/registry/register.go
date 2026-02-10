@@ -24,6 +24,7 @@ import (
 	azure "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-azure"
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
 	openstack "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-openstack"
+	cert "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-cert-service"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -42,6 +43,7 @@ var ComponentList = []func() components.Interface{
 	openstack.NewComponent,
 	gardenlinux.NewComponent,
 	suse.NewComponent,
+	cert.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.
