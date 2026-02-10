@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestProvideralicloud(t *testing.T) {
+func TestProviderAlicloud(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Components Provider alicloud Suite")
+	RunSpecs(t, "Components Provider Alicloud Suite")
 }
