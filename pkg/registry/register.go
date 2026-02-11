@@ -24,6 +24,7 @@ import (
 	azure "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-azure"
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
 	openstack "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-openstack"
+	gvisor "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/runtime-gvisor"
 	cert "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-cert-service"
 	dns "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-dns-service"
 	networkproblemdetector "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-network-problem-detector"
@@ -50,6 +51,7 @@ var ComponentList = []func() components.Interface{
 	dns.NewComponent,
 	oidc.NewComponent,
 	networkproblemdetector.NewComponent,
+	gvisor.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.
