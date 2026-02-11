@@ -1,0 +1,23 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: extension-shoot-network-problem-detector
+  namespace: garden
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: {{ .landscapeComponentPath }}
+  prune: true
+  dependsOn:
+  - name: gardener-operator
+    namespace: garden
+  interval: 30m
+  timeout: 10m
+  retryInterval: 2m
+  wait: true
+  healthCheckExprs:
+  - apiVersion: operator.gardener.cloud/v1alpha1
+    kind: Extension
+    current: "status.conditions.filter(e, e.type == 'Installed').all(e, e.status == 'True')"

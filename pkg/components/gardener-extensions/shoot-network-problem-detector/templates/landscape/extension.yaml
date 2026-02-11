@@ -1,0 +1,21 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  name: shoot-network-problem-detector
+spec:
+  deployment:
+    extension:
+      values: {}
+#       controllers:
+#         healthcheck:
+#           concurrentSyncs: 10
+#         lifecycle:
+#           concurrentSyncs: 10
+#       networkProblemDetector:
+#         k8sExporter:
+#           enabled: true
+#       replicaCount: 1
+#       resources:
+#         requests:
+#           cpu: 30m
+#           memory: 128Mi

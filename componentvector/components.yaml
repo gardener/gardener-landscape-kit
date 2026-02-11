@@ -38,3 +38,6 @@ components:
 - name: github.com/gardener/gardener-extension-shoot-oidc-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
   version: v0.36.0
+- name: github.com/gardener/gardener-extension-shoot-networking-problemdetector
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-networking-problemdetector
+  version: v0.31.0
