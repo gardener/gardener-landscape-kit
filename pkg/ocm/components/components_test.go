@@ -23,7 +23,7 @@ import (
 const resourcesDir = "testdata"
 
 const (
-	refShootCertService = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
+	refShootCertService = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
 	refGardener         = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot             = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
 )
@@ -52,7 +52,7 @@ var _ = Describe("Components", func() {
 		c = components.NewComponents()
 	})
 
-	It("should produce correct image vector for shoot-cert-service", func() {
+	It("should produce correct image vector for extension-test", func() {
 		loadWithDep(1, refShootCertService)
 		Expect(c.ComponentsCount()).To(Equal(1))
 		roots := c.GetRootComponents()
@@ -87,19 +87,19 @@ var _ = Describe("Components", func() {
 		Expect(resources).To(HaveLen(4))
 		Expect(resources).To(ContainElements(
 			components.Resource{
-				Name:    "gardener-extension-shoot-cert-service",
+				Name:    "gardener-extension_extension-test",
 				Version: "v1.53.0",
 				Type:    "ociImage",
-				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
+				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
 			},
 			components.Resource{
-				Name:    "shoot-cert-service",
+				Name:    "extension-test",
 				Version: "v1.53.0",
 				Type:    "helmChart/v1",
-				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
+				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/extension-test:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
 			},
 			components.Resource{
-				Name:    "shoot-cert-service",
+				Name:    "extension-test",
 				Version: "v1.53.0",
 				Type:    "helmchart-imagemap",
 				Value:   "fake content",

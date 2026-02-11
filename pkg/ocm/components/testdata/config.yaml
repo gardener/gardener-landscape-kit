@@ -31,9 +31,9 @@ externalResources:
     type: helmChart/v1
 
 components:
-  - name: gardener-extensions_extension-shoot-cert-service
+  - name: gardener-extensions_extension-extension-test
     version: v1.53.0
-    componentName: "github.com/gardener/gardener-extension-shoot-cert-service"
+    componentName: "github.com/gardener/gardener-extension_extension-test"
   - name: gardener
     version: v1.128.3
     componentName: "github.com/gardener/gardener"
