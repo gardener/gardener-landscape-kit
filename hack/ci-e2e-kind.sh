@@ -21,6 +21,7 @@ make kind-up e2e-prepare
 # export all container logs and events after test execution
 trap "
   ( export_artifacts "glk-single" )
+  ( export_resource_yamls_for garden )
   ( make kind-down )
 " EXIT
 

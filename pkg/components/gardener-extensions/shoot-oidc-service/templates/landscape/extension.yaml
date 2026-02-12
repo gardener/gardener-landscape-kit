@@ -1,0 +1,12 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  name: shoot-oidc-service
+spec:
+  deployment:
+    extension:
+      values: {}
+#       resources:
+#         requests:
+#           cpu: 100m
+#           memory: 64Mi

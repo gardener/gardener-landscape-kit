@@ -5,13 +5,13 @@ metadata:
 spec:
   deployment:
     admission:
-      values:
+      values: {}
 #       resources:
 #         requests:
 #           cpu: 50m
 #           memory: 100Mi
     extension:
-      values:
+      values: {}
 #       resources:
 #         requests:
 #           cpu: 100m

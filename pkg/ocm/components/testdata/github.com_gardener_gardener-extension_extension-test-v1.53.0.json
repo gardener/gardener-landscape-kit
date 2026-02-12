@@ -3,7 +3,7 @@
     "schemaVersion": "v2"
   },
   "component": {
-    "name": "github.com/gardener/gardener-extension-shoot-cert-service",
+    "name": "github.com/gardener/gardener-extension_extension-test",
     "version": "v1.53.0",
     "creationTime": "2025-09-03T13:59:52Z",
     "repositoryContexts": [
@@ -16,12 +16,12 @@
     "provider": "SAP SE",
     "resources": [
       {
-        "name": "gardener-extension-shoot-cert-service",
+        "name": "gardener-extension_extension-test",
         "version": "v1.53.0",
         "labels": [
           {
             "name": "cloud.gardener.cnudie/migration/original_ref",
-            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0"
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0"
           }
         ],
         "extraIdentity": {
@@ -30,7 +30,7 @@
         "type": "ociImage",
         "relation": "local",
         "access": {
-          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
           "type": "ociRegistry"
         }
       },
@@ -85,12 +85,12 @@
         }
       },
       {
-        "name": "shoot-cert-service",
+        "name": "extension-test",
         "version": "v1.53.0",
         "labels": [
           {
             "name": "cloud.gardener.cnudie/migration/original_ref",
-            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0"
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/extension-test:v1.53.0"
           }
         ],
         "extraIdentity": {
@@ -99,12 +99,12 @@
         "type": "helmChart/v1",
         "relation": "local",
         "access": {
-          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/extension-test:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
           "type": "ociRegistry"
         }
       },
       {
-        "name": "shoot-cert-service",
+        "name": "extension-test",
         "version": "v1.53.0",
         "extraIdentity": {
           "type": "helmchart-imagemap"
@@ -200,7 +200,7 @@
         "access": {
           "commit": "60104118c753d5860de6689a2ddf5032e268c461",
           "ref": "refs/heads/master",
-          "repoUrl": "github.com/gardener/gardener-extension-shoot-cert-service",
+          "repoUrl": "github.com/gardener/gardener-extension_extension-test",
           "type": "github"
         }
       }

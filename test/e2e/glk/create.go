@@ -57,7 +57,7 @@ var _ = Describe("Garden Reconciliation", Label("Garden", "default"), Ordered, f
 				"Progress": BeEquivalentTo(100),
 			})))
 		}).Should(Succeed())
-	}, SpecTimeout(30*time.Minute))
+	}, SpecTimeout(20*time.Minute))
 
 	It("Ensure that the configured operator extensions have been installed", func(ctx SpecContext) {
 		var (

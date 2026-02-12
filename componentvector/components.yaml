@@ -29,3 +29,18 @@ components:
 - name: github.com/gardener/gardener-extension-provider-alicloud
   sourceRepository: https://github.com/gardener/gardener-extension-provider-alicloud
   version: v1.68.2
+- name: github.com/gardener/gardener-extension-shoot-cert-service
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-cert-service
+  version: v1.56.0
+- name: github.com/gardener/gardener-extension-shoot-dns-service
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-dns-service
+  version: v1.77.0
+- name: github.com/gardener/gardener-extension-shoot-oidc-service
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
+  version: v0.36.0
+- name: github.com/gardener/gardener-extension-shoot-networking-problemdetector
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-networking-problemdetector
+  version: v0.31.0
+- name: github.com/gardener/gardener-extension-runtime-gvisor
+  sourceRepository: https://github.com/gardener/gardener-extension-runtime-gvisor
+  version: v0.28.0
