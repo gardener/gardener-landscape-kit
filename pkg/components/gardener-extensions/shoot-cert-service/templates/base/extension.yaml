@@ -16,14 +16,14 @@ spec:
         certificateConfig:
           defaultIssuer:
             acme:
-              email: to_be_filled_in # e.g. some.user@example.com
+              email: <to_be_filled_in> # e.g. some.user@example.com
               server: https://acme-v02.api.letsencrypt.org/directory
             name: garden
       values:
         certificateConfig:
           defaultIssuer:
             acme:
-              email: to_be_filled_in # e.g. some.user@example.com
+              email: <to_be_filled_in> # e.g. some.user@example.com
               server: https://acme-v02.api.letsencrypt.org/directory
             name: garden
   resources:
