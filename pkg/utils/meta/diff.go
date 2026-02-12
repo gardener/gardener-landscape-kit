@@ -6,6 +6,7 @@ package meta
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/elliotchance/orderedmap/v3"
 	"go.yaml.in/yaml/v4"
@@ -36,8 +37,11 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	var (
 		output []byte
 
-		diff = newManifestDiff(preProcess(oldDefaultYaml), preProcess(newDefaultYaml), preProcess(currentYaml))
+		diff, err = newManifestDiff(preProcess(oldDefaultYaml), preProcess(newDefaultYaml), preProcess(currentYaml))
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	for key, value := range diff.current.AllFromFront() {
 		sect := newSection(key, value)
@@ -359,7 +363,7 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-func splitManifestFile(combinedYaml []byte) *orderedmap.OrderedMap[string, []byte] {
+func splitManifestFile(combinedYaml []byte) (*orderedmap.OrderedMap[string, []byte], error) {
 	var values [][]byte
 	if len(combinedYaml) > 0 { // Only split if there is content
 		values = bytes.Split(combinedYaml, []byte("\n---\n"))
@@ -367,26 +371,35 @@ func splitManifestFile(combinedYaml []byte) *orderedmap.OrderedMap[string, []byt
 	om := orderedmap.NewOrderedMap[string, []byte]()
 	for _, v := range values {
 		var t map[string]any
-		err := yaml.Unmarshal(v, &t)
+		if err := yaml.Unmarshal(v, &t); err != nil {
+			return nil, err
+		}
 		key := buildKey(t)
-		if err != nil || key == "" {
+		if key == "" {
 			key = string(v)
 		}
 		om.Set(key, v)
 	}
-	return om
+	return om, nil
 }
 
 type manifestDiff struct {
 	oldDefault, newDefault, current *orderedmap.OrderedMap[string, []byte]
 }
 
-func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) *manifestDiff {
-	return &manifestDiff{
-		oldDefault: splitManifestFile(oldDefaultYaml),
-		newDefault: splitManifestFile(newDefaultYaml),
-		current:    splitManifestFile(currentYaml),
+func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (*manifestDiff, error) {
+	md := &manifestDiff{}
+	var err error
+	if md.oldDefault, err = splitManifestFile(oldDefaultYaml); err != nil {
+		return nil, fmt.Errorf("parsing oldDefault file for manifest diff failed: %w", err)
 	}
+	if md.newDefault, err = splitManifestFile(newDefaultYaml); err != nil {
+		return nil, fmt.Errorf("parsing newDefault file for manifest diff failed: %w", err)
+	}
+	if md.current, err = splitManifestFile(currentYaml); err != nil {
+		return nil, fmt.Errorf("parsing current file for manifest diff failed: %w", err)
+	}
+	return md, nil
 }
 
 func addWithSeparator(output, content []byte) []byte {

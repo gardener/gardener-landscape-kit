@@ -47,21 +47,21 @@ var _ = Describe("Writer", func() {
 	Describe("#WriteObjectsToFilesystem", func() {
 		It("should ensure the directories within the path and write the objects", func() {
 			objects := map[string][]byte{
-				"file.txt":    []byte("This is the file's content"),
-				"another.txt": []byte("Some other content"),
+				"file.yaml":    []byte("content: This is the file's content"),
+				"another.yaml": []byte("content: Some other content"),
 			}
 			baseDir := "/path/to"
 			path := "my/files"
 
 			Expect(files.WriteObjectsToFilesystem(objects, baseDir, path, fs)).To(Succeed())
 
-			contents, err := fs.ReadFile("/path/to/my/files/file.txt")
+			contents, err := fs.ReadFile("/path/to/my/files/file.yaml")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(contents)).To(Equal("This is the file's content\n"))
+			Expect(string(contents)).To(Equal("content: This is the file's content\n"))
 
-			contents, err = fs.ReadFile("/path/to/my/files/another.txt")
+			contents, err = fs.ReadFile("/path/to/my/files/another.yaml")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(contents)).To(Equal("Some other content\n"))
+			Expect(string(contents)).To(Equal("content: Some other content\n"))
 		})
 
 		It("should overwrite the manifest file if no meta file is present yet", func() {
