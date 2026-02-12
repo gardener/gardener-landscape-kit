@@ -9,7 +9,7 @@ alias flux=$FLUX_CLI
 echo "> Generating Flux components"
 flux install \
   --export \
-  > $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+  > $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-components.yaml
 flux create secret git flux-system \
   --url="https://github.com/<org>/<repo>" \
   --username="<username>" \
