@@ -3,7 +3,7 @@ kind: Extension
 metadata:
   annotations:
     security.gardener.cloud/pod-security-enforce: baseline
-  name: shoot-network-problem-detector
+  name: shoot-networking-problemdetector
 spec:
   deployment:
     extension:

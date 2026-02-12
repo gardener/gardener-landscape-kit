@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_network_problem_detector
+package shoot_networking_problemdetector
 
 import (
 	"embed"
@@ -15,7 +15,7 @@ import (
 
 const (
 	// ComponentDirectory is the garden component directory within the base components directory.
-	ComponentDirectory = "gardener-extensions/shoot-network-problem-detector"
+	ComponentDirectory = "gardener-extensions/shoot-networking-problemdetector"
 )
 
 var (
@@ -39,7 +39,7 @@ func NewComponent() components.Interface {
 
 // Name returns the component name.
 func (c *component) Name() string {
-	return "shoot-network-problem-detector"
+	return "shoot-networking-problemdetector"
 }
 
 // GenerateBase generates the component base directory.

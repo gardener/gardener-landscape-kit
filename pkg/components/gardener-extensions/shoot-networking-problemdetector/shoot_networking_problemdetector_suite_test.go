@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_network_problem_detector_test
+package shoot_networking_problemdetector_test
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestShootNetworkProblemDetector(t *testing.T) {
+func TestShootNetworkingProblemdetector(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Components Shoot Network Problem Detector Suite")
+	RunSpecs(t, "Components Shoot Networking Problemdetector Suite")
 }

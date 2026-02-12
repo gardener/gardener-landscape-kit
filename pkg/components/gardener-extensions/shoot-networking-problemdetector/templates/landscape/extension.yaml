@@ -1,7 +1,7 @@
 apiVersion: operator.gardener.cloud/v1alpha1
 kind: Extension
 metadata:
-  name: shoot-network-problem-detector
+  name: shoot-networking-problemdetector
 spec:
   deployment:
     extension:

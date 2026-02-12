@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_network_problem_detector_test
+package shoot_networking_problemdetector_test
 
 import (
 	"github.com/go-logr/logr"
@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	network_problem_detector "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-network-problem-detector"
+	networking_problemdetector "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-networking-problemdetector"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -43,15 +43,15 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := network_problem_detector.NewComponent()
+			component := networking_problemdetector.NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
-			content, err := fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-network-problem-detector/extension.yaml")
+			content, err := fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-networking-problemdetector/extension.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("apiVersion: operator.gardener.cloud/v1alpha1"))
 			Expect(string(content)).To(ContainSubstring("kind: Extension"))
 
-			content, err = fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-network-problem-detector/kustomization.yaml")
+			content, err = fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-networking-problemdetector/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- extension.yaml"))
 		})
@@ -66,7 +66,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := network_problem_detector.NewComponent()
+			component := networking_problemdetector.NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
 			Expect(err).ToNot(HaveOccurred())
@@ -75,13 +75,13 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(exists).To(BeFalse())
 
-			content, err := fs.ReadFile("/repo/landscapeDir/components/gardener-extensions/shoot-network-problem-detector/flux-kustomization.yaml")
+			content, err := fs.ReadFile("/repo/landscapeDir/components/gardener-extensions/shoot-networking-problemdetector/flux-kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/gardener-extensions/shoot-network-problem-detector"))
+			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/gardener-extensions/shoot-networking-problemdetector"))
 
-			content, err = fs.ReadFile("/repo/landscapeDir/components/gardener-extensions/shoot-network-problem-detector/kustomization.yaml")
+			content, err = fs.ReadFile("/repo/landscapeDir/components/gardener-extensions/shoot-networking-problemdetector/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/shoot-network-problem-detector"))
+			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/shoot-networking-problemdetector"))
 		})
 	})
 })
