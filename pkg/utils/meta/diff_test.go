@@ -132,5 +132,33 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(expected)))
 		})
+
+		It("should error when invalid YAML content is provided", func() {
+			var (
+				err error
+
+				emptyYaml   = []byte(``)
+				validYaml   = []byte(`a: key`)
+				invalidYaml = []byte(`keyWith: colonSuffix:`)
+			)
+
+			_, err = meta.ThreeWayMergeManifest(emptyYaml, invalidYaml, emptyYaml)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("parsing newDefault file for manifest diff failed"))
+
+			_, err = meta.ThreeWayMergeManifest(invalidYaml, validYaml, validYaml)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("parsing oldDefault file for manifest diff failed"))
+
+			_, err = meta.ThreeWayMergeManifest(validYaml, validYaml, invalidYaml)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("parsing current file for manifest diff failed"))
+
+			_, err = meta.ThreeWayMergeManifest(validYaml, validYaml, validYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			_, err = meta.ThreeWayMergeManifest(emptyYaml, emptyYaml, emptyYaml)
+			Expect(err).NotTo(HaveOccurred())
+		})
 	})
 })
