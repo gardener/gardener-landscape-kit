@@ -27,4 +27,14 @@ const (
 	NameGardenerGardenerExtensionProviderGcp = "github.com/gardener/gardener-extension-provider-gcp"
 	// NameGardenerGardenerExtensionProviderOpenstack is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-provider-openstack'.
 	NameGardenerGardenerExtensionProviderOpenstack = "github.com/gardener/gardener-extension-provider-openstack"
+	// NameGardenerGardenerExtensionRuntimeGvisor is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-runtime-gvisor'.
+	NameGardenerGardenerExtensionRuntimeGvisor = "github.com/gardener/gardener-extension-runtime-gvisor"
+	// NameGardenerGardenerExtensionShootCertService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-cert-service'.
+	NameGardenerGardenerExtensionShootCertService = "github.com/gardener/gardener-extension-shoot-cert-service"
+	// NameGardenerGardenerExtensionShootDnsService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-dns-service'.
+	NameGardenerGardenerExtensionShootDnsService = "github.com/gardener/gardener-extension-shoot-dns-service"
+	// NameGardenerGardenerExtensionShootNetworkingProblemdetector is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-networking-problemdetector'.
+	NameGardenerGardenerExtensionShootNetworkingProblemdetector = "github.com/gardener/gardener-extension-shoot-networking-problemdetector"
+	// NameGardenerGardenerExtensionShootOidcService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-oidc-service'.
+	NameGardenerGardenerExtensionShootOidcService = "github.com/gardener/gardener-extension-shoot-oidc-service"
 )
