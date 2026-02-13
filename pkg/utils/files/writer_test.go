@@ -148,13 +148,13 @@ spec:
 		})
 
 		It("should go up the depth of the passed relativeDir", func() {
-			Expect(files.RelativePathFromDirDepth("examples")).To(Equal("../."))
-			Expect(files.RelativePathFromDirDepth("some/directory")).To(Equal("../../."))
-			Expect(files.RelativePathFromDirDepth("some/path/to/dir")).To(Equal("../../../../."))
+			Expect(files.RelativePathFromDirDepth("examples")).To(Equal(".."))
+			Expect(files.RelativePathFromDirDepth("some/directory")).To(Equal("../.."))
+			Expect(files.RelativePathFromDirDepth("some/path/to/dir")).To(Equal("../../../.."))
 		})
 
 		It("should resolve path switches within relativeDir correctly", func() {
-			Expect(files.RelativePathFromDirDepth("enter/../not/../only/destination")).To(Equal("../../."))
+			Expect(files.RelativePathFromDirDepth("enter/../not/../only/destination")).To(Equal("../.."))
 			Expect(files.RelativePathFromDirDepth("./././")).To(Equal("."))
 			Expect(files.RelativePathFromDirDepth("/")).To(Equal("."))
 		})
