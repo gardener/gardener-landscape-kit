@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package networking_calico
+package calico
 
 import (
 	"embed"

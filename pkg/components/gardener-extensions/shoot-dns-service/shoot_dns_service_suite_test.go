@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_dns_service_test
+package dnsservice_test
 
 import (
 	"testing"

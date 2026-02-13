@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package networking_calico_test
+package calico_test
 
 import (
 	"github.com/go-logr/logr"

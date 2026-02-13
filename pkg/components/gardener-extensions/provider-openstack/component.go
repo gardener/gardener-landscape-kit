@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package provider_openstack
+package openstack
 
 import (
 	"embed"

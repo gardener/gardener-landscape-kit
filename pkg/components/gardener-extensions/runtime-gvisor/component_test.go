@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package runtime_gvisor_test
+package gvisor_test
 
 import (
 	"github.com/go-logr/logr"

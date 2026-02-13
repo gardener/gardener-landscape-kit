@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_networking_problemdetector
+package networkingproblemdetector
 
 import (
 	"embed"
