@@ -1,13 +1,16 @@
-/args
-/bin
-/tmp/*
-/local
-/dev
+# Ignore everything
+**
 
-*.test
-*.coverprofile
-*.html
-.vscode
-.idea
-.DS_Store
-*~
+# Exclude folders relevant for build
+!.git
+!.dockerignore
+!charts/
+!cmd/
+!hack/
+!componentvector/
+!pkg/
+!.golangci.yaml
+!go.mod
+!go.sum
+!Makefile
+!VERSION
