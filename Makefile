@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 NAME                 := gardener-landscape-kit
+IMAGE_REGISTRY       := europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
 VERSION              := $(shell cat VERSION)
 EFFECTIVE_VERSION    := $(VERSION)-$(shell git rev-parse HEAD)
 REPO_ROOT            := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -10,6 +11,7 @@ HACK_DIR             := $(REPO_ROOT)/hack
 ENSURE_GARDENER_MOD  := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
 GARDENER_HACK_DIR    := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
 LD_FLAGS             := "-w $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME))"
+TARGET_PLATFORMS     ?= linux/$(shell go env GOARCH)
 
 #########################################
 # Tools                                 #
@@ -33,6 +35,11 @@ build:
 .PHONY: install
 install:
 	@LD_FLAGS=$(LD_FLAGS) bash $(GARDENER_HACK_DIR)/install.sh ./cmd/...
+
+.PHONY: docker-images
+docker-images:
+	@echo "Building docker images with version and tag $(EFFECTIVE_VERSION) for target platforms $(TARGET_PLATFORMS)"
+	@docker build --build-arg EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) --platform $(TARGET_PLATFORMS) -t $(IMAGE_REGISTRY):$(EFFECTIVE_VERSION) -t $(IMAGE_REGISTRY):latest -f Dockerfile --target gardener-landscape-kit .
 
 .PHONY: tidy
 tidy:
