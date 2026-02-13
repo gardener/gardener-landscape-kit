@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
@@ -130,7 +129,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To(componentVectorFile),
+						ComponentsVectorFile: new(componentVectorFile),
 					},
 				}
 
@@ -151,7 +150,7 @@ var _ = Describe("Types", func() {
 			It("should return an error when component vector file does not exist", func() {
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To("/non/existent/file.yaml"),
+						ComponentsVectorFile: new("/non/existent/file.yaml"),
 					},
 				}
 
@@ -167,7 +166,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To(componentVectorFile),
+						ComponentsVectorFile: new(componentVectorFile),
 					},
 				}
 
@@ -183,7 +182,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To(componentVectorFile),
+						ComponentsVectorFile: new(componentVectorFile),
 					},
 				}
 
@@ -224,7 +223,7 @@ var _ = Describe("Types", func() {
 					Git: &v1alpha1.GitRepository{
 						URL: "https://github.com/example/repo.git",
 						Ref: v1alpha1.GitRepositoryRef{
-							Branch: ptr.To("main"),
+							Branch: new("main"),
 						},
 						Paths: v1alpha1.PathConfiguration{
 							Base:      "base",
@@ -278,7 +277,7 @@ var _ = Describe("Types", func() {
 						Git: &v1alpha1.GitRepository{
 							URL: "https://github.com/example/repo.git",
 							Ref: v1alpha1.GitRepositoryRef{
-								Branch: ptr.To("main"),
+								Branch: new("main"),
 							},
 							Paths: v1alpha1.PathConfiguration{
 								Base:      "base",

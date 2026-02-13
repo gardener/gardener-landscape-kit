@@ -208,7 +208,6 @@ The following dependencies have been updated:\n\
         "go.opentelemetry.io/otel/sdk/metric",
         "go.opentelemetry.io/otel/trace",
         "go.opentelemetry.io/proto/otlp",
-        "go.uber.org/automaxprocs",
         "go.uber.org/mock",
         "go.uber.org/multierr",
         "go.uber.org/zap",

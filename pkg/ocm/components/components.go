@@ -513,7 +513,7 @@ func referenceToComponentReferenceWithImageSource(ref descriptorruntime.Referenc
 			img, err = rawToImageSource(label.Value)
 			if img != nil {
 				// needed for image overwrite lookup later
-				img.ReferencedComponent = ptr.To(string(cref))
+				img.ReferencedComponent = new(string(cref))
 			}
 			return
 		}
