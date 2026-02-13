@@ -68,7 +68,6 @@ jobs:
                 value:
                 - test
 
-
   gardener-landscape-kit:
     permissions:
       contents: read
@@ -146,3 +145,21 @@ jobs:
               type: localBlob
               localReference: >-
                 gardener-landscape-kit-${{ matrix.args.os }}-${{ matrix.args.arch }}.archive
+
+  oci-images:
+    name: Build OCI-Images
+    uses: gardener/cc-utils/.github/workflows/oci-ocm.yaml@master
+    needs:
+    - prepare
+    - tests
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    with:
+      name: gardener-landscape-kit
+      version: ${{ needs.prepare.outputs.version }}
+      oci-registry: ${{ needs.prepare.outputs.oci-registry }}
+      oci-repository: gardener/gardener-landscape-kit
+      oci-platforms: linux/arm64,linux/amd64
