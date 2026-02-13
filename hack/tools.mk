@@ -18,8 +18,5 @@ $(FLUX_CLI): $(TOOLS_DIR) $(call tool_version_file,$(FLUX_CLI),$(FLUX_CLI_VERSIO
 	tar -zxvf $(FLUX_CLI).tar.gz -C $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH) flux
 	touch $(FLUX_CLI) && chmod +x $(FLUX_CLI) && rm $(FLUX_CLI).tar.gz
 
-$(GLK_GLK): $(call tool_version_file,$(GLK_GLK),$(GLK_GLK_VERSION))
-	GOBIN=$(abspath $(TOOLS_BIN_DIR)) go install ./cmd/gardener-landscape-kit
-
 $(GLK_PRETTIFY): $(call tool_version_file,$(GLK_PRETTIFY),$(GLK_PRETTIFY_VERSION))
 	GOBIN=$(abspath $(TOOLS_BIN_DIR)) go install ./hack/tools/prettify
