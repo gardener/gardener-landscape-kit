@@ -11,7 +11,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
@@ -38,7 +37,7 @@ var _ = Describe("Validation", func() {
 				Git: &v1alpha1.GitRepository{
 					URL: "https://github.com/gardener/gardener-landscape-kit",
 					Ref: v1alpha1.GitRepositoryRef{
-						Branch: ptr.To("main"),
+						Branch: new("main"),
 					},
 					Paths: v1alpha1.PathConfiguration{
 						Base:      "base",
@@ -46,7 +45,7 @@ var _ = Describe("Validation", func() {
 					},
 				},
 				VersionConfig: &v1alpha1.VersionConfiguration{
-					ComponentsVectorFile: ptr.To("components.yaml"),
+					ComponentsVectorFile: new("components.yaml"),
 				},
 			}
 
@@ -136,9 +135,9 @@ var _ = Describe("Validation", func() {
 
 				It("should pass with valid refs", func() {
 					for _, ref := range []v1alpha1.GitRepositoryRef{
-						{Branch: ptr.To("main")},
-						{Tag: ptr.To("v1.0.0")},
-						{Commit: ptr.To("abc123def456")},
+						{Branch: new("main")},
+						{Tag: new("v1.0.0")},
+						{Commit: new("abc123def456")},
 					} {
 						Expect(test(ref)).To(BeEmpty(), fmt.Sprintf("Git ref %+v should be valid", ref))
 					}
@@ -146,9 +145,9 @@ var _ = Describe("Validation", func() {
 
 				It("should fail with empty refs", func() {
 					for _, ref := range []v1alpha1.GitRepositoryRef{
-						{Branch: ptr.To("")},
-						{Tag: ptr.To("")},
-						{Commit: ptr.To("")},
+						{Branch: new("")},
+						{Tag: new("")},
+						{Commit: new("")},
 					} {
 						Expect(test(ref)).To(ConsistOf(
 							PointTo(MatchFields(IgnoreExtras, Fields{
@@ -290,7 +289,7 @@ var _ = Describe("Validation", func() {
 			It("should fail if ComponentsVectorFile is empty", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To(""),
+						ComponentsVectorFile: new(""),
 					},
 				}
 
@@ -306,7 +305,7 @@ var _ = Describe("Validation", func() {
 			It("should fail if ComponentsVectorFile is whitespace only", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To("   "),
+						ComponentsVectorFile: new("   "),
 					},
 				}
 
@@ -322,7 +321,7 @@ var _ = Describe("Validation", func() {
 			It("should pass with a valid ComponentsVectorFile", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: ptr.To("path/to/components.yaml"),
+						ComponentsVectorFile: new("path/to/components.yaml"),
 					},
 				}
 
@@ -333,7 +332,7 @@ var _ = Describe("Validation", func() {
 			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						DefaultVersionsUpdateStrategy: ptr.To("ReleaseBranch"),
+						DefaultVersionsUpdateStrategy: new("ReleaseBranch"),
 					},
 				}
 

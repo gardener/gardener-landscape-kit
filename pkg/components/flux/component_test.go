@@ -18,7 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -159,7 +158,7 @@ var _ = Describe("Flux Component Generation", func() {
 
 			It("should contain the correct repository URL, path and branch", func() {
 				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
-					Branch: ptr.To("develop"),
+					Branch: new("develop"),
 				}
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
@@ -169,7 +168,7 @@ var _ = Describe("Flux Component Generation", func() {
 
 			It("should contain the correct repository URL, path and tag", func() {
 				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
-					Tag: ptr.To("v1.0.0"),
+					Tag: new("v1.0.0"),
 				}
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
@@ -179,7 +178,7 @@ var _ = Describe("Flux Component Generation", func() {
 
 			It("should contain the correct repository URL, path and commit", func() {
 				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
-					Commit: ptr.To("a1b2c3d4"),
+					Commit: new("a1b2c3d4"),
 				}
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
@@ -189,8 +188,8 @@ var _ = Describe("Flux Component Generation", func() {
 
 			It("should contain prefer the branch configuration", func() {
 				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
-					Branch: ptr.To("develop"),
-					Tag:    ptr.To("v1.0.0"),
+					Branch: new("develop"),
+					Tag:    new("v1.0.0"),
 				}
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
@@ -200,9 +199,9 @@ var _ = Describe("Flux Component Generation", func() {
 
 			It("should contain prefer the commit configuration", func() {
 				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
-					Branch: ptr.To("develop"),
-					Tag:    ptr.To("v1.0.0"),
-					Commit: ptr.To("a1b2c3d4"),
+					Branch: new("develop"),
+					Tag:    new("v1.0.0"),
+					Commit: new("a1b2c3d4"),
 				}
 
 				test(opts, MatchFields(IgnoreExtras, Fields{

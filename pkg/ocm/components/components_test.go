@@ -12,7 +12,6 @@ import (
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"k8s.io/utils/ptr"
 	descriptorruntime "ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
 
@@ -65,9 +64,9 @@ var _ = Describe("Components", func() {
 		Expect(imageVector).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "cert-management",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/cert-controller-manager"),
-				Tag:        ptr.To("v0.17.7@sha256:6f55f7bf5a6498dc0d138e5cde33eb39a090ceeee1fe80647008cb8e04676d8c"),
-				Version:    ptr.To("v0.17.7"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/cert-controller-manager"),
+				Tag:        new("v0.17.7@sha256:6f55f7bf5a6498dc0d138e5cde33eb39a090ceeee1fe80647008cb8e04676d8c"),
+				Version:    new("v0.17.7"),
 			}))
 
 		By("original references")
@@ -77,9 +76,9 @@ var _ = Describe("Components", func() {
 		Expect(imageVector).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "cert-management",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager"),
-				Tag:        ptr.To("v0.17.7"),
-				Version:    ptr.To("v0.17.7"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/cert-controller-manager"),
+				Tag:        new("v0.17.7"),
+				Version:    new("v0.17.7"),
 			}))
 
 		By("check resources for ociImage, helmChart and helmchart-imagemap types")
@@ -126,83 +125,83 @@ var _ = Describe("Components", func() {
 		Expect(filterByNamePrefix(imageVector, "cluster-autoscaler")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To("1.31.x"),
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.31.0@sha256:501e13c151f6d655bc38bc6f9c08e4f327f074c4a958e9e0a36f1d0819e091ff"),
-				Version:       ptr.To("v1.31.0"),
+				TargetVersion: new("1.31.x"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.31.0@sha256:501e13c151f6d655bc38bc6f9c08e4f327f074c4a958e9e0a36f1d0819e091ff"),
+				Version:       new("v1.31.0"),
 			},
 			imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To("1.32.x"),
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.32.1@sha256:8c7080fa391ba569c67d4f2470dad4de0f6f1a83aa1a539f7df6fadad1fb6240"),
-				Version:       ptr.To("v1.32.1"),
+				TargetVersion: new("1.32.x"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.32.1@sha256:8c7080fa391ba569c67d4f2470dad4de0f6f1a83aa1a539f7df6fadad1fb6240"),
+				Version:       new("v1.32.1"),
 			}, imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To(">= 1.33"),
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.33.0@sha256:4932021e763b81c2679dda43af369619976a1a177726c8a507aa9003e84c18e3"),
-				Version:       ptr.To("v1.33.0"),
+				TargetVersion: new(">= 1.33"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.33.0@sha256:4932021e763b81c2679dda43af369619976a1a177726c8a507aa9003e84c18e3"),
+				Version:       new("v1.33.0"),
 			}))
 
 		By("check gardener images")
 		Expect(filterByNamePrefix(imageVector, "gardener-")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:       "gardener-admission-controller",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller"),
-				Tag:        ptr.To("v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller"),
+				Tag:        new("v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d"),
+				Version:    new("v1.128.3"),
 			},
 			imagevector.ImageSource{
 				Name:       "gardener-apiserver",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver"),
-				Tag:        ptr.To("v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver"),
+				Tag:        new("v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942"),
+				Version:    new("v1.128.3"),
 			},
 			imagevector.ImageSource{
 				Name:       "gardener-controller-manager",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager"),
-				Tag:        ptr.To("v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager"),
+				Tag:        new("v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7"),
+				Version:    new("v1.128.3"),
 			}))
 
 		By("check images from a referenced components")
 		Expect(filterByNamePrefix(imageVector, "vpn-")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "vpn-client",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-client"),
-				Tag:        ptr.To("0.41.1@sha256:1871708ac9d09183b11d4f6d55548052db89e075faa0eddb1eb8bd5bb8ee956f"),
-				Version:    ptr.To("0.41.1"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-client"),
+				Tag:        new("0.41.1@sha256:1871708ac9d09183b11d4f6d55548052db89e075faa0eddb1eb8bd5bb8ee956f"),
+				Version:    new("0.41.1"),
 			},
 			imagevector.ImageSource{
 				Name:       "vpn-server",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-server"),
-				Tag:        ptr.To("0.41.1@sha256:25b166baba9426d77929dc6cd38ab1e3d6dd846e3e9f847365dd216a1d9dd1ab"),
-				Version:    ptr.To("0.41.1"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/vpn-server"),
+				Tag:        new("0.41.1@sha256:25b166baba9426d77929dc6cd38ab1e3d6dd846e3e9f847365dd216a1d9dd1ab"),
+				Version:    new("0.41.1"),
 			}))
 
 		By("check images referenced from Kubernetes component by label `imagevector.gardener.cloud/images`")
 		Expect(filterByNamePrefix(imageVector, "hyperkube")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.32.6@sha256:7ea3d70fa985db8b1577cbae3af775af304eec06432518cc4e69d1fb5e48459f"),
-				Version:       ptr.To("1.32.6"),
-				TargetVersion: ptr.To("1.32.6"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.32.6@sha256:7ea3d70fa985db8b1577cbae3af775af304eec06432518cc4e69d1fb5e48459f"),
+				Version:       new("1.32.6"),
+				TargetVersion: new("1.32.6"),
 			},
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.32.8@sha256:6cd7f4cf3eaabfd34eb0c500b92c1bca0c88e23b851cca6e076f0e2b6f3a18e5"),
-				Version:       ptr.To("1.32.8"),
-				TargetVersion: ptr.To("1.32.8"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.32.8@sha256:6cd7f4cf3eaabfd34eb0c500b92c1bca0c88e23b851cca6e076f0e2b6f3a18e5"),
+				Version:       new("1.32.8"),
+				TargetVersion: new("1.32.8"),
 			},
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.31.10@sha256:54ba6d6336e7ce9585db3ec3bba789bfc0980e1e514b03eec6d69d193bd15c55"),
-				Version:       ptr.To("1.31.10"),
-				TargetVersion: ptr.To("1.31.10"),
+				Repository:    new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.31.10@sha256:54ba6d6336e7ce9585db3ec3bba789bfc0980e1e514b03eec6d69d193bd15c55"),
+				Version:       new("1.31.10"),
+				TargetVersion: new("1.31.10"),
 			}))
 		kubernetesVersionCount := 5
 		Expect(countImagesByName(imageVector, "hyperkube")).To(Equal(kubernetesVersionCount))
@@ -215,18 +214,18 @@ var _ = Describe("Components", func() {
 		Expect(filterByNamePrefix(imageVector, "ingress-default-backend")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "ingress-default-backend",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/ingress-default-backend"),
-				Tag:        ptr.To("0.24.0@sha256:4c9b83da61f44d255d128c56421450de95fbdd2c9f77d8ff8e9a15b8ca41a924"),
-				Version:    ptr.To("0.24.0"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/ingress-default-backend"),
+				Tag:        new("0.24.0@sha256:4c9b83da61f44d255d128c56421450de95fbdd2c9f77d8ff8e9a15b8ca41a924"),
+				Version:    new("0.24.0"),
 			}))
 
 		By("check resolution if resourceID != component name")
 		Expect(filterByNamePrefix(imageVector, "apiserver-proxy-sidecar")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "apiserver-proxy-sidecar",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver-proxy"),
-				Tag:        ptr.To("v0.19.0@sha256:18fd91eb57eef02cfb2c0f9943deeefc4e44c4a1577863d808250538af8a6e03"),
-				Version:    ptr.To("v0.19.0"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver-proxy"),
+				Tag:        new("v0.19.0@sha256:18fd91eb57eef02cfb2c0f9943deeefc4e44c4a1577863d808250538af8a6e03"),
+				Version:    new("v0.19.0"),
 			}))
 
 		By("check resources for ociImage, helmChart and helmchart-imagemap types")
@@ -281,79 +280,79 @@ var _ = Describe("Components", func() {
 		Expect(filterByNamePrefix(imageVector, "cluster-autoscaler")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To("1.31.x"),
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.31.0"),
-				Version:       ptr.To("v1.31.0"),
+				TargetVersion: new("1.31.x"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.31.0"),
+				Version:       new("v1.31.0"),
 			},
 			imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To("1.32.x"),
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.32.1"),
-				Version:       ptr.To("v1.32.1"),
+				TargetVersion: new("1.32.x"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.32.1"),
+				Version:       new("v1.32.1"),
 			}, imagevector.ImageSource{
 				Name:          "cluster-autoscaler",
-				TargetVersion: ptr.To(">= 1.33"),
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
-				Tag:           ptr.To("v1.33.0"),
-				Version:       ptr.To("v1.33.0"),
+				TargetVersion: new(">= 1.33"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/gardener/autoscaler/cluster-autoscaler"),
+				Tag:           new("v1.33.0"),
+				Version:       new("v1.33.0"),
 			}))
 		Expect(filterByNamePrefix(imageVector, "gardener-")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:       "gardener-admission-controller",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/admission-controller"),
-				Tag:        ptr.To("v1.128.3"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/admission-controller"),
+				Tag:        new("v1.128.3"),
+				Version:    new("v1.128.3"),
 			},
 			imagevector.ImageSource{
 				Name:       "gardener-apiserver",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver"),
-				Tag:        ptr.To("v1.128.3"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver"),
+				Tag:        new("v1.128.3"),
+				Version:    new("v1.128.3"),
 			},
 			imagevector.ImageSource{
 				Name:       "gardener-controller-manager",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/controller-manager"),
-				Tag:        ptr.To("v1.128.3"),
-				Version:    ptr.To("v1.128.3"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/controller-manager"),
+				Tag:        new("v1.128.3"),
+				Version:    new("v1.128.3"),
 			}))
 
 		Expect(filterByNamePrefix(imageVector, "vpn-")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "vpn-client",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-client"),
-				Tag:        ptr.To("0.41.1"),
-				Version:    ptr.To("0.41.1"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-client"),
+				Tag:        new("0.41.1"),
+				Version:    new("0.41.1"),
 			},
 			imagevector.ImageSource{
 				Name:       "vpn-server",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-server"),
-				Tag:        ptr.To("0.41.1"),
-				Version:    ptr.To("0.41.1"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/vpn-server"),
+				Tag:        new("0.41.1"),
+				Version:    new("0.41.1"),
 			}))
 
 		Expect(filterByNamePrefix(imageVector, "hyperkube")).To(ContainElements(
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.32.6"),
-				Version:       ptr.To("1.32.6"),
-				TargetVersion: ptr.To("1.32.6"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.32.6"),
+				Version:       new("1.32.6"),
+				TargetVersion: new("1.32.6"),
 			},
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.32.8"),
-				Version:       ptr.To("1.32.8"),
-				TargetVersion: ptr.To("1.32.8"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.32.8"),
+				Version:       new("1.32.8"),
+				TargetVersion: new("1.32.8"),
 			},
 			imagevector.ImageSource{
 				Name:          "hyperkube",
-				Repository:    ptr.To("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
-				Tag:           ptr.To("v1.31.10"),
-				Version:       ptr.To("1.31.10"),
-				TargetVersion: ptr.To("1.31.10"),
+				Repository:    new("europe-docker.pkg.dev/gardener-project/releases/hyperkube"),
+				Tag:           new("v1.31.10"),
+				Version:       new("1.31.10"),
+				TargetVersion: new("1.31.10"),
 			}))
 		kubernetesVersionCount := 5
 		Expect(countImagesByName(imageVector, "hyperkube")).To(Equal(kubernetesVersionCount))
@@ -365,18 +364,18 @@ var _ = Describe("Components", func() {
 		Expect(filterByNamePrefix(imageVector, "ingress-default-backend")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "ingress-default-backend",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/ingress-default-backend"),
-				Tag:        ptr.To("0.24.0"),
-				Version:    ptr.To("0.24.0"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/ingress-default-backend"),
+				Tag:        new("0.24.0"),
+				Version:    new("0.24.0"),
 			}))
 
 		// check resolution by resourceID
 		Expect(filterByNamePrefix(imageVector, "apiserver-proxy-sidecar")).To(ConsistOf(
 			imagevector.ImageSource{
 				Name:       "apiserver-proxy-sidecar",
-				Repository: ptr.To("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy"),
-				Tag:        ptr.To("v0.19.0"),
-				Version:    ptr.To("v0.19.0"),
+				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy"),
+				Tag:        new("v0.19.0"),
+				Version:    new("v0.19.0"),
 			}))
 	})
 })
