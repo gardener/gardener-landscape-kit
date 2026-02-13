@@ -37,6 +37,7 @@ install:
 .PHONY: tidy
 tidy:
 	@GO111MODULE=on go mod tidy
+	@cd $(HACK_DIR)/tools/mod && go mod tidy
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
@@ -66,12 +67,12 @@ clean:
 	@bash $(GARDENER_HACK_DIR)/clean.sh ./pkg/...
 
 .PHONY: sast
-sast: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev
+sast:
+	@export HACK_DIR=$(HACK_DIR); source $(HACK_DIR)/tools/mod/aliases.sh; bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
-sast-report: $(GOSEC)
-	@bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
+sast-report:
+	@export HACK_DIR=$(HACK_DIR); source $(HACK_DIR)/tools/mod/aliases.sh; bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
 test:
