@@ -68,11 +68,11 @@ clean:
 
 .PHONY: sast
 sast:
-	@export HACK_DIR=$(HACK_DIR); source $(HACK_DIR)/tools/mod/aliases.sh; bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev
+	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
 sast-report:
-	@export HACK_DIR=$(HACK_DIR); source $(HACK_DIR)/tools/mod/aliases.sh; bash $(GARDENER_HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
+	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
 test:
