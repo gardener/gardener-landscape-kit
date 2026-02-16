@@ -10,7 +10,7 @@ components:
   version: v1.46.0
 - name: github.com/gardener/gardener-extension-os-suse-chost
   sourceRepository: https://github.com/gardener/gardener-extension-os-suse-chost
-  version: v1.34.0
+  version: v1.35.0
 - name: github.com/gardener/gardener-extension-os-gardenlinux
   sourceRepository: https://github.com/gardener/gardener-extension-os-gardenlinux
   version: v0.35.0
