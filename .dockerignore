@@ -1,13 +1,30 @@
+# Exclude folders not relevant for build
 /args
 /bin
 /tmp/*
 /local
 /dev
+/test
+/dev-setup
+/example
+/.github
+/.idea
 
 *.test
 *.coverprofile
 *.html
 .vscode
 .idea
+.claude
 .DS_Store
 *~
+
+# Virtual go & fuse
+.virtualgo
+.fuse_hidden*
+
+# GitGuardian
+.cache_ggshield
+
+# gosec
+gosec-report.sarif
