@@ -43,4 +43,4 @@ components:
   version: v0.31.0
 - name: github.com/gardener/gardener-extension-runtime-gvisor
   sourceRepository: https://github.com/gardener/gardener-extension-runtime-gvisor
-  version: v0.28.0
+  version: v0.29.0
