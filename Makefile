@@ -136,8 +136,10 @@ ifndef ARTIFACTS
 	export ARTIFACTS=/tmp/artifacts
 endif
 
+e2e-prepare: export BUILD_OUTPUT_FILE=$(TOOLS_BIN_DIR)
+
 .PHONY: e2e-prepare
-e2e-prepare: $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY) $(GLK_GLK)
+e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
 	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh

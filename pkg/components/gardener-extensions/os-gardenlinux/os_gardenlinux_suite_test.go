@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package os_gardenlinux_test
+package gardenlinux_test
 
 import (
 	"testing"

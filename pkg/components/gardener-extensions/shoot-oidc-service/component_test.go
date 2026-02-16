@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_oidc_service_test
+package oidcservice_test
 
 import (
 	"github.com/go-logr/logr"

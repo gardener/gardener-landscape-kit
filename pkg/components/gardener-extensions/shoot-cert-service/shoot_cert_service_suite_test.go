@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package shoot_cert_service_test
+package certservice_test
 
 import (
 	"testing"

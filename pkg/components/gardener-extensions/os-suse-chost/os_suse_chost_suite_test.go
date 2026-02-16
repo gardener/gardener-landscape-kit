@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package os_suse_chost_test
+package suse_test
 
 import (
 	"testing"

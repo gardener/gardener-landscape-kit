@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package provider_azure_test
+package azure_test
 
 import (
 	"testing"

@@ -25,10 +25,10 @@ import (
 	gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
 	openstack "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-openstack"
 	gvisor "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/runtime-gvisor"
-	cert "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-cert-service"
-	dns "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-dns-service"
+	certservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-cert-service"
+	dnsservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-dns-service"
 	networkingproblemdetector "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-networking-problemdetector"
-	oidc "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-oidc-service"
+	oidcservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-oidc-service"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 )
@@ -47,9 +47,9 @@ var ComponentList = []func() components.Interface{
 	openstack.NewComponent,
 	gardenlinux.NewComponent,
 	suse.NewComponent,
-	cert.NewComponent,
-	dns.NewComponent,
-	oidc.NewComponent,
+	certservice.NewComponent,
+	dnsservice.NewComponent,
+	oidcservice.NewComponent,
 	networkingproblemdetector.NewComponent,
 	gvisor.NewComponent,
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package provider_alicloud_test
+package alicloud_test
 
 import (
 	"testing"

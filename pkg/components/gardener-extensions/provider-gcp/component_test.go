@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package provider_gcp_test
+package gcp_test
 
 import (
 	"github.com/go-logr/logr"
