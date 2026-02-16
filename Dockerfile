@@ -1,12 +1,17 @@
 # builder
 FROM --platform=$BUILDPLATFORM golang:1.26.0 AS builder
-ARG GOPROXY=https://proxy.golang.org,direct
-ENV GOPROXY=$GOPROXY
-WORKDIR /go/src/github.com/gardener/gardener-landscape-kit
-COPY . .
+
 ARG EFFECTIVE_VERSION
 ARG TARGETOS
 ARG TARGETARCH
+ARG GOPROXY=https://proxy.golang.org,direct
+ENV GOPROXY=$GOPROXY
+WORKDIR /go/src/github.com/gardener/gardener-landscape-kit
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
 RUN make build EFFECTIVE_VERSION=$EFFECTIVE_VERSION GOOS=$TARGETOS GOARCH=$TARGETARCH BUILD_OUTPUT_FILE="/output/bin/"
 
 # distroless-static
