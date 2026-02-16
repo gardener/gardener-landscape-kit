@@ -24,7 +24,7 @@ The following dependencies have been updated:\n\
       managerFilePatterns: ['/^componentvector/components\\.yaml$/'],
       matchStrings: [
         // Match default versions in components.yaml, regardless of the order of the fields.
-        '- (?:(?:name: (?<depName>[^\\s]+)|sourceRepository: https://github\\.com/(?<packageName>[^\\s]+)|version: (?<currentValue>v?[^\\s]+))\\s*\\n?\\s*){3}',
+        '- (?:(?:name: github\\.com/(?<depName>[^\\s]+)|sourceRepository: https://github\\.com/(?<packageName>[^\\s]+)|version: (?<currentValue>v?[^\\s]+))\\s*\\n?\\s*){3}',
       ],
       datasourceTemplate: 'github-releases',
     },
