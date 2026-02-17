@@ -12,3 +12,4 @@ patches:
     - op: add
       path: /spec/template/spec/containers/0/args/-
       value: --concurrent=30
+- path: patch-flux-virtual-garden-access.yaml
