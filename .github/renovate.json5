@@ -5,7 +5,7 @@
     'github>gardener/ci-infra//config/renovate/group-go-updates.json5',
   ],
   postUpgradeTasks: {
-    commands: ['make generate'],
+    commands: ['make generate MODE=sequential'],
     fileFilters: ['.github/**', 'pkg/**', 'docs/**'],
   },
   baseBranchPatterns: [
@@ -40,6 +40,10 @@ The following dependencies have been updated:\n\
       matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
       matchUpdateTypes: ['minor', 'major'],
       enabled: false,
+    },
+    {
+      groupName: "gardener/gardener",
+      matchPackageNames: ["github.com/gardener/gardener", "gardener/gardener"],
     },
     {
       matchDatasources: ['go'],
