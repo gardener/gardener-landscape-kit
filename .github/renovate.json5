@@ -42,6 +42,10 @@ The following dependencies have been updated:\n\
       enabled: false,
     },
     {
+      groupName: "gardener/gardener",
+      matchPackageNames: ["github.com/gardener/gardener", "gardener/gardener"],
+    },
+    {
       matchDatasources: ['go'],
       groupName: "open-component-model-bindings-go-descriptor-runtime",
       matchPackageNames: ["ocm.software/open-component-model/bindings/go/descriptor/runtime"],
