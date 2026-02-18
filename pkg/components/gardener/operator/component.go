@@ -107,7 +107,10 @@ func getRenderValues(opts components.Options) (map[string]any, error) {
 		return nil, err
 	}
 
-	values := cv.TemplateValues()
+	values, err := cv.TemplateValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get template values from component vector: %w", err)
+	}
 	values["repository"] = repository
 	values["tag"] = tag
 	return values, nil

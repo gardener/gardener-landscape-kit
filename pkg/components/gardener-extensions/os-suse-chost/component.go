@@ -68,7 +68,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func getRenderValues(opts components.Options) map[string]any {
+func getRenderValues(opts components.Options) (map[string]any, error) {
 	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardenerExtensionOsSuseChost)
 	if cv == nil || len(cv.Resources) == 0 {
 		version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionOsSuseChost)
@@ -83,7 +83,7 @@ func getRenderValues(opts components.Options) map[string]any {
 					},
 				},
 			},
-		}
+		}, nil
 	}
 	return cv.TemplateValues()
 }
@@ -103,7 +103,11 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	values := utils.MergeMaps(getRenderValues(opts), map[string]any{
+	renderValue, err := getRenderValues(opts)
+	if err != nil {
+		return err
+	}
+	values := utils.MergeMaps(renderValue, map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})

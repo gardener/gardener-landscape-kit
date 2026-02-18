@@ -7,16 +7,19 @@ package cilium_test
 import (
 	"os"
 
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
+	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	networking_cilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
@@ -104,7 +107,14 @@ var _ = Describe("Component Generation", func() {
 			"testdata/expected-kustomize-plain.yaml"),
 		Entry("ocm",
 			testutils.ComponentVector("github.com/gardener/gardener-extension-networking-cilium", "v1.2.3").
-				WithImageVectorOverwrite("imageVectorOverwriteContent").
+				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+					Images: []imagevector.ImageSource{
+						{
+							Name: "component1",
+							Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+						},
+					},
+				}).
 				WithResourcesYAML(`
 admissionCiliumApplication:
   helmChart:
