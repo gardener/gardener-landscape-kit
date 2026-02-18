@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package gardenproject
+package gardenconfig
 
 import (
 	"embed"
@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	// ComponentName is the name of the garden-project component.
-	ComponentName = "garden-project"
-	// ComponentDirectory is the directory of the garden-project component within the base components directory.
-	ComponentDirectory = "virtual-garden/garden-project"
+	// ComponentName is the name of the garden-config component.
+	ComponentName = "garden-config"
+	// ComponentDirectory is the directory of the garden-config component within the base components directory.
+	ComponentDirectory = "virtual-garden/garden-config"
 )
 
 var (
@@ -33,7 +33,7 @@ var (
 
 type component struct{}
 
-// NewComponent creates a new garden-project component.
+// NewComponent creates a new garden-config component.
 func NewComponent() components.Interface {
 	return &component{}
 }
