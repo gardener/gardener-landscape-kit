@@ -73,7 +73,7 @@ type Resource struct {
 	// Name is the name of the resource.
 	Name string `json:"name"`
 	// Alias is an optional alias name of the resource.
-	Alias string `json:"alias,omitempty"`
+	Alias *string `json:"alias,omitempty"`
 	// Version is the version of the resource.
 	Version string `json:"version"`
 	// Type is the type of the resource (e.g., "ociImage", "helmChart/v1").
@@ -213,7 +213,7 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 					Local:   src.Local,
 				}
 				if src.ResourceName != src.Name {
-					resource.Alias = src.ResourceName
+					resource.Alias = ptr.To(src.ResourceName)
 				}
 				resources = append(resources, resource)
 			}
@@ -431,9 +431,9 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 				}
 				addEntry(res.Value, m, res.Name, "ociImage", "ref")
 				ociImageRefs[res.Name] = res.Value
-				if res.Alias != "" {
-					addEntry(res.Value, m, res.Alias, "ociImage", "ref")
-					ociImageRefs[res.Alias] = res.Value
+				if alias := ptr.Deref(res.Alias, ""); alias != "" {
+					addEntry(res.Value, m, alias, "ociImage", "ref")
+					ociImageRefs[alias] = res.Value
 				}
 			case ResourceTypeHelmChart:
 				addEntry(res.Value, m, res.Name, "helmChart", "ref")
