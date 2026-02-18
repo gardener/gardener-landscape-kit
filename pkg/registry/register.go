@@ -32,7 +32,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 	virtualgardenaccess "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/virtual-garden-access"
-	gardenproject "github.com/gardener/gardener-landscape-kit/pkg/components/virtual-garden/garden-project"
+	gardenconfig "github.com/gardener/gardener-landscape-kit/pkg/components/virtual-garden/garden-config"
 )
 
 // ComponentList contains all available components.
@@ -55,7 +55,7 @@ var ComponentList = []func() components.Interface{
 	networkingproblemdetector.NewComponent,
 	gvisor.NewComponent,
 	virtualgardenaccess.NewComponent,
-	gardenproject.NewComponent,
+	gardenconfig.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.

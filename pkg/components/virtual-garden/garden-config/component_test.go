@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package gardenproject_test
+package gardenconfig_test
 
 import (
 	"github.com/go-logr/logr"
@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	gardenproject "github.com/gardener/gardener-landscape-kit/pkg/components/virtual-garden/garden-project"
+	gardenconfig "github.com/gardener/gardener-landscape-kit/pkg/components/virtual-garden/garden-config"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -43,19 +43,19 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := gardenproject.NewComponent()
+			component := gardenconfig.NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			for _, file := range []string{
-				"/repo/baseDir/.glk/defaults/components/virtual-garden/garden-project/project.yaml",
-				"/repo/baseDir/components/virtual-garden/garden-project/project.yaml",
+				"/repo/baseDir/.glk/defaults/components/virtual-garden/garden-config/project.yaml",
+				"/repo/baseDir/components/virtual-garden/garden-config/project.yaml",
 			} {
 				content, err := fs.ReadFile(file)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(content)).To(ContainSubstring("Project"))
 			}
 
-			content, err := fs.ReadFile("/repo/baseDir/components/virtual-garden/garden-project/kustomization.yaml")
+			content, err := fs.ReadFile("/repo/baseDir/components/virtual-garden/garden-config/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- project.yaml"))
 		})
@@ -70,7 +70,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := gardenproject.NewComponent()
+			component := gardenconfig.NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
@@ -79,13 +79,13 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(exists).To(BeFalse())
 
-			content, err := fs.ReadFile("/repo/landscapeDir/components/virtual-garden/garden-project/flux-kustomization.yaml")
+			content, err := fs.ReadFile("/repo/landscapeDir/components/virtual-garden/garden-config/flux-kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/virtual-garden/garden-project"))
+			Expect(string(content)).To(ContainSubstring("path: landscapeDir/components/virtual-garden/garden-config"))
 
-			content, err = fs.ReadFile("/repo/landscapeDir/components/virtual-garden/garden-project/kustomization.yaml")
+			content, err = fs.ReadFile("/repo/landscapeDir/components/virtual-garden/garden-config/kustomization.yaml")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/virtual-garden/garden-project"))
+			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/virtual-garden/garden-config"))
 		})
 	})
 })

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package gardenproject_test
+package gardenconfig_test
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGardenProject(t *testing.T) {
+func TestGardenConfig(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Components Garden Project Suite")
+	RunSpecs(t, "Components Garden Config Suite")
 }
