@@ -55,14 +55,14 @@ func ComponentVector(name, version string) *ComponentVectorFactoryBuilder {
 }
 
 // WithImageVectorOverwrite sets the image vector overwrite of the component vector.
-func (b *ComponentVectorFactoryBuilder) WithImageVectorOverwrite(s string) *ComponentVectorFactoryBuilder {
-	b.cv.ImageVectorOverwrite = s
+func (b *ComponentVectorFactoryBuilder) WithImageVectorOverwrite(v componentvector.ImageVectorOverwrite) *ComponentVectorFactoryBuilder {
+	b.cv.ImageVectorOverwrite = &v
 	return b
 }
 
 // WithComponentImageVectorOverwrites sets the component image vector overwrites of the component vector.
-func (b *ComponentVectorFactoryBuilder) WithComponentImageVectorOverwrites(s string) *ComponentVectorFactoryBuilder {
-	b.cv.ComponentImageVectorOverwrites = s
+func (b *ComponentVectorFactoryBuilder) WithComponentImageVectorOverwrites(v componentvector.ComponentImageVectorOverwrites) *ComponentVectorFactoryBuilder {
+	b.cv.ComponentImageVectorOverwrites = &v
 	return b
 }
 

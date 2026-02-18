@@ -18,7 +18,6 @@ import (
 	descriptorruntime "ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
 	accessv1 "ocm.software/open-component-model/bindings/go/oci/spec/access/v1"
-	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
@@ -88,22 +87,6 @@ type Resource struct {
 // ResourcesOutput is the output format for the resources JSON output.
 type ResourcesOutput struct {
 	Resources []Resource `json:"resources"`
-}
-
-// ComponentImageOverwritesOutput is the output format for multiple components' image vector overwrites.
-type ComponentImageOverwritesOutput struct {
-	Components []ComponentImageOverwriteOutput `json:"components"`
-}
-
-// ComponentImageOverwriteOutput is the output format for a single component's image vector overwrite.
-type ComponentImageOverwriteOutput struct {
-	Name                 string                     `json:"name"`
-	ImageVectorOverwrite ImageVectorOverwriteOutput `json:"imageVectorOverwrite"`
-}
-
-// ImageVectorOverwriteOutput is the output format for the image vector overwrite.
-type ImageVectorOverwriteOutput struct {
-	Images []imagevector.ImageSource `json:"images"`
 }
 
 // NewComponents creates a new instance of Components.
@@ -212,7 +195,7 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 					Value:   reference,
 					Local:   src.Local,
 				}
-				if src.ResourceName != src.Name {
+				if src.ResourceName != src.Name && src.ResourceName != "" {
 					resource.Alias = ptr.To(src.ResourceName)
 				}
 				resources = append(resources, resource)
@@ -469,20 +452,16 @@ func (c *Components) addGLKImageVectorOverwrite(cref ComponentReference, cv *uti
 		return fmt.Errorf("could not get image vector for component %s: %w", cref, err)
 	}
 	if len(imageSources) > 0 {
-		data, err := yaml.Marshal(ImageVectorOverwriteOutput{
+		cv.ImageVectorOverwrite = &utilscomponentvector.ImageVectorOverwrite{
 			Images: imageSources,
-		})
-		if err != nil {
-			return fmt.Errorf("could not marshal image vector for component %s: %w", cref, err)
 		}
-		cv.ImageVectorOverwrite = string(data)
 	}
 
 	return nil
 }
 
 func (c *Components) addGLKComponentsImageOverwrites(cref ComponentReference, cv *utilscomponentvector.ComponentVector) error {
-	var componentsImageOverwrites ComponentImageOverwritesOutput
+	var componentsImageOverwrites utilscomponentvector.ComponentImageVectorOverwrites
 	for _, dep := range c.dependencies[cref] {
 		if dep.ComponentReference == cref {
 			continue
@@ -494,20 +473,16 @@ func (c *Components) addGLKComponentsImageOverwrites(cref ComponentReference, cv
 		if len(componentImageSources) == 0 {
 			continue
 		}
-		componentsImageOverwrites.Components = append(componentsImageOverwrites.Components, ComponentImageOverwriteOutput{
+		componentsImageOverwrites.Components = append(componentsImageOverwrites.Components, utilscomponentvector.ComponentImageVectorOverwrite{
 			Name: dep.LocalName,
-			ImageVectorOverwrite: ImageVectorOverwriteOutput{
+			ImageVectorOverwrite: utilscomponentvector.ImageVectorOverwrite{
 				Images: componentImageSources,
 			},
 		})
 	}
 
 	if len(componentsImageOverwrites.Components) > 0 {
-		data, err := yaml.Marshal(componentsImageOverwrites)
-		if err != nil {
-			return fmt.Errorf("could not marshal dependent components image vector for component %s: %w", cref, err)
-		}
-		cv.ComponentImageVectorOverwrites = string(data)
+		cv.ComponentImageVectorOverwrites = &componentsImageOverwrites
 	}
 	return nil
 }

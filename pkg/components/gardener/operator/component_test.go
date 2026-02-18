@@ -7,17 +7,20 @@ package operator_test
 import (
 	"os"
 
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 	"github.com/spf13/afero"
+	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
 )
 
@@ -122,8 +125,29 @@ var _ = Describe("Component Generation", func() {
 			"testdata/expected-kustomize-plain.yaml"),
 		Entry("ocm",
 			testutils.ComponentVector("github.com/gardener/gardener", "v1.2.3").
-				WithImageVectorOverwrite("imageVectorOverwriteContent").
-				WithComponentImageVectorOverwrites("componentImageVectorOverwritesContent").
+				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+					Images: []imagevector.ImageSource{
+						{
+							Name: "component1",
+							Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+						},
+					},
+				}).
+				WithComponentImageVectorOverwrites(componentvector.ComponentImageVectorOverwrites{
+					Components: []componentvector.ComponentImageVectorOverwrite{
+						{
+							Name: "etcd-druid",
+							ImageVectorOverwrite: componentvector.ImageVectorOverwrite{
+								Images: []imagevector.ImageSource{
+									{
+										Name: "component2",
+										Ref:  ptr.To("test.repo/path/component2:v1.2.3"),
+									},
+								},
+							},
+						},
+					},
+				}).
 				WithResourcesYAML(`
 operator:
   helmChart:

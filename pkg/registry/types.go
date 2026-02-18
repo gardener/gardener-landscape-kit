@@ -95,7 +95,11 @@ func (r *registry) renderCustomComponents(ocmComponentName, componentDir string,
 		if err != nil {
 			return err
 		}
-		renderedContent, _, err := files.RenderTemplate(content, info.Name(), cv.TemplateValues())
+		values, err := cv.TemplateValues()
+		if err != nil {
+			return fmt.Errorf("error getting template values for custom component %s: %w", ocmComponentName, err)
+		}
+		renderedContent, _, err := files.RenderTemplate(content, info.Name(), values)
 		if err != nil {
 			return fmt.Errorf("error rendering template file %s for custom component %s: %w", path, ocmComponentName, err)
 		}

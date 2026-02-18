@@ -4,6 +4,8 @@
 
 package componentvector
 
+import "github.com/gardener/gardener/pkg/utils/imagevector"
+
 // Components is a list of components.
 type Components struct {
 	// Components is the list of component vectors.
@@ -21,9 +23,25 @@ type ComponentVector struct {
 	// Resources is an optional list of values representing resources of the component.
 	Resources map[string]any `json:"resources,omitempty"`
 	// ImageVectorOverwrite is an optional image vector overwrite for the component.
-	ImageVectorOverwrite string `json:"imageVectorOverwrite,omitempty"`
+	ImageVectorOverwrite *ImageVectorOverwrite `json:"imageVectorOverwrite,omitempty"`
 	// ComponentImageVectorOverwrites are optional component image vector overwrites for components deployed with this component.
-	ComponentImageVectorOverwrites string `json:"componentImageVectorOverwrites,omitempty"`
+	ComponentImageVectorOverwrites *ComponentImageVectorOverwrites `json:"componentImageVectorOverwrites,omitempty"`
+}
+
+// ImageVectorOverwrite is the list of image sources that overwrite the default image vector for a component.
+type ImageVectorOverwrite struct {
+	Images []imagevector.ImageSource `json:"images"`
+}
+
+// ComponentImageVectorOverwrites is list of ComponentImageVectorOverwrite.
+type ComponentImageVectorOverwrites struct {
+	Components []ComponentImageVectorOverwrite `json:"components"`
+}
+
+// ComponentImageVectorOverwrite is the named ImageVectorOverwrite for a subcomponent.
+type ComponentImageVectorOverwrite struct {
+	Name                 string               `json:"name"`
+	ImageVectorOverwrite ImageVectorOverwrite `json:"imageVectorOverwrite"`
 }
 
 // Interface is a marker interface for component vectors.

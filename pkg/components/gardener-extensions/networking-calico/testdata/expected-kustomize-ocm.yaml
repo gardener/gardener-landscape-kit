@@ -28,7 +28,9 @@ spec:
           repository: test-repo/path/gardener/extensions/networking-calico
           tag: v1.2.3
         imageVectorOverwrite: |
-          imageVectorOverwriteContent
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
   resources:
   - kind: Network
     type: calico

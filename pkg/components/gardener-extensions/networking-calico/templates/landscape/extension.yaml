@@ -27,5 +27,5 @@ spec:
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
-  {{ indent 10 .imageVectorOverwrite }}
+{{ indent 10 .imageVectorOverwrite }}
         {{- end }}

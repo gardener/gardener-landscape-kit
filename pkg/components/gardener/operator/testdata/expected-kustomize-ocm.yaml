@@ -29,10 +29,17 @@ spec:
     crds: CreateReplace
   values:
     componentImageVectorOverwrites: |
-      componentImageVectorOverwritesContent
+      components:
+      - imageVectorOverwrite: |
+          images:
+          - name: component2
+            ref: test.repo/path/component2:v1.2.3
+        name: etcd-druid
     image:
       repository: test.repo/path/gardener/operator
       tag: v1.2.3
     imageVectorOverwrite: |
-      imageVectorOverwriteContent
+      images:
+      - name: component1
+        ref: test.repo/path/component1:v1.2.3
     replicaCount: 2

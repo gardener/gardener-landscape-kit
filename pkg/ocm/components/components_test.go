@@ -337,15 +337,20 @@ scheduler:
   ociImage:
     ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
 `))
-		Expect(componentVersions.Components[0].ImageVectorOverwrite).To(ContainSubstring(`images:
-- name: alertmanager
-  repository: registry.example.com/path/to/repo/quay_io/prometheus/alertmanager
-  tag: v0.28.1@sha256:ec1de8cc83bac6ec73b7c8bd0530341d70d8407e5749d561681654731881f351
-  version: v0.28.1
-- name: alpine-conntrack
-  repository: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack
-  tag: 3.21.3@sha256:d776104e96516887cd33abb4fc4786fb6c1872cf3e03bd2d53b93c1652b947fa
-  version: 3.21.3`))
+		Expect(componentVersions.Components[0].ImageVectorOverwrite).NotTo(BeNil())
+		Expect(componentVersions.Components[0].ImageVectorOverwrite.Images).To(ContainElements(
+			imagevector.ImageSource{
+				Name:       "alertmanager",
+				Repository: ptr.To("registry.example.com/path/to/repo/quay_io/prometheus/alertmanager"),
+				Tag:        ptr.To("v0.28.1@sha256:ec1de8cc83bac6ec73b7c8bd0530341d70d8407e5749d561681654731881f351"),
+				Version:    ptr.To("v0.28.1"),
+			},
+			imagevector.ImageSource{
+				Name:       "alpine-conntrack",
+				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack"),
+				Tag:        ptr.To("3.21.3@sha256:d776104e96516887cd33abb4fc4786fb6c1872cf3e03bd2d53b93c1652b947fa"),
+				Version:    ptr.To("3.21.3"),
+			}))
 	})
 
 	It("should produce correct image vector for gardener/gardener with original reference", func() {
