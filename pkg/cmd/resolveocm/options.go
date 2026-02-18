@@ -85,11 +85,11 @@ func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.IntVar(&o.Workers, "workers", 10, "Number of concurrent workers to use for resolving OCM components.")
 }
 
-func (o *Options) effectiveOutputDir() string {
-	return path.Join(o.baseDir(), o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
+func (o *Options) effectiveIntermediateOutputDir() string {
+	return path.Join(o.intermediateResultDir(), o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
 }
 
-func (o *Options) baseDir() string {
+func (o *Options) intermediateResultDir() string {
 	return path.Join(o.LandscapeDir, files.GLKSystemDirName, "ocm")
 }
 

@@ -52,7 +52,7 @@ gardner-landscape-kit resolve-ocm-components \
 }
 
 func run(_ context.Context, opts *Options) error {
-	outputDir := opts.effectiveOutputDir()
+	outputDir := opts.effectiveIntermediateOutputDir()
 	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", outputDir, "rootComponent", opts.Config.OCM.RootComponent)
 
 	if err := writeGitIgnoreFile(opts); err != nil {
@@ -63,12 +63,12 @@ func run(_ context.Context, opts *Options) error {
 }
 
 func writeGitIgnoreFile(opts *Options) error {
-	baseDir := opts.baseDir()
-	if err := os.MkdirAll(baseDir, 0700); err != nil {
-		return fmt.Errorf("failed to create output base directory %s: %w", baseDir, err)
+	intermediateResultDir := opts.intermediateResultDir()
+	if err := os.MkdirAll(intermediateResultDir, 0700); err != nil {
+		return fmt.Errorf("failed to create intermediate result directory %s: %w", intermediateResultDir, err)
 	}
-	if err := os.WriteFile(path.Join(baseDir, ".gitignore"), []byte("/*"), 0600); err != nil {
-		return fmt.Errorf("failed to write .gitignore file to output base directory %s: %w", baseDir, err)
+	if err := os.WriteFile(path.Join(intermediateResultDir, ".gitignore"), []byte("/*"), 0600); err != nil {
+		return fmt.Errorf("failed to write .gitignore file to intermediate result directory %s: %w", intermediateResultDir, err)
 	}
 	return nil
 }
