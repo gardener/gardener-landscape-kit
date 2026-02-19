@@ -65,7 +65,7 @@ func WriteKustomizationComponent(objects map[string][]byte, baseDir, componentDi
 // Kustomize kustomization.yaml files for each level until each component leaf node containing a Flux Kustomization is reached.
 func WriteLandscapeComponentsKustomizations(options components.Options) error {
 	fs := options.GetFilesystem()
-	targetDir := path.Clean(options.GetTargetPath())
+	targetDir := options.GetTargetPath()
 	componentsDir := filepath.Join(targetDir, components.DirName)
 
 	return fs.Walk(componentsDir, writeKustomizationsToFileTree(fs, targetDir))

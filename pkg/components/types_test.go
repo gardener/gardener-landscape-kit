@@ -53,7 +53,16 @@ var _ = Describe("Types", func() {
 				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetTargetPath()).To(BeEmpty())
+				Expect(componentOpts.GetTargetPath()).To(Equal("."))
+			})
+
+			It("should return a cleaned path", func() {
+				opts.TargetDirPath = "/path/to/target/../landscape"
+
+				componentOpts, err := components.NewOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/landscape"))
 			})
 		})
 

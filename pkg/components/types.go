@@ -7,6 +7,7 @@ package components
 import (
 	_ "embed"
 	"fmt"
+	"path"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
@@ -112,7 +113,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 
 	return &options{
 		componentVector: componentVector,
-		targetPath:      opts.TargetDirPath,
+		targetPath:      path.Clean(opts.TargetDirPath),
 		filesystem:      fs,
 		logger:          opts.Log,
 	}, nil
