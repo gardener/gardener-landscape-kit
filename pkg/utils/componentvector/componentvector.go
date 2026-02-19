@@ -67,8 +67,12 @@ func New(input []byte) (Interface, error) {
 
 // TemplateValues returns the template values for the component vector.
 func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
+	resources, err := resourcesToUnstructuredMap(cv.Resources)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
+	}
 	m := map[string]any{
-		"resources": cv.Resources,
+		"resources": resources,
 	}
 	if cv.ImageVectorOverwrite != nil {
 		// Marshal the ImageVectorOverwrite as it is expected to be as string.
@@ -105,16 +109,16 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 	return m, nil
 }
 
-// GetTemplateResourceValue retrieves a nested value from the Resources map using the provided keys.
-// It returns nil if any key in the path does not exist.
-func (cv *ComponentVector) GetTemplateResourceValue(keys ...string) any {
-	var current any = cv.Resources
-	for _, key := range keys {
-		currentMap, ok := current.(map[string]any)
-		if !ok {
-			return nil
+func resourcesToUnstructuredMap(resources map[string]*ResourceData) (map[string]any, error) {
+	unstructuredMap := make(map[string]any)
+	if len(resources) > 0 {
+		data, err := yaml.Marshal(resources)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal resources: %w", err)
 		}
-		current = currentMap[key]
+		if err := yaml.Unmarshal(data, &unstructuredMap); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal resources: %w", err)
+		}
 	}
-	return current
+	return unstructuredMap, nil
 }

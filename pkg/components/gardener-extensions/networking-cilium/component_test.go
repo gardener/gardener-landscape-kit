@@ -117,31 +117,26 @@ var _ = Describe("Component Generation", func() {
 				}).
 				WithResourcesYAML(`
 admissionCiliumApplication:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-cilium-application:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-cilium-application:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionCilium:
       image:
         repository: test-repo/path/gardener/extensions/admission-cilium
         tag: v1.2.3
 admissionCiliumRuntime:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-cilium-runtime:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-cilium-runtime:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionCilium:
       image:
         repository: test-repo/path/gardener/extensions/admission-cilium
         tag: v1.2.3
 gardenerExtensionAdmissionCilium:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/admission-cilium:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/admission-cilium:v1.2.3
 gardenerExtensionNetworkingCilium:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/networking-cilium:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/networking-cilium:v1.2.3
 networkingCilium:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/networking-cilium:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/networking-cilium:v1.2.3
+  helmChartImageMap:
     gardenerExtensionNetworkingCilium:
       image:
         repository: test-repo/path/gardener/extensions/networking-cilium

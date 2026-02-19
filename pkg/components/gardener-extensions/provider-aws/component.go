@@ -78,19 +78,13 @@ func getRenderValues(opts components.Options) (map[string]any, error) {
 		return map[string]any{
 			"resources": map[string]any{
 				"admissionAwsRuntime": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:" + version,
 				},
 				"admissionAwsApplication": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application:" + version,
 				},
 				"providerAws": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws:" + version,
 				},
 			},
 		}, nil

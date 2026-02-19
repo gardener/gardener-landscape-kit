@@ -117,12 +117,10 @@ var _ = Describe("Component Generation", func() {
 				}).
 				WithResourcesYAML(`
 gardenerExtensionOsSuseChost:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/os-suse-chost:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/os-suse-chost:v1.2.3
 osSuseChost:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/os-suse-chost:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/os-suse-chost:v1.2.3
+  helmChartImageMap:
     gardenerExtensionOsSuseChost:
       image:
         repository: test-repo/path/gardener/extensions/os-suse-chost

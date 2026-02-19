@@ -20,8 +20,8 @@ type ComponentVector struct {
 	SourceRepository string `json:"sourceRepository"`
 	// Version is the version of the component.
 	Version string `json:"version"`
-	// Resources is an optional list of values representing resources of the component.
-	Resources map[string]any `json:"resources,omitempty"`
+	// Resources contains additional data for component resources like OCI image references and Helm chart references.
+	Resources map[string]*ResourceData `json:"resources,omitempty"`
 	// ImageVectorOverwrite is an optional image vector overwrite for the component.
 	ImageVectorOverwrite *ImageVectorOverwrite `json:"imageVectorOverwrite,omitempty"`
 	// ComponentImageVectorOverwrites are optional component image vector overwrites for components deployed with this component.
@@ -42,6 +42,16 @@ type ComponentImageVectorOverwrites struct {
 type ComponentImageVectorOverwrite struct {
 	Name                 string               `json:"name"`
 	ImageVectorOverwrite ImageVectorOverwrite `json:"imageVectorOverwrite"`
+}
+
+// ResourceData contains additional data for component resources like OCI image references and Helm chart references.
+type ResourceData struct {
+	// OCIImageReference is the OCI image reference of the component resource.
+	OCIImageReference *string `json:"ociImageRef,omitempty"`
+	// HelmChartReference is the Helm chart reference of the component resource.
+	HelmChartReference *string `json:"helmChartRef,omitempty"`
+	// HelmChartImageMap is the map of image names to helm chart values for overwriting OCI image repository and tag.
+	HelmChartImageMap map[string]any `json:"helmChartImageMap,omitempty"`
 }
 
 // Interface is a marker interface for component vectors.

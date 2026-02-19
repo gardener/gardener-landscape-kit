@@ -401,7 +401,7 @@ func (c *Components) GetGLKComponents(customComponents sets.Set[string], ignoreM
 }
 
 func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utilscomponentvector.ComponentVector) error {
-	m := make(map[string]any)
+	m := make(map[string]*utilscomponentvector.ResourceData)
 	ociImageRefs := make(map[string]string)
 	imageMaps := make(map[string]string)
 	if resources := c.GetResources(cref); len(resources) > 0 {
@@ -412,14 +412,17 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 					// external images are only relevant for imageVectorOverwrite
 					continue
 				}
-				addEntry(res.Value, m, res.Name, "ociImage", "ref")
+				data := ensureResourceData(m, res.Name)
+				data.OCIImageReference = ptr.To(res.Value)
 				ociImageRefs[res.Name] = res.Value
 				if alias := ptr.Deref(res.Alias, ""); alias != "" {
-					addEntry(res.Value, m, alias, "ociImage", "ref")
+					data = ensureResourceData(m, alias)
+					data.OCIImageReference = ptr.To(res.Value)
 					ociImageRefs[alias] = res.Value
 				}
 			case ResourceTypeHelmChart:
-				addEntry(res.Value, m, res.Name, "helmChart", "ref")
+				data := ensureResourceData(m, res.Name)
+				data.HelmChartReference = ptr.To(res.Value)
 			case ResourceTypeHelmChartImageMap:
 				imageMaps[res.Name] = res.Value
 			default:
@@ -429,19 +432,13 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 	}
 
 	for name, value := range imageMaps {
-		if m[name] == nil {
-			m[name] = map[string]any{}
-		}
-		subMap, ok := m[name].(map[string]any)
-		if !ok {
-			return fmt.Errorf("expected map for inserting helm chart image map %s for component %s", name, cref)
-		}
-		if err := insertDataFromHelmChartImageMap(subMap, value, ociImageRefs); err != nil {
+		data := ensureResourceData(m, name)
+		if err := insertDataFromHelmChartImageMap(data, value, ociImageRefs); err != nil {
 			return fmt.Errorf("could not insert data from helm chart image map %s for component %s: %w", name, cref, err)
 		}
 	}
 
-	cv.Resources = helpers.DashToCamelCaseForMapKeys(m)
+	cv.Resources = dashToCamelCaseForMapKeys(m)
 
 	return nil
 }
@@ -776,7 +773,16 @@ func SortImageSources(images []imagevector.ImageSource) {
 	})
 }
 
-func insertDataFromHelmChartImageMap(resourceMap map[string]any, value string, ociImageReferences map[string]string) error {
+func ensureResourceData(m map[string]*utilscomponentvector.ResourceData, resourceName string) *utilscomponentvector.ResourceData {
+	res, exists := m[resourceName]
+	if !exists {
+		res = &utilscomponentvector.ResourceData{}
+		m[resourceName] = res
+	}
+	return res
+}
+
+func insertDataFromHelmChartImageMap(resourceData *utilscomponentvector.ResourceData, value string, ociImageReferences map[string]string) error {
 	data, err := helpers.ParseHelmChartImageMap([]byte(value))
 	if err != nil {
 		return err
@@ -796,7 +802,7 @@ func insertDataFromHelmChartImageMap(resourceMap map[string]any, value string, o
 		addEntryWithDotKey(current, imgMapping.Repository, repository)
 		addEntryWithDotKey(current, imgMapping.Tag, tag)
 	}
-	resourceMap[ResourceTypeHelmChartImageMap] = result
+	resourceData.HelmChartImageMap = result
 	return nil
 }
 
@@ -817,4 +823,16 @@ func addEntry(value string, m map[string]any, keys ...string) {
 		current = current[key].(map[string]any)
 	}
 	current[keys[len(keys)-1]] = value
+}
+
+func dashToCamelCaseForMapKeys(m map[string]*utilscomponentvector.ResourceData) map[string]*utilscomponentvector.ResourceData {
+	result := make(map[string]*utilscomponentvector.ResourceData)
+	for key, value := range m {
+		newKey := helpers.DashToCamelCase(key)
+		if value.HelmChartImageMap != nil {
+			value.HelmChartImageMap = helpers.DashToCamelCaseForMapKeys(value.HelmChartImageMap)
+		}
+		result[newKey] = value
+	}
+	return result
 }

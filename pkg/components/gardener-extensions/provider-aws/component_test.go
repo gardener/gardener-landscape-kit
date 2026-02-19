@@ -117,31 +117,26 @@ var _ = Describe("Component Generation", func() {
 				}).
 				WithResourcesYAML(`
 admissionAwsApplication:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-aws-application:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-aws-application:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionAws:
       image:
         repository: test-repo/path/gardener/extensions/admission-aws
         tag: v1.2.3
 admissionAwsRuntime:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-aws-runtime:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-aws-runtime:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionAws:
       image:
         repository: test-repo/path/gardener/extensions/admission-aws
         tag: v1.2.3
 gardenerExtensionAdmissionAws:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/admission-aws:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/admission-aws:v1.2.3
 gardenerExtensionProviderAws:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/provider-aws:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/provider-aws:v1.2.3
 providerAws:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
+  helmChartImageMap:
     gardenerExtensionProviderAws:
       image:
         repository: test-repo/path/gardener/extensions/provider-aws

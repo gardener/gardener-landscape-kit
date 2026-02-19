@@ -278,78 +278,57 @@ var _ = Describe("Components", func() {
 		data, err := yaml.Marshal(componentVersions.Components[0].Resources)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(data)).To(Equal(`admissionController:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
 apiserver:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
 controllerManager:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
 controlplane:
-  helmChart:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/controlplane:v1.128.3@sha256:9916e1dbe8de5bcc354c41adc52b51fe7ef67cc2e1f34d44d1ec51ff06d962e5
-  helmchartImagemap: {}
+  helmChartRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/controlplane:v1.128.3@sha256:9916e1dbe8de5bcc354c41adc52b51fe7ef67cc2e1f34d44d1ec51ff06d962e5
 gardenerAdmissionController:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/admission-controller:v1.128.3@sha256:1b4d5332ebe78b9e4970361230ec043aa967ea70ea6e53b2c3a8538e2e4a496d
 gardenerApiserver:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/apiserver:v1.128.3@sha256:d8679b8760f77e540c28d1e32e938b082d3dfdd3b7603666d474726940bb8942
 gardenerControllerManager:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/controller-manager:v1.128.3@sha256:f1509f9f7d43902d319a87757612bd369439739fc4381ef77698d3e5447896f7
 gardenerNodeAgent:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
 gardenerResourceManager:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
 gardenerScheduler:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
 gardenlet:
-  helmChart:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
-  helmchartImagemap:
+  helmChartImageMap:
     gardenlet:
       image:
         repository: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet
         tag: v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
+  helmChartRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11
 nodeAgent:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/node-agent:v1.128.3@sha256:3c89691e4b2edc9fc8a824a881b819b4fb1de2af1c980d08262afbbea4896227
 operator:
-  helmChart:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
-  helmchartImagemap: {}
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
+  helmChartRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/operator:v1.128.3@sha256:1e544a671edc7e5b72c45f1fce3817a67c4eefa3d709855c119708fb04737f5b
 resourceManager:
-  helmChart:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
-  helmchartImagemap: {}
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+  helmChartRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e
 scheduler:
-  ociImage:
-    ref: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
+  ociImageRef: registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/scheduler:v1.128.3@sha256:c612f6a97c5c688cd71b4a11bae43a3cbcb4602d0f5fdb9cd8dc60a49224aa71
 `))
 		Expect(componentVersions.Components[0].ImageVectorOverwrite).NotTo(BeNil())
 		Expect(componentVersions.Components[0].ImageVectorOverwrite.Images).To(ContainElements(
 			imagevector.ImageSource{
 				Name:       "alertmanager",
-				Repository: ptr.To("registry.example.com/path/to/repo/quay_io/prometheus/alertmanager"),
-				Tag:        ptr.To("v0.28.1@sha256:ec1de8cc83bac6ec73b7c8bd0530341d70d8407e5749d561681654731881f351"),
-				Version:    ptr.To("v0.28.1"),
+				Repository: new("registry.example.com/path/to/repo/quay_io/prometheus/alertmanager"),
+				Tag:        new("v0.28.1@sha256:ec1de8cc83bac6ec73b7c8bd0530341d70d8407e5749d561681654731881f351"),
+				Version:    new("v0.28.1"),
 			},
 			imagevector.ImageSource{
 				Name:       "alpine-conntrack",
-				Repository: ptr.To("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack"),
-				Tag:        ptr.To("3.21.3@sha256:d776104e96516887cd33abb4fc4786fb6c1872cf3e03bd2d53b93c1652b947fa"),
-				Version:    ptr.To("3.21.3"),
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/alpine-conntrack"),
+				Tag:        new("3.21.3@sha256:d776104e96516887cd33abb4fc4786fb6c1872cf3e03bd2d53b93c1652b947fa"),
+				Version:    new("3.21.3"),
 			}))
 	})
 
