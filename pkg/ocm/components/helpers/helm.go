@@ -4,7 +4,11 @@
 
 package helpers
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 // HelmChartImageMap represents a Helm chart image map.
 type HelmChartImageMap struct {
@@ -36,4 +40,13 @@ func ParseHelmChartImageMap(data []byte) (*HelmChartImageMap, error) {
 		return nil, err
 	}
 	return &helmChartImageMap, nil
+}
+
+// SplitOCIImageReference splits an OCI image reference into repository and tag.
+func SplitOCIImageReference(ref string) (string, string, error) {
+	parts := strings.SplitN(ref, ":", 2)
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
+	}
+	return parts[0], parts[1], nil
 }

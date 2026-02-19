@@ -2,22 +2,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package utils
+package test
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/spf13/afero"
 	"sigs.k8s.io/yaml"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
-type ComponentVectorFactory func() (componentvector.ComponentVector, error)
+// BuildComponentVectorFn is a function type that builds a component vector.
+type BuildComponentVectorFn func() (componentvector.ComponentVector, error)
 
 // CreateComponentsVectorFile creates a components vector YAML file in the given filesystem.
-func CreateComponentsVectorFile(fs afero.Afero, cvf ComponentVectorFactory) (string, error) {
-	cv, err := cvf()
+func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (string, error) {
+	cv, err := build()
 	if err != nil {
 		return "", err
 	}
@@ -38,14 +40,14 @@ func CreateComponentsVectorFile(fs afero.Afero, cvf ComponentVectorFactory) (str
 	return filePath, nil
 }
 
-// ComponentVectorFactoryBuilder helps to build ComponentVectorFactory instances.
+// ComponentVectorFactoryBuilder helps to build BuildComponentVectorFn instances.
 type ComponentVectorFactoryBuilder struct {
 	cv  componentvector.ComponentVector
 	err error
 }
 
-// ComponentVector creates a new ComponentVectorFactoryBuilder with the given name and version.
-func ComponentVector(name, version string) *ComponentVectorFactoryBuilder {
+// NewComponentVectorFactoryBuilder creates a new ComponentVectorFactoryBuilder with the given name and version.
+func NewComponentVectorFactoryBuilder(name, version string) *ComponentVectorFactoryBuilder {
 	return &ComponentVectorFactoryBuilder{
 		cv: componentvector.ComponentVector{
 			Name:    name,
@@ -77,8 +79,8 @@ func (b *ComponentVectorFactoryBuilder) WithResourcesYAML(yaml string) *Componen
 	return b
 }
 
-// Build builds the ComponentVectorFactory.
-func (b *ComponentVectorFactoryBuilder) Build() ComponentVectorFactory {
+// Build builds the BuildComponentVectorFn.
+func (b *ComponentVectorFactoryBuilder) Build() BuildComponentVectorFn {
 	return func() (componentvector.ComponentVector, error) {
 		return b.cv, b.err
 	}

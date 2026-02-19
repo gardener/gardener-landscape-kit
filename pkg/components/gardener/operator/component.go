@@ -13,7 +13,7 @@ import (
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	ocmcomponents "github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
@@ -99,7 +99,7 @@ func getRenderValues(opts components.Options) (map[string]any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get operator OCI image reference from component vector: %w", err)
 	}
-	repository, tag, err := ocmcomponents.SplitOCIImageReference(ref)
+	repository, tag, err := helpers.SplitOCIImageReference(ref)
 	if err != nil {
 		return nil, err
 	}

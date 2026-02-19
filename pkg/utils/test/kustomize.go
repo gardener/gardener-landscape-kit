@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package utils
+package test
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
-	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
-	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
-	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
+	"github.com/gardener/gardener-landscape-kit/pkg/components"
 )
 
 type filesystemAdapter struct {
@@ -69,7 +70,7 @@ func (fsa filesystemAdapter) Exists(path string) bool {
 	return err == nil && b
 }
 
-func (fsa filesystemAdapter) Glob(pattern string) ([]string, error) {
+func (fsa filesystemAdapter) Glob(_ string) ([]string, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
