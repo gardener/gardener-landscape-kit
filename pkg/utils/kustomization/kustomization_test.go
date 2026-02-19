@@ -85,7 +85,7 @@ var _ = Describe("Kustomization", func() {
 				Options: &cmd.Options{
 					Log: logr.Discard(),
 				},
-				TargetDirPath: "/landscapeDir",
+				TargetDirPath: "/absolute/path/with/../to/repo/landscape",
 			}, fs)
 			Expect(err).NotTo(HaveOccurred())
 		})
