@@ -795,7 +795,7 @@ func insertDataFromHelmChartImageMap(resourceData *utilscomponentvector.Resource
 		if ref == "" {
 			return fmt.Errorf("OCI image reference for resource '%s' not found", imgMapping.Resource.Name)
 		}
-		repository, tag, err := SplitOCIImageReference(ref)
+		repository, tag, err := helpers.SplitOCIImageReference(ref)
 		if err != nil {
 			return fmt.Errorf("invalid OCI image reference '%s' for resource '%s'", ref, imgMapping.Resource.Name)
 		}

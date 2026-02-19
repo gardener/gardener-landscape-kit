@@ -21,7 +21,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
-	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -110,21 +110,21 @@ var _ = Describe("Component Generation", func() {
 	})
 
 	DescribeTable("Kustomize",
-		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+		func(build test.BuildComponentVectorFn, expectedFile string) {
 			component := operator.NewComponent()
-			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
 			Expect(err).ToNot(HaveOccurred())
-			result, err := testutils.KustomizeComponent(fs, component, "components/gardener/operator", componentsVectorFile)
+			result, err := test.KustomizeComponent(fs, component, "components/gardener/operator", componentsVectorFile)
 			Expect(err).ToNot(HaveOccurred())
 			expected, err := os.ReadFile(expectedFile)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(result)).To(Equal(string(expected)))
 		},
 		Entry("plain",
-			testutils.ComponentVector("github.com/gardener/gardener", "v1.2.3").Build(),
+			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener", "v1.2.3").Build(),
 			"testdata/expected-kustomize-plain.yaml"),
 		Entry("ocm",
-			testutils.ComponentVector("github.com/gardener/gardener", "v1.2.3").
+			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener", "v1.2.3").
 				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
 					Images: []imagevector.ImageSource{
 						{

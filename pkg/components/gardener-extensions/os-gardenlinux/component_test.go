@@ -20,7 +20,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	os_gardenlinux "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/os-gardenlinux"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
-	testutils "github.com/gardener/gardener-landscape-kit/test/utils"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -92,21 +92,21 @@ var _ = Describe("Component Generation", func() {
 	})
 
 	DescribeTable("Kustomize",
-		func(fcv testutils.ComponentVectorFactory, expectedFile string) {
+		func(build test.BuildComponentVectorFn, expectedFile string) {
 			component := os_gardenlinux.NewComponent()
-			componentsVectorFile, err := testutils.CreateComponentsVectorFile(fs, fcv)
+			componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
 			Expect(err).ToNot(HaveOccurred())
-			result, err := testutils.KustomizeComponent(fs, component, "components/gardener-extensions/os-gardenlinux", componentsVectorFile)
+			result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/os-gardenlinux", componentsVectorFile)
 			Expect(err).ToNot(HaveOccurred())
 			expected, err := os.ReadFile(expectedFile)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(result)).To(Equal(string(expected)))
 		},
 		Entry("plain",
-			testutils.ComponentVector("github.com/gardener/gardener-extension-os-gardenlinux", "v1.2.3").Build(),
+			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-gardenlinux", "v1.2.3").Build(),
 			"testdata/expected-kustomize-plain.yaml"),
 		Entry("ocm",
-			testutils.ComponentVector("github.com/gardener/gardener-extension-os-gardenlinux", "v1.2.3").
+			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-gardenlinux", "v1.2.3").
 				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
 					Images: []imagevector.ImageSource{
 						{
