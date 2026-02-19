@@ -14,6 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	ocmcomponents "github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -94,15 +95,11 @@ func getRenderValues(opts components.Options) (map[string]any, error) {
 		}, nil
 	}
 
-	ref := cv.GetTemplateResourceValue("operator", "ociImage", "ref")
-	if ref == nil {
-		return nil, fmt.Errorf("failed to get operator OCI image reference from component resources")
+	ref, err := getOCIImageReferenceFromComponentVector("operator", cv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get operator OCI image reference from component vector: %w", err)
 	}
-	refStr, ok := ref.(string)
-	if !ok {
-		return nil, fmt.Errorf("operator OCI image reference is not a string")
-	}
-	repository, tag, err := ocmcomponents.SplitOCIImageReference(refStr)
+	repository, tag, err := ocmcomponents.SplitOCIImageReference(ref)
 	if err != nil {
 		return nil, err
 	}
@@ -137,4 +134,20 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvector.ComponentVector) (string, error) {
+	if cv == nil || len(cv.Resources) == 0 {
+		return "", fmt.Errorf("component vector or component resources are nil")
+	}
+
+	data := cv.Resources[name]
+	if data == nil {
+		return "", fmt.Errorf("no resources found for component %s", name)
+	}
+	ref := data.OCIImageReference
+	if ref == nil {
+		return "", fmt.Errorf("OCI image reference not found for component %s", name)
+	}
+	return *ref, nil
 }

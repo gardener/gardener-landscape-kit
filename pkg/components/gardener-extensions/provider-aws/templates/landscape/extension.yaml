@@ -8,10 +8,10 @@ spec:
       runtimeCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionAwsRuntime.helmChart.ref }}
+            ref: {{ .resources.admissionAwsRuntime.helmChartRef }}
       values:
-        {{- if .resources.admissionAwsRuntime.helmchartImagemap }}
-{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmchartImagemap.gardenerExtensionAdmissionAws) }}
+        {{- if .resources.admissionAwsRuntime.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChartImageMap.gardenerExtensionAdmissionAws) }}
         {{- end }}
 #       resources:
 #         requests:
@@ -20,22 +20,22 @@ spec:
       virtualCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionAwsApplication.helmChart.ref }}
+            ref: {{ .resources.admissionAwsApplication.helmChartRef }}
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.providerAws.helmChart.ref }}
+          ref: {{ .resources.providerAws.helmChartRef }}
       runtimeValues:
-        {{- if .resources.providerAws.helmchartImagemap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmchartImagemap.gardenerExtensionProviderAws) }}
+        {{- if .resources.providerAws.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
       values:
-        {{- if .resources.providerAws.helmchartImagemap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmchartImagemap.gardenerExtensionProviderAws) }}
+        {{- if .resources.providerAws.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

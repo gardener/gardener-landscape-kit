@@ -117,34 +117,28 @@ var _ = Describe("Component Generation", func() {
 				}).
 				WithResourcesYAML(`
 admissionCalicoApplication:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionCalico:
       image:
         repository: test-repo/path/gardener/extensions/admission-calico
         tag: v1.2.3
 admissionCalicoRuntime:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
+  helmChartImageMap:
     gardenerExtensionAdmissionCalico:
       image:
         repository: test-repo/path/gardener/extensions/admission-calico
         tag: v1.2.3
 cniPlugins:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/cni-plugins:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/cni-plugins:v1.2.3
 gardenerExtensionAdmissionCalico:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/admission-calico:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/admission-calico:v1.2.3
 gardenerExtensionNetworkingCalico:
-  ociImage:
-    ref: test-repo/path/gardener/extensions/networking-calico:v1.2.3
+  ociImageRef: test-repo/path/gardener/extensions/networking-calico:v1.2.3
 networkingCalico:
-  helmChart:
-    ref: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
-  helmchartImagemap:
+  helmChartRef: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
+  helmChartImageMap:
     gardenerExtensionNetworkingCalico:
       image:
         repository: test-repo/path/gardener/extensions/networking-calico

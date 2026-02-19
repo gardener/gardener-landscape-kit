@@ -69,10 +69,10 @@ spec:
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.myExtension.helmChart.ref }}
+          ref: {{ .resources.myExtension.helmChartRef }}
       values:
-        {{- if .resources.myExtension.helmchartImagemap }}
-{{ indent 8 (toIndentYAML 2 .resources.myExtension.helmchartImagemap.gardenerExtensionMyExtension) }}
+        {{- if .resources.myExtension.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.myExtension.helmChartImageMap.gardenerExtensionMyExtension) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

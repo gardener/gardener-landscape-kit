@@ -69,33 +69,21 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getRenderValues(opts components.Options) (map[string]any, error) {
-	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardenerExtensionNetworkingCilium)
-	if cv == nil || len(cv.Resources) == 0 {
-		version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionNetworkingCilium)
-		if !exists {
-			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardenerExtensionNetworkingCilium)
-		}
-		return map[string]any{
-			"resources": map[string]any{
+	return components.GetRenderValues(opts,
+		componentvector.NameGardenerGardenerExtensionNetworkingCilium,
+		func(version string) map[string]any {
+			return map[string]any{
 				"admissionCiliumRuntime": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime:" + version,
 				},
 				"admissionCiliumApplication": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application:" + version,
 				},
 				"networkingCilium": map[string]any{
-					"helmChart": map[string]any{
-						"ref": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:" + version,
-					},
+					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:" + version,
 				},
-			},
-		}, nil
-	}
-	return cv.TemplateValues()
+			}
+		})
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

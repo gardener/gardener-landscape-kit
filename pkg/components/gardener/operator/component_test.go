@@ -150,15 +150,13 @@ var _ = Describe("Component Generation", func() {
 				}).
 				WithResourcesYAML(`
 operator:
-  helmChart:
-    ref: test.repo/path/charts/gardener/operator:v1.2.3
+  helmChartRef: test.repo/path/charts/gardener/operator:v1.2.3
   helmchartImagemap:
     operator:
       image:
         repository: test.repo/path/gardener/operator
         tag: v1.2.3
-  ociImage:
-     ref: test.repo/path/gardener/operator:v1.2.3
+  ociImageRef: test.repo/path/gardener/operator:v1.2.3
 `).Build(),
 			"testdata/expected-kustomize-ocm.yaml"),
 	)
