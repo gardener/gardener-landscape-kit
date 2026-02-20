@@ -8,7 +8,7 @@ require (
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fluxcd/kustomize-controller/api v1.7.3
 	github.com/fluxcd/source-controller/api v1.7.4
-	github.com/gardener/gardener v1.136.1
+	github.com/gardener/gardener v1.136.2
 	github.com/go-logr/logr v1.4.3
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
