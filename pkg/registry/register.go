@@ -31,6 +31,8 @@ import (
 	oidcservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-oidc-service"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	virtualgardenaccess "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/virtual-garden-access"
+	gardenconfig "github.com/gardener/gardener-landscape-kit/pkg/components/virtual-garden/garden-config"
 )
 
 // ComponentList contains all available components.
@@ -52,6 +54,8 @@ var ComponentList = []func() components.Interface{
 	oidcservice.NewComponent,
 	networkingproblemdetector.NewComponent,
 	gvisor.NewComponent,
+	virtualgardenaccess.NewComponent,
+	gardenconfig.NewComponent,
 }
 
 // RegisterAllComponents registers all available components.
