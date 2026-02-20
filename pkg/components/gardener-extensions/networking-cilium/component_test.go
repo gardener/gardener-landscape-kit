@@ -89,33 +89,32 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/networking-cilium"))
 		})
-	})
 
-	DescribeTable("Kustomize",
-		func(build test.BuildComponentVectorFn, expectedFile string) {
-			component := networking_cilium.NewComponent()
-			componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
-			Expect(err).ToNot(HaveOccurred())
-			result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/networking-cilium", componentsVectorFile)
-			Expect(err).ToNot(HaveOccurred())
-			expected, err := os.ReadFile(expectedFile)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(string(result)).To(Equal(string(expected)))
-		},
-		Entry("plain",
-			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-networking-cilium", "v1.2.3").Build(),
-			"testdata/expected-kustomize-plain.yaml"),
-		Entry("ocm",
-			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-networking-cilium", "v1.2.3").
-				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
-					Images: []imagevector.ImageSource{
-						{
-							Name: "component1",
-							Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+		DescribeTable("should generate correct kustomize build output",
+			func(build test.BuildComponentVectorFn, expectedFile string) {
+				component := networking_cilium.NewComponent()
+				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
+				Expect(err).ToNot(HaveOccurred())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/networking-cilium", componentsVectorFile)
+				Expect(err).ToNot(HaveOccurred())
+				expected, err := os.ReadFile(expectedFile)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(result)).To(Equal(string(expected)))
+			},
+			Entry("with plain component vector without OCM resources",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-networking-cilium", "v1.2.3").Build(),
+				"testdata/expected-kustomize-plain.yaml"),
+			Entry("with OCM component vector including helm charts and OCI images",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-networking-cilium", "v1.2.3").
+					WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+						Images: []imagevector.ImageSource{
+							{
+								Name: "component1",
+								Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+							},
 						},
-					},
-				}).
-				WithResourcesYAML(`
+					}).
+					WithResourcesYAML(`
 admissionCiliumApplication:
   helmChartRef: test-repo/path/charts/gardener/extensions/admission-cilium-application:v1.2.3
   helmChartImageMap:
@@ -142,6 +141,7 @@ networkingCilium:
         repository: test-repo/path/gardener/extensions/networking-cilium
         tag: v1.2.3
 `).Build(),
-			"testdata/expected-kustomize-ocm.yaml"),
-	)
+				"testdata/expected-kustomize-ocm.yaml"),
+		)
+	})
 })

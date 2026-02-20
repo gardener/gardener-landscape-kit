@@ -82,7 +82,7 @@ func writeBaseTemplateFiles(opts components.Options) error {
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
 }
 
-func getRenderValues(opts components.Options) (map[string]any, error) {
+func getTemplateValues(opts components.Options) (map[string]any, error) {
 	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardener)
 	if cv == nil || len(cv.Resources) == 0 {
 		gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
@@ -119,7 +119,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	values, err := getRenderValues(opts)
+	values, err := getTemplateValues(opts)
 	if err != nil {
 		return err
 	}

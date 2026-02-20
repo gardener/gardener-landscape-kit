@@ -51,6 +51,11 @@ components/my-gardener-extension
   ...
 ```
 
+Here the file `ocm-component-name` contains the OCM component name:
+```
+my.private-github.com/gardener/my-gardener-extension
+```
+
 3. Run the `resolve-ocm-components` command to extract the versions and image vector overrides:
 ```bash
 glk resolve-ocm-components -c landscapekitconfiguration.yaml -l /path/to/landscape-or-base-repo
@@ -58,7 +63,7 @@ glk resolve-ocm-components -c landscapekitconfiguration.yaml -l /path/to/landsca
 
 4. Make use of the extracted resource information stored in the file `ocm-components.yaml`.
 
-If your component is an operator extension, the `my-extension-deployment.yaml.template` may look like this:
+If your component is a gardener extension, the `my-extension-deployment.yaml.template` may look like this:
 ```yaml
 apiVersion: operator.gardener.cloud/v1alpha1
 kind: Extension

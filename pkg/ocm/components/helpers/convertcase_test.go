@@ -11,8 +11,8 @@ import (
 	. "github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 )
 
-var _ = Describe("DashToCamelCase", func() {
-	DescribeTable("converting dash-case to camelCase",
+var _ = Describe("convertcase", func() {
+	DescribeTable("#DashToCamelCase",
 		func(input, expected string) {
 			Expect(DashToCamelCase(input)).To(Equal(expected))
 		},
@@ -20,33 +20,33 @@ var _ = Describe("DashToCamelCase", func() {
 		Entry("two words", "foo-bar", "fooBar"),
 		Entry("multiple words", "admission-calico-runtime", "admissionCalicoRuntime"),
 	)
-})
 
-var _ = Describe("DashToCamelCaseForMapKeys", func() {
-	It("should convert nested map keys recursively", func() {
-		input := map[string]any{
-			"outer-key": map[string]any{
-				"inner-key": "value",
-				"deep-nest": map[string]any{
-					"very-deep": "nested-value",
+	Describe("#DashToCamelCaseForMapKeys", func() {
+		It("should convert nested map keys recursively", func() {
+			input := map[string]any{
+				"outer-key": map[string]any{
+					"inner-key": "value",
+					"deep-nest": map[string]any{
+						"very-deep": "nested-value",
+					},
+					"word": "value3",
 				},
-				"word": "value3",
-			},
-		}
+			}
 
-		result := DashToCamelCaseForMapKeys(input)
+			result := DashToCamelCaseForMapKeys(input)
 
-		outerMap := result["outerKey"].(map[string]any)
-		Expect(outerMap).To(HaveKeyWithValue("innerKey", "value"))
-		Expect(outerMap).To(HaveKeyWithValue("word", "value3"))
-		deepMap := outerMap["deepNest"].(map[string]any)
-		Expect(deepMap).To(HaveKeyWithValue("veryDeep", "nested-value"))
-		Expect(outerMap).To(HaveLen(3))
-	})
+			outerMap := result["outerKey"].(map[string]any)
+			Expect(outerMap).To(HaveKeyWithValue("innerKey", "value"))
+			Expect(outerMap).To(HaveKeyWithValue("word", "value3"))
+			deepMap := outerMap["deepNest"].(map[string]any)
+			Expect(deepMap).To(HaveKeyWithValue("veryDeep", "nested-value"))
+			Expect(outerMap).To(HaveLen(3))
+		})
 
-	It("should handle empty map", func() {
-		input := map[string]any{}
-		result := DashToCamelCaseForMapKeys(input)
-		Expect(result).To(BeEmpty())
+		It("should handle empty map", func() {
+			input := map[string]any{}
+			result := DashToCamelCaseForMapKeys(input)
+			Expect(result).To(BeEmpty())
+		})
 	})
 })

@@ -44,9 +44,13 @@ func ParseHelmChartImageMap(data []byte) (*HelmChartImageMap, error) {
 
 // SplitOCIImageReference splits an OCI image reference into repository and tag.
 func SplitOCIImageReference(ref string) (string, string, error) {
-	parts := strings.SplitN(ref, ":", 2)
+	lastIndex := strings.LastIndex(ref, "/")
+	if lastIndex == -1 {
+		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
+	}
+	parts := strings.SplitN(ref[lastIndex:], ":", 2)
 	if len(parts) != 2 {
 		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
 	}
-	return parts[0], parts[1], nil
+	return ref[:lastIndex] + parts[0], parts[1], nil
 }

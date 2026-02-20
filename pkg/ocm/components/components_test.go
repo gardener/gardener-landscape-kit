@@ -93,7 +93,7 @@ var _ = Describe("Components", func() {
 				Version: "v1.53.0",
 				Type:    "ociImage",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
-				Local:   true,
+				Local:   new(true),
 			},
 			components.Resource{
 				Name:    "extension-test",
@@ -265,7 +265,7 @@ var _ = Describe("Components", func() {
 				Version: "v1.128.3",
 				Type:    "ociImage",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11",
-				Local:   true,
+				Local:   new(true),
 			},
 		))
 
