@@ -48,7 +48,7 @@ tidy:
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
-	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) MODE=$(MODE) bash $(HACK_DIR)/format.sh ./cmd ./pkg
+	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg
 
 tools-for-generate: $(GEN_CRD_API_REFERENCE_DOCS)
 	@go mod download
