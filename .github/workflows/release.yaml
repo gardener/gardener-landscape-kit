@@ -13,8 +13,9 @@ jobs:
   build:
     if: ${{ github.repository == 'gardener/gardener-landscape-kit' && startsWith(github.ref, 'refs/heads/release-v') }}
     uses: ./.github/workflows/build.yaml
+    secrets: inherit
     permissions:
-      contents: write
+      contents: read
       id-token: write
       packages: write
     with:
@@ -25,7 +26,6 @@ jobs:
     uses: gardener/cc-utils/.github/workflows/release.yaml@master
     needs:
       - build
-    secrets: inherit
     permissions:
       contents: write
       id-token: write
@@ -33,8 +33,6 @@ jobs:
     with:
       release-commit-target: branch
       next-version: ${{ inputs.next-version }}
-      next-version-callback-action-path:
-      # slack-channel-id:
       assets: |
         - name: gardener-landscape-kit-darwin-amd64
           type: ocm-resource
