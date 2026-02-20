@@ -1,0 +1,27 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: os-gardenlinux
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/os-gardenlinux:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/os-gardenlinux
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - kind: OperatingSystemConfig
+    type: gardenlinux
+  - kind: OperatingSystemConfig
+    type: gardenlinux-fips
+  - kind: OperatingSystemConfig
+    type: memoryone-gardenlinux

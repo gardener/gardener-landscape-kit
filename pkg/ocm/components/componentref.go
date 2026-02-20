@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// ToFilename translates a ComponentReference into a json file name.
+// ToFilename translates a ComponentReference into a JSON file name.
 func (cr ComponentReference) ToFilename(dir string) string {
 	return fmt.Sprintf("%s/%s.json", dir, strings.ReplaceAll(strings.ReplaceAll(string(cr), "/", "_"), ":", "-"))
 }

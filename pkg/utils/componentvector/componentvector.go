@@ -5,6 +5,7 @@
 package componentvector
 
 import (
+	"fmt"
 	"maps"
 	"slices"
 
@@ -62,4 +63,62 @@ func New(input []byte) (Interface, error) {
 	}
 
 	return components, nil
+}
+
+// TemplateValues returns the template values for the component vector.
+func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
+	resources, err := resourcesToUnstructuredMap(cv.Resources)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
+	}
+	m := map[string]any{
+		"resources": resources,
+	}
+	if cv.ImageVectorOverwrite != nil {
+		// Marshal the ImageVectorOverwrite as it is expected to be as string.
+		data, err := yaml.Marshal(cv.ImageVectorOverwrite)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal image vector overwrite: %w", err)
+		}
+		m["imageVectorOverwrite"] = string(data)
+	}
+	if cv.ComponentImageVectorOverwrites != nil {
+		// Marshal the ComponentImageVectorOverwrites as it is expected to be as string.
+		// We need to marshal each ComponentImageVectorOverwrite separately to ensure the correct format.
+		type component struct {
+			Name                 string `json:"name"`
+			ImageVectorOverwrite string `json:"imageVectorOverwrite"`
+		}
+		type componentImageVectorOverwritesForTemplate struct {
+			Components []component `json:"components"`
+		}
+		var value componentImageVectorOverwritesForTemplate
+		for _, c := range cv.ComponentImageVectorOverwrites.Components {
+			cdata, err := yaml.Marshal(c.ImageVectorOverwrite)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal image vector overwrite for component %s: %w", c.Name, err)
+			}
+			value.Components = append(value.Components, component{Name: c.Name, ImageVectorOverwrite: string(cdata)})
+		}
+		data, err := yaml.Marshal(value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal component image vector overwrites: %w", err)
+		}
+		m["componentImageVectorOverwrites"] = string(data)
+	}
+	return m, nil
+}
+
+func resourcesToUnstructuredMap(resources map[string]*ResourceData) (map[string]any, error) {
+	unstructuredMap := make(map[string]any)
+	if len(resources) > 0 {
+		data, err := yaml.Marshal(resources)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal resources: %w", err)
+		}
+		if err := yaml.Unmarshal(data, &unstructuredMap); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal resources: %w", err)
+		}
+	}
+	return unstructuredMap, nil
 }

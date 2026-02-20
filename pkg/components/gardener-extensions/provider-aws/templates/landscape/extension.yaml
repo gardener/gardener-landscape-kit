@@ -5,13 +5,42 @@ metadata:
 spec:
   deployment:
     admission:
-      values: {}
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionAwsRuntime.helmChartRef }}
+      values:
+        {{- if .resources.admissionAwsRuntime.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChartImageMap.gardenerExtensionAdmissionAws) }}
+        {{- end }}
 #       resources:
 #         requests:
 #           cpu: 50m
 #           memory: 100Mi
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionAwsApplication.helmChartRef }}
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.providerAws.helmChartRef }}
+      runtimeValues:
+        {{- if .resources.providerAws.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      values:
+        {{- if .resources.providerAws.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
 #       resources:
 #         requests:
 #           cpu: 100m

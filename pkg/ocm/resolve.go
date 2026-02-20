@@ -10,16 +10,24 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	"sigs.k8s.io/yaml"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
-	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+)
+
+const (
+	// CustomOCMComponentNameFilename is the filename containing a custom OCM component name.
+	CustomOCMComponentNameFilename = "ocm-component-name"
 )
 
 type ocmComponentsResolver struct {
@@ -27,13 +35,16 @@ type ocmComponentsResolver struct {
 	cfg          *configv1alpha1.LandscapeKitConfiguration
 	landscapeDir string
 	outputDir    string
+	debug        bool
+	workers      int
 	components   *components.Components
 	repos        []*ociaccess.RepoAccess
 }
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
-func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string) error {
+func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string,
+	workers int, debug bool) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
 		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
@@ -49,6 +60,8 @@ func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfi
 		cfg:          cfg,
 		landscapeDir: landscapeDir,
 		outputDir:    outputDir,
+		debug:        debug,
+		workers:      workers,
 		components:   components.NewComponents(),
 		repos:        repos,
 	}
@@ -68,12 +81,14 @@ func (r *ocmComponentsResolver) resolve(ctx context.Context) error {
 		return err
 	}
 
-	if err := r.writeAllImageVectors(); err != nil {
-		return err
-	}
-
-	if err := r.writeComponentResources(); err != nil {
-		return err
+	if r.debug {
+		r.log.Info("Debug mode is enabled, writing additional debug files.")
+		if err := r.writeAllImageVectors(); err != nil {
+			return err
+		}
+		if err := r.writeComponentResources(); err != nil {
+			return err
+		}
 	}
 
 	if err := r.writeComponentList(); err != nil {
@@ -130,7 +145,7 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 		return r.components.AddComponentDependencies(descriptor, blobs)
 	}
 
-	walker := components.NewComponentWalker(r.log, r.components, 5, itemFunc)
+	walker := components.NewComponentWalker(r.log, r.components, r.workers, itemFunc)
 	rootComponentReference := components.ComponentReferenceFromNameAndVersion(r.cfg.OCM.RootComponent.Name, r.cfg.OCM.RootComponent.Version)
 
 	if err := walker.Walk(rootComponentReference); err != nil {
@@ -189,7 +204,11 @@ func (r *ocmComponentsResolver) writeComponentList() error {
 }
 
 func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
-	componentVersions, err := r.components.GetGLKComponents(false)
+	customComponents, err := r.findCustomComponents()
+	if err != nil {
+		return err
+	}
+	componentVersions, err := r.components.GetGLKComponents(customComponents, false)
 	if err != nil {
 		return err
 	}
@@ -205,11 +224,35 @@ func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
 	return nil
 }
 
+func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error) {
+	customComponents := sets.New[string]()
+
+	if err := filepath.WalkDir(r.landscapeDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || d.Name() != CustomOCMComponentNameFilename {
+			return nil
+		}
+		content, err := os.ReadFile(path) // #nosec: G304 -- safe, as it's reading within the landscape directory
+		if err != nil {
+			return fmt.Errorf("failed to read custom OCM component name file %s: %w", path, err)
+		}
+		name := strings.TrimSpace(string(content))
+		customComponents.Insert(name)
+		r.log.Info("Found custom OCM component", "name", name, "file", path)
+		return nil
+	}); err != nil {
+		return nil, fmt.Errorf("failed to walk landscape directory %s: %w", r.landscapeDir, err)
+	}
+	return customComponents, nil
+}
+
 func writeImageVector(outputDir string, cref components.ComponentReference, images []imagevector.ImageSource) error {
 	if len(images) == 0 {
 		return nil
 	}
-	return writeObject(outputDir, cref, ocmimagevector.ImageVectorOutput{
+	return writeObject(outputDir, cref, componentvector.ImageVectorOverwrite{
 		Images: images,
 	})
 }

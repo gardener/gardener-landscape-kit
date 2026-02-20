@@ -5,6 +5,27 @@ metadata:
 spec:
   deployment:
     admission:
-      values: {}
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionCalicoRuntime.helmChartRef }}
+      values:
+        {{- if .resources.admissionCalicoRuntime.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionCalicoRuntime.helmChartImageMap.gardenerExtensionAdmissionCalico) }}
+        {{- end }}
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionCalicoApplication.helmChartRef }}
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.networkingCalico.helmChartRef }}
+      values:
+        {{- if .resources.networkingCalico.helmChartImageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.networkingCalico.helmChartImageMap.gardenerExtensionNetworkingCalico) }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}

@@ -6,10 +6,15 @@ package operator
 
 import (
 	"embed"
+	"fmt"
 	"path"
+
+	"github.com/gardener/gardener/pkg/utils"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -69,19 +74,43 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
-	gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
-	if !exists {
-		opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
-	}
-
-	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
-		"version": gardenerVersion,
-	})
+	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, nil)
 	if err != nil {
 		return err
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func getTemplateValues(opts components.Options) (map[string]any, error) {
+	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardener)
+	if cv == nil || len(cv.Resources) == 0 {
+		gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
+		if !exists {
+			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
+		}
+		return map[string]any{
+			"repository": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/operator",
+			"tag":        gardenerVersion,
+		}, nil
+	}
+
+	ref, err := getOCIImageReferenceFromComponentVector("operator", cv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get operator OCI image reference from component vector: %w", err)
+	}
+	repository, tag, err := helpers.SplitOCIImageReference(ref)
+	if err != nil {
+		return nil, err
+	}
+
+	values, err := cv.TemplateValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get template values from component vector: %w", err)
+	}
+	values["repository"] = repository
+	values["tag"] = tag
+	return values, nil
 }
 
 func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
@@ -90,13 +119,35 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+	values, err := getTemplateValues(opts)
+	if err != nil {
+		return err
+	}
+
+	values = utils.MergeMaps(values, map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
 		return err
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+}
+
+func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvector.ComponentVector) (string, error) {
+	if cv == nil || len(cv.Resources) == 0 {
+		return "", fmt.Errorf("component vector or component resources are nil")
+	}
+
+	data := cv.Resources[name]
+	if data == nil {
+		return "", fmt.Errorf("no resources found for component %s", name)
+	}
+	ref := data.OCIImageReference
+	if ref == nil {
+		return "", fmt.Errorf("OCI image reference not found for component %s", name)
+	}
+	return *ref, nil
 }

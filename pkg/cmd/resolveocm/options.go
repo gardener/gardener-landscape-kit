@@ -17,6 +17,7 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	configv1alpha1validation "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var configDecoder runtime.Decoder
@@ -39,6 +40,12 @@ type Options struct {
 
 	// Config is the path to the landscape kit configuration file.
 	Config *configv1alpha1.LandscapeKitConfiguration
+
+	// Debug enables additional debug output files like resources and image vectors.
+	Debug bool
+
+	// Workers is the number of concurrent workers to use for resolving OCM components.
+	Workers int
 }
 
 // Validate validates the options.
@@ -74,14 +81,16 @@ func (o *Options) complete() error {
 func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.LandscapeDir, "landscape-dir", "l", "", "Path to a directory containing the landscape specific configuration files, aka overlays.")
 	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
+	fs.BoolVar(&o.Debug, "debug", false, "Enable debug output files like resources and imagevectors.")
+	fs.IntVar(&o.Workers, "workers", 10, "Number of concurrent workers to use for resolving OCM components.")
 }
 
-func (o *Options) effectiveOutputDir(subdir string) string {
-	outputDir := path.Join(o.LandscapeDir, "ocm", o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
-	if subdir != "" {
-		outputDir = path.Join(outputDir, subdir)
-	}
-	return outputDir
+func (o *Options) effectiveIntermediateOutputDir() string {
+	return path.Join(o.intermediateResultDir(), o.Config.OCM.RootComponent.Name, o.Config.OCM.RootComponent.Version)
+}
+
+func (o *Options) intermediateResultDir() string {
+	return path.Join(o.LandscapeDir, files.GLKSystemDirName, "ocm")
 }
 
 func (o *Options) loadConfigFile(filename string) error {

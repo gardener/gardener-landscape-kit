@@ -9,9 +9,9 @@ spec:
     extension:
       helm:
         ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost:{{ .version }}
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost
   resources:
-    - kind: OperatingSystemConfig
-      type: suse-chost
-    - kind: OperatingSystemConfig
-      type: memoryone-chost
+  - kind: OperatingSystemConfig
+    type: suse-chost
+  - kind: OperatingSystemConfig
+    type: memoryone-chost

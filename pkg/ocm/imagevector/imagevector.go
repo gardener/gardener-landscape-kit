@@ -20,6 +20,7 @@ type ExtendedImageSource struct {
 	ReferencedComponent *string
 	LookupOnly          bool
 	OriginalRef         *string
+	Local               bool
 }
 
 // EffectiveResourceName returns the ResourceName if set, otherwise the Name.
@@ -38,9 +39,4 @@ type ResourceID struct {
 // ExtendedImageVector is an extended image vector format that includes additional metadata for each image source.
 type ExtendedImageVector struct {
 	Images []*ExtendedImageSource `json:"images"`
-}
-
-// ImageVectorOutput is the output format for the image vector JSON output.
-type ImageVectorOutput struct {
-	Images []imagevector.ImageSource `json:"images"`
 }

@@ -10,15 +10,17 @@ spec:
       runtimeCluster:
         helm:
           ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime:{{ .version }}
+            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime
+      values:
       virtualCluster:
         helm:
           ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-application:{{ .version }}
+            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-application
     extension:
       helm:
         ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico:{{ .version }}
+          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico
+      values:
   resources:
   - kind: Network
     type: calico

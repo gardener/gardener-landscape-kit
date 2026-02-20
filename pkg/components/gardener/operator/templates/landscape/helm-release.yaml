@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gardener-operator
+  namespace: garden
+spec:
+  values:
+    replicaCount: 2
+    {{- if .resources.operator.helmChartImageMap }}
+{{ indent 4 (toIndentYAML 2 .resources.operator.helmChartImageMap.operator) }}
+    {{- end }}
+    {{- if .imageVectorOverwrite }}
+    imageVectorOverwrite: |
+{{ indent 6 .imageVectorOverwrite }}
+    {{- end }}
+    {{- if .componentImageVectorOverwrites }}
+    componentImageVectorOverwrites: |
+{{ indent 6 .componentImageVectorOverwrites }}
+    {{- end }}
