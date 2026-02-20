@@ -89,33 +89,32 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/os-suse-chost"))
 		})
-	})
 
-	DescribeTable("Kustomize",
-		func(build test.BuildComponentVectorFn, expectedFile string) {
-			component := os_suse_chost.NewComponent()
-			componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
-			Expect(err).ToNot(HaveOccurred())
-			result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/os-suse-chost", componentsVectorFile)
-			Expect(err).ToNot(HaveOccurred())
-			expected, err := os.ReadFile(expectedFile)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(string(result)).To(Equal(string(expected)))
-		},
-		Entry("plain",
-			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").Build(),
-			"testdata/expected-kustomize-plain.yaml"),
-		Entry("ocm",
-			test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").
-				WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
-					Images: []imagevector.ImageSource{
-						{
-							Name: "component1",
-							Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+		DescribeTable("should generate correct kustomize build output",
+			func(build test.BuildComponentVectorFn, expectedFile string) {
+				component := os_suse_chost.NewComponent()
+				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
+				Expect(err).ToNot(HaveOccurred())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/os-suse-chost", componentsVectorFile)
+				Expect(err).ToNot(HaveOccurred())
+				expected, err := os.ReadFile(expectedFile)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(result)).To(Equal(string(expected)))
+			},
+			Entry("with plain component vector without OCM resources",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").Build(),
+				"testdata/expected-kustomize-plain.yaml"),
+			Entry("with OCM component vector including helm charts and OCI images",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-os-suse-chost", "v1.2.3").
+					WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+						Images: []imagevector.ImageSource{
+							{
+								Name: "component1",
+								Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+							},
 						},
-					},
-				}).
-				WithResourcesYAML(`
+					}).
+					WithResourcesYAML(`
 gardenerExtensionOsSuseChost:
   ociImageRef: test-repo/path/gardener/extensions/os-suse-chost:v1.2.3
 osSuseChost:
@@ -126,6 +125,7 @@ osSuseChost:
         repository: test-repo/path/gardener/extensions/os-suse-chost
         tag: v1.2.3
 `).Build(),
-			"testdata/expected-kustomize-ocm.yaml"),
-	)
+				"testdata/expected-kustomize-ocm.yaml"),
+		)
+	})
 })

@@ -68,15 +68,11 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func getRenderValues(opts components.Options) (map[string]any, error) {
-	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardenerExtensionProviderAws)
-	if cv == nil || len(cv.Resources) == 0 {
-		version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionProviderAws)
-		if !exists {
-			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardenerExtensionProviderAws)
-		}
-		return map[string]any{
-			"resources": map[string]any{
+func getTemplateValues(opts components.Options) (map[string]any, error) {
+	return components.GetTemplateValues(opts,
+		componentvector.NameGardenerGardenerExtensionProviderAws,
+		func(version string) map[string]any {
+			return map[string]any{
 				"admissionAwsRuntime": map[string]any{
 					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:" + version,
 				},
@@ -86,10 +82,8 @@ func getRenderValues(opts components.Options) (map[string]any, error) {
 				"providerAws": map[string]any{
 					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws:" + version,
 				},
-			},
-		}, nil
-	}
-	return cv.TemplateValues()
+			}
+		})
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
@@ -107,7 +101,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	renderValue, err := getRenderValues(opts)
+	renderValue, err := getTemplateValues(opts)
 	if err != nil {
 		return err
 	}

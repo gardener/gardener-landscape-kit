@@ -80,8 +80,9 @@ type Resource struct {
 	// Value is the reference or URL of the resource (for types like "ociImage", "helmChart/v1")
 	// or other relevant information depending on the resource type.
 	Value string `json:"value"`
-	// Local indicates whether the resource is a local blob.
-	Local bool `json:"local,omitempty"`
+	// Local optionally indicates whether the resource is a local OCI image of the component and not an external reference.
+	// Only relevant for resources of type "ociImage".
+	Local *bool `json:"local,omitempty"`
 }
 
 // ResourcesOutput is the output format for the resources JSON output.
@@ -193,10 +194,12 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 					Version: res.Version,
 					Type:    res.Type,
 					Value:   reference,
-					Local:   src.Local,
+				}
+				if src.Local {
+					resource.Local = new(true)
 				}
 				if src.ResourceName != src.Name && src.ResourceName != "" {
-					resource.Alias = ptr.To(src.ResourceName)
+					resource.Alias = new(src.ResourceName)
 				}
 				resources = append(resources, resource)
 			}
@@ -408,21 +411,21 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 		for _, res := range resources {
 			switch res.Type {
 			case ResourceTypeOCIImage:
-				if !res.Local {
+				if !ptr.Deref(res.Local, false) {
 					// external images are only relevant for imageVectorOverwrite
 					continue
 				}
 				data := ensureResourceData(m, res.Name)
-				data.OCIImageReference = ptr.To(res.Value)
+				data.OCIImageReference = new(res.Value)
 				ociImageRefs[res.Name] = res.Value
 				if alias := ptr.Deref(res.Alias, ""); alias != "" {
 					data = ensureResourceData(m, alias)
-					data.OCIImageReference = ptr.To(res.Value)
+					data.OCIImageReference = new(res.Value)
 					ociImageRefs[alias] = res.Value
 				}
 			case ResourceTypeHelmChart:
 				data := ensureResourceData(m, res.Name)
-				data.HelmChartReference = ptr.To(res.Value)
+				data.HelmChartReference = new(res.Value)
 			case ResourceTypeHelmChartImageMap:
 				imageMaps[res.Name] = res.Value
 			default:

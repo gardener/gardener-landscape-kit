@@ -68,8 +68,8 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func getRenderValues(opts components.Options) (map[string]any, error) {
-	return components.GetRenderValues(opts,
+func getTemplateValues(opts components.Options) (map[string]any, error) {
+	return components.GetTemplateValues(opts,
 		componentvector.NameGardenerGardenerExtensionOsSuseChost,
 		func(version string) map[string]any {
 			return map[string]any{
@@ -95,7 +95,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	renderValue, err := getRenderValues(opts)
+	renderValue, err := getTemplateValues(opts)
 	if err != nil {
 		return err
 	}
