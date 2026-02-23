@@ -27,20 +27,21 @@ import (
 )
 
 type ocmComponentsResolver struct {
-	log          logr.Logger
-	cfg          *configv1alpha1.LandscapeKitConfiguration
-	landscapeDir string
-	outputDir    string
-	debug        bool
-	workers      int
-	components   *components.Components
-	repos        []*ociaccess.RepoAccess
+	log                     logr.Logger
+	cfg                     *configv1alpha1.LandscapeKitConfiguration
+	landscapeDir            string
+	outputDir               string
+	debug                   bool
+	ignoreMissingComponents bool
+	workers                 int
+	components              *components.Components
+	repos                   []*ociaccess.RepoAccess
 }
 
 // ResolveOCMComponents resolves OCM components starting from a root component, processes their dependencies,
 // and writes component descriptors and image vectors to the specified output directory.
 func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string,
-	workers int, debug bool) error {
+	workers int, debug, ignoreMissingComponents bool) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
 	if os.Getenv(ociaccess.OCIRegUsernameEnvKey) == "" || os.Getenv(ociaccess.OCIRegPasswordEnvKey) == "" {
 		log.Info("Warning: Environment variables " + ociaccess.OCIRegUsernameEnvKey + " and/or " + ociaccess.OCIRegPasswordEnvKey + " are not set. Accessing private OCI repositories may fail.")
@@ -52,14 +53,15 @@ func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfi
 	}
 
 	resolver := &ocmComponentsResolver{
-		log:          log,
-		cfg:          cfg,
-		landscapeDir: landscapeDir,
-		outputDir:    outputDir,
-		debug:        debug,
-		workers:      workers,
-		components:   components.NewComponents(),
-		repos:        repos,
+		log:                     log,
+		cfg:                     cfg,
+		landscapeDir:            landscapeDir,
+		outputDir:               outputDir,
+		debug:                   debug,
+		ignoreMissingComponents: ignoreMissingComponents,
+		workers:                 workers,
+		components:              components.NewComponents(),
+		repos:                   repos,
 	}
 
 	ctx := context.Background()
@@ -204,7 +206,7 @@ func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
 	if err != nil {
 		return err
 	}
-	componentVersions, err := r.components.GetGLKComponents(customComponents, false)
+	componentVersions, err := r.components.GetGLKComponents(customComponents, r.ignoreMissingComponents)
 	if err != nil {
 		return err
 	}
