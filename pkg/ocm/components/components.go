@@ -367,9 +367,8 @@ func (c *Components) GetGLKComponents(customComponents sets.Set[string], ignoreM
 			}
 		} else if customComponents.Has(ocmName) {
 			cv = &utilscomponentvector.ComponentVector{
-				Name:             ocmName,
-				Version:          version,
-				SourceRepository: "https://some.where/unknown/custom/repo", // TODO(MartinWeindel) SourceRepository is mandatory, but we don't have it for custom components
+				Name:    ocmName,
+				Version: version,
 			}
 		}
 		if cv != nil {

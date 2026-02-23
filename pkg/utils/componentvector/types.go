@@ -17,7 +17,7 @@ type ComponentVector struct {
 	// Name is the name of the component.
 	Name string `json:"name"`
 	// SourceRepository is the source repository of the component.
-	SourceRepository string `json:"sourceRepository"`
+	SourceRepository *string `json:"sourceRepository,omitempty"`
 	// Version is the version of the component.
 	Version string `json:"version"`
 	// Resources contains additional data for component resources like OCI image references and Helm chart references.

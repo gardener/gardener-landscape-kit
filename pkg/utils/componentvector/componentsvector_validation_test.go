@@ -26,12 +26,12 @@ var _ = Describe("ComponentVector Validation", func() {
 				Components: []*ComponentVector{
 					{
 						Name:             "component1",
-						SourceRepository: "https://github.com/org/repo1",
+						SourceRepository: new("https://github.com/org/repo1"),
 						Version:          "1.0.0",
 					},
 					{
 						Name:             "component2",
-						SourceRepository: "https://github.com/org/repo2",
+						SourceRepository: new("https://github.com/org/repo2"),
 						Version:          "2.0.0",
 					},
 				},
@@ -66,7 +66,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "",
-							SourceRepository: "https://github.com/org/repo",
+							SourceRepository: new("https://github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -86,7 +86,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "   ",
-							SourceRepository: "https://github.com/org/repo",
+							SourceRepository: new("https://github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -106,12 +106,12 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "duplicate-component",
-							SourceRepository: "https://github.com/org/repo1",
+							SourceRepository: new("https://github.com/org/repo1"),
 							Version:          "1.0.0",
 						},
 						{
 							Name:             "duplicate-component",
-							SourceRepository: "https://github.com/org/repo2",
+							SourceRepository: new("https://github.com/org/repo2"),
 							Version:          "2.0.0",
 						},
 					},
@@ -132,22 +132,22 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component-a",
-							SourceRepository: "https://github.com/org/repo1",
+							SourceRepository: new("https://github.com/org/repo1"),
 							Version:          "1.0.0",
 						},
 						{
 							Name:             "component-a",
-							SourceRepository: "https://github.com/org/repo2",
+							SourceRepository: new("https://github.com/org/repo2"),
 							Version:          "2.0.0",
 						},
 						{
 							Name:             "component-b",
-							SourceRepository: "https://github.com/org/repo3",
+							SourceRepository: new("https://github.com/org/repo3"),
 							Version:          "3.0.0",
 						},
 						{
 							Name:             "component-a",
-							SourceRepository: "https://github.com/org/repo4",
+							SourceRepository: new("https://github.com/org/repo4"),
 							Version:          "4.0.0",
 						},
 					},
@@ -170,12 +170,26 @@ var _ = Describe("ComponentVector Validation", func() {
 		})
 
 		Context("Source Repository Validation", func() {
+			It("should succeed if source repository is nil", func() {
+				components := &Components{
+					Components: []*ComponentVector{
+						{
+							Name:    "component1",
+							Version: "1.0.0",
+						},
+					},
+				}
+
+				errList := ValidateComponents(components, fldPath)
+				Expect(errList).To(BeEmpty())
+			})
+
 			It("should fail if source repository is empty", func() {
 				components := &Components{
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "",
+							SourceRepository: new(""),
 							Version:          "1.0.0",
 						},
 					},
@@ -195,7 +209,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "   ",
+							SourceRepository: new("   "),
 							Version:          "1.0.0",
 						},
 					},
@@ -215,7 +229,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "://invalid-url",
+							SourceRepository: new("://invalid-url"),
 							Version:          "1.0.0",
 						},
 					},
@@ -236,7 +250,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "github.com/org/repo",
+							SourceRepository: new("github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -257,7 +271,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "https://",
+							SourceRepository: new("https://"),
 							Version:          "1.0.0",
 						},
 					},
@@ -278,7 +292,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "http://github.com/org/repo",
+							SourceRepository: new("http://github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -293,7 +307,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "https://github.com/org/repo",
+							SourceRepository: new("https://github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -308,7 +322,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "ssh://git@github.com/org/repo",
+							SourceRepository: new("ssh://git@github.com/org/repo"),
 							Version:          "1.0.0",
 						},
 					},
@@ -325,7 +339,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "https://github.com/org/repo",
+							SourceRepository: new("https://github.com/org/repo"),
 							Version:          "",
 						},
 					},
@@ -345,7 +359,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "https://github.com/org/repo",
+							SourceRepository: new("https://github.com/org/repo"),
 							Version:          "   ",
 						},
 					},
@@ -383,13 +397,13 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "component1",
-							SourceRepository: "https://github.com/org/repo1",
+							SourceRepository: new("https://github.com/org/repo1"),
 							Version:          "1.0.0",
 						},
 						nil,
 						{
 							Name:             "component2",
-							SourceRepository: "https://github.com/org/repo2",
+							SourceRepository: new("https://github.com/org/repo2"),
 							Version:          "2.0.0",
 						},
 					},
@@ -411,7 +425,7 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "",
-							SourceRepository: "",
+							SourceRepository: new(""),
 							Version:          "",
 						},
 					},
@@ -439,17 +453,17 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "",
-							SourceRepository: "https://github.com/org/repo1",
+							SourceRepository: new("https://github.com/org/repo1"),
 							Version:          "1.0.0",
 						},
 						{
 							Name:             "component2",
-							SourceRepository: "invalid-url",
+							SourceRepository: new("invalid-url"),
 							Version:          "2.0.0",
 						},
 						{
 							Name:             "component3",
-							SourceRepository: "https://github.com/org/repo3",
+							SourceRepository: new("https://github.com/org/repo3"),
 							Version:          "",
 						},
 					},
@@ -478,17 +492,17 @@ var _ = Describe("ComponentVector Validation", func() {
 					Components: []*ComponentVector{
 						{
 							Name:             "duplicate",
-							SourceRepository: "https://github.com/org/repo1",
+							SourceRepository: new("https://github.com/org/repo1"),
 							Version:          "1.0.0",
 						},
 						{
 							Name:             "duplicate",
-							SourceRepository: "",
+							SourceRepository: new(""),
 							Version:          "2.0.0",
 						},
 						{
 							Name:             "component3",
-							SourceRepository: "https://github.com/org/repo3",
+							SourceRepository: new("https://github.com/org/repo3"),
 							Version:          "",
 						},
 					},

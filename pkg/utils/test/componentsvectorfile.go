@@ -24,9 +24,6 @@ func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (s
 	if err != nil {
 		return "", err
 	}
-	if cv.SourceRepository == "" {
-		cv.SourceRepository = "https://github.com/dummy/repo"
-	}
 	components := &utilscomponentvector.Components{
 		Components: []*utilscomponentvector.ComponentVector{&cv},
 	}
