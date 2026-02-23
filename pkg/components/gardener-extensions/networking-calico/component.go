@@ -69,21 +69,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetTemplateValues(opts,
-		componentvector.NameGardenerGardenerExtensionNetworkingCalico,
-		func(version string) map[string]any {
-			return map[string]any{
-				"admissionCalicoRuntime": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime:" + version,
-				},
-				"admissionCalicoApplication": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-application:" + version,
-				},
-				"networkingCalico": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico:" + version,
-				},
-			}
-		})
+	return components.GetTemplateValues(opts, componentvector.NameGardenerGardenerExtensionNetworkingCalico)
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

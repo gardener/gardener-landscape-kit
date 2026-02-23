@@ -9,10 +9,10 @@ spec:
         helm:
           ociRepository:
             ref: {{ .resources.admissionAwsRuntime.helmChartRef }}
+      {{- if .resources.admissionAwsRuntime.helmChartImageMap }}
       values:
-        {{- if .resources.admissionAwsRuntime.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChartImageMap.gardenerExtensionAdmissionAws) }}
-        {{- end }}
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 50m
@@ -25,6 +25,7 @@ spec:
       helm:
         ociRepository:
           ref: {{ .resources.providerAws.helmChartRef }}
+      {{- if (or .resources.providerAws.helmChartImageMap .imageVectorOverwrite) }}
       runtimeValues:
         {{- if .resources.providerAws.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
@@ -45,3 +46,4 @@ spec:
 #         requests:
 #           cpu: 100m
 #           memory: 512Mi
+      {{- end }}

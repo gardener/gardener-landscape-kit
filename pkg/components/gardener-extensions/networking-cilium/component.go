@@ -69,21 +69,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetTemplateValues(opts,
-		componentvector.NameGardenerGardenerExtensionNetworkingCilium,
-		func(version string) map[string]any {
-			return map[string]any{
-				"admissionCiliumRuntime": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime:" + version,
-				},
-				"admissionCiliumApplication": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application:" + version,
-				},
-				"networkingCilium": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium:" + version,
-				},
-			}
-		})
+	return components.GetTemplateValues(opts, componentvector.NameGardenerGardenerExtensionNetworkingCilium)
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

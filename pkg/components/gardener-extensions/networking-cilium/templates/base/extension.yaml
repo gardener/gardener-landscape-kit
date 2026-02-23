@@ -7,20 +7,9 @@ metadata:
 spec:
   deployment:
     admission:
-      runtimeCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime
-      values:
-      virtualCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application
+      values: {}
     extension:
-      helm:
-        ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium
-      values:
+      values: {}
   resources:
   - kind: Network
     type: cilium

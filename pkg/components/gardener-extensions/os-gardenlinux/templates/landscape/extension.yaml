@@ -8,6 +8,7 @@ spec:
       helm:
         ociRepository:
           ref: {{ .resources.osGardenlinux.helmChartRef }}
+      {{- if (or .resources.osGardenlinux.helmChartImageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.osGardenlinux.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.osGardenlinux.helmChartImageMap.gardenerExtensionOsGardenlinux) }}
@@ -16,3 +17,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
+      {{- end }}

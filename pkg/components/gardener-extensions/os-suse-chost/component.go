@@ -69,15 +69,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetTemplateValues(opts,
-		componentvector.NameGardenerGardenerExtensionOsSuseChost,
-		func(version string) map[string]any {
-			return map[string]any{
-				"osSuseChost": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost:" + version,
-				},
-			}
-		})
+	return components.GetTemplateValues(opts, componentvector.NameGardenerGardenerExtensionOsSuseChost)
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

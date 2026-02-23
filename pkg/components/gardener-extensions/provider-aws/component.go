@@ -69,21 +69,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetTemplateValues(opts,
-		componentvector.NameGardenerGardenerExtensionProviderAws,
-		func(version string) map[string]any {
-			return map[string]any{
-				"admissionAwsRuntime": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime:" + version,
-				},
-				"admissionAwsApplication": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application:" + version,
-				},
-				"providerAws": map[string]any{
-					"helmChartRef": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws:" + version,
-				},
-			}
-		})
+	return components.GetTemplateValues(opts, componentvector.NameGardenerGardenerExtensionProviderAws)
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

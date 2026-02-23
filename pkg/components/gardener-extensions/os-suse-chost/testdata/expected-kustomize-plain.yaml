@@ -10,6 +10,7 @@ spec:
       helm:
         ociRepository:
           ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost:v1.2.3
+      values: {}
   resources:
   - kind: OperatingSystemConfig
     type: suse-chost

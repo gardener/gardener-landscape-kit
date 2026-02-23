@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"maps"
 	"slices"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/yaml"
@@ -66,8 +67,10 @@ func New(input []byte) (Interface, error) {
 }
 
 // TemplateValues returns the template values for the component vector.
+// It converts the resources to an unstructured map and marshals the image vector overwrites as strings if they are present.
+// The resources are patched by replacing the string `${version}` with the version of the component vector before being returned as template values.
 func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
-	resources, err := resourcesToUnstructuredMap(cv.Resources)
+	resources, err := resourcesToUnstructuredMap(cv.Resources, cv.Version)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
 	}
@@ -109,14 +112,15 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 	return m, nil
 }
 
-func resourcesToUnstructuredMap(resources map[string]*ResourceData) (map[string]any, error) {
+func resourcesToUnstructuredMap(resources map[string]*ResourceData, version string) (map[string]any, error) {
 	unstructuredMap := make(map[string]any)
 	if len(resources) > 0 {
 		data, err := yaml.Marshal(resources)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal resources: %w", err)
 		}
-		if err := yaml.Unmarshal(data, &unstructuredMap); err != nil {
+		patched := strings.ReplaceAll(string(data), "${version}", version)
+		if err := yaml.Unmarshal([]byte(patched), &unstructuredMap); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal resources: %w", err)
 		}
 	}

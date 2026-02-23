@@ -9,10 +9,10 @@ spec:
         helm:
           ociRepository:
             ref: {{ .resources.admissionCalicoRuntime.helmChartRef }}
+      {{- if .resources.admissionCalicoRuntime.helmChartImageMap }}
       values:
-        {{- if .resources.admissionCalicoRuntime.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.admissionCalicoRuntime.helmChartImageMap.gardenerExtensionAdmissionCalico) }}
-        {{- end }}
+      {{- end }}
       virtualCluster:
         helm:
           ociRepository:
@@ -21,6 +21,7 @@ spec:
       helm:
         ociRepository:
           ref: {{ .resources.networkingCalico.helmChartRef }}
+      {{- if (or .resources.networkingCalico.helmChartImageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.networkingCalico.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.networkingCalico.helmChartImageMap.gardenerExtensionNetworkingCalico) }}
@@ -29,3 +30,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
+      {{- end }}

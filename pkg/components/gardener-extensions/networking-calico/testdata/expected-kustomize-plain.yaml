@@ -11,6 +11,7 @@ spec:
         helm:
           ociRepository:
             ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime:v1.2.3
+      values: {}
       virtualCluster:
         helm:
           ociRepository:
@@ -19,6 +20,7 @@ spec:
       helm:
         ociRepository:
           ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico:v1.2.3
+      values: {}
   resources:
   - kind: Network
     type: calico

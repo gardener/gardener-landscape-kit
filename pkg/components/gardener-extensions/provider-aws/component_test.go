@@ -102,7 +102,7 @@ var _ = Describe("Component Generation", func() {
 				Expect(string(result)).To(Equal(string(expected)))
 			},
 			Entry("with plain component vector without OCM resources",
-				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-provider-aws", "v1.2.3").Build(),
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-provider-aws", "v1.2.3").WithDefaultResources().Build(),
 				"testdata/expected-kustomize-plain.yaml"),
 			Entry("with OCM component vector including helm charts and OCI images",
 				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-provider-aws", "v1.2.3").

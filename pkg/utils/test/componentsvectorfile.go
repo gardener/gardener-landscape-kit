@@ -11,11 +11,12 @@ import (
 	"github.com/spf13/afero"
 	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	"github.com/gardener/gardener-landscape-kit/componentvector"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 // BuildComponentVectorFn is a function type that builds a component vector.
-type BuildComponentVectorFn func() (componentvector.ComponentVector, error)
+type BuildComponentVectorFn func() (utilscomponentvector.ComponentVector, error)
 
 // CreateComponentsVectorFile creates a components vector YAML file in the given filesystem.
 func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (string, error) {
@@ -26,8 +27,8 @@ func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (s
 	if cv.SourceRepository == "" {
 		cv.SourceRepository = "https://github.com/dummy/repo"
 	}
-	components := &componentvector.Components{
-		Components: []*componentvector.ComponentVector{&cv},
+	components := &utilscomponentvector.Components{
+		Components: []*utilscomponentvector.ComponentVector{&cv},
 	}
 	content, err := yaml.Marshal(components)
 	if err != nil {
@@ -42,14 +43,14 @@ func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (s
 
 // ComponentVectorFactoryBuilder helps to build BuildComponentVectorFn instances.
 type ComponentVectorFactoryBuilder struct {
-	cv  componentvector.ComponentVector
+	cv  utilscomponentvector.ComponentVector
 	err error
 }
 
 // NewComponentVectorFactoryBuilder creates a new ComponentVectorFactoryBuilder with the given name and version.
 func NewComponentVectorFactoryBuilder(name, version string) *ComponentVectorFactoryBuilder {
 	return &ComponentVectorFactoryBuilder{
-		cv: componentvector.ComponentVector{
+		cv: utilscomponentvector.ComponentVector{
 			Name:    name,
 			Version: version,
 		},
@@ -57,13 +58,13 @@ func NewComponentVectorFactoryBuilder(name, version string) *ComponentVectorFact
 }
 
 // WithImageVectorOverwrite sets the image vector overwrite of the component vector.
-func (b *ComponentVectorFactoryBuilder) WithImageVectorOverwrite(v componentvector.ImageVectorOverwrite) *ComponentVectorFactoryBuilder {
+func (b *ComponentVectorFactoryBuilder) WithImageVectorOverwrite(v utilscomponentvector.ImageVectorOverwrite) *ComponentVectorFactoryBuilder {
 	b.cv.ImageVectorOverwrite = &v
 	return b
 }
 
 // WithComponentImageVectorOverwrites sets the component image vector overwrites of the component vector.
-func (b *ComponentVectorFactoryBuilder) WithComponentImageVectorOverwrites(v componentvector.ComponentImageVectorOverwrites) *ComponentVectorFactoryBuilder {
+func (b *ComponentVectorFactoryBuilder) WithComponentImageVectorOverwrites(v utilscomponentvector.ComponentImageVectorOverwrites) *ComponentVectorFactoryBuilder {
 	b.cv.ComponentImageVectorOverwrites = &v
 	return b
 }
@@ -79,16 +80,32 @@ func (b *ComponentVectorFactoryBuilder) WithResourcesYAML(yaml string) *Componen
 	return b
 }
 
+// WithDefaultResources sets the resources of the component vector from the default components YAML.
+func (b *ComponentVectorFactoryBuilder) WithDefaultResources() *ComponentVectorFactoryBuilder {
+	componentVector, err := utilscomponentvector.New(componentvector.DefaultComponentsYAML)
+	if err != nil {
+		b.err = errors.Join(b.err, fmt.Errorf("failed to unmarshal default components YAML: %w", err))
+		return b
+	}
+	cv := componentVector.FindComponentVector(b.cv.Name)
+	if cv == nil {
+		b.err = errors.Join(b.err, fmt.Errorf("failed to find component vector with name %s in default components: %w", b.cv.Name, err))
+		return b
+	}
+	b.cv.Resources = cv.Resources
+	return b
+}
+
 // Build builds the BuildComponentVectorFn.
 func (b *ComponentVectorFactoryBuilder) Build() BuildComponentVectorFn {
-	return func() (componentvector.ComponentVector, error) {
+	return func() (utilscomponentvector.ComponentVector, error) {
 		return b.cv, b.err
 	}
 }
 
 // UnmarshalToResources unmarshals the given YAML content into a resources map.
-func UnmarshalToResources(content string) (map[string]*componentvector.ResourceData, error) {
-	result := make(map[string]*componentvector.ResourceData)
+func UnmarshalToResources(content string) (map[string]*utilscomponentvector.ResourceData, error) {
+	result := make(map[string]*utilscomponentvector.ResourceData)
 	if err := yaml.Unmarshal([]byte(content), &result); err != nil {
 		return nil, err
 	}

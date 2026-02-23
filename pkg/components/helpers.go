@@ -8,26 +8,15 @@
 
 package components
 
-// DefaultResourcesFactory is a function type that defines a factory for creating default resources based on a given version.
-// It takes a component version string as input and returns a nested map structure (map[string]any) representing
-// the component's default resources configuration. The returned map follows the marshalled YAML of map[string]*utiscomponentvector.ResourceData.
-// The keys are the helm chart names in camel case and the value typically only specified the helm chart reference "helmChartRef".
-type DefaultResourcesFactory func(version string) map[string]any
+import "fmt"
 
 // GetTemplateValues returns the template values for a component based on the provided options and component name.
-// It first checks if the component vector contains the component and its resources.
-// If not, it falls back to using the default resources factory with the component version from the component vector.
-// The returned map contains the key "resources" with the resolved resources as value.
-func GetTemplateValues(opts Options, componentName string, factory DefaultResourcesFactory) (map[string]any, error) {
+func GetTemplateValues(opts Options, componentName string) (map[string]any, error) {
 	cv := opts.GetComponentVector().FindComponentVector(componentName)
-	if cv == nil || len(cv.Resources) == 0 {
-		version, exists := opts.GetComponentVector().FindComponentVersion(componentName)
-		if !exists {
-			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentName)
-		}
-		return map[string]any{
-			"resources": factory(version),
-		}, nil
+	if cv == nil {
+		err := fmt.Errorf("component vector not found for component %s", componentName)
+		opts.GetLogger().Error(err, "GetTemplateValues failed", "component", componentName)
+		return nil, err
 	}
 	return cv.TemplateValues()
 }

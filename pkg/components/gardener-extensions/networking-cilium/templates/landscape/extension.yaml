@@ -9,10 +9,10 @@ spec:
         helm:
           ociRepository:
             ref: {{ .resources.admissionCiliumRuntime.helmChartRef }}
+      {{- if .resources.admissionCiliumRuntime.helmChartImageMap }}
       values:
-        {{- if .resources.admissionCiliumRuntime.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.admissionCiliumRuntime.helmChartImageMap.gardenerExtensionAdmissionCilium) }}
-        {{- end }}
+      {{- end }}
       virtualCluster:
         helm:
           ociRepository:
@@ -21,6 +21,7 @@ spec:
       helm:
         ociRepository:
           ref: {{ .resources.networkingCilium.helmChartRef }}
+      {{- if (or .resources.networkingCilium.helmChartImageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.networkingCilium.helmChartImageMap }}
 {{ indent 8 (toIndentYAML 2 .resources.networkingCilium.helmChartImageMap.gardenerExtensionNetworkingCilium) }}
@@ -29,3 +30,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
+      {{- end }}
