@@ -3,7 +3,6 @@ kind: Namespace
 metadata:
   name: flux-system
   labels:
-    kubernetes.io/metadata.name: flux-system
     networking.gardener.cloud/access-target-apiserver: allowed
 ---
 apiVersion: apps/v1

@@ -8,7 +8,7 @@ metadata:
     resources.gardener.cloud/purpose: token-requestor
     resources.gardener.cloud/class: shoot
   annotations:
-    serviceaccount.resources.gardener.cloud/name: flux
+    serviceaccount.resources.gardener.cloud/name: gardener.cloud:system:gardener-landscape-kit:flux
     serviceaccount.resources.gardener.cloud/namespace: kube-system
     serviceaccount.resources.gardener.cloud/token-expiration-duration: 3h
     serviceaccount.resources.gardener.cloud/inject-ca-bundle: "true"
@@ -18,7 +18,7 @@ stringData:
     kind: Config
     clusters:
     - cluster:
-        server: https://virtual-garden-kube-apiserver.garden.svc.cluster.local
+        server: https://virtual-garden-kube-apiserver.garden.svc.cluster.local.
       name: garden
     contexts:
     - context:
@@ -46,16 +46,16 @@ metadata:
   namespace: garden
 type: Opaque
 stringData:
-  clusterrolebinding____gardener.cloud.virtual-garden-access-flux.yaml: |
+  clusterrolebinding____gardener.cloud.system.gardener-landscape-kit.administrators.yaml: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
-      name: gardener.cloud.sap:virtual-garden-flux
+      name: gardener.cloud:system:gardener-landscape-kit:administrators
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
       name: cluster-admin
     subjects:
     - kind: ServiceAccount
-      name: flux
+      name: gardener.cloud:system:gardener-landscape-kit:flux
       namespace: kube-system
