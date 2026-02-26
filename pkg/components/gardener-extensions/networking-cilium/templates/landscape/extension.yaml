@@ -8,23 +8,23 @@ spec:
       runtimeCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionCiliumRuntime.helmChartRef }}
-      {{- if .resources.admissionCiliumRuntime.helmChartImageMap }}
+            ref: {{ .resources.admissionCiliumRuntime.helmChart.ref }}
+      {{- if .resources.admissionCiliumRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionCiliumRuntime.helmChartImageMap.gardenerExtensionAdmissionCilium) }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionCiliumRuntime.helmChart.imageMap.gardenerExtensionAdmissionCilium) }}
       {{- end }}
       virtualCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionCiliumApplication.helmChartRef }}
+            ref: {{ .resources.admissionCiliumApplication.helmChart.ref }}
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.networkingCilium.helmChartRef }}
-      {{- if (or .resources.networkingCilium.helmChartImageMap .imageVectorOverwrite) }}
+          ref: {{ .resources.networkingCilium.helmChart.ref }}
+      {{- if (or .resources.networkingCilium.helmChart.imageMap .imageVectorOverwrite) }}
       values:
-        {{- if .resources.networkingCilium.helmChartImageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.networkingCilium.helmChartImageMap.gardenerExtensionNetworkingCilium) }}
+        {{- if .resources.networkingCilium.helmChart.imageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.networkingCilium.helmChart.imageMap.gardenerExtensionNetworkingCilium) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

@@ -116,30 +116,35 @@ var _ = Describe("Component Generation", func() {
 					}).
 					WithResourcesYAML(`
 admissionCiliumApplication:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-cilium-application:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionCilium:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-cilium
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-cilium-application:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionCilium:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-cilium
+          tag: v1.2.3
 admissionCiliumRuntime:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-cilium-runtime:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionCilium:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-cilium
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-cilium-runtime:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionCilium:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-cilium
+          tag: v1.2.3
 gardenerExtensionAdmissionCilium:
-  ociImageRef: test-repo/path/gardener/extensions/admission-cilium:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-cilium:v1.2.3
 gardenerExtensionNetworkingCilium:
-  ociImageRef: test-repo/path/gardener/extensions/networking-cilium:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/networking-cilium:v1.2.3
 networkingCilium:
-  helmChartRef: test-repo/path/charts/gardener/extensions/networking-cilium:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionNetworkingCilium:
-      image:
-        repository: test-repo/path/gardener/extensions/networking-cilium
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/networking-cilium:v1.2.3
+    imageMap:
+      gardenerExtensionNetworkingCilium:
+        image:
+          repository: test-repo/path/gardener/extensions/networking-cilium
+          tag: v1.2.3
 `).Build(),
 				"testdata/expected-kustomize-ocm.yaml"),
 		)

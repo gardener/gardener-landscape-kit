@@ -7,11 +7,11 @@ spec:
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.osGardenlinux.helmChartRef }}
-      {{- if (or .resources.osGardenlinux.helmChartImageMap .imageVectorOverwrite) }}
+          ref: {{ .resources.osGardenlinux.helmChart.ref }}
+      {{- if (or .resources.osGardenlinux.helmChart.imageMap .imageVectorOverwrite) }}
       values:
-        {{- if .resources.osGardenlinux.helmChartImageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.osGardenlinux.helmChartImageMap.gardenerExtensionOsGardenlinux) }}
+        {{- if .resources.osGardenlinux.helmChart.imageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.osGardenlinux.helmChart.imageMap.gardenerExtensionOsGardenlinux) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

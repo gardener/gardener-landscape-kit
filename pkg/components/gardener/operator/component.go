@@ -145,9 +145,9 @@ func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvect
 	if data == nil {
 		return "", fmt.Errorf("no resources found for component %s", name)
 	}
-	ref := data.OCIImageReference
-	if ref == nil {
+	ociImage := data.OCIImage
+	if ociImage == nil || ociImage.Reference == "" {
 		return "", fmt.Errorf("OCI image reference not found for component %s", name)
 	}
-	return *ref, nil
+	return ociImage.Reference, nil
 }

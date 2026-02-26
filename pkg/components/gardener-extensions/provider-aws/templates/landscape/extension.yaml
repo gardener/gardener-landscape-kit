@@ -8,10 +8,10 @@ spec:
       runtimeCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionAwsRuntime.helmChartRef }}
-      {{- if .resources.admissionAwsRuntime.helmChartImageMap }}
+            ref: {{ .resources.admissionAwsRuntime.helmChart.ref }}
+      {{- if .resources.admissionAwsRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChartImageMap.gardenerExtensionAdmissionAws) }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChart.imageMap.gardenerExtensionAdmissionAws) }}
       {{- end }}
 #       resources:
 #         requests:
@@ -20,23 +20,23 @@ spec:
       virtualCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionAwsApplication.helmChartRef }}
+            ref: {{ .resources.admissionAwsApplication.helmChart.ref }}
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.providerAws.helmChartRef }}
-      {{- if (or .resources.providerAws.helmChartImageMap .imageVectorOverwrite) }}
+          ref: {{ .resources.providerAws.helmChart.ref }}
+      {{- if (or .resources.providerAws.helmChart.imageMap .imageVectorOverwrite) }}
       runtimeValues:
-        {{- if .resources.providerAws.helmChartImageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
+        {{- if .resources.providerAws.helmChart.imageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
       values:
-        {{- if .resources.providerAws.helmChartImageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChartImageMap.gardenerExtensionProviderAws) }}
+        {{- if .resources.providerAws.helmChart.imageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

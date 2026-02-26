@@ -116,14 +116,16 @@ var _ = Describe("Component Generation", func() {
 					}).
 					WithResourcesYAML(`
 gardenerExtensionOsGardenlinux:
-  ociImageRef: test-repo/path/gardener/extensions/os-gardenlinux:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/os-gardenlinux:v1.2.3
 osGardenlinux:
-  helmChartRef: test-repo/path/charts/gardener/extensions/os-gardenlinux:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionOsGardenlinux:
-      image:
-        repository: test-repo/path/gardener/extensions/os-gardenlinux
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/os-gardenlinux:v1.2.3
+    imageMap:
+      gardenerExtensionOsGardenlinux:
+        image:
+          repository: test-repo/path/gardener/extensions/os-gardenlinux
+          tag: v1.2.3
 `).Build(),
 				"testdata/expected-kustomize-ocm.yaml"),
 		)

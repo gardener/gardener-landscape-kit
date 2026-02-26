@@ -8,23 +8,23 @@ spec:
       runtimeCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionCalicoRuntime.helmChartRef }}
-      {{- if .resources.admissionCalicoRuntime.helmChartImageMap }}
+            ref: {{ .resources.admissionCalicoRuntime.helmChart.ref }}
+      {{- if .resources.admissionCalicoRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionCalicoRuntime.helmChartImageMap.gardenerExtensionAdmissionCalico) }}
+{{ indent 8 (toIndentYAML 2 .resources.admissionCalicoRuntime.helmChart.imageMap.gardenerExtensionAdmissionCalico) }}
       {{- end }}
       virtualCluster:
         helm:
           ociRepository:
-            ref: {{ .resources.admissionCalicoApplication.helmChartRef }}
+            ref: {{ .resources.admissionCalicoApplication.helmChart.ref }}
     extension:
       helm:
         ociRepository:
-          ref: {{ .resources.networkingCalico.helmChartRef }}
-      {{- if (or .resources.networkingCalico.helmChartImageMap .imageVectorOverwrite) }}
+          ref: {{ .resources.networkingCalico.helmChart.ref }}
+      {{- if (or .resources.networkingCalico.helmChart.imageMap .imageVectorOverwrite) }}
       values:
-        {{- if .resources.networkingCalico.helmChartImageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.networkingCalico.helmChartImageMap.gardenerExtensionNetworkingCalico) }}
+        {{- if .resources.networkingCalico.helmChart.imageMap }}
+{{ indent 8 (toIndentYAML 2 .resources.networkingCalico.helmChart.imageMap.gardenerExtensionNetworkingCalico) }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

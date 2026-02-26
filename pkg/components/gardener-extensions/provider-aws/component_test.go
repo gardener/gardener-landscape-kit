@@ -116,30 +116,35 @@ var _ = Describe("Component Generation", func() {
 					}).
 					WithResourcesYAML(`
 admissionAwsApplication:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-aws-application:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionAws:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-aws
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-aws-application:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionAws:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-aws
+          tag: v1.2.3
 admissionAwsRuntime:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-aws-runtime:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionAws:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-aws
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-aws-runtime:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionAws:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-aws
+          tag: v1.2.3
 gardenerExtensionAdmissionAws:
-  ociImageRef: test-repo/path/gardener/extensions/admission-aws:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-aws:v1.2.3
 gardenerExtensionProviderAws:
-  ociImageRef: test-repo/path/gardener/extensions/provider-aws:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/provider-aws:v1.2.3
 providerAws:
-  helmChartRef: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionProviderAws:
-      image:
-        repository: test-repo/path/gardener/extensions/provider-aws
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
+    imageMap:
+      gardenerExtensionProviderAws:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-aws
+          tag: v1.2.3
 `).Build(),
 				"testdata/expected-kustomize-ocm.yaml"),
 		)

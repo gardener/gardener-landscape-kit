@@ -6,8 +6,8 @@ metadata:
 spec:
   values:
     replicaCount: 2
-    {{- if .resources.operator.helmChartImageMap }}
-{{ indent 4 (toIndentYAML 2 .resources.operator.helmChartImageMap.operator) }}
+    {{- if .resources.operator.helmChart.imageMap }}
+{{ indent 4 (toIndentYAML 2 .resources.operator.helmChart.imageMap.operator) }}
     {{- end }}
     {{- if .imageVectorOverwrite }}
     imageVectorOverwrite: |

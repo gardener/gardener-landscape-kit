@@ -18,11 +18,13 @@ For each component, the generated `ocm-components.yaml` contains these fields:
   ```yaml
   resources:
     <componentResourceName>:
-      ociImageRef: ... # if the resource is an OCI image
-      helmChartRef: ... # if the resource is a Helm chart
-      helmChartImageMap: # if the resource is a Helm chart with need to overwrite Helm values for images repository and tag.
-        <imageOverwriteName>:
-           ... # calculated Helm values for the image overwrite, which can be directly rendered into Helm values.yaml files
+      ociImage: # if the resource has an OCI image
+        ref: <repository>:<tag>[@<digest>] # oci image reference
+      helmChart: # if the resource has a Helm chart
+        ref: <repository>:<tag>[@<digest>] # Helm chart reference
+        imageMap: # if the resource is a Helm chart with need to overwrite Helm values for images repository and tag.
+          <imageOverwriteName>:
+             ... # calculated Helm values for the image overwrite, which can be directly rendered into Helm values.yaml files
   ```
 - `componentImageVectorOverwrites` contains the image vector overwrites images deployed by subcomponents. This is not relevant for most components. Notable exception is the Gardener operator.
 

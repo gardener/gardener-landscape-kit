@@ -415,16 +415,16 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 					continue
 				}
 				data := ensureResourceData(m, res.Name)
-				data.OCIImageReference = new(res.Value)
+				data.OCIImage = &utilscomponentvector.OCIImage{Reference: res.Value}
 				ociImageRefs[res.Name] = res.Value
 				if alias := ptr.Deref(res.Alias, ""); alias != "" {
 					data = ensureResourceData(m, alias)
-					data.OCIImageReference = new(res.Value)
+					data.OCIImage = &utilscomponentvector.OCIImage{Reference: res.Value}
 					ociImageRefs[alias] = res.Value
 				}
 			case ResourceTypeHelmChart:
 				data := ensureResourceData(m, res.Name)
-				data.HelmChartReference = new(res.Value)
+				data.HelmChart = &utilscomponentvector.HelmChart{Reference: res.Value}
 			case ResourceTypeHelmChartImageMap:
 				imageMaps[res.Name] = res.Value
 			default:
@@ -804,7 +804,10 @@ func insertDataFromHelmChartImageMap(resourceData *utilscomponentvector.Resource
 		addEntryWithDotKey(current, imgMapping.Repository, repository)
 		addEntryWithDotKey(current, imgMapping.Tag, tag)
 	}
-	resourceData.HelmChartImageMap = result
+	if resourceData.HelmChart == nil {
+		return fmt.Errorf("resource data for helm chart image map does not contain helm chart data")
+	}
+	resourceData.HelmChart.ImageMap = result
 	return nil
 }
 
@@ -831,8 +834,8 @@ func dashToCamelCaseForMapKeys(m map[string]*utilscomponentvector.ResourceData) 
 	result := make(map[string]*utilscomponentvector.ResourceData)
 	for key, value := range m {
 		newKey := helpers.DashToCamelCase(key)
-		if value.HelmChartImageMap != nil {
-			value.HelmChartImageMap = helpers.DashToCamelCaseForMapKeys(value.HelmChartImageMap)
+		if value.HelmChart != nil && value.HelmChart.ImageMap != nil {
+			value.HelmChart.ImageMap = helpers.DashToCamelCaseForMapKeys(value.HelmChart.ImageMap)
 		}
 		result[newKey] = value
 	}

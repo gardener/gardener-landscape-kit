@@ -116,32 +116,38 @@ var _ = Describe("Component Generation", func() {
 					}).
 					WithResourcesYAML(`
 admissionCalicoApplication:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionCalico:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-calico
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionCalico:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-calico
+          tag: v1.2.3
 admissionCalicoRuntime:
-  helmChartRef: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionAdmissionCalico:
-      image:
-        repository: test-repo/path/gardener/extensions/admission-calico
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionCalico:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-calico
+          tag: v1.2.3
 cniPlugins:
-  ociImageRef: test-repo/path/gardener/extensions/cni-plugins:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/cni-plugins:v1.2.3
 gardenerExtensionAdmissionCalico:
-  ociImageRef: test-repo/path/gardener/extensions/admission-calico:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-calico:v1.2.3
 gardenerExtensionNetworkingCalico:
-  ociImageRef: test-repo/path/gardener/extensions/networking-calico:v1.2.3
+  ociImage:
+    ref: test-repo/path/gardener/extensions/networking-calico:v1.2.3
 networkingCalico:
-  helmChartRef: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
-  helmChartImageMap:
-    gardenerExtensionNetworkingCalico:
-      image:
-        repository: test-repo/path/gardener/extensions/networking-calico
-        tag: v1.2.3
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
+    imageMap:
+      gardenerExtensionNetworkingCalico:
+        image:
+          repository: test-repo/path/gardener/extensions/networking-calico
+          tag: v1.2.3
 `).Build(),
 				"testdata/expected-kustomize-ocm.yaml"),
 		)
