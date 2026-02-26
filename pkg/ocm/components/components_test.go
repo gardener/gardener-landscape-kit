@@ -24,8 +24,8 @@ import (
 const resourcesDir = "testdata"
 
 const (
-	refShootCertService               = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
-	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
+	refTestExtension = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
+	refGardener      = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
@@ -55,13 +55,13 @@ var _ = Describe("Components", func() {
 	})
 
 	It("should produce correct image vector for extension-test", func() {
-		loadWithDep(1, refShootCertService)
+		loadWithDep(1, refTestExtension)
 		Expect(c.ComponentsCount()).To(Equal(1))
 		roots := c.GetRootComponents()
-		Expect(roots).To(ConsistOf(refShootCertService))
+		Expect(roots).To(ConsistOf(refTestExtension))
 
 		By("resolved references")
-		imageVector, err := c.GetImageVector(refShootCertService, false)
+		imageVector, err := c.GetImageVector(refTestExtension, false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(HaveLen(1))
 		Expect(imageVector).To(ConsistOf(
@@ -73,7 +73,7 @@ var _ = Describe("Components", func() {
 			}))
 
 		By("original references")
-		imageVector, err = c.GetImageVector(refShootCertService, true)
+		imageVector, err = c.GetImageVector(refTestExtension, true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(HaveLen(1))
 		Expect(imageVector).To(ConsistOf(
@@ -85,7 +85,7 @@ var _ = Describe("Components", func() {
 			}))
 
 		By("check resources for ociImage, helmChart and helmchart-imagemap types")
-		resources := c.GetResources(refShootCertService)
+		resources := c.GetResources(refTestExtension)
 		Expect(resources).To(HaveLen(4))
 		Expect(resources).To(ContainElements(
 			components.Resource{

@@ -8,6 +8,3 @@ spec:
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
-  ref:
-    tag: ""
-  url: oci://europe-docker.pkg.dev/gardener-project/releases/charts/gardener/operator

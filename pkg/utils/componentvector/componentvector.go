@@ -14,6 +14,8 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const versionMarker = "${version}"
+
 // components is a wrapper type for component vectors that implements Interface.
 type components struct {
 	nameToComponentVector map[string]*ComponentVector
@@ -119,7 +121,7 @@ func resourcesToUnstructuredMap(resources map[string]*ResourceData, version stri
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal resources: %w", err)
 		}
-		patched := strings.ReplaceAll(string(data), "${version}", version)
+		patched := strings.ReplaceAll(string(data), versionMarker, version)
 		if err := yaml.Unmarshal([]byte(patched), &unstructuredMap); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal resources: %w", err)
 		}
