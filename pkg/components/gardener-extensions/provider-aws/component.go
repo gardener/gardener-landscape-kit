@@ -69,7 +69,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetTemplateValues(opts, componentvector.NameGardenerGardenerExtensionProviderAws)
+	return components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerExtensionProviderAws)
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {

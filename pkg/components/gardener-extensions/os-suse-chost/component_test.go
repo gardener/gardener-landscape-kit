@@ -90,7 +90,7 @@ var _ = Describe("Component Generation", func() {
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/os-suse-chost"))
 		})
 
-		DescribeTable("should generate correct kustomize build output",
+		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
 				component := os_suse_chost.NewComponent()
 				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)

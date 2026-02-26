@@ -24,8 +24,8 @@ import (
 const resourcesDir = "testdata"
 
 const (
-	refTestExtension = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
-	refGardener      = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
+	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
+	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
