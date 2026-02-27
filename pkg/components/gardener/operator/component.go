@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/gardener/gardener/pkg/utils"
+	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
@@ -141,13 +142,13 @@ func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvect
 		return "", fmt.Errorf("component vector or component resources are nil")
 	}
 
-	data := cv.Resources[name]
-	if data == nil {
+	data, found := cv.Resources[name]
+	if !found {
 		return "", fmt.Errorf("no resources found for component %s", name)
 	}
 	ociImage := data.OCIImage
-	if ociImage == nil || ociImage.Reference == "" {
+	if ociImage == nil || ptr.Deref(ociImage.Ref, "") == "" {
 		return "", fmt.Errorf("OCI image reference not found for component %s", name)
 	}
-	return ociImage.Reference, nil
+	return ptr.Deref(ociImage.Ref, ""), nil
 }

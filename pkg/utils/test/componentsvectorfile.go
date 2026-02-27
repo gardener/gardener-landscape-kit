@@ -68,12 +68,11 @@ func (b *ComponentVectorFactoryBuilder) WithComponentImageVectorOverwrites(v uti
 
 // WithResourcesYAML sets the resources of the component vector from the given YAML content.
 func (b *ComponentVectorFactoryBuilder) WithResourcesYAML(yaml string) *ComponentVectorFactoryBuilder {
-	unstructuredMap, err := UnmarshalToResources(yaml)
+	var err error
+	b.cv.Resources, err = UnmarshalToResources(yaml)
 	if err != nil {
 		b.err = errors.Join(b.err, fmt.Errorf("failed to unmarshal resources YAML: %w", err))
-		return b
 	}
-	b.cv.Resources = unstructuredMap
 	return b
 }
 
@@ -101,8 +100,8 @@ func (b *ComponentVectorFactoryBuilder) Build() BuildComponentVectorFn {
 }
 
 // UnmarshalToResources unmarshals the given YAML content into a resources map.
-func UnmarshalToResources(content string) (map[string]*utilscomponentvector.ResourceData, error) {
-	result := make(map[string]*utilscomponentvector.ResourceData)
+func UnmarshalToResources(content string) (map[string]utilscomponentvector.ResourceData, error) {
+	result := make(map[string]utilscomponentvector.ResourceData)
 	if err := yaml.Unmarshal([]byte(content), &result); err != nil {
 		return nil, err
 	}

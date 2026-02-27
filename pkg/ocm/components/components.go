@@ -415,16 +415,16 @@ func (c *Components) addGLKComponentResources(cref ComponentReference, cv *utils
 					continue
 				}
 				data := ensureResourceData(m, res.Name)
-				data.OCIImage = &utilscomponentvector.OCIImage{Reference: res.Value}
+				data.OCIImage = &utilscomponentvector.OCIImage{Ref: new(res.Value)}
 				ociImageRefs[res.Name] = res.Value
 				if alias := ptr.Deref(res.Alias, ""); alias != "" {
 					data = ensureResourceData(m, alias)
-					data.OCIImage = &utilscomponentvector.OCIImage{Reference: res.Value}
+					data.OCIImage = &utilscomponentvector.OCIImage{Ref: new(res.Value)}
 					ociImageRefs[alias] = res.Value
 				}
 			case ResourceTypeHelmChart:
 				data := ensureResourceData(m, res.Name)
-				data.HelmChart = &utilscomponentvector.HelmChart{Reference: res.Value}
+				data.HelmChart = &utilscomponentvector.HelmChart{Ref: new(res.Value)}
 			case ResourceTypeHelmChartImageMap:
 				imageMaps[res.Name] = res.Value
 			default:
@@ -830,14 +830,14 @@ func addEntry(value string, m map[string]any, keys ...string) {
 	current[keys[len(keys)-1]] = value
 }
 
-func dashToCamelCaseForMapKeys(m map[string]*utilscomponentvector.ResourceData) map[string]*utilscomponentvector.ResourceData {
-	result := make(map[string]*utilscomponentvector.ResourceData)
+func dashToCamelCaseForMapKeys(m map[string]*utilscomponentvector.ResourceData) map[string]utilscomponentvector.ResourceData {
+	result := make(map[string]utilscomponentvector.ResourceData)
 	for key, value := range m {
 		newKey := helpers.DashToCamelCase(key)
 		if value.HelmChart != nil && value.HelmChart.ImageMap != nil {
 			value.HelmChart.ImageMap = helpers.DashToCamelCaseForMapKeys(value.HelmChart.ImageMap)
 		}
-		result[newKey] = value
+		result[newKey] = *value
 	}
 	return result
 }

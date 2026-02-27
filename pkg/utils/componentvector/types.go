@@ -21,7 +21,7 @@ type ComponentVector struct {
 	// Version is the version of the component.
 	Version string `json:"version"`
 	// Resources contains additional data for component resources like OCI image references and Helm chart references.
-	Resources map[string]*ResourceData `json:"resources,omitempty"`
+	Resources map[string]ResourceData `json:"resources,omitempty"`
 	// ImageVectorOverwrite is an optional image vector overwrite for the component.
 	ImageVectorOverwrite *ImageVectorOverwrite `json:"imageVectorOverwrite,omitempty"`
 	// ComponentImageVectorOverwrites are optional component image vector overwrites for components deployed with this component.
@@ -54,12 +54,22 @@ type ResourceData struct {
 
 // OCIImage contains the OCI image reference of a component resource.
 type OCIImage struct {
-	Reference string `json:"ref"`
+	// Ref is the full artifact Ref and takes precedence over all other fields.
+	Ref *string `json:"ref,omitempty"`
+	// Repository is a reference to an OCI artifact repository.
+	Repository *string `json:"repository,omitempty"`
+	// Tag is the image tag to pull.
+	Tag *string `json:"tag,omitempty"`
 }
 
 // HelmChart contains the Helm chart reference and image map of a component resource.
 type HelmChart struct {
-	Reference string `json:"ref"`
+	// Ref is the full artifact Ref and takes precedence over all other fields.
+	Ref *string `json:"ref,omitempty"`
+	// Repository is a reference to an OCI artifact repository.
+	Repository *string `json:"repository,omitempty"`
+	// Tag is the artifact tag to pull.
+	Tag *string `json:"tag,omitempty"`
 	// ImageMap is the map of image names to helm chart values for overwriting OCI image repository and tag.
 	ImageMap map[string]any `json:"imageMap,omitempty"`
 }

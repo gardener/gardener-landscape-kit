@@ -8,13 +8,11 @@ import (
 	"fmt"
 	"maps"
 	"slices"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 )
-
-const versionMarker = "${version}"
 
 // components is a wrapper type for component vectors that implements Interface.
 type components struct {
@@ -72,7 +70,10 @@ func New(input []byte) (Interface, error) {
 // It converts the resources to an unstructured map and marshals the image vector overwrites as strings if they are present.
 // The resources are patched by replacing the string `${version}` with the version of the component vector before being returned as template values.
 func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
-	resources, err := resourcesToUnstructuredMap(cv.Resources, cv.Version)
+	if err := ensureReferences(cv.Resources, cv.Version); err != nil {
+		return nil, fmt.Errorf("failed to ensure references for Helm charts and OCI images: %w", err)
+	}
+	resources, err := resourcesToUnstructuredMap(cv.Resources)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
 	}
@@ -114,15 +115,33 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 	return m, nil
 }
 
-func resourcesToUnstructuredMap(resources map[string]*ResourceData, version string) (map[string]any, error) {
+func ensureReferences(resources map[string]ResourceData, version string) error {
+	for resourceName, resourceData := range resources {
+		if resourceData.HelmChart != nil && resourceData.HelmChart.Ref == nil {
+			if resourceData.HelmChart.Repository == nil {
+				return fmt.Errorf("missing reference or repository for Helm chart in resource %s", resourceName)
+			}
+			resourceData.HelmChart.Ref = new(*resourceData.HelmChart.Repository + ":" + ptr.Deref(resourceData.HelmChart.Tag, version))
+		}
+		if resourceData.OCIImage != nil && resourceData.OCIImage.Ref == nil {
+			if resourceData.OCIImage.Repository == nil {
+				return fmt.Errorf("missing reference or repository for OCI image in resource %s", resourceName)
+			}
+			resourceData.OCIImage.Ref = new(*resourceData.OCIImage.Repository + ":" + ptr.Deref(resourceData.OCIImage.Tag, version))
+		}
+		resources[resourceName] = resourceData
+	}
+	return nil
+}
+
+func resourcesToUnstructuredMap(resources map[string]ResourceData) (map[string]any, error) {
 	unstructuredMap := make(map[string]any)
 	if len(resources) > 0 {
 		data, err := yaml.Marshal(resources)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal resources: %w", err)
 		}
-		patched := strings.ReplaceAll(string(data), versionMarker, version)
-		if err := yaml.Unmarshal([]byte(patched), &unstructuredMap); err != nil {
+		if err := yaml.Unmarshal(data, &unstructuredMap); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal resources: %w", err)
 		}
 	}
