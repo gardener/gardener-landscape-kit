@@ -11,7 +11,7 @@ spec:
       {{- if (or .resources.osSuseChost.helmChart.imageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.osSuseChost.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.osSuseChost.helmChart.imageMap.gardenerExtensionOsSuseChost) }}
+{{ toIndentYAML 2 .resources.osSuseChost.helmChart.imageMap.gardenerExtensionOsSuseChost | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

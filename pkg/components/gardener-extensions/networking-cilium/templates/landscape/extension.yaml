@@ -11,7 +11,7 @@ spec:
             ref: {{ .resources.admissionCiliumRuntime.helmChart.ref }}
       {{- if .resources.admissionCiliumRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionCiliumRuntime.helmChart.imageMap.gardenerExtensionAdmissionCilium) }}
+{{ toIndentYAML 2 .resources.admissionCiliumRuntime.helmChart.imageMap.gardenerExtensionAdmissionCilium | indent 8 }}
       {{- end }}
       virtualCluster:
         helm:
@@ -24,7 +24,7 @@ spec:
       {{- if (or .resources.networkingCilium.helmChart.imageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.networkingCilium.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.networkingCilium.helmChart.imageMap.gardenerExtensionNetworkingCilium) }}
+{{ toIndentYAML 2 .resources.networkingCilium.helmChart.imageMap.gardenerExtensionNetworkingCilium | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

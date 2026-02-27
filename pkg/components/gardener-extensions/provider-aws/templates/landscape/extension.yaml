@@ -11,7 +11,7 @@ spec:
             ref: {{ .resources.admissionAwsRuntime.helmChart.ref }}
       {{- if .resources.admissionAwsRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionAwsRuntime.helmChart.imageMap.gardenerExtensionAdmissionAws) }}
+{{ toIndentYAML 2 .resources.admissionAwsRuntime.helmChart.imageMap.gardenerExtensionAdmissionAws | indent 8 }}
       {{- end }}
 #       resources:
 #         requests:
@@ -28,7 +28,7 @@ spec:
       {{- if (or .resources.providerAws.helmChart.imageMap .imageVectorOverwrite) }}
       runtimeValues:
         {{- if .resources.providerAws.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws) }}
+{{ toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
@@ -36,7 +36,7 @@ spec:
         {{- end }}
       values:
         {{- if .resources.providerAws.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws) }}
+{{ toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

@@ -77,7 +77,7 @@ spec:
           ref: {{ .resources.myExtension.helmChart.ref }}
       values:
         {{- if .resources.myExtension.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.myExtension.helmChart.imageMap.gardenerExtensionMyExtension) }}
+{{ toIndentYAML 2 .resources.myExtension.helmChart.imageMap.gardenerExtensionMyExtension | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |

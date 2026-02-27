@@ -11,7 +11,7 @@ spec:
             ref: {{ .resources.admissionCalicoRuntime.helmChart.ref }}
       {{- if .resources.admissionCalicoRuntime.helmChart.imageMap }}
       values:
-{{ indent 8 (toIndentYAML 2 .resources.admissionCalicoRuntime.helmChart.imageMap.gardenerExtensionAdmissionCalico) }}
+{{ toIndentYAML 2 .resources.admissionCalicoRuntime.helmChart.imageMap.gardenerExtensionAdmissionCalico | indent 8 }}
       {{- end }}
       virtualCluster:
         helm:
@@ -24,7 +24,7 @@ spec:
       {{- if (or .resources.networkingCalico.helmChart.imageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.networkingCalico.helmChart.imageMap }}
-{{ indent 8 (toIndentYAML 2 .resources.networkingCalico.helmChart.imageMap.gardenerExtensionNetworkingCalico) }}
+{{ toIndentYAML 2 .resources.networkingCalico.helmChart.imageMap.gardenerExtensionNetworkingCalico | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
