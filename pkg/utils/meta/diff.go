@@ -143,10 +143,10 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 	currentMap := buildMap(current)
 	newMap := buildMap(newDefault)
 
-	// Create result node preserving current's comments
+	// Create result node preserving current's comments and style
 	result := &yaml.Node{
 		Kind:        yaml.MappingNode,
-		Style:       newDefault.Style,
+		Style:       current.Style,
 		Tag:         newDefault.Tag,
 		HeadComment: current.HeadComment,
 		LineComment: current.LineComment,

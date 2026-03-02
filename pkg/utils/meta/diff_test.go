@@ -160,5 +160,37 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			_, err = meta.ThreeWayMergeManifest(emptyYaml, emptyYaml, emptyYaml)
 			Expect(err).NotTo(HaveOccurred())
 		})
+
+		Describe("retain a completely replaced manifest content in a glk-managed file", func() {
+			It("should keep the data section expanded", func() {
+				oldDefault, err := testdata.ReadFile("testdata/replaced-file-1-initial.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				newDefault, err := testdata.ReadFile("testdata/replaced-file-2-new-default.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				current, err := testdata.ReadFile("testdata/replaced-file-3-custom.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				expected, err := testdata.ReadFile("testdata/replaced-file-4-expected-generated.yaml")
+				Expect(err).NotTo(HaveOccurred())
+
+				content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(Equal(string(expected)))
+			})
+
+			It("should keep the data section collapsed", func() {
+				oldDefault, err := testdata.ReadFile("testdata/replaced-file-3-custom.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				newDefault, err := testdata.ReadFile("testdata/replaced-file-4-expected-generated.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				current, err := testdata.ReadFile("testdata/replaced-file-1-initial.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				expected, err := testdata.ReadFile("testdata/replaced-file-2-new-default.yaml")
+				Expect(err).NotTo(HaveOccurred())
+
+				content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(Equal(string(expected)))
+			})
+		})
 	})
 })
