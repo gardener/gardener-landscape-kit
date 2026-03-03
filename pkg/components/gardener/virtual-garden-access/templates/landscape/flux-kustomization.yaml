@@ -15,5 +15,5 @@ spec:
     namespace: garden
   interval: 30m
   timeout: 5m
-  retryInterval: 10m
+  retryInterval: 30s
   wait: true

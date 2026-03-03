@@ -15,7 +15,7 @@ spec:
     namespace: garden
   interval: 30m
   timeout: 10m
-  retryInterval: 2m
+  retryInterval: 30s
   wait: true
   healthCheckExprs:
   - apiVersion: operator.gardener.cloud/v1alpha1
