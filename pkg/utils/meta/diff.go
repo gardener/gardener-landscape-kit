@@ -399,7 +399,78 @@ func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (*manif
 	if md.current, err = splitManifestFile(currentYaml); err != nil {
 		return nil, fmt.Errorf("parsing current file for manifest diff failed: %w", err)
 	}
+
+	// Handle single manifest files with different names/namespaces
+	md.normalizeSingleManifestKeys()
+
 	return md, nil
+}
+
+// normalizeSingleManifestKeys handles the case where all three files contain a single manifest
+// of the same type (apiVersion/kind). In this case, even if name/namespace differ,
+// we normalize the keys so they match for merging. This allows users to rename resources
+// while still receiving GLK updates.
+func (md *manifestDiff) normalizeSingleManifestKeys() {
+	// Only apply this logic if all three maps have exactly one non-comment entry
+	if countNonCommentEntries(md.oldDefault) != 1 || countNonCommentEntries(md.newDefault) != 1 || countNonCommentEntries(md.current) != 1 {
+		return
+	}
+
+	// Get the single entries
+	oldKey, oldValue := getSingleNonCommentEntry(md.oldDefault)
+	newKey, newValue := getSingleNonCommentEntry(md.newDefault)
+	currentKey, currentValue := getSingleNonCommentEntry(md.current)
+
+	// Extract apiVersion/kind from each
+	oldType := extractTypeKey(oldValue)
+	newType := extractTypeKey(newValue)
+	currentType := extractTypeKey(currentValue)
+
+	// If all three have the same type, normalize keys to match
+	if oldType != "" && oldType == newType && oldType == currentType {
+		normalizedKey := oldType + "/*/normalized"
+
+		// Rebuild the ordered maps with normalized keys
+		md.oldDefault = rebuildWithKey(md.oldDefault, oldKey, normalizedKey)
+		md.newDefault = rebuildWithKey(md.newDefault, newKey, normalizedKey)
+		md.current = rebuildWithKey(md.current, currentKey, normalizedKey)
+	}
+}
+
+// countNonCommentEntries counts entries that are not comments (not isComment())
+func countNonCommentEntries(om *orderedmap.OrderedMap[string, []byte]) int {
+	count := 0
+	for key, value := range om.AllFromFront() {
+		sect := newSection(key, value)
+		if !sect.isComment() {
+			count++
+		}
+	}
+	return count
+}
+
+// getSingleNonCommentEntry returns the single non-comment entry (assumes count == 1)
+func getSingleNonCommentEntry(om *orderedmap.OrderedMap[string, []byte]) (string, []byte) {
+	for key, value := range om.AllFromFront() {
+		sect := newSection(key, value)
+		if !sect.isComment() {
+			return key, value
+		}
+	}
+	return "", nil
+}
+
+// rebuildWithKey rebuilds an ordered map, replacing oldKey with newKey
+func rebuildWithKey(om *orderedmap.OrderedMap[string, []byte], oldKey, newKey string) *orderedmap.OrderedMap[string, []byte] {
+	newOM := orderedmap.NewOrderedMap[string, []byte]()
+	for key, value := range om.AllFromFront() {
+		if key == oldKey {
+			newOM.Set(newKey, value)
+		} else {
+			newOM.Set(key, value)
+		}
+	}
+	return newOM
 }
 
 func addWithSeparator(output, content []byte) []byte {
@@ -426,17 +497,34 @@ func collectAppendix(diff *manifestDiff) []*section {
 	return appendix
 }
 
-func buildKey(t map[string]any) string {
+// extractTypeKey extracts "apiVersion/kind" from a manifest YAML
+func extractTypeKey(yamlContent []byte) string {
+	var t map[string]any
+	if err := yaml.Unmarshal(yamlContent, &t); err != nil {
+		return ""
+	}
+	return buildTypeKey(t)
+}
+
+func buildTypeKey(t map[string]any) string {
 	apiVersion, _ := t["apiVersion"].(string)
 	kind, _ := t["kind"].(string)
+	if apiVersion == "" || kind == "" {
+		return ""
+	}
+	return apiVersion + "/" + kind
+}
+
+func buildKey(t map[string]any) string {
+	typeKey := buildTypeKey(t)
 	metadata, _ := t["metadata"].(map[string]any)
 	name, _ := metadata["name"].(string)
 	namespace, _ := metadata["namespace"].(string)
-	if apiVersion == "" && kind == "" && namespace == "" && name == "" {
+	if typeKey == "" && namespace == "" && name == "" {
 		return ""
 	}
 
-	return apiVersion + "/" + kind + "/" + namespace + "/" + name
+	return typeKey + "/" + namespace + "/" + name
 }
 
 // keepLeftAlignedMarker is a marker to identify left-aligned comment lines during pre- and post-processing.

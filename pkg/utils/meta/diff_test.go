@@ -10,6 +10,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
@@ -23,6 +24,8 @@ var (
 )
 
 var _ = Describe("Meta Dir Config Diff", func() {
+	format.CharactersAroundMismatchToInclude = 100
+
 	Describe("#ThreeWayMergeManifest", func() {
 		It("should patch only changed default values on subsequent generates and retain custom modifications", func() {
 			obj := &corev1.ConfigMap{
@@ -191,6 +194,21 @@ var _ = Describe("Meta Dir Config Diff", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(Equal(string(expected)))
 			})
+		})
+
+		It("should merge single manifest files regardless different namespace and name", func() {
+			oldDefault, err := testdata.ReadFile("testdata/replaced-file-1-initial.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			newDefault, err := testdata.ReadFile("testdata/replaced-file-4-expected-generated.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			current, err := testdata.ReadFile("testdata/replaced-file-5-different-name.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			expected, err := testdata.ReadFile("testdata/replaced-file-6-different-name-merged.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(expected)))
 		})
 	})
 })
