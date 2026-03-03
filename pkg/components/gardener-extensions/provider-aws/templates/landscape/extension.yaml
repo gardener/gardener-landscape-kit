@@ -34,6 +34,8 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
+      {{- end }}
+      {{- if (or .resources.providerAws.helmChart.imageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.providerAws.helmChart.imageMap }}
 {{ toIndentYAML 2 .resources.providerAws.helmChart.imageMap.gardenerExtensionProviderAws | indent 8 }}
@@ -42,8 +44,10 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
+      {{- else }}
+#     values:
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 100m
 #           memory: 512Mi
-      {{- end }}

@@ -14,6 +14,12 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const (
+	resourcesKey                      = "resources"
+	imageVectorOverwriteKey           = "imageVectorOverwrite"
+	componentImageVectorOverwritesKey = "componentImageVectorOverwrites"
+)
+
 // components is a wrapper type for component vectors that implements Interface.
 type components struct {
 	nameToComponentVector map[string]*ComponentVector
@@ -78,7 +84,7 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
 	}
 	m := map[string]any{
-		"resources": resources,
+		resourcesKey: resources,
 	}
 	if cv.ImageVectorOverwrite != nil {
 		// Marshal the ImageVectorOverwrite as it is expected to be as string.
@@ -86,7 +92,7 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal image vector overwrite: %w", err)
 		}
-		m["imageVectorOverwrite"] = string(data)
+		m[imageVectorOverwriteKey] = string(data)
 	}
 	if cv.ComponentImageVectorOverwrites != nil {
 		// Marshal the ComponentImageVectorOverwrites as it is expected to be as string.
@@ -110,7 +116,7 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal component image vector overwrites: %w", err)
 		}
-		m["componentImageVectorOverwrites"] = string(data)
+		m[componentImageVectorOverwritesKey] = string(data)
 	}
 	return m, nil
 }

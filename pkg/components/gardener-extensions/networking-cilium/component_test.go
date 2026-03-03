@@ -12,7 +12,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
@@ -110,7 +109,7 @@ var _ = Describe("Component Generation", func() {
 						Images: []imagevector.ImageSource{
 							{
 								Name: "component1",
-								Ref:  ptr.To("test.repo/path/component1:v1.2.3"),
+								Ref:  new("test.repo/path/component1:v1.2.3"),
 							},
 						},
 					}).
