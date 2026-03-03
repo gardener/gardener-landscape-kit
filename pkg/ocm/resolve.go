@@ -234,7 +234,7 @@ func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error)
 		if d.IsDir() || d.Name() != CustomOCMComponentNameFilename {
 			return nil
 		}
-		content, err := os.ReadFile(path) // #nosec: G304 -- safe, as it's reading within the landscape directory
+		content, err := os.ReadFile(path) // #nosec: G304,G122 -- safe, as it's reading within the landscape directory
 		if err != nil {
 			return fmt.Errorf("failed to read custom OCM component name file %s: %w", path, err)
 		}
