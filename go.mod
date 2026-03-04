@@ -7,7 +7,7 @@ require (
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fluxcd/kustomize-controller/api v1.7.3
 	github.com/fluxcd/source-controller/api v1.7.4
-	github.com/gardener/gardener v1.137.0
+	github.com/gardener/gardener v1.137.2
 	github.com/gardener/gardener/pkg/apis v1.137.0
 	github.com/go-logr/logr v1.4.3
 	github.com/go-sprout/sprout v1.0.3
