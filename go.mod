@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
-	github.com/fluxcd/kustomize-controller/api v1.7.3
+	github.com/fluxcd/kustomize-controller/api v1.8.1
 	github.com/fluxcd/source-controller/api v1.7.4
 	github.com/gardener/gardener v1.137.2
 	github.com/gardener/gardener/pkg/apis v1.137.0
@@ -81,8 +81,8 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fluent/fluent-operator/v3 v3.6.0 // indirect
 	github.com/fluxcd/pkg/apis/acl v0.9.0 // indirect
-	github.com/fluxcd/pkg/apis/kustomize v1.14.0 // indirect
-	github.com/fluxcd/pkg/apis/meta v1.23.0 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.15.0 // indirect
+	github.com/fluxcd/pkg/apis/meta v1.25.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/gardener/cert-management v0.19.0 // indirect
