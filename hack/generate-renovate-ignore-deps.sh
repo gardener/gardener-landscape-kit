@@ -40,13 +40,16 @@ common_dependencies=()
 for local_dependency in "${local_dependencies[@]}"; do
     for gardener_dependency in "${gardener_dependencies[@]}"; do
         if [[ "$local_dependency" == "$gardener_dependency" ]]; then
-            common_dependencies+=("$local_dependency")
+            # Exclude dependencies starting with github.com/gardener/gardener
+            if [[ ! "$local_dependency" =~ ^github\.com/gardener/gardener ]]; then
+                common_dependencies+=("$local_dependency")
+            fi
             break # Continue with the next element of the outer loop.
         fi
     done
 done
 
-echo "☯️ Found ${#common_dependencies[@]} common dependencies."
+echo "☯️ Found ${#common_dependencies[@]} common dependencies (excluding github.com/gardener/gardener* packages)."
 
 ignore_deps=$(printf ',"%s"' "${common_dependencies[@]}") # Add a comma to the beginning of each element and concatenate them.
 ignore_deps="[${ignore_deps:1}]" # Remove the leading comma and wrap the string in square brackets to format it as a JSON array.

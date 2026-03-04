@@ -64,7 +64,6 @@ The following dependencies have been updated:\n\
       matchPackageNames: [ // GENERATOR-PIN
         "github.com/ahmetb/gen-crd-api-reference-docs",
         "github.com/elliotchance/orderedmap/v3",
-        "github.com/gardener/gardener/pkg/apis",
         "github.com/go-logr/logr",
         "github.com/onsi/ginkgo/v2",
         "github.com/onsi/gomega",
