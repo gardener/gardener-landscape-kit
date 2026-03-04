@@ -1,0 +1,38 @@
+# header-line1
+# header-line2
+ # header-line3 misaligned
+a1:
+# a2: 2
+# a3: 3
+    # b1 blabla
+    b1:
+        # c1 blabla
+        c1:
+          d1: 1
+        # d2: 2
+        # d3: 3
+    # b2 blabla-line1
+    # b2 blabla-line2
+    b2: 2
+# a2 blabla
+a2:
+# b3: 3
+  b4: 4
+# b5: 5
+# b6: 6
+  b7:
+  # c2: 2
+    c3: 3
+  # c4: 4
+a3: 3
+
+a4:
+# b8:
+#   c5: 5
+#   c6: 6
+#   c7:
+#     d4: 4
+#     d5: 5
+
+a5: 5
+# footer
