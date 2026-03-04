@@ -1,0 +1,36 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: networking-calico
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-calico-runtime:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-calico
+          tag: v1.2.3
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-calico-application:v1.2.3
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/networking-calico:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/networking-calico
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - kind: Network
+    type: calico

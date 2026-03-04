@@ -7,13 +7,11 @@ metadata:
 spec:
   deployment:
     extension:
-      helm:
-        ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux:{{ .version }}
+      values: {}
   resources:
-    - kind: OperatingSystemConfig
-      type: gardenlinux
-    - kind: OperatingSystemConfig
-      type: gardenlinux-fips
-    - kind: OperatingSystemConfig
-      type: memoryone-gardenlinux
+  - kind: OperatingSystemConfig
+    type: gardenlinux
+  - kind: OperatingSystemConfig
+    type: gardenlinux-fips
+  - kind: OperatingSystemConfig
+    type: memoryone-gardenlinux

@@ -62,17 +62,20 @@ func validateComponentVector(component *ComponentVector, fldPath *field.Path) fi
 	}
 
 	// Validate SourceRepository
-	if strings.TrimSpace(component.SourceRepository) == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("sourceRepository"), "source repository must not be empty"))
-	} else {
-		// Validate URL format
-		repoURL, err := url.Parse(component.SourceRepository)
-		if err != nil {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), component.SourceRepository, "must be a valid URL"))
-		} else if repoURL.Scheme == "" {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), component.SourceRepository, "must have a valid URL scheme (e.g., https, http)"))
-		} else if repoURL.Host == "" {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), component.SourceRepository, "must have a valid host"))
+	if component.SourceRepository != nil {
+		sourceRepo := *component.SourceRepository
+		if strings.TrimSpace(sourceRepo) == "" {
+			allErrs = append(allErrs, field.Required(fldPath.Child("sourceRepository"), "source repository must not be empty"))
+		} else {
+			// Validate URL format
+			repoURL, err := url.Parse(sourceRepo)
+			if err != nil {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), sourceRepo, "must be a valid URL"))
+			} else if repoURL.Scheme == "" {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), sourceRepo, "must have a valid URL scheme (e.g., https, http)"))
+			} else if repoURL.Host == "" {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("sourceRepository"), sourceRepo, "must have a valid host"))
+			}
 		}
 	}
 

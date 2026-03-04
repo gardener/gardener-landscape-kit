@@ -64,6 +64,7 @@ generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) bash $(GARDENER_HACK_DIR)/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
+	@hack/check-component-yaml.sh
 
 .PHONY: check-generate
 check-generate:

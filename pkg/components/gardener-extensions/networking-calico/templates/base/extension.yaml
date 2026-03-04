@@ -7,18 +7,9 @@ metadata:
 spec:
   deployment:
     admission:
-      runtimeCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime:{{ .version }}
-      virtualCluster:
-        helm:
-          ociRepository:
-            ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-application:{{ .version }}
+      values: {}
     extension:
-      helm:
-        ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico:{{ .version }}
+      values: {}
   resources:
   - kind: Network
     type: calico

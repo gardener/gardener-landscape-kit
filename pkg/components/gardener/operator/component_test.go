@@ -5,9 +5,13 @@
 package operator_test
 
 import (
+	"os"
+
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	"github.com/spf13/afero"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -15,6 +19,8 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -25,6 +31,7 @@ var _ = Describe("Component Generation", func() {
 	)
 
 	BeforeEach(func() {
+		format.CharactersAroundMismatchToInclude = 100
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
 		cmdOpts = &cmd.Options{Log: logr.Discard()}
 		generateOpts = &generateoptions.Options{
@@ -99,5 +106,59 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener/operator"))
 		})
+
+		DescribeTable("should generate correct kustomized build output",
+			func(build test.BuildComponentVectorFn, expectedFile string) {
+				component := operator.NewComponent()
+				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
+				Expect(err).ToNot(HaveOccurred())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener/operator", componentsVectorFile)
+				Expect(err).ToNot(HaveOccurred())
+				expected, err := os.ReadFile(expectedFile)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(result)).To(Equal(string(expected)))
+			},
+			Entry("with plain component vector without OCM resources",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener", "v1.2.3").Build(),
+				"testdata/expected-kustomize-plain.yaml"),
+			Entry("with OCM component vector including helm charts and OCI images",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener", "v1.2.3").
+					WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+						Images: []imagevector.ImageSource{
+							{
+								Name: "component1",
+								Ref:  new("test.repo/path/component1:v1.2.3"),
+							},
+						},
+					}).
+					WithComponentImageVectorOverwrites(componentvector.ComponentImageVectorOverwrites{
+						Components: []componentvector.ComponentImageVectorOverwrite{
+							{
+								Name: "etcd-druid",
+								ImageVectorOverwrite: componentvector.ImageVectorOverwrite{
+									Images: []imagevector.ImageSource{
+										{
+											Name: "component2",
+											Ref:  new("test.repo/path/component2:v1.2.3"),
+										},
+									},
+								},
+							},
+						},
+					}).
+					WithResourcesYAML(`
+operator:
+  helmChart:
+    ref: test.repo/path/charts/gardener/operator:v1.2.3
+    imagemap:
+      operator:
+        image:
+          repository: test.repo/path/gardener/operator
+          tag: v1.2.3
+  ociImage:
+    ref: test.repo/path/gardener/operator:v1.2.3
+`).Build(),
+				"testdata/expected-kustomize-ocm.yaml"),
+		)
 	})
 })

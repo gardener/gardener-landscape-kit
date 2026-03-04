@@ -6,6 +6,9 @@ package resolveocm
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 
@@ -49,7 +52,23 @@ gardner-landscape-kit resolve-ocm-components \
 }
 
 func run(_ context.Context, opts *Options) error {
-	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", opts.effectiveOutputDir(""), "rootComponent", opts.Config.OCM.RootComponent)
+	outputDir := opts.effectiveIntermediateOutputDir()
+	opts.Log.Info("Starting resolve-ocm-components command", "outputDir", outputDir, "rootComponent", opts.Config.OCM.RootComponent)
 
-	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.LandscapeDir, opts.effectiveOutputDir(""))
+	if err := writeGitIgnoreFile(opts); err != nil {
+		return err
+	}
+
+	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.LandscapeDir, outputDir, opts.Workers, opts.Debug)
+}
+
+func writeGitIgnoreFile(opts *Options) error {
+	intermediateResultDir := opts.intermediateResultDir()
+	if err := os.MkdirAll(intermediateResultDir, 0700); err != nil {
+		return fmt.Errorf("failed to create intermediate result directory %s: %w", intermediateResultDir, err)
+	}
+	if err := os.WriteFile(path.Join(intermediateResultDir, ".gitignore"), []byte("/*"), 0600); err != nil {
+		return fmt.Errorf("failed to write .gitignore file to intermediate result directory %s: %w", intermediateResultDir, err)
+	}
+	return nil
 }

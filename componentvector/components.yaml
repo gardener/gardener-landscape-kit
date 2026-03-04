@@ -5,18 +5,56 @@ components:
 - name: github.com/gardener/gardener-extension-networking-calico
   sourceRepository: https://github.com/gardener/gardener-extension-networking-calico
   version: v1.56.0
+  resources:
+    admissionCalicoRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-runtime
+    admissionCalicoApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-calico-application
+    networkingCalico:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico
 - name: github.com/gardener/gardener-extension-networking-cilium
   sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
   version: v1.46.0
+  resources:
+    admissionCiliumRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-runtime
+    admissionCiliumApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/admission-cilium-application
+    networkingCilium:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium
 - name: github.com/gardener/gardener-extension-os-suse-chost
   sourceRepository: https://github.com/gardener/gardener-extension-os-suse-chost
   version: v1.35.0
+  resources:
+    osSuseChost:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost
 - name: github.com/gardener/gardener-extension-os-gardenlinux
   sourceRepository: https://github.com/gardener/gardener-extension-os-gardenlinux
   version: v0.36.0
+  resources:
+    osGardenlinux:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux
 - name: github.com/gardener/gardener-extension-provider-aws
   sourceRepository: https://github.com/gardener/gardener-extension-provider-aws
   version: v1.67.4
+  resources:
+    admissionAwsRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-runtime
+    admissionAwsApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-aws-application
+    providerAws:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws
 - name: github.com/gardener/gardener-extension-provider-azure
   sourceRepository: https://github.com/gardener/gardener-extension-provider-azure
   version: v1.58.2

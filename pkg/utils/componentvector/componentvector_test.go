@@ -235,7 +235,7 @@ components:
 			component := cv.FindComponentVector("component1")
 			Expect(component).NotTo(BeNil())
 			Expect(component.Name).To(Equal("component1"))
-			Expect(component.SourceRepository).To(Equal("https://github.com/org/repo1"))
+			Expect(component.SourceRepository).To(Equal(new("https://github.com/org/repo1")))
 			Expect(component.Version).To(Equal("1.0.0"))
 		})
 
