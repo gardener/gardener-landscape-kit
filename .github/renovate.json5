@@ -42,8 +42,12 @@ The following dependencies have been updated:\n\
       enabled: false,
     },
     {
-      groupName: "gardener/gardener",
-      matchPackageNames: ["github.com/gardener/gardener", "gardener/gardener"],
+      groupName: 'gardener/gardener',
+      matchPackageNames: ['/^(github\\.com\\/)?gardener\\/gardener(\\/.*)?$/'],
+    },
+    {
+      matchPackageNames: ['github.com/gardener/gardener/pkg/apis'],
+      enabled: true,
     },
     {
       matchDatasources: ['go'],
