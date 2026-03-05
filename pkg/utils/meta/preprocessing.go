@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"unicode"
 )
 
 // commentLevelPrefix is a prefix used to mark comment lines with their indentation level during pre-processing.
@@ -36,7 +37,7 @@ func process(yamlContent []byte, processLineFunc func(line []byte, index int, le
 	var levels = []int{0}
 	for i, line := range lines {
 		index := bytes.IndexFunc(line, func(r rune) bool {
-			return r != ' ' && r != '\t'
+			return !unicode.IsSpace(r)
 		})
 		if index == -1 {
 			buf.Write(line)
