@@ -26,7 +26,7 @@ spec:
         ociRepository:
           ref: {{ .resources.providerGcp.helmChart.ref }}
       {{- if (or .resources.providerGcp.helmChart.imageMap .imageVectorOverwrite) }}
-      runtimeValues:
+      runtimeClusterValues:
         {{- if .resources.providerGcp.helmChart.imageMap }}
 {{ toIndentYAML 2 .resources.providerGcp.helmChart.imageMap.gardenerExtensionProviderGcp | indent 8 }}
         {{- end }}

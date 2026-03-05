@@ -13,10 +13,6 @@ spec:
       values:
 {{ toIndentYAML 2 .resources.admissionOpenstackRuntime.helmChart.imageMap.gardenerExtensionAdmissionOpenstack | indent 8 }}
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 50m
-#           memory: 100Mi
       virtualCluster:
         helm:
           ociRepository:
@@ -26,7 +22,7 @@ spec:
         ociRepository:
           ref: {{ .resources.providerOpenstack.helmChart.ref }}
       {{- if (or .resources.providerOpenstack.helmChart.imageMap .imageVectorOverwrite) }}
-      runtimeValues:
+      runtimeClusterValues:
         {{- if .resources.providerOpenstack.helmChart.imageMap }}
 {{ toIndentYAML 2 .resources.providerOpenstack.helmChart.imageMap.gardenerExtensionProviderOpenstack | indent 8 }}
         {{- end }}
@@ -44,10 +40,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
-      {{- else }}
-#     values:
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 512Mi

@@ -6,12 +6,8 @@ metadata:
   name: provider-alicloud
 spec:
   deployment:
-    admission:
-      values: {}
     extension:
       injectGardenKubeconfig: true
-      values:
-        controllers:
   resources:
   - kind: BackupBucket
     type: alicloud

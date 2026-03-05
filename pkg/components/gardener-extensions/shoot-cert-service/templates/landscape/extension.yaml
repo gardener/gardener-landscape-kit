@@ -36,7 +36,3 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 64Mi

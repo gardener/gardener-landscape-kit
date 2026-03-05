@@ -11,7 +11,6 @@ spec:
         helm:
           ociRepository:
             ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-openstack-runtime:v1.2.3
-      values: {}
       virtualCluster:
         helm:
           ociRepository:
@@ -21,7 +20,6 @@ spec:
         ociRepository:
           ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-openstack:v1.2.3
       injectGardenKubeconfig: true
-      values: {}
   resources:
   - kind: BackupBucket
     type: openstack

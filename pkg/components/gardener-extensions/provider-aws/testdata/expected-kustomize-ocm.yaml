@@ -24,7 +24,7 @@ spec:
         ociRepository:
           ref: test-repo/path/charts/gardener/extensions/provider-aws:v1.2.3
       injectGardenKubeconfig: true
-      runtimeValues:
+      runtimeClusterValues:
         image:
           repository: test-repo/path/gardener/extensions/provider-aws
           tag: v1.2.3

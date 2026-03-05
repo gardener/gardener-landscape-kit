@@ -11,7 +11,6 @@ spec:
         ociRepository:
           ref: test-repo/path/charts/gardener/extensions/shoot-cert-service:v1.2.3
       injectGardenKubeconfig: true
-      policy: Always
       runtimeClusterValues:
         certificateConfig:
           defaultIssuer:

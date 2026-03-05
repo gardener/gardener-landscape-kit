@@ -5,9 +5,6 @@ metadata:
     security.gardener.cloud/pod-security-enforce: baseline
   name: os-suse-chost
 spec:
-  deployment:
-    extension:
-      values: {}
   resources:
   - kind: OperatingSystemConfig
     type: suse-chost

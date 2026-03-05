@@ -5,11 +5,6 @@ metadata:
     security.gardener.cloud/pod-security-enforce: baseline
   name: networking-calico
 spec:
-  deployment:
-    admission:
-      values: {}
-    extension:
-      values: {}
   resources:
   - kind: Network
     type: calico

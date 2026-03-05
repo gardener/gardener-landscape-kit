@@ -13,10 +13,6 @@ spec:
       values:
 {{ toIndentYAML 2 .resources.admissionAlicloudRuntime.helmChart.imageMap.gardenerExtensionAdmissionAlicloud | indent 8 }}
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 50m
-#           memory: 100Mi
       virtualCluster:
         helm:
           ociRepository:
@@ -26,7 +22,7 @@ spec:
         ociRepository:
           ref: {{ .resources.providerAlicloud.helmChart.ref }}
       {{- if (or .resources.providerAlicloud.helmChart.imageMap .imageVectorOverwrite) }}
-      runtimeValues:
+      runtimeClusterValues:
         {{- if .resources.providerAlicloud.helmChart.imageMap }}
 {{ toIndentYAML 2 .resources.providerAlicloud.helmChart.imageMap.gardenerExtensionProviderAlicloud | indent 8 }}
         {{- end }}
@@ -44,10 +40,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
-      {{- else }}
-#     values:
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 512Mi

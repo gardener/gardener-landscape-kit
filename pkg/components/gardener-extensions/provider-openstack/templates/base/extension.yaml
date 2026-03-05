@@ -6,13 +6,8 @@ metadata:
   name: provider-openstack
 spec:
   deployment:
-    admission:
-      values: {}
     extension:
       injectGardenKubeconfig: true
-      values:
-        controllers:
-#       replicaCount: 1
   resources:
   - kind: BackupBucket
     type: openstack
