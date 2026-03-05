@@ -31,20 +31,19 @@ The following dependencies have been updated:\n\
   ],
   packageRules: [
     {
-      matchFileNames: ['!componentvector/components.yaml'],
-      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
-      enabled: false,
-    },
-    {
-      matchFileNames: ['componentvector/components.yaml'],
-      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
-      matchUpdateTypes: ['minor', 'major'],
-      enabled: false,
-    },
-    {
       groupName: 'gardener/gardener',
       matchPackageNames: ['/^(github\\.com\\/)?gardener\\/gardener(\\/.*)?$/'],
       enabled: true
+    },
+    {
+      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
+      enabled: false,
+    },
+    {
+      matchBaseBranches: ['/^release-v\\d+\\.\\d+$/'],
+      matchFileNames: ['componentvector/components.yaml'],
+      matchUpdateTypes: ['patch'],
+      enabled: true,
     },
     {
       matchDatasources: ['go'],
