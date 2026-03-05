@@ -72,7 +72,7 @@ components:
   version: v1.57.0
 - name: github.com/gardener/gardener-extension-shoot-dns-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-dns-service
-  version: v1.78.0
+  version: v1.79.0
 - name: github.com/gardener/gardener-extension-shoot-oidc-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
   version: v0.36.0
