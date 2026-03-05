@@ -14,7 +14,7 @@ spec:
 {{ toIndentYAML 2 .resources.runtimeGvisor.helmChart.imageMap.gardenerExtensionRuntimeGvisor | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
-        imageVectorOverwrite: |
+        imageVectorOverwrite:
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
       {{- end }}

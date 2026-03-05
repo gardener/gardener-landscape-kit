@@ -14,7 +14,7 @@ spec:
 {{ toIndentYAML 2 .resources.shootOidcService.helmChart.imageMap.gardenerExtensionShootOidcService | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
-        imageVectorOverwrite: |
+        imageVectorOverwrite:
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
       {{- end }}
@@ -24,7 +24,7 @@ spec:
 {{ toIndentYAML 2 .resources.shootOidcService.helmChart.imageMap.gardenerExtensionShootOidcService | indent 8 }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
-        imageVectorOverwrite: |
+        imageVectorOverwrite:
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
       {{- end }}

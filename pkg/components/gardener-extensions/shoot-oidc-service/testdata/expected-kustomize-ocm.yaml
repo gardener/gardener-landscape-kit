@@ -14,7 +14,7 @@ spec:
         image:
           repository: test-repo/path/gardener/extensions/shoot-oidc-service
           tag: v1.2.3
-        imageVectorOverwrite: |
+        imageVectorOverwrite:
           images:
           - name: component1
             ref: test.repo/path/component1:v1.2.3
@@ -22,7 +22,7 @@ spec:
         image:
           repository: test-repo/path/gardener/extensions/shoot-oidc-service
           tag: v1.2.3
-        imageVectorOverwrite: |
+        imageVectorOverwrite:
           images:
           - name: component1
             ref: test.repo/path/component1:v1.2.3
