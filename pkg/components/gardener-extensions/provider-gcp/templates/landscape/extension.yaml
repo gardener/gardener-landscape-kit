@@ -13,10 +13,6 @@ spec:
       values:
 {{ toIndentYAML 2 .resources.admissionGcpRuntime.helmChart.imageMap.gardenerExtensionAdmissionGcp | indent 8 }}
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 50m
-#           memory: 100Mi
       virtualCluster:
         helm:
           ociRepository:
@@ -44,10 +40,4 @@ spec:
         imageVectorOverwrite: |
 {{ indent 10 .imageVectorOverwrite }}
         {{- end }}
-      {{- else }}
-#     values:
       {{- end }}
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 512Mi
