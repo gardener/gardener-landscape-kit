@@ -13,6 +13,8 @@ a1:
           d1: 1
         # d2: 2
         # d3: 3
+  # unrelated comment1
+  # unrelated comment2
     # b2 blabla-line1
     # b2 blabla-line2
     b2: 2

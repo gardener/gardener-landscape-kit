@@ -42,10 +42,7 @@ func process(yamlContent []byte, processLineFunc func(line []byte, index int, le
 		if index == -1 {
 			buf.Write(line)
 		} else {
-			if index > oldIndent {
-				levels = append(levels, index)
-				oldIndent = index
-			} else if index < oldIndent {
+			if index < oldIndent {
 				for len(levels) > 0 && index < oldIndent {
 					oldIndent = levels[len(levels)-1]
 					levels = levels[:len(levels)-1]
@@ -55,6 +52,10 @@ func process(yamlContent []byte, processLineFunc func(line []byte, index int, le
 				} else {
 					levels = append(levels, index)
 				}
+			}
+			if index > oldIndent {
+				levels = append(levels, index)
+				oldIndent = index
 			}
 			buf.Write(processLineFunc(line, index, levels))
 		}
