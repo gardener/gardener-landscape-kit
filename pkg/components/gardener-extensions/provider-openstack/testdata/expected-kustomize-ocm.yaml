@@ -1,0 +1,57 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: provider-openstack
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-openstack-runtime:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-openstack
+          tag: v1.2.3
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-openstack-application:v1.2.3
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/provider-openstack:v1.2.3
+      injectGardenKubeconfig: true
+      runtimeValues:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-openstack
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-openstack
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - kind: BackupBucket
+    type: openstack
+  - kind: BackupEntry
+    type: openstack
+  - kind: Bastion
+    type: openstack
+  - kind: ControlPlane
+    type: openstack
+  - kind: DNSRecord
+    type: openstack-designate
+  - kind: Infrastructure
+    type: openstack
+  - kind: Worker
+    type: openstack

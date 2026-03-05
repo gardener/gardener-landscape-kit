@@ -7,8 +7,25 @@ metadata:
 spec:
   deployment:
     extension:
+      helm:
+        ociRepository:
+          ref: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.2.3
       injectGardenKubeconfig: true
       policy: Always
+      runtimeClusterValues:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in>
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
+      values:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in>
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
   resources:
   - autoEnable:
     - shoot

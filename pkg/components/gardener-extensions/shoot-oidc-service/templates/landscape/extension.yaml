@@ -5,7 +5,31 @@ metadata:
 spec:
   deployment:
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.shootOidcService.helmChart.ref }}
+      {{- if (or .resources.runtimeGvisor.helmChart.imageMap .imageVectorOverwrite) }}
+      runtimeClusterValues:
+        {{- if .resources.shootOidcService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootOidcService.helmChart.imageMap.gardenerExtensionShootOidcService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}
+      {{- if (or .resources.shootOidcService.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.shootOidcService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootOidcService.helmChart.imageMap.gardenerExtensionShootOidcService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- else }}
+#     values:
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 100m

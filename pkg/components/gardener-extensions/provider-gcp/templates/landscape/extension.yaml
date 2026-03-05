@@ -5,13 +5,48 @@ metadata:
 spec:
   deployment:
     admission:
-      values: {}
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionGcpRuntime.helmChart.ref }}
+      {{- if .resources.admissionGcpRuntime.helmChart.imageMap }}
+      values:
+{{ toIndentYAML 2 .resources.admissionGcpRuntime.helmChart.imageMap.gardenerExtensionAdmissionGcp | indent 8 }}
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 50m
 #           memory: 100Mi
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionGcpApplication.helmChart.ref }}
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.providerGcp.helmChart.ref }}
+      {{- if (or .resources.providerGcp.helmChart.imageMap .imageVectorOverwrite) }}
+      runtimeValues:
+        {{- if .resources.providerGcp.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.providerGcp.helmChart.imageMap.gardenerExtensionProviderGcp | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}
+      {{- if (or .resources.providerGcp.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.providerGcp.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.providerGcp.helmChart.imageMap.gardenerExtensionProviderGcp | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- else }}
+#     values:
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 100m

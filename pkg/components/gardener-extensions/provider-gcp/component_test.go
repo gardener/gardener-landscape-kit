@@ -5,6 +5,9 @@
 package gcp_test
 
 import (
+	"os"
+
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -15,6 +18,8 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	provider_gcp "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/provider-gcp"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -83,5 +88,64 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("- ../../../../baseDir/components/gardener-extensions/provider-gcp"))
 		})
+
+		DescribeTable("should generate correct kustomized build output",
+			func(build test.BuildComponentVectorFn, expectedFile string) {
+				component := provider_gcp.NewComponent()
+				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
+				Expect(err).ToNot(HaveOccurred())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/provider-gcp", componentsVectorFile)
+				Expect(err).ToNot(HaveOccurred())
+				expected, err := os.ReadFile(expectedFile)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(result)).To(Equal(string(expected)))
+			},
+			Entry("with plain component vector without OCM resources",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-provider-gcp", "v1.2.3").WithDefaultResources().Build(),
+				"testdata/expected-kustomize-plain.yaml"),
+			Entry("with OCM component vector including helm charts and OCI images",
+				test.NewComponentVectorFactoryBuilder("github.com/gardener/gardener-extension-provider-gcp", "v1.2.3").
+					WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
+						Images: []imagevector.ImageSource{
+							{
+								Name: "component1",
+								Ref:  new("test.repo/path/component1:v1.2.3"),
+							},
+						},
+					}).
+					WithResourcesYAML(`
+admissionGcpApplication:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-gcp-application:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionGcp:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-gcp
+          tag: v1.2.3
+admissionGcpRuntime:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/admission-gcp-runtime:v1.2.3
+    imageMap:
+      gardenerExtensionAdmissionGcp:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-gcp
+          tag: v1.2.3
+gardenerExtensionAdmissionGcp:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/admission-gcp:v1.2.3
+gardenerExtensionProviderGcp:
+  ociImage:
+    ref: test-repo/path/gardener/extensions/provider-gcp:v1.2.3
+providerGcp:
+  helmChart:
+    ref: test-repo/path/charts/gardener/extensions/provider-gcp:v1.2.3
+    imageMap:
+      gardenerExtensionProviderGcp:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-gcp
+          tag: v1.2.3
+`).Build(),
+				"testdata/expected-kustomize-ocm.yaml"),
+		)
 	})
 })

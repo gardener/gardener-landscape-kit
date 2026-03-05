@@ -1,0 +1,49 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: shoot-dns-service
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/shoot-dns-service-admission-runtime:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-dns-service-admission
+          tag: v1.2.3
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/shoot-dns-service-admission-application:v1.2.3
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/shoot-dns-service:v1.2.3
+      runtimeValues:
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-dns-service
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-dns-service
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - autoEnable:
+    - shoot
+    clusterCompatibility:
+    - shoot
+    kind: Extension
+    type: shoot-dns-service
+    workerlessSupported: true

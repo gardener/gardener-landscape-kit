@@ -8,6 +8,8 @@ import (
 	"embed"
 	"path"
 
+	"github.com/gardener/gardener/pkg/utils"
+
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
@@ -54,6 +56,10 @@ func (c *component) GenerateBase(options components.Options) error {
 	return nil
 }
 
+func getTemplateValues(opts components.Options) (map[string]any, error) {
+	return components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerExtensionRuntimeGvisor)
+}
+
 // GenerateLandscape generates the component landscape directory.
 func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
@@ -67,14 +73,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeBaseTemplateFiles(opts components.Options) error {
-	version, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerExtensionRuntimeGvisor)
-	if !exists {
-		opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardenerExtensionRuntimeGvisor)
-	}
-
-	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, map[string]any{
-		"version": version,
-	})
+	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, nil)
 	if err != nil {
 		return err
 	}
@@ -88,10 +87,14 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
 	)
 
-	values := map[string]any{
+	renderValue, err := getTemplateValues(opts)
+	if err != nil {
+		return err
+	}
+	values := utils.MergeMaps(renderValue, map[string]any{
 		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
-	}
+	})
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
 		return err

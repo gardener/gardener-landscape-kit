@@ -1,0 +1,57 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: provider-azure
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-azure-runtime:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-azure
+          tag: v1.2.3
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-azure-application:v1.2.3
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/provider-azure:v1.2.3
+      injectGardenKubeconfig: true
+      runtimeValues:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-azure
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-azure
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - kind: BackupBucket
+    type: azure
+  - kind: BackupEntry
+    type: azure
+  - kind: Bastion
+    type: azure
+  - kind: ControlPlane
+    type: azure
+  - kind: DNSRecord
+    type: azure-dns
+  - kind: Infrastructure
+    type: azure
+  - kind: Worker
+    type: azure

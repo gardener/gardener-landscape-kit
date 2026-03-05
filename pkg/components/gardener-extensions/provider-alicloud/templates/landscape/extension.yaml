@@ -5,13 +5,48 @@ metadata:
 spec:
   deployment:
     admission:
-      values: {}
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionAlicloudRuntime.helmChart.ref }}
+      {{- if .resources.admissionAlicloudRuntime.helmChart.imageMap }}
+      values:
+{{ toIndentYAML 2 .resources.admissionAlicloudRuntime.helmChart.imageMap.gardenerExtensionAdmissionAlicloud | indent 8 }}
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 50m
 #           memory: 100Mi
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.admissionAlicloudApplication.helmChart.ref }}
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.providerAlicloud.helmChart.ref }}
+      {{- if (or .resources.providerAlicloud.helmChart.imageMap .imageVectorOverwrite) }}
+      runtimeValues:
+        {{- if .resources.providerAlicloud.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.providerAlicloud.helmChart.imageMap.gardenerExtensionProviderAlicloud | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}
+      {{- if (or .resources.providerAlicloud.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.providerAlicloud.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.providerAlicloud.helmChart.imageMap.gardenerExtensionProviderAlicloud | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- else }}
+#     values:
+      {{- end }}
 #       resources:
 #         requests:
 #           cpu: 100m

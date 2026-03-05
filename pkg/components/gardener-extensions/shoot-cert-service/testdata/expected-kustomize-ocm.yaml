@@ -1,0 +1,58 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: shoot-cert-service
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/shoot-cert-service:v1.2.3
+      injectGardenKubeconfig: true
+      policy: Always
+      runtimeClusterValues:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in>
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-cert-service
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in>
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-cert-service
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - autoEnable:
+    - shoot
+    clusterCompatibility:
+    - shoot
+    kind: Extension
+    type: shoot-cert-service
+    workerlessSupported: true
+  - clusterCompatibility:
+    - garden
+    - seed
+    kind: Extension
+    lifecycle:
+      delete: AfterKubeAPIServer
+      reconcile: BeforeKubeAPIServer
+    type: controlplane-cert-service
