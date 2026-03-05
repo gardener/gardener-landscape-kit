@@ -5,7 +5,21 @@ metadata:
 spec:
   deployment:
     extension:
-      values: {}
+      helm:
+        ociRepository:
+          ref: {{ .resources.shootNetworkingProblemdetector.helmChart.ref }}
+      {{- if (or .resources.shootNetworkingProblemdetector.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.shootNetworkingProblemdetector.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootNetworkingProblemdetector.helmChart.imageMap.gardenerExtensionShootNetworkingProblemdetector | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- else }}
+#     values:
+      {{- end }}
 #       controllers:
 #         healthcheck:
 #           concurrentSyncs: 10
@@ -15,7 +29,3 @@ spec:
 #         k8sExporter:
 #           enabled: true
 #       replicaCount: 1
-#       resources:
-#         requests:
-#           cpu: 30m
-#           memory: 128Mi

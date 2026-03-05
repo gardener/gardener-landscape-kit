@@ -4,10 +4,40 @@ metadata:
   name: shoot-dns-service
 spec:
   deployment:
-    admission: {}
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.shootDnsServiceAdmissionRuntime.helmChart.ref }}
+      {{- if .resources.shootDnsServiceAdmissionRuntime.helmChart.imageMap }}
+      values:
+{{ toIndentYAML 2 .resources.shootDnsServiceAdmissionRuntime.helmChart.imageMap.gardenerExtensionAdmissionShootDnsService | indent 8 }}
+      {{- end }}
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: {{ .resources.shootDnsServiceAdmissionApplication.helmChart.ref }}
     extension:
-      values: {}
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 64Mi
+      helm:
+        ociRepository:
+          ref: {{ .resources.shootDnsService.helmChart.ref }}
+      {{- if (or .resources.shootDnsService.helmChart.imageMap .imageVectorOverwrite) }}
+      runtimeClusterValues:
+        {{- if .resources.shootDnsService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootDnsService.helmChart.imageMap.gardenerExtensionShootDnsService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}
+      {{- if (or .resources.shootDnsService.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.shootDnsService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootDnsService.helmChart.imageMap.gardenerExtensionShootDnsService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}

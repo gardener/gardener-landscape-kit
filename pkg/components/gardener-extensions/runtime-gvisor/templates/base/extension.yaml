@@ -5,11 +5,6 @@ metadata:
     security.gardener.cloud/pod-security-enforce: baseline
   name: runtime-gvisor
 spec:
-  deployment:
-    extension:
-      helm:
-        ociRepository:
-          ref: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/runtime-gvisor:{{ .version }}
   resources:
   - kind: ContainerRuntime
     type: gvisor

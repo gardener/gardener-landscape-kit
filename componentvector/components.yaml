@@ -58,27 +58,93 @@ components:
 - name: github.com/gardener/gardener-extension-provider-azure
   sourceRepository: https://github.com/gardener/gardener-extension-provider-azure
   version: v1.58.2
+  resources:
+    admissionAzureRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-azure-runtime
+    admissionAzureApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-azure-application
+    providerAzure:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-azure
 - name: github.com/gardener/gardener-extension-provider-gcp
   sourceRepository: https://github.com/gardener/gardener-extension-provider-gcp
   version: v1.49.4
+  resources:
+    admissionGcpRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-gcp-runtime
+    admissionGcpApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-gcp-application
+    providerGcp:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-gcp
 - name: github.com/gardener/gardener-extension-provider-openstack
   sourceRepository: https://github.com/gardener/gardener-extension-provider-openstack
   version: v1.52.0
+  resources:
+    admissionOpenstackRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-openstack-runtime
+    admissionOpenstackApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-openstack-application
+    providerOpenstack:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-openstack
 - name: github.com/gardener/gardener-extension-provider-alicloud
   sourceRepository: https://github.com/gardener/gardener-extension-provider-alicloud
   version: v1.68.3
+  resources:
+    admissionAlicloudRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-alicloud-runtime
+    admissionAlicloudApplication:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/admission-alicloud-application
+    providerAlicloud:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-alicloud
 - name: github.com/gardener/gardener-extension-shoot-cert-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-cert-service
   version: v1.57.0
+  resources:
+    shootCertService:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service
 - name: github.com/gardener/gardener-extension-shoot-dns-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-dns-service
   version: v1.79.0
+  resources:
+    shootDnsServiceAdmissionRuntime:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-runtime
+    shootDnsServiceAdmissionApplication:
+     helmChart:
+       repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-application
+    shootDnsService:
+       helmChart:
+         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service
 - name: github.com/gardener/gardener-extension-shoot-oidc-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
   version: v0.36.0
+  resources:
+    shootOidcService:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service
 - name: github.com/gardener/gardener-extension-shoot-networking-problemdetector
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-networking-problemdetector
   version: v0.32.0
+  resources:
+    shootNetworkingProblemdetector:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-problemdetector
 - name: github.com/gardener/gardener-extension-runtime-gvisor
   sourceRepository: https://github.com/gardener/gardener-extension-runtime-gvisor
   version: v0.29.0
+  resources:
+    runtimeGvisor:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor

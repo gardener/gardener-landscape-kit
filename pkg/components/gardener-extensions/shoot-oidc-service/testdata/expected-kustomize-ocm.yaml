@@ -1,0 +1,35 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: shoot-oidc-service
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/shoot-oidc-service:v1.2.3
+      runtimeClusterValues:
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-oidc-service
+          tag: v1.2.3
+        imageVectorOverwrite:
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/shoot-oidc-service
+          tag: v1.2.3
+        imageVectorOverwrite:
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - clusterCompatibility:
+    - garden
+    - shoot
+    kind: Extension
+    type: shoot-oidc-service
+    workerlessSupported: true

@@ -1,0 +1,57 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: provider-alicloud
+spec:
+  deployment:
+    admission:
+      runtimeCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-alicloud-runtime:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/admission-alicloud
+          tag: v1.2.3
+      virtualCluster:
+        helm:
+          ociRepository:
+            ref: test-repo/path/charts/gardener/extensions/admission-alicloud-application:v1.2.3
+    extension:
+      helm:
+        ociRepository:
+          ref: test-repo/path/charts/gardener/extensions/provider-alicloud:v1.2.3
+      injectGardenKubeconfig: true
+      runtimeClusterValues:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-alicloud
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+      values:
+        image:
+          repository: test-repo/path/gardener/extensions/provider-alicloud
+          tag: v1.2.3
+        imageVectorOverwrite: |
+          images:
+          - name: component1
+            ref: test.repo/path/component1:v1.2.3
+  resources:
+  - kind: BackupBucket
+    type: alicloud
+  - kind: BackupEntry
+    type: alicloud
+  - kind: Bastion
+    type: alicloud
+  - kind: ControlPlane
+    type: alicloud
+  - kind: DNSRecord
+    type: alicloud-dns
+  - kind: Infrastructure
+    type: alicloud
+  - kind: Worker
+    type: alicloud

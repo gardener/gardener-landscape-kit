@@ -4,20 +4,35 @@ metadata:
   name: shoot-cert-service
 spec:
   deployment:
-    extension: {}
-#     runtimeClusterValues:
-#       certificateConfig:
-#         defaultIssuer:
-#           acme:
-#             email: # e.g. some.user@example.com
-#             server: https://acme-v02.api.letsencrypt.org/directory
-#     values:
-#       certificateConfig:
-#         defaultIssuer:
-#           acme:
-#             email: # e.g. some.user@example.com
-#             server: https://acme-v02.api.letsencrypt.org/directory
-#       resources:
-#         requests:
-#           cpu: 100m
-#           memory: 64Mi
+    extension:
+      helm:
+        ociRepository:
+          ref: {{ .resources.shootCertService.helmChart.ref }}
+      runtimeClusterValues:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in> # e.g. some.user@example.com
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
+        {{- if .resources.shootCertService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootCertService.helmChart.imageMap.gardenerExtensionShootCertService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      values:
+        certificateConfig:
+          defaultIssuer:
+            acme:
+              email: <to_be_filled_in> # e.g. some.user@example.com
+              server: https://acme-v02.api.letsencrypt.org/directory
+            name: garden
+        {{- if .resources.shootCertService.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootCertService.helmChart.imageMap.gardenerExtensionShootCertService | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite: |
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
