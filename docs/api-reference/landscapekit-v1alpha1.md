@@ -400,6 +400,20 @@ string
 </tr>
 <tr>
 <td>
+<code>overrideComponentsFile</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>OverrideComponentsFile is the path to a partial components vector file used to override specific component
+versions on top of the base vector (default, ReleaseBranch-updated, or a full ComponentsVectorFile).
+Only the listed components are overridden, all others keep their base-vector values.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>defaultVersionsUpdateStrategy</code></br>
 <em>
 string

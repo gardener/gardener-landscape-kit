@@ -19,4 +19,8 @@ kind: LandscapeKitConfiguration
 #   - component-name
 # versionConfig:
 #   componentsVectorFile: ./versions.yaml
+#   # overrideComponentsFile points to a partial components.yaml that overrides specific component
+#   # versions on top of the base vector. Only listed components are affected; others keep their
+#   # base-vector values. Can be combined with componentsVectorFile (override applies on top).
+#   overrideComponentsFile: ./override-versions.yaml
 #   defaultVersionsUpdateStrategy: ReleaseBranch

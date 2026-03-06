@@ -72,6 +72,70 @@ func New(input []byte) (Interface, error) {
 	return components, nil
 }
 
+// MergeComponents merges override components on top of base components.
+// For each component in override: if its name exists in base, the base entry is replaced;
+// otherwise it is appended. Returns a new Components struct with the merged result.
+func MergeComponents(base, override *Components) *Components {
+	// Build an ordered list starting from base, replacing entries found in override.
+	nameToOverride := make(map[string]*ComponentVector, len(override.Components))
+	for _, ov := range override.Components {
+		nameToOverride[ov.Name] = ov
+	}
+
+	merged := make([]*ComponentVector, 0, len(base.Components)+len(override.Components))
+	seen := make(map[string]struct{}, len(base.Components))
+	for _, bc := range base.Components {
+		if ov, ok := nameToOverride[bc.Name]; ok {
+			merged = append(merged, ov)
+		} else {
+			merged = append(merged, bc)
+		}
+		seen[bc.Name] = struct{}{}
+	}
+	// Append components from override that were not present in base.
+	for _, ov := range override.Components {
+		if _, exists := seen[ov.Name]; !exists {
+			merged = append(merged, ov)
+		}
+	}
+	return &Components{Components: merged}
+}
+
+// NewWithOverride creates a component vector by merging override entries on top of the base.
+// The override file uses the same Components schema but may list only a subset of components.
+// Components present in the override replace their counterparts in base; new names are appended.
+func NewWithOverride(base []byte, override []byte) (Interface, error) {
+	baseObj := Components{}
+	if err := yaml.Unmarshal(base, &baseObj); err != nil {
+		return nil, fmt.Errorf("failed to parse base component vector: %w", err)
+	}
+	if errList := ValidateComponents(&baseObj, field.NewPath("")); len(errList) > 0 {
+		return nil, fmt.Errorf("invalid base component vector: %w", errList.ToAggregate())
+	}
+
+	overrideObj := Components{}
+	if err := yaml.Unmarshal(override, &overrideObj); err != nil {
+		return nil, fmt.Errorf("failed to parse override component vector: %w", err)
+	}
+	// Validate individual entries in the override (name + version required per entry),
+	// but allow an empty list (an override with no entries is a no-op).
+	for i, ov := range overrideObj.Components {
+		if errList := validateComponentVector(ov, field.NewPath("").Child("components").Index(i)); len(errList) > 0 {
+			return nil, fmt.Errorf("invalid override component vector: %w", errList.ToAggregate())
+		}
+	}
+
+	merged := MergeComponents(&baseObj, &overrideObj)
+
+	result := &components{
+		nameToComponentVector: make(map[string]*ComponentVector, len(merged.Components)),
+	}
+	for _, cv := range merged.Components {
+		result.nameToComponentVector[cv.Name] = cv
+	}
+	return result, nil
+}
+
 // TemplateValues returns the template values for the component vector.
 // It converts the resources to an unstructured map and marshals the image vector overwrites as strings if they are present.
 // The resources are patched by replacing the string `${version}` with the version of the component vector before being returned as template values.

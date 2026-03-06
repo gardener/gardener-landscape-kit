@@ -106,9 +106,27 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		}
 	}
 
-	componentVector, err := utilscomponentvector.New(componentVectorBytes)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create component vector: %w", err)
+	var componentVector utilscomponentvector.Interface
+	if opts.Config != nil && opts.Config.VersionConfig != nil && opts.Config.VersionConfig.OverrideComponentsFile != nil {
+		overrideCompFile := *opts.Config.VersionConfig.OverrideComponentsFile
+		if !path.IsAbs(overrideCompFile) {
+			overrideCompFile = path.Join(path.Dir(opts.ConfigFilePath), overrideCompFile)
+		}
+		opts.Log.Info("Applying component version overrides", "file", overrideCompFile)
+		overrideBytes, err := fs.ReadFile(overrideCompFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read override components file: %w", err)
+		}
+		componentVector, err = utilscomponentvector.NewWithOverride(componentVectorBytes, overrideBytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create component vector with overrides: %w", err)
+		}
+	} else {
+		var err error
+		componentVector, err = utilscomponentvector.New(componentVectorBytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create component vector: %w", err)
+		}
 	}
 
 	return &options{

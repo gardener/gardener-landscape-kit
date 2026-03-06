@@ -111,6 +111,11 @@ type VersionConfiguration struct {
 	// ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.
 	// +optional
 	ComponentsVectorFile *string `json:"componentsVectorFile,omitempty"`
+	// OverrideComponentsFile is the path to a partial components vector file used to override specific component
+	// versions on top of the base vector (default, ReleaseBranch-updated, or a full ComponentsVectorFile).
+	// Only the listed components are overridden, all others keep their base-vector values.
+	// +optional
+	OverrideComponentsFile *string `json:"overrideComponentsFile,omitempty"`
 	// UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on generate.
 	// Possible values are "Disabled" (default) and "ReleaseBranch".
 	// Only used if no ComponentsVectorFile is specified.
