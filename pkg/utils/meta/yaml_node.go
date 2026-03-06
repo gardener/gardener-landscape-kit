@@ -106,14 +106,14 @@ func nodeToString(node *yaml.Node) string {
 	return buf.String()
 }
 
-// encodeResult encodes a YAML node to bytes
-func encodeResult(merged *yaml.Node) ([]byte, error) {
+// EncodeResult encodes a YAML node to bytes
+func EncodeResult(node *yaml.Node) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	defer encoder.Close()
 	encoder.SetIndent(2)
 	encoder.CompactSeqIndent()
-	if err := encoder.Encode(merged); err != nil {
+	if err := encoder.Encode(node); err != nil {
 		return nil, err
 	}
 
