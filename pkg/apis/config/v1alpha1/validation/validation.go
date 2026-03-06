@@ -164,6 +164,9 @@ func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *f
 	if conf.ComponentsVectorFile != nil && strings.TrimSpace(*conf.ComponentsVectorFile) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("componentsVectorFile"), "components vector file path must be specified"))
 	}
+	if conf.OverrideComponentsFile != nil && strings.TrimSpace(*conf.OverrideComponentsFile) == "" {
+		allErrs = append(allErrs, field.Required(fldPath.Child("overrideComponentsFile"), "override components file path must be specified"))
+	}
 	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, *conf.DefaultVersionsUpdateStrategy) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("defaultVersionsUpdateStrategy"), *conf.DefaultVersionsUpdateStrategy, "allowed values are: "+strings.Join(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, ", ")))
 	}

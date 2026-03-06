@@ -339,6 +339,61 @@ var _ = Describe("Validation", func() {
 				errList := validation.ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
+
+			It("should fail if OverrideComponentsFile is empty", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						OverrideComponentsFile: new(""),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("versionConfig.overrideComponentsFile"),
+					})),
+				))
+			})
+
+			It("should fail if OverrideComponentsFile is whitespace only", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						OverrideComponentsFile: new("   "),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("versionConfig.overrideComponentsFile"),
+					})),
+				))
+			})
+
+			It("should pass with a valid OverrideComponentsFile", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						OverrideComponentsFile: new("path/to/override.yaml"),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should pass with both ComponentsVectorFile and OverrideComponentsFile set", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						ComponentsVectorFile:   new("path/to/components.yaml"),
+						OverrideComponentsFile: new("path/to/override.yaml"),
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
 		})
 	})
 })
