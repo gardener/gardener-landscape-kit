@@ -37,8 +37,7 @@ func (c *components) FindComponentVersion(name string) (string, bool) {
 // Returns the ComponentVector if found, otherwise nil.
 func (c *components) FindComponentVector(name string) *ComponentVector {
 	if component, exists := c.nameToComponentVector[name]; exists {
-		h := *component
-		return &h
+		return new(*component)
 	}
 	return nil
 }
@@ -84,6 +83,7 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 		return nil, fmt.Errorf("failed to convert resources to unstructured map: %w", err)
 	}
 	m := map[string]any{
+		"version":    cv.Version,
 		resourcesKey: resources,
 	}
 	if cv.ImageVectorOverwrite != nil {

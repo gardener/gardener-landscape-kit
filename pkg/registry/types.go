@@ -80,7 +80,7 @@ func (r *registry) findAndRenderCustomComponents(opts components.Options) error 
 
 func (r *registry) renderCustomComponents(ocmComponentName, componentDir string, opts components.Options) error {
 	cv := opts.GetComponentVector().FindComponentVector(ocmComponentName)
-	if cv == nil || len(cv.Resources) == 0 {
+	if cv == nil {
 		return fmt.Errorf("no component vector found for custom component %s", ocmComponentName)
 	}
 
