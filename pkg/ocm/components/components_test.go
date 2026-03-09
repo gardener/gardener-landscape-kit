@@ -27,6 +27,7 @@ const (
 	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
 	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
+	refRuntimeGvisor                  = components.ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.28.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
 
@@ -457,6 +458,25 @@ scheduler:
 				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy"),
 				Tag:        new("v0.19.0"),
 				Version:    new("v0.19.0"),
+			}))
+	})
+
+	It("should produce correct image vector for runtime-gvisor", func() {
+		loadWithDep(3, refRoot)
+		Expect(c.ComponentsCount()).To(Equal(24))
+		roots := c.GetRootComponents()
+		Expect(roots).To(ConsistOf(refRoot))
+
+		By("resolved references")
+		imageVector, err := c.GetImageVector(refRuntimeGvisor, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(imageVector).To(HaveLen(1))
+		Expect(imageVector).To(ConsistOf(
+			imagevector.ImageSource{
+				Name:       "runtime-gvisor-installation",
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation"),
+				Tag:        new("v0.28.0@sha256:5740df168e6065c346f92c366271412112e0ed9d65683136366c4a47061f86b5"),
+				Version:    new("v0.28.0"),
 			}))
 	})
 })
