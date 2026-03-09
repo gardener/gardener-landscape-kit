@@ -220,6 +220,14 @@
             "value": "We use gosec (linter) for SAST scans, see: https://github.com/securego/gosec.\nEnabled by https://github.com/gardener/logging/pull/261\n"
           }
         ],
+        "srcRefs": [
+          {
+            "identitySelector": {
+              "name": "github_com_gardener_logging",
+              "version": "v0.65.0"
+            }
+          }
+        ],
         "type": "application/data",
         "relation": "local",
         "access": {

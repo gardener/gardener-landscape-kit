@@ -16,7 +16,7 @@ The generator creates a Kubernetes root OCM descriptor with Kubernetes resources
 
 ### Regenerating Test Data
 
-To regenerate these mock component descriptors, you can run `make ocm-testdata-generate` from the root of the repository.
+To regenerate these mock component descriptors, you can run `make generate-ocm-testdata` from the root of the repository.
 You may want to adjust the configuration file at `pkg/ocm/components/testdata/generator/config.yaml` before running the command to specify different component versions or other parameters.
 It should only be necessary if there are new features introduced in the OCM component descriptors or if some new test scenarios may not be covered by the existing test data.
 It is expected that the image references checked in the tests of `pkg/ocm/components/components_test.go` have to be updated accordingly after regenerating the test data if the component versions have changed.
