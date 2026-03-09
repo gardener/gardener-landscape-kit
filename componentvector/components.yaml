@@ -57,7 +57,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-aws
 - name: github.com/gardener/gardener-extension-provider-azure
   sourceRepository: https://github.com/gardener/gardener-extension-provider-azure
-  version: v1.58.2
+  version: v1.58.3
   resources:
     admissionAzureRuntime:
       helmChart:
