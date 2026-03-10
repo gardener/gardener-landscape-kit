@@ -52,6 +52,15 @@ Resource Types:
 </tr>
 </tbody>
 </table>
+<h3 id="landscape.config.gardener.cloud/v1alpha1.DefaultVersionsUpdateStrategy">DefaultVersionsUpdateStrategy
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.VersionConfiguration">VersionConfiguration</a>)
+</p>
+<p>
+<p>DefaultVersionsUpdateStrategy controls whether the versions in the default components vector should be updated from the release branch on generate.</p>
+</p>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.GitRepository">GitRepository
 </h3>
 <p>
@@ -402,7 +411,9 @@ string
 <td>
 <code>defaultVersionsUpdateStrategy</code></br>
 <em>
-string
+<a href="#landscape.config.gardener.cloud/v1alpha1.DefaultVersionsUpdateStrategy">
+DefaultVersionsUpdateStrategy
+</a>
 </em>
 </td>
 <td>

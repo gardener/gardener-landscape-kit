@@ -96,24 +96,32 @@ func (nv *OCMComponent) String() string {
 	return nv.Name + ":" + nv.Version
 }
 
+// DefaultVersionsUpdateStrategy controls whether the versions in the default components vector should be updated from the release branch on generate.
+type DefaultVersionsUpdateStrategy string
+
 const (
 	// DefaultVersionsUpdateStrategyReleaseBranch indicates that the versions in the default vector should be updated from the release branch on generate.
-	DefaultVersionsUpdateStrategyReleaseBranch = "ReleaseBranch"
+	DefaultVersionsUpdateStrategyReleaseBranch DefaultVersionsUpdateStrategy = "ReleaseBranch"
 	// DefaultVersionsUpdateStrategyDisabled indicates that the versions in the default vector should not be updated on generate.
-	DefaultVersionsUpdateStrategyDisabled = "Disabled"
+	DefaultVersionsUpdateStrategyDisabled DefaultVersionsUpdateStrategy = "Disabled"
 )
 
 // AllowedDefaultVersionsUpdateStrategies lists all allowed strategies for updating versions in the default components vector.
-var AllowedDefaultVersionsUpdateStrategies = []string{DefaultVersionsUpdateStrategyReleaseBranch, DefaultVersionsUpdateStrategyDisabled}
+var AllowedDefaultVersionsUpdateStrategies = []string{
+	string(DefaultVersionsUpdateStrategyReleaseBranch),
+	string(DefaultVersionsUpdateStrategyDisabled),
+}
 
 // VersionConfiguration contains configuration for versioning.
 type VersionConfiguration struct {
-	// ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.
+	// ComponentsVectorFile is the path to a components vector file. It may contain all components (full replacement of
+	// the embedded default vector) or only a subset (partial override merged on top of the embedded default vector).
+	// A default vector is applied if not specified.
 	// +optional
 	ComponentsVectorFile *string `json:"componentsVectorFile,omitempty"`
 	// UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on generate.
 	// Possible values are "Disabled" (default) and "ReleaseBranch".
 	// Only used if no ComponentsVectorFile is specified.
 	// +optional
-	DefaultVersionsUpdateStrategy *string `json:"defaultVersionsUpdateStrategy,omitempty"`
+	DefaultVersionsUpdateStrategy *DefaultVersionsUpdateStrategy `json:"defaultVersionsUpdateStrategy,omitempty"`
 }

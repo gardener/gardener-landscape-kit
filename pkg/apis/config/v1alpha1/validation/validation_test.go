@@ -332,7 +332,7 @@ var _ = Describe("Validation", func() {
 			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						DefaultVersionsUpdateStrategy: new("ReleaseBranch"),
+						DefaultVersionsUpdateStrategy: new(v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch),
 					},
 				}
 
