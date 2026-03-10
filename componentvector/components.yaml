@@ -96,7 +96,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-openstack
 - name: github.com/gardener/gardener-extension-provider-alicloud
   sourceRepository: https://github.com/gardener/gardener-extension-provider-alicloud
-  version: v1.68.3
+  version: v1.69.0
   resources:
     admissionAlicloudRuntime:
       helmChart:
