@@ -136,7 +136,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service
 - name: github.com/gardener/gardener-extension-shoot-networking-problemdetector
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-networking-problemdetector
-  version: v0.32.0
+  version: v0.32.1
   resources:
     shootNetworkingProblemdetector:
       helmChart:
