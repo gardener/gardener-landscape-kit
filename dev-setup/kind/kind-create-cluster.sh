@@ -19,6 +19,113 @@ fi
 
 clusterName="$GLK_KIND_CLUSTER_PREFIX-$clusterNameSuffix"
 
+SUDO=""
+if [[ "$(id -u)" != "0" ]]; then
+  SUDO="sudo "
+fi
+
+# The local registry needs to be available from the host for pushing and from the containers for pulling.
+# On the host, we bind the registry to localhost (see infra/docker-compose.yaml), because 127.0.0.1 and ::1
+# are configured as HTTP-only (insecure-registries) by default in Docker, which allows `docker push` without
+# changing the Docker daemon config.
+# From within the containers (e.g., the kind nodes), the registry domain is resolved via Docker's built-in
+# DNS server to the IP of the registry container because of the host alias configured in docker compose.
+#
+# We could also bind the registry to an 172.18.255.* address similar to bind9 to make the registry reachable
+# from the host and containers via the same IP. This would be cleaner, because we wouldn't need to add entries
+# to /etc/hosts for the registry domain and would resolve the domain from the host via bind9 just as all other
+# domains.
+# However, this would require changing the Docker daemon config to set registry.local.gardener.cloud as an
+# insecure registry to allow pushing to it from the host. The insecureRegistries settings in the skaffold config
+# doesn't apply here, because skaffold uses the Docker daemon/CLI under the hood for pushing images, which only
+# considers the Docker daemon's registry configuration.
+ensure_local_registry_hosts() {
+  local host="glk-registry.local.gardener.cloud"
+
+  for ip in 127.0.0.1 ::1 ; do
+    if ! grep -Eq "^$ip $host$" /etc/hosts; then
+      echo "> Adding entry '$ip $host' to /etc/hosts..."
+      echo "$ip $host" | ${SUDO}tee -a /etc/hosts
+    else
+      echo "> /etc/hosts already contains entry '$ip $host', skipping..."
+    fi
+  done
+}
+
+setup_local_dns_resolver() {
+  local dns_ip=172.18.255.54
+  local dns_ipv6=fd00:ff::54
+
+  # Special handling in CI: we don't have a fully-fledged systemd-resolved or similar in the CI environment, so we set
+  # up dnsmasq as a local DNS resolver with conditional forwarding for the local.gardener.cloud domain to the local
+  # setup's DNS server (bind9).
+  # Setting bind9 as the nameserver in /etc/resolv.conf directly does not work, as bind9 itself forwards to the host's
+  # nameservers configured in resolv.conf, creating a cyclic dependency. With dnsmasq however, we can configure it to
+  # forward requests only for the local.gardener.cloud domain to the local setup's DNS server, and forward all other
+  # requests to the default nameservers (the Prow cluster's coredns), which works fine.
+  if [ -n "${CI:-}" -a -n "${ARTIFACTS:-}" ]; then
+    mkdir -p /etc/dnsmasq.d/
+    cp /etc/resolv.conf /etc/resolv-default.conf
+    tee /etc/dnsmasq.d/gardener-local.conf <<EOF
+# Force dnsmasq to listen ONLY on standard localhost and prevent it from scanning other interfaces/IPs.
+# Without this, it ignores the server directive for local.gardener.cloud because the IP is bound to the loopback
+# interface and assumes doing so would create an infinite loop.
+listen-address=127.0.0.1
+bind-interfaces
+
+# Configure conditional forwarding for local.gardener.cloud but use the resolv.conf from Kubernetes (coredns) as
+# upstream for all other requests, which is required for resolving the registry cache services in the Prow cluster.
+server=/local.gardener.cloud/$dns_ip
+resolv-file=/etc/resolv-default.conf
+
+# Export dnsmasq logs to a file for debugging purposes
+log-facility=/var/log/dnsmasq.log
+log-queries
+EOF
+
+    service dnsmasq start || service dnsmasq restart
+
+    echo "> Setting dnsmasq as nameserver in /etc/resolv.conf..."
+    # /etc/resolv.conf is shared between all containers in the pod, i.e., it will also be used by the injected sidecar
+    # containers (e.g., for uploading artifacts to GCS). Hence, we keep the previous nameservers as fallback if dnsmasq
+    # is not working, but set dnsmasq as the first entry to ensure it is used as primary resolver for the test job.
+    # We cannot use sed -i on the /etc/resolv.conf bind mount that Kubernetes adds, so we need to write to a temp file
+    # and then overwrite the resolv.conf with the combined content.
+    echo "nameserver 127.0.0.1" > /tmp/resolv.conf
+    cat /etc/resolv.conf >> /tmp/resolv.conf
+    cat /tmp/resolv.conf > /etc/resolv.conf
+    rm /tmp/resolv.conf
+
+    echo "> Content of /etc/resolv.conf after setting dnsmasq as nameserver"
+    cat /etc/resolv.conf
+
+    return 0
+  fi
+
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    local desired_resolver_config="nameserver $dns_ip"
+    if ! grep -q "$desired_resolver_config" /etc/resolver/local.gardener.cloud ; then
+      echo "Configuring macOS to resolve the local.gardener.cloud zone using the local setup's DNS server"
+      ${SUDO}mkdir -p /etc/resolver
+      echo "$desired_resolver_config" | ${SUDO}tee /etc/resolver/local.gardener.cloud
+    fi
+  elif [[ "$OSTYPE" == "linux"* && -d /etc/systemd/resolved.conf.d ]]; then
+    if ! grep -q "$dns_ip" /etc/systemd/resolved.conf.d/gardener-local.conf || ! grep -q "$dns_ipv6" /etc/systemd/resolved.conf.d/gardener-local.conf ; then
+      echo "Configuring systemd-resolved to resolve the local.gardener.cloud zone using the local setup's DNS server"
+      cat <<EOF | ${SUDO}tee /etc/systemd/resolved.conf.d/gardener-local.conf
+[Resolve]
+DNS=$dns_ip $dns_ipv6
+Domains=~local.gardener.cloud
+EOF
+      echo "restarting systemd-resolved"
+      ${SUDO}systemctl restart systemd-resolved
+    fi
+  elif ! nslookup -type=ns local.gardener.cloud >/dev/null 2>/dev/null ; then
+    echo "Warning: Unknown OS. Make sure your host resolves the local.gardener.cloud zone using the local setup's DNS server at $dns_ip or $dns_ipv6 respectively."
+    return 0
+  fi
+}
+
 install_metallb() {
   echo "🚀 install metal loadbalancer on kind cluster $clusterName"
   # install metal loadbalancer (see https://kind.sigs.k8s.io/docs/user/loadbalancer/)
@@ -92,6 +199,8 @@ create_kind_cluster() {
 
 setup_kind_network
 build_kind_node_image
+ensure_local_registry_hosts
+setup_local_dns_resolver
 create_kind_cluster
 install_metallb
 

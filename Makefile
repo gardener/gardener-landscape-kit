@@ -116,21 +116,22 @@ git-server-down:
 git-server-cleanup: git-server-down $(YQ)
 	@rm -rf $(REPO_ROOT)/dev/git-server/data
 
-.PHONY: registry-up
-registry-up:
-	@$(REPO_ROOT)/dev-setup/registry/registry-up.sh
+.PHONY: infra-up
+infra-up:
+	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml up -d
 
-.PHONY: registry-down
-registry-down:
-	@$(REPO_ROOT)/dev-setup/registry/registry-down.sh
+.PHONY: infra-down
+infra-down:
+	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml down
 
 .PHONY: kind-up ## create single kind cluster for hosting glk and runtime
 kind-up: $(KIND) $(KUBECTL) $(HELM)
+	@$(REPO_ROOT)/dev-setup/kind/kind-setup-loopback-devices.sh
 	@$(REPO_ROOT)/dev-setup/kind/kind-create-cluster.sh single
-	@$(MAKE) registry-up git-server-up
+	@$(MAKE) infra-up git-server-up
 
 .PHONY: kind-down
-kind-down: git-server-down registry-down $(KIND) $(KUBECTL)
+kind-down: git-server-down infra-down $(KIND) $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
 
 #########################################
