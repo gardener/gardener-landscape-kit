@@ -112,6 +112,28 @@ var AllowedDefaultVersionsUpdateStrategies = []string{
 	string(DefaultVersionsUpdateStrategyDisabled),
 }
 
+// EffectiveComponentsVectorFileMode controls for which generate subcommands the effective components vector is written.
+type EffectiveComponentsVectorFileMode string
+
+const (
+	// EffectiveComponentsVectorFileModeNone disables writing the effective components vector file.
+	EffectiveComponentsVectorFileModeNone EffectiveComponentsVectorFileMode = "None"
+	// EffectiveComponentsVectorFileModeBase writes the effective components vector file only when running generate base.
+	EffectiveComponentsVectorFileModeBase EffectiveComponentsVectorFileMode = "Base"
+	// EffectiveComponentsVectorFileModeLandscape writes the effective components vector file only when running generate landscape.
+	EffectiveComponentsVectorFileModeLandscape EffectiveComponentsVectorFileMode = "Landscape"
+	// EffectiveComponentsVectorFileModeBoth writes the effective components vector file for both generate base and generate landscape.
+	EffectiveComponentsVectorFileModeBoth EffectiveComponentsVectorFileMode = "Both"
+)
+
+// AllowedEffectiveComponentsVectorFileModes lists all allowed modes for writing the effective components vector file.
+var AllowedEffectiveComponentsVectorFileModes = []string{
+	string(EffectiveComponentsVectorFileModeNone),
+	string(EffectiveComponentsVectorFileModeBase),
+	string(EffectiveComponentsVectorFileModeLandscape),
+	string(EffectiveComponentsVectorFileModeBoth),
+}
+
 // VersionConfiguration contains configuration for versioning.
 type VersionConfiguration struct {
 	// ComponentsVectorFile is the path to a components vector file. It may contain all components (full replacement of
@@ -124,4 +146,10 @@ type VersionConfiguration struct {
 	// Only used if no ComponentsVectorFile is specified.
 	// +optional
 	DefaultVersionsUpdateStrategy *DefaultVersionsUpdateStrategy `json:"defaultVersionsUpdateStrategy,omitempty"`
+	// WriteEffectiveComponentsVectorFile controls for which generate subcommands the effective components vector
+	// (the merged result of the embedded default and any configured ComponentsVectorFile) is written to a file
+	// next to the GLK configuration file.
+	// Allowed values: "None", "Base", "Landscape", "Both". Defaults to "Landscape".
+	// +optional
+	WriteEffectiveComponentsVectorFile *EffectiveComponentsVectorFileMode `json:"writeEffectiveComponentsVectorFile,omitempty"`
 }

@@ -20,3 +20,4 @@ kind: LandscapeKitConfiguration
 # versionConfig:
 #   componentsVectorFile: ./versions.yaml
 #   defaultVersionsUpdateStrategy: ReleaseBranch
+#   writeEffectiveComponentsVectorFile: Landscape

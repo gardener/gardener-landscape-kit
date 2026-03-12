@@ -200,6 +200,11 @@ func (in *VersionConfiguration) DeepCopyInto(out *VersionConfiguration) {
 		*out = new(DefaultVersionsUpdateStrategy)
 		**out = **in
 	}
+	if in.WriteEffectiveComponentsVectorFile != nil {
+		in, out := &in.WriteEffectiveComponentsVectorFile, &out.WriteEffectiveComponentsVectorFile
+		*out = new(EffectiveComponentsVectorFileMode)
+		**out = **in
+	}
 	return
 }
 

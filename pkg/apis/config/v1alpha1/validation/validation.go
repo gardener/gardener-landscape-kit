@@ -167,6 +167,9 @@ func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *f
 	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, string(*conf.DefaultVersionsUpdateStrategy)) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("defaultVersionsUpdateStrategy"), *conf.DefaultVersionsUpdateStrategy, "allowed values are: "+strings.Join(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, ", ")))
 	}
+	if conf.WriteEffectiveComponentsVectorFile != nil && !slices.Contains(configv1alpha1.AllowedEffectiveComponentsVectorFileModes, string(*conf.WriteEffectiveComponentsVectorFile)) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("writeEffectiveComponentsVectorFile"), *conf.WriteEffectiveComponentsVectorFile, "allowed values are: "+strings.Join(configv1alpha1.AllowedEffectiveComponentsVectorFileModes, ", ")))
+	}
 
 	return allErrs
 }
