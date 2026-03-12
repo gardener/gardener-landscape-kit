@@ -7,6 +7,9 @@ package meta
 import (
 	"bytes"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 
 	"github.com/elliotchance/orderedmap/v3"
 	"go.yaml.in/yaml/v4"
@@ -127,13 +130,16 @@ func splitManifestFile(combinedYaml []byte) (*orderedmap.OrderedMap[string, []by
 }
 
 // buildKey builds a unique key for a manifest using apiVersion/kind/namespace/name
+// If any of these fields are missing, it tries to build a key from all top-level keys.
 func buildKey(t map[string]any) string {
 	typeKey := buildTypeKey(t)
 	metadata, _ := t["metadata"].(map[string]any)
 	name, _ := metadata["name"].(string)
 	namespace, _ := metadata["namespace"].(string)
 	if typeKey == "" && namespace == "" && name == "" {
-		return ""
+		keys := slices.Collect(maps.Keys(t))
+		slices.Sort(keys)
+		return strings.Join(keys, "-")
 	}
 
 	return typeKey + "/" + namespace + "/" + name
