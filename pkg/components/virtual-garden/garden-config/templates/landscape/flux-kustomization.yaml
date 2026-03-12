@@ -11,7 +11,7 @@ spec:
   path: {{ .landscapeComponentPath }}
   prune: true
   dependsOn:
-  - name: virtual-garden-access-flux
+  - name: virtual-garden-access
     namespace: garden
   kubeConfig:
     secretRef:
