@@ -42,7 +42,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	var (
 		output []byte
 
-		diff, err = newManifestDiff(preProcess(oldDefaultYaml), preProcess(newDefaultYaml), preProcess(currentYaml))
+		diff, err = newManifestDiff(PreProcess(oldDefaultYaml), PreProcess(newDefaultYaml), PreProcess(currentYaml))
 	)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 	if len(output) > 0 && output[len(output)-1] != '\n' {
 		output = append(output, '\n')
 	}
-	return postProcess(output), nil
+	return PostProcess(output), nil
 }
 
 func newManifestDiff(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (*manifestDiff, error) {

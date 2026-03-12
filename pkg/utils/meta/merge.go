@@ -26,7 +26,7 @@ func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([
 		}
 	}
 
-	return encodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
+	return EncodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
 }
 
 // threeWayMerge performs a three-way merge of YAML nodes
