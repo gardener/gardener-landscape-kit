@@ -78,7 +78,7 @@ func (b *ComponentVectorFactoryBuilder) WithResourcesYAML(yaml string) *Componen
 
 // WithDefaultResources sets the resources of the component vector from the default components YAML.
 func (b *ComponentVectorFactoryBuilder) WithDefaultResources() *ComponentVectorFactoryBuilder {
-	componentVector, err := utilscomponentvector.New(componentvector.DefaultComponentsYAML)
+	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, nil)
 	if err != nil {
 		b.err = errors.Join(b.err, fmt.Errorf("failed to unmarshal default components YAML: %w", err))
 		return b
