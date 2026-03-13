@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	fluxv1 "github.com/fluxcd/kustomize-controller/api/v1"
+	fluxmeta "github.com/fluxcd/pkg/apis/meta"
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	operatorv1alpha1 "github.com/gardener/gardener/pkg/apis/operator/v1alpha1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
@@ -19,7 +21,9 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	componentbaseconfigv1alpha1 "k8s.io/component-base/config/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -34,9 +38,13 @@ var _ = Describe("Garden Reconciliation", Label("Garden", "default"), Ordered, f
 	)
 
 	It("Create Kubernetes client", func() {
+		runtimeScheme := runtime.NewScheme()
+		Expect(fluxv1.AddToScheme(runtimeScheme)).To(Succeed())
+		Expect(operatorclient.AddRuntimeSchemeToScheme(runtimeScheme)).To(Succeed())
+
 		var err error
 		runtimeClusterClient, err = kubernetes.NewClientFromFile("", os.Getenv("KUBECONFIG"),
-			kubernetes.WithClientOptions(client.Options{Scheme: operatorclient.RuntimeScheme}),
+			kubernetes.WithClientOptions(client.Options{Scheme: runtimeScheme}),
 			kubernetes.WithClientConnectionOptions(
 				componentbaseconfigv1alpha1.ClientConnectionConfiguration{QPS: 100, Burst: 130}),
 			kubernetes.WithAllowedUserFields([]string{kubernetes.AuthTokenFile}),
@@ -95,6 +103,25 @@ var _ = Describe("Garden Reconciliation", Label("Garden", "default"), Ordered, f
 		Eventually(ctx, func(g Gomega) {
 			g.Eventually(s.VirtualClusterKomega.List(&extOps)).To(Succeed())
 			g.Expect(extOps.Items).To(ConsistOf(expectedExtensions))
+		}).Should(Succeed())
+	})
+
+	It("Ensure that all Flux Kustomizations have been reconciled successfully", func(ctx SpecContext) {
+		Eventually(ctx, func(g Gomega) {
+			var ksList fluxv1.KustomizationList
+			g.Expect(runtimeClusterClient.Client().List(ctx, &ksList)).To(Succeed())
+			g.Expect(ksList.Items).ToNot(BeEmpty())
+
+			for _, ks := range ksList.Items {
+				readyCond := apimeta.FindStatusCondition(ks.Status.Conditions, fluxmeta.ReadyCondition)
+				if !g.Expect(readyCond).ToNot(BeNil(),
+					"Kustomization %s/%s has no Ready condition", ks.Namespace, ks.Name) {
+					continue
+				}
+				g.Expect(readyCond.Status).To(Equal(metav1.ConditionTrue),
+					"Kustomization %s/%s is not ready: %s: %s", ks.Namespace, ks.Name,
+					readyCond.Reason, readyCond.Message)
+			}
 		}).Should(Succeed())
 	})
 })
