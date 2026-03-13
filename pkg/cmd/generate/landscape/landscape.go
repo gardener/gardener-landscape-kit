@@ -76,7 +76,9 @@ func run(_ context.Context, opts *options.Options) error {
 	}
 
 	if opts.ShouldWriteEffectiveComponentsFile(configv1alpha1.EffectiveComponentsVectorFileModeLandscape) {
-		// TODO(LucaBernstein): Write component vector file (next commit)
+		if err := reg.WriteComponentVectorFile(componentOpts, path.Dir(opts.ConfigFilePath)); err != nil {
+			return err
+		}
 	}
 
 	return kustomization.WriteLandscapeComponentsKustomizations(componentOpts)

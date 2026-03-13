@@ -1,5 +1,7 @@
+# Changed in default - ignored
 apiVersion: v1alpha1
 # Edit: Just a test fixture manifest.
+# Changed in default - ignored
 kind: TestFixture
 metadata:
   labels:
@@ -10,8 +12,10 @@ data:
 # optionalSection:
 #   keyOptional: optionalValue
   # This is the key. Please change it.
+  # New default comment for key will be ignored as the user modified the value.
   key: valueChanged
   # New comment for key4
+  # New default comment for key4 will be used as the user did not modify the value.
   key4: value4
   keyModified: value2
   # add new value in between with comments
@@ -23,7 +27,6 @@ enumeration:
 - item4_new
 - item17 # Very new
 complex_array:
-- name: itemC_new
 - name: itemA
   # need >99
   value: 100
@@ -33,3 +36,4 @@ complex_array:
 - name: itemB
   value: 25
   description: This is item B (modified in default)
+- name: itemC_new
