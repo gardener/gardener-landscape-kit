@@ -31,11 +31,14 @@ externalResources:
     type: helmChart/v1
 
 components:
-  - name: gardener-extensions_extension-extension-test
+  - name: gardener-extensions-extension-shoot-cert-service
     version: v1.53.0
-    componentName: "github.com/gardener/gardener-extension_extension-test"
+    componentName: "github.com/gardener/gardener-extension-shoot-cert-service"
   - name: gardener
     version: v1.128.3
     componentName: "github.com/gardener/gardener"
+  - name: gardener-extension-runtime-gvisor
+    version: v0.30.0
+    componentName: "github.com/gardener/gardener-extension-runtime-gvisor"
 
 targetRepositoryURL: registry.example.com/path/to/repo

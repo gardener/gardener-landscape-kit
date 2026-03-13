@@ -24,9 +24,10 @@ import (
 const resourcesDir = "testdata"
 
 const (
-	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension_extension-test:v1.53.0")
+	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
 	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
+	refRuntimeGvisor                  = components.ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.30.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
 
@@ -54,7 +55,7 @@ var _ = Describe("Components", func() {
 		c = components.NewComponents()
 	})
 
-	It("should produce correct image vector for extension-test", func() {
+	It("should produce correct image vector for extension-shoot-cert-service", func() {
 		loadWithDep(1, refTestExtension)
 		Expect(c.ComponentsCount()).To(Equal(1))
 		roots := c.GetRootComponents()
@@ -89,23 +90,23 @@ var _ = Describe("Components", func() {
 		Expect(resources).To(HaveLen(4))
 		Expect(resources).To(ContainElements(
 			components.Resource{
-				Name:    "gardener-extension_extension-test",
+				Name:    "gardener-extension-shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "ociImage",
-				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/extension-test:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
+				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
 				Local:   new(true),
 			},
 			components.Resource{
-				Name:    "extension-test",
+				Name:    "shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "helmChart/v1",
-				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/extension-test:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
+				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
 			},
 			components.Resource{
-				Name:    "extension-test",
+				Name:    "shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "helmchart-imagemap",
-				Value:   "{\"helmchartResource\": {\"name\": \"extension-test\"}, \"imageMapping\": []}",
+				Value:   "{\"helmchartResource\": {\"name\": \"shoot-cert-service\"}, \"imageMapping\": []}",
 			},
 			components.Resource{
 				Name:    "cert-management",
@@ -118,7 +119,7 @@ var _ = Describe("Components", func() {
 
 	It("should produce correct image vector for gardener/gardener for rewritten images in OCM components", func() {
 		loadWithDep(3, refRoot)
-		Expect(c.ComponentsCount()).To(Equal(23))
+		Expect(c.ComponentsCount()).To(Equal(24))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 		imageVector, err := c.GetImageVector(refGardener, false)
@@ -272,7 +273,7 @@ var _ = Describe("Components", func() {
 		By("GLK componentvector")
 		componentVersions, err := c.GetGLKComponents(nil, true)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(componentVersions.Components).To(HaveLen(1))
+		Expect(componentVersions.Components).To(HaveLen(3))
 		Expect(componentVersions.Components[0].Version).To(Equal("v1.128.3"))
 
 		data, err := yaml.Marshal(componentVersions.Components[0].Resources)
@@ -352,7 +353,7 @@ scheduler:
 
 	It("should produce correct image vector for gardener/gardener with original reference", func() {
 		loadWithDep(3, refRoot)
-		Expect(c.ComponentsCount()).To(Equal(23))
+		Expect(c.ComponentsCount()).To(Equal(24))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 		imageVector, err := c.GetImageVector(refGardener, true)
@@ -457,6 +458,25 @@ scheduler:
 				Repository: new("europe-docker.pkg.dev/gardener-project/releases/gardener/apiserver-proxy"),
 				Tag:        new("v0.19.0"),
 				Version:    new("v0.19.0"),
+			}))
+	})
+
+	It("should produce correct image vector for runtime-gvisor", func() {
+		loadWithDep(3, refRoot)
+		Expect(c.ComponentsCount()).To(Equal(24))
+		roots := c.GetRootComponents()
+		Expect(roots).To(ConsistOf(refRoot))
+
+		By("resolved references")
+		imageVector, err := c.GetImageVector(refRuntimeGvisor, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(imageVector).To(HaveLen(1))
+		Expect(imageVector).To(ConsistOf(
+			imagevector.ImageSource{
+				Name:       "runtime-gvisor-installation",
+				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation"),
+				Tag:        new("v0.30.0@sha256:86e26f6190ef103e9431a2897e38053e0ef2e06b30d20cdcc303827dac966a18"),
+				Version:    new("v0.30.0"),
 			}))
 	})
 })

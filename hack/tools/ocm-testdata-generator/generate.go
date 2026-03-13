@@ -24,7 +24,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
-const gardenerRepositoryURL = "europe-docker.pkg.dev/gardener-project/releases"
+const gardenerRepositoryURL = "oci://europe-docker.pkg.dev/gardener-project/releases"
 
 type generator struct {
 	config *Config

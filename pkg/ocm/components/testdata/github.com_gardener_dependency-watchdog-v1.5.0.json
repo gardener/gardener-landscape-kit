@@ -57,6 +57,14 @@
             "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
           }
         ],
+        "srcRefs": [
+          {
+            "identitySelector": {
+              "name": "github_com_gardener_dependency-watchdog",
+              "version": "v1.5.0"
+            }
+          }
+        ],
         "type": "application/data",
         "relation": "local",
         "access": {

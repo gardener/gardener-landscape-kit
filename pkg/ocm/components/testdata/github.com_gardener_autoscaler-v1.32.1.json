@@ -57,6 +57,14 @@
             "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
           }
         ],
+        "srcRefs": [
+          {
+            "identitySelector": {
+              "name": "github_com_gardener_autoscaler",
+              "version": "v1.32.1"
+            }
+          }
+        ],
         "type": "application/data",
         "relation": "local",
         "access": {

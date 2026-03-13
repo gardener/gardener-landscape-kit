@@ -77,6 +77,14 @@
             "value": "we use gosec (linter) for SAST scans\nsee: https://github.com/securego/gosec\n"
           }
         ],
+        "srcRefs": [
+          {
+            "identitySelector": {
+              "name": "github_com_gardener_etcd-wrapper",
+              "version": "v0.5.2"
+            }
+          }
+        ],
         "type": "application/data",
         "relation": "local",
         "access": {
