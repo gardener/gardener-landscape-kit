@@ -6,7 +6,7 @@ require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fluxcd/kustomize-controller/api v1.8.2
-	github.com/fluxcd/pkg/apis/meta v1.25.1
+	github.com/fluxcd/pkg/apis/meta v1.26.0
 	github.com/fluxcd/source-controller/api v1.8.1
 	github.com/gardener/gardener v1.138.0
 	github.com/gardener/gardener/pkg/apis v1.138.0
