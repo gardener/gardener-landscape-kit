@@ -143,7 +143,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-networking-problemdetector
 - name: github.com/gardener/gardener-extension-runtime-gvisor
   sourceRepository: https://github.com/gardener/gardener-extension-runtime-gvisor
-  version: v0.29.0
+  version: v0.30.0
   resources:
     runtimeGvisor:
       helmChart:
