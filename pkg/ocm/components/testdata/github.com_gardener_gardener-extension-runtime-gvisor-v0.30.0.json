@@ -4,7 +4,7 @@
   },
   "component": {
     "name": "github.com/gardener/gardener-extension-runtime-gvisor",
-    "version": "v0.28.0",
+    "version": "v0.30.0",
     "labels": [
       {
         "name": "cloud.gardener.cnudie/responsibles",
@@ -22,21 +22,9 @@
             "username": "Vincinator"
           }
         ]
-      },
-      {
-        "name": "imagevector.gardener.cloud/images",
-        "value": {
-          "images": [
-            {
-              "name": "runtime-gvisor-installation",
-              "repository": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation",
-              "sourceRepository": "github.com/gardener/gardener-extension-runtime-gvisor"
-            }
-          ]
-        }
       }
     ],
-    "creationTime": "2026-01-20T09:48:53Z",
+    "creationTime": "2026-03-13T14:38:51Z",
     "repositoryContexts": [
       {
         "baseUrl": "europe-docker.pkg.dev/gardener-project/releases",
@@ -47,8 +35,44 @@
     "provider": "SAP SE",
     "resources": [
       {
+        "name": "runtime-gvisor",
+        "version": "v0.30.0",
+        "labels": [
+          {
+            "name": "cloud.gardener.cnudie/migration/original_ref",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.30.0"
+          }
+        ],
+        "extraIdentity": {
+          "type": "helmChart"
+        },
+        "type": "helmChart/v1",
+        "relation": "local",
+        "access": {
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.30.0@sha256:3764441ee8886a356372e4e9eedf0fabb3c303fee886050d7c0bc45fbaf2fec3",
+          "type": "ociRegistry"
+        }
+      },
+      {
+        "name": "runtime-gvisor",
+        "version": "v0.30.0",
+        "extraIdentity": {
+          "type": "helmchart-imagemap"
+        },
+        "type": "helmchart-imagemap",
+        "relation": "local",
+        "access": {
+          "globalAccess": null,
+          "localReference": "sha256:b850f2ec2a66fd760b70cfb96465b8c85e084a4e7d9e8fdcdc14a5f3c44e77a2",
+          "mediaType": "application/json",
+          "referenceName": null,
+          "size": 182,
+          "type": "localBlob/v1"
+        }
+      },
+      {
         "name": "gosec-report",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "labels": [
           {
             "name": "gardener.cloud/purposes",
@@ -67,16 +91,16 @@
         "relation": "local",
         "access": {
           "globalAccess": null,
-          "localReference": "sha256:652df44df41dc947e99bf7b2187df3060483858fae15d54107ee2c1486d5bd6d",
+          "localReference": "sha256:80a2a012ac946bbdbcaf1843d40be46b2435ce761faa31870c947da5b21fec1a",
           "mediaType": "application/data",
           "referenceName": null,
-          "size": 1532,
+          "size": 1602,
           "type": "localBlob/v1"
         }
       },
       {
         "name": "test-results",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "labels": [
           {
             "name": "gardener.cloud/purposes",
@@ -89,118 +113,91 @@
         "relation": "local",
         "access": {
           "globalAccess": null,
-          "localReference": "sha256:a87ac97d40977c4111527d59d74d2b64a33ae02149a1abcda2b5f42424157b72",
+          "localReference": "sha256:aa4924f2926e0feb557bcd7ec4929183a2d0548ebac4cb493f9a75d5828c5fdc",
           "mediaType": "application/data",
           "referenceName": null,
-          "size": 6045,
+          "size": 6217,
           "type": "localBlob/v1"
-        }
-      },
-      {
-        "name": "gardener-extension-runtime-gvisor-installation",
-        "version": "v0.28.0",
-        "labels": [
-          {
-            "name": "cloud.gardener.cnudie/migration/original_ref",
-            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.28.0"
-          }
-        ],
-        "extraIdentity": {
-          "version": "v0.28.0"
-        },
-        "type": "ociImage",
-        "relation": "local",
-        "access": {
-          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.28.0@sha256:5740df168e6065c346f92c366271412112e0ed9d65683136366c4a47061f86b5",
-          "type": "ociRegistry"
         }
       },
       {
         "name": "gardener-extension-runtime-gvisor",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "labels": [
           {
             "name": "cloud.gardener.cnudie/migration/original_ref",
-            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.28.0"
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.30.0"
           }
         ],
         "extraIdentity": {
-          "version": "v0.28.0"
+          "version": "v0.30.0"
         },
         "type": "ociImage",
         "relation": "local",
         "access": {
-          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.28.0@sha256:70abcd9ce6c1d3b98162bf6dc8d2ee93016971eb4d1d6099464b899e491e03de",
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor:v0.30.0@sha256:9641f9fd03f935e2f2cb8f4762604ec77c8b474ec4071ae663a503468a773c7f",
           "type": "ociRegistry"
         }
       },
       {
-        "name": "runtime-gvisor",
-        "version": "v0.28.0",
+        "name": "gardener-extension-runtime-gvisor-installation",
+        "version": "v0.30.0",
         "labels": [
           {
+            "name": "imagevector.gardener.cloud/name",
+            "value": "runtime-gvisor-installation"
+          },
+          {
+            "name": "imagevector.gardener.cloud/repository",
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation"
+          },
+          {
+            "name": "imagevector.gardener.cloud/source-repository",
+            "value": "github.com/gardener/gardener-extension-runtime-gvisor"
+          },
+          {
             "name": "cloud.gardener.cnudie/migration/original_ref",
-            "value": "europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.28.0"
+            "value": "europe-docker.pkg.dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.30.0"
           }
         ],
-        "extraIdentity": {
-          "type": "helmChart"
-        },
-        "type": "helmChart/v1",
+        "type": "ociImage",
         "relation": "local",
         "access": {
-          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/runtime-gvisor:v0.28.0@sha256:29315e001d1743034593030c4e31c225a005cf1588d4c60956cda06dbfcee26e",
+          "imageReference": "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation:v0.30.0@sha256:86e26f6190ef103e9431a2897e38053e0ef2e06b30d20cdcc303827dac966a18",
           "type": "ociRegistry"
-        }
-      },
-      {
-        "name": "runtime-gvisor",
-        "version": "v0.28.0",
-        "extraIdentity": {
-          "type": "helmchart-imagemap"
-        },
-        "type": "helmchart-imagemap",
-        "relation": "local",
-        "access": {
-          "globalAccess": null,
-          "localReference": "sha256:b850f2ec2a66fd760b70cfb96465b8c85e084a4e7d9e8fdcdc14a5f3c44e77a2",
-          "mediaType": "application/json",
-          "referenceName": null,
-          "size": 182,
-          "type": "localBlob/v1"
         }
       },
       {
         "name": "release-notes",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "type": "text/markdown.release-notes",
         "relation": "local",
         "access": {
           "globalAccess": null,
-          "localReference": "sha256:aac380f7ea554b3e0fceef749ba977b234e196ad88cd5378e533401712cbbfbd",
+          "localReference": "sha256:796b56b19df8d30037122249c4b9a3d479af3e9319906b130fea425d8c5b6ba1",
           "mediaType": "text/markdown.release-notes",
           "referenceName": null,
-          "size": 1536,
+          "size": 706,
           "type": "localBlob/v1"
         }
       },
       {
         "name": "release-notes-archive",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "type": "application/tar.release-notes",
         "relation": "local",
         "access": {
           "globalAccess": null,
-          "localReference": "sha256:30277342bc6ea2779ff19036c4df459abca4d77ebd785a6f8a0e1c42557729b2",
+          "localReference": "sha256:40535447156ad6a0489c46b0db5a58ede0edb7a2efa3c5191adedf0d97827bb1",
           "mediaType": "application/tar.release-notes",
           "referenceName": null,
-          "size": 4096,
+          "size": 2048,
           "type": "localBlob/v1"
         }
       },
       {
         "name": "branch-info",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "type": "application/vnd.gardener.cloud.branch-info+yaml",
         "relation": "local",
         "access": {
@@ -216,7 +213,7 @@
     "sources": [
       {
         "name": "main-source",
-        "version": "v0.28.0",
+        "version": "v0.30.0",
         "labels": [
           {
             "name": "cloud.gardener/cicd/source",
@@ -234,7 +231,7 @@
         ],
         "type": "git",
         "access": {
-          "commit": "c445e8965826c8163d0ec756028c5ccd960552cc",
+          "commit": "0617f5bffd58511703aecd59ca20dde40fcc0a0e",
           "ref": "refs/heads/master",
           "repoUrl": "github.com/gardener/gardener-extension-runtime-gvisor",
           "type": "github"

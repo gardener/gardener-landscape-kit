@@ -651,7 +651,7 @@
       {
         "componentName": "github.com/gardener/gardener-extension-runtime-gvisor",
         "name": "gardener-extension-runtime-gvisor",
-        "version": "v0.28.0"
+        "version": "v0.30.0"
       }
     ]
   }

@@ -27,7 +27,7 @@ const (
 	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
 	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
 	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
-	refRuntimeGvisor                  = components.ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.28.0")
+	refRuntimeGvisor                  = components.ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.30.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
 
@@ -475,8 +475,8 @@ scheduler:
 			imagevector.ImageSource{
 				Name:       "runtime-gvisor-installation",
 				Repository: new("registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/runtime-gvisor-installation"),
-				Tag:        new("v0.28.0@sha256:5740df168e6065c346f92c366271412112e0ed9d65683136366c4a47061f86b5"),
-				Version:    new("v0.28.0"),
+				Tag:        new("v0.30.0@sha256:86e26f6190ef103e9431a2897e38053e0ef2e06b30d20cdcc303827dac966a18"),
+				Version:    new("v0.30.0"),
 			}))
 	})
 })

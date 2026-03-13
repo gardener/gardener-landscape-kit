@@ -38,7 +38,7 @@ components:
     version: v1.128.3
     componentName: "github.com/gardener/gardener"
   - name: gardener-extension-runtime-gvisor
-    version: v0.28.0
+    version: v0.30.0
     componentName: "github.com/gardener/gardener-extension-runtime-gvisor"
 
 targetRepositoryURL: registry.example.com/path/to/repo

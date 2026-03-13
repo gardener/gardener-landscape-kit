@@ -509,16 +509,6 @@ func (c *Components) getImageVector(cref ComponentReference, originalRef bool) (
 		for _, imgex := range dep.ImageVector {
 			lookupOnly := imgex.LookupOnly
 			mappedImages := c.mappedImages[cref]
-
-			// TODO (MartinWeindel) Remove this workaround after release v0.29 which should contain the fix PR https://github.com/gardener/gardener-extension-runtime-gvisor/pull/369
-			if strings.HasPrefix(imgex.Name, "gardener-extension-runtime-gvisor") && mappedImages != nil {
-				if idx := slices.IndexFunc(mappedImages, func(img *ocmimagevector.ExtendedImageSource) bool {
-					return img.Name == "runtime-gvisor-installation" && img.ResourceID == nil
-				}); idx != -1 {
-					mappedImages[idx].ResourceID = &ocmimagevector.ResourceID{Name: "gardener-extension-runtime-gvisor-installation"}
-				}
-			}
-
 			mappedName := ""
 			if lookupOnly && mappedImages != nil {
 				if idx := slices.IndexFunc(mappedImages, func(img *ocmimagevector.ExtendedImageSource) bool {
