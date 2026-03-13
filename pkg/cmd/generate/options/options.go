@@ -31,7 +31,8 @@ func init() {
 type Options struct {
 	*cmd.Options
 
-	configFilePath string
+	// ConfigFilePath is the path to the landscape kit configuration file.
+	ConfigFilePath string
 
 	// TargetDirPath is the target directory for generation.
 	TargetDirPath string
@@ -59,7 +60,7 @@ func (o *Options) Complete(args []string) error {
 	}
 	o.TargetDirPath = args[0]
 
-	data, err := os.ReadFile(o.configFilePath) // #nosec G304 -- Trusted file from CLI argument.
+	data, err := os.ReadFile(o.ConfigFilePath) // #nosec G304 -- Trusted file from CLI argument.
 	if err != nil {
 		return fmt.Errorf("error reading config file: %w", err)
 	}
@@ -74,5 +75,15 @@ func (o *Options) Complete(args []string) error {
 
 // AddFlags adds flags for the options to the given FlagSet.
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
+	fs.StringVarP(&o.ConfigFilePath, "config", "c", o.ConfigFilePath, "Path to configuration file.")
+}
+
+// ShouldWriteEffectiveComponentsFile reports whether the effective components file should be written
+// for the given generate subcommand mode. Defaults to Landscape-only when not configured.
+func (o *Options) ShouldWriteEffectiveComponentsFile(mode configv1alpha1.EffectiveComponentsVectorFileMode) bool {
+	configured := configv1alpha1.EffectiveComponentsVectorFileModeLandscape
+	if o.Config != nil && o.Config.VersionConfig != nil && o.Config.VersionConfig.WriteEffectiveComponentsVectorFile != nil {
+		configured = *o.Config.VersionConfig.WriteEffectiveComponentsVectorFile
+	}
+	return configured == mode || configured == configv1alpha1.EffectiveComponentsVectorFileModeBoth
 }

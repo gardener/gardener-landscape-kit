@@ -86,31 +86,34 @@ func (o *options) GetLogger() logr.Logger {
 
 // NewOptions returns a new Options instance.
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
-	componentVectorBytes := componentvector.DefaultComponentsYAML
+	var customBytes []byte
 	if opts.Config != nil && opts.Config.VersionConfig != nil {
-		if opts.Config.VersionConfig.ComponentsVectorFile != nil {
-			opts.Log.Info("Using custom component vector file", "file", *opts.Config.VersionConfig.ComponentsVectorFile)
-
-			var err error
-			componentVectorBytes, err = fs.ReadFile(*opts.Config.VersionConfig.ComponentsVectorFile)
-			if err != nil {
-				return nil, fmt.Errorf("failed to read component vector file: %w", err)
-			}
-		} else if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
+		if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
 			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
 			var err error
-			componentVectorBytes, err = utilscomponentvector.GetDefaultComponentVectorFromGitHub()
+			// The componentvector.DefaultComponentsYAML is intentionally overridden, so that subsequently it can be used to extract the updated default component vector versions.
+			componentvector.DefaultComponentsYAML, err = utilscomponentvector.GetDefaultComponentVectorFromGitHub()
 			if err != nil {
 				return nil, fmt.Errorf("failed to update default component vector file: %w", err)
 			}
 		}
-	}
 
-	componentVector, err := utilscomponentvector.New(componentVectorBytes)
+		if opts.Config.VersionConfig.ComponentsVectorFile != nil {
+			compVectorFile := *opts.Config.VersionConfig.ComponentsVectorFile
+			if !path.IsAbs(compVectorFile) {
+				compVectorFile = path.Join(path.Dir(opts.ConfigFilePath), compVectorFile)
+			}
+			opts.Log.Info("Using custom component vector override file", "file", compVectorFile)
+			var err error
+			if customBytes, err = fs.ReadFile(compVectorFile); err != nil {
+				return nil, fmt.Errorf("failed to read component vector override file: %w", err)
+			}
+		}
+	}
+	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customBytes)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create component vector: %w", err)
 	}
-
 	return &options{
 		componentVector: componentVector,
 		targetPath:      path.Clean(opts.TargetDirPath),
