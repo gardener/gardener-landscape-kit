@@ -37,7 +37,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-suse-chost
 - name: github.com/gardener/gardener-extension-os-gardenlinux
   sourceRepository: https://github.com/gardener/gardener-extension-os-gardenlinux
-  version: v0.36.0
+  version: v0.37.0
   resources:
     osGardenlinux:
       helmChart:
