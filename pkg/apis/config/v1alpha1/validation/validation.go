@@ -164,8 +164,11 @@ func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *f
 	if conf.ComponentsVectorFile != nil && strings.TrimSpace(*conf.ComponentsVectorFile) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("componentsVectorFile"), "components vector file path must be specified"))
 	}
-	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, *conf.DefaultVersionsUpdateStrategy) {
+	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, string(*conf.DefaultVersionsUpdateStrategy)) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("defaultVersionsUpdateStrategy"), *conf.DefaultVersionsUpdateStrategy, "allowed values are: "+strings.Join(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, ", ")))
+	}
+	if conf.WriteEffectiveComponentsVectorFile != nil && !slices.Contains(configv1alpha1.AllowedEffectiveComponentsVectorFileModes, string(*conf.WriteEffectiveComponentsVectorFile)) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("writeEffectiveComponentsVectorFile"), *conf.WriteEffectiveComponentsVectorFile, "allowed values are: "+strings.Join(configv1alpha1.AllowedEffectiveComponentsVectorFileModes, ", ")))
 	}
 
 	return allErrs

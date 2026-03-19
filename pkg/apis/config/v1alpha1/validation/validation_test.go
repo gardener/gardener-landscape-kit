@@ -332,13 +332,45 @@ var _ = Describe("Validation", func() {
 			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						DefaultVersionsUpdateStrategy: new("ReleaseBranch"),
+						DefaultVersionsUpdateStrategy: new(v1alpha1.DefaultVersionsUpdateStrategy("ReleaseBranch")),
 					},
 				}
 
 				errList := validation.ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
+
+			It("should fail if WriteEffectiveComponentsVectorFile is an invalid value", func() {
+				mode := v1alpha1.EffectiveComponentsVectorFileMode("Invalid")
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &v1alpha1.VersionConfiguration{
+						WriteEffectiveComponentsVectorFile: &mode,
+					},
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeInvalid),
+						"Field": Equal("versionConfig.writeEffectiveComponentsVectorFile"),
+					})),
+				))
+			})
+
+			DescribeTable("should pass with a valid WriteEffectiveComponentsVectorFile",
+				func(mode v1alpha1.EffectiveComponentsVectorFileMode) {
+					conf := &v1alpha1.LandscapeKitConfiguration{
+						VersionConfig: &v1alpha1.VersionConfiguration{
+							WriteEffectiveComponentsVectorFile: &mode,
+						},
+					}
+					Expect(validation.ValidateLandscapeKitConfiguration(conf)).To(BeEmpty())
+				},
+				Entry("None", v1alpha1.EffectiveComponentsVectorFileModeNone),
+				Entry("Base", v1alpha1.EffectiveComponentsVectorFileModeBase),
+				Entry("Landscape", v1alpha1.EffectiveComponentsVectorFileModeLandscape),
+				Entry("Both", v1alpha1.EffectiveComponentsVectorFileModeBoth),
+			)
 		})
 	})
 })
