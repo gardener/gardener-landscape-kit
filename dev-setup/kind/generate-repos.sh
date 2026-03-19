@@ -36,10 +36,13 @@ clone_or_update_repo() {
   popd > /dev/null
 }
 
+checkout_base_repo() {
+  echo "📥 Checking out base repository"
+  clone_or_update_repo base base
+}
+
 generate_base() {
   echo "🌱 Generating base"
-  clone_or_update_repo base base
-
   glk generate base -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/base"
 
   cd "${WORK_DIR}/base"
@@ -48,10 +51,13 @@ generate_base() {
   git push
 }
 
+checkout_landscape_repo() {
+  echo "📥 Checking out test landscape repository"
+  clone_or_update_repo test-landscape test-landscape
+}
+
 generate_landscape() {
   echo "🌱 Generating test landscape"
-  clone_or_update_repo test-landscape test-landscape
-
   glk generate landscape -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
 
   cd "${WORK_DIR}/test-landscape"
@@ -80,6 +86,8 @@ ensure_base_as_submodule() {
 }
 
 ensure_glk_configuration
+checkout_base_repo
 generate_base
-generate_landscape
+checkout_landscape_repo
 ensure_base_as_submodule
+generate_landscape

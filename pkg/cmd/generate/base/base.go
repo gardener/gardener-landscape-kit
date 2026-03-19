@@ -15,6 +15,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate base.
@@ -57,6 +58,14 @@ func run(_ context.Context, opts *options.Options) error {
 
 	if err := reg.GenerateBase(componentOpts); err != nil {
 		return err
+	}
+
+	// Write version metadata after successful generation
+	if err := version.WriteVersionMetadata(
+		opts.TargetDirPath,
+		afero.Afero{Fs: afero.NewOsFs()},
+	); err != nil {
+		return fmt.Errorf("failed to write version metadata: %w", err)
 	}
 
 	return nil
