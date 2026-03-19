@@ -7,6 +7,7 @@ package landscape
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -15,7 +16,9 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/kustomization"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit generate landscape.
@@ -53,6 +56,16 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 func validate(opts *options.Options) error {
 	if opts.Config.Git == nil {
 		return fmt.Errorf("git config is required")
+	}
+
+	// Calculate the path to the base directory from the landscape directory
+	relPathToRoot := files.RelativePathFromDirDepth(opts.Config.Git.Paths.Landscape)
+	pathToBase := filepath.Join(opts.TargetDirPath, relPathToRoot, opts.Config.Git.Paths.Base)
+
+	// Validate version compatibility
+	fs := afero.Afero{Fs: afero.NewOsFs()}
+	if err := version.ValidateLandscapeVersionCompatibility(pathToBase, fs); err != nil {
+		return fmt.Errorf("version compatibility check failed: %w", err)
 	}
 
 	return nil
