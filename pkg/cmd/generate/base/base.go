@@ -7,12 +7,10 @@ package base
 import (
 	"context"
 	"fmt"
-	"path"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
-	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
@@ -59,12 +57,6 @@ func run(_ context.Context, opts *options.Options) error {
 
 	if err := reg.GenerateBase(componentOpts); err != nil {
 		return err
-	}
-
-	if opts.ShouldWriteEffectiveComponentsFile(configv1alpha1.EffectiveComponentsVectorFileModeBase) {
-		if err := reg.WriteComponentVectorFile(componentOpts, path.Dir(opts.ConfigFilePath)); err != nil {
-			return err
-		}
 	}
 
 	return nil

@@ -19,23 +19,23 @@ import (
 type BuildComponentVectorFn func() (utilscomponentvector.ComponentVector, error)
 
 // CreateComponentsVectorFile creates a components vector YAML file in the given filesystem.
-func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (string, error) {
+func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) error {
 	cv, err := build()
 	if err != nil {
-		return "", err
+		return err
 	}
 	components := &utilscomponentvector.Components{
 		Components: []*utilscomponentvector.ComponentVector{&cv},
 	}
 	content, err := yaml.Marshal(components)
 	if err != nil {
-		return "", err
+		return err
 	}
-	filePath := "/repo/components-vector.yaml"
+	filePath := "/repo/baseDir/components.yaml"
 	if err := fs.WriteFile(filePath, content, 0o644); err != nil {
-		return "", err
+		return err
 	}
-	return filePath, nil
+	return nil
 }
 
 // ComponentVectorFactoryBuilder helps to build BuildComponentVectorFn instances.

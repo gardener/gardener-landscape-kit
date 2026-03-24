@@ -6,7 +6,9 @@ package components
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
+	"os"
 	"path"
 
 	"github.com/go-logr/logr"
@@ -16,6 +18,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 const (
@@ -86,31 +89,27 @@ func (o *options) GetLogger() logr.Logger {
 
 // NewOptions returns a new Options instance.
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
-	var customBytes []byte
-	if opts.Config != nil && opts.Config.VersionConfig != nil {
-		if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
-			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
-			var err error
-			// The componentvector.DefaultComponentsYAML is intentionally overridden, so that subsequently it can be used to extract the updated default component vector versions.
-			componentvector.DefaultComponentsYAML, err = utilscomponentvector.GetDefaultComponentVectorFromGitHub()
+	var customComponentVectors [][]byte
+	if opts.Config != nil && opts.Config.Git != nil {
+		// isTargetLandscapeDir: when the target dir is the landscape dir, also check for a components.yaml in the base dir.
+		isTargetLandscapeDir := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Landscape) == path.Clean(opts.TargetDirPath)
+		if isTargetLandscapeDir {
+			baseCompVectorFile := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Base, utilscomponentvector.ComponentVectorFilename)
+			componentsBytes, err := useComponentsFile(opts, fs, baseCompVectorFile)
 			if err != nil {
-				return nil, fmt.Errorf("failed to update default component vector file: %w", err)
+				return nil, err
 			}
-		}
-
-		if opts.Config.VersionConfig.ComponentsVectorFile != nil {
-			compVectorFile := *opts.Config.VersionConfig.ComponentsVectorFile
-			if !path.IsAbs(compVectorFile) {
-				compVectorFile = path.Join(path.Dir(opts.ConfigFilePath), compVectorFile)
-			}
-			opts.Log.Info("Using custom component vector override file", "file", compVectorFile)
-			var err error
-			if customBytes, err = fs.ReadFile(compVectorFile); err != nil {
-				return nil, fmt.Errorf("failed to read component vector override file: %w", err)
-			}
+			customComponentVectors = append(customComponentVectors, componentsBytes)
 		}
 	}
-	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customBytes)
+
+	componentsBytes, err := useComponentsFile(opts, fs, path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename))
+	if err != nil {
+		return nil, err
+	}
+	customComponentVectors = append(customComponentVectors, componentsBytes)
+
+	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customComponentVectors...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create component vector: %w", err)
 	}
@@ -120,6 +119,16 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		filesystem:      fs,
 		logger:          opts.Log,
 	}, nil
+}
+
+func useComponentsFile(opts *generateoptions.Options, fs afero.Afero, filePath string) ([]byte, error) {
+	customBytes, err := fs.ReadFile(filePath)
+	if err == nil {
+		opts.Log.Info("Found custom component vector override file", "file", filePath)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return nil, fmt.Errorf("failed to read component vector override file: %w", err)
+	}
+	return customBytes, nil
 }
 
 type landscapeOptions struct {

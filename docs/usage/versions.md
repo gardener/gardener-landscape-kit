@@ -39,16 +39,28 @@ versionConfig:
 
 ### Custom Component Vector
 
-You can override the default component vector by specifying a custom vector file in your GLK configuration:
+You can pin or override component versions by editing the `components.yaml` file in your base or landscape directory.
+This file is created (or updated) by running the `resolve` command without `--ocm`:
 
-```yaml
-apiVersion: landscape.config.gardener.cloud/v1alpha1
-kind: LandscapeKitConfiguration
-versionConfig:
-  componentsVectorFile: ./path/to/your/versions.yaml
+```bash
+gardener-landscape-kit resolve \
+    --target-dir /path/to/base/dir \
+    --config path/to/config-file
 ```
 
-When a custom component vector file is configured, GLK will use that file instead of the default one. The custom vector file must follow the same structure as the default component vector.
+The file is written to `<target-dir>/components.yaml`. GLK uses the three-way merge strategy when re-writing it, so any versions you have manually pinned are preserved across subsequent `resolve` runs.
+
+To pin a version, simply edit the file and set the desired version for a component. On the next `generate` run GLK will use the pinned version and show the default version as a comment next to it:
+
+```yaml
+components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+# version: v1.134.1 # <-- gardener-landscape-kit version default
+  version: v1.133.0
+```
+
+The landscape-level `components.yaml` (if present) overrides the base-level file, which in turn overrides the built-in defaults.
 
 ## Version Maintenance and Compatibility
 

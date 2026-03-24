@@ -6,22 +6,18 @@ package registry_test
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/gardener/gardener/pkg/utils/test"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
-	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 var _ = Describe("Registry", func() {
@@ -34,15 +30,6 @@ var _ = Describe("Registry", func() {
 	)
 
 	BeforeEach(func() {
-		componentvector.DefaultComponentsYAML = []byte(`components:
-- name: github.com/gardener/gardener
-  sourceRepository: https://github.com/gardener/gardener
-  version: v1.137.1
-- name: github.com/gardener/other-component
-  sourceRepository: https://github.com/gardener/other-component
-  version: v2.0.0
-`)
-
 		reg = registry.New()
 
 		config = &v1alpha1.LandscapeKitConfiguration{
@@ -323,111 +310,6 @@ var _ = Describe("Registry", func() {
 		})
 	})
 
-	Describe("#WriteComponentVectorFile", func() {
-		const outputDir = "/output"
-
-		makeOptions := func(fs afero.Afero, cvYAML []byte) components.Options {
-			cv, err := utilscomponentvector.NewWithOverride(cvYAML, nil)
-			ExpectWithOffset(1, err).NotTo(HaveOccurred())
-			return &testOptions{
-				componentVector: cv,
-				filesystem:      fs,
-			}
-		}
-
-		// componentNames parses the written components.yaml and returns the list of component names.
-		componentNames := func(fs afero.Afero) []string {
-			data, err := fs.ReadFile(outputDir + "/components.yaml")
-			ExpectWithOffset(1, err).NotTo(HaveOccurred())
-			var comps struct {
-				Components []struct {
-					Name string `json:"name"`
-				} `json:"components"`
-			}
-			ExpectWithOffset(1, yaml.Unmarshal(data, &comps)).NotTo(HaveOccurred())
-			names := make([]string, 0, len(comps.Components))
-			for _, c := range comps.Components {
-				names = append(names, c.Name)
-			}
-			return names
-		}
-
-		It("should not produce duplicate entries when the user edits the injected default-version comment", func() {
-			fs := afero.Afero{Fs: afero.NewMemMapFs()}
-
-			overrideCV := []byte(`components:
-- name: github.com/gardener/gardener
-  sourceRepository: https://github.com/gardener/gardener
-  version: v1.99.0
-- name: github.com/gardener/other-component
-  sourceRepository: https://github.com/gardener/other-component
-  version: v2.0.0
-`)
-
-			// Run 1: write from default CV so no comment is injected.
-			opts1 := makeOptions(fs, componentvector.DefaultComponentsYAML)
-			Expect(reg.WriteComponentVectorFile(opts1, outputDir)).To(Succeed())
-
-			// User changes the gardener version.
-			writtenFile := outputDir + "/components.yaml"
-			writtenData, err := fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(fs.WriteFile(writtenFile,
-				[]byte(strings.ReplaceAll(string(writtenData), "version: v1.137.1", "version: v1.99.0")),
-				0600)).To(Succeed())
-
-			// Run 2: the injected default-version comment appears.
-			Expect(reg.WriteComponentVectorFile(makeOptions(fs, overrideCV), outputDir)).To(Succeed())
-
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(writtenData)).To(ContainSubstring("# version: v1.137.1 # <-- gardener-landscape-kit version default"))
-
-			// User edits the injected comment (e.g. adds a personal annotation).
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(fs.WriteFile(writtenFile,
-				[]byte(strings.ReplaceAll(string(writtenData),
-					"# version: v1.137.1 # <-- gardener-landscape-kit version default",
-					"# version: v1.137.1 # <-- default (my annotation)")),
-				0600)).To(Succeed())
-
-			// Run 3: must not duplicate gardener entry and amend the comment with a new default version comment.
-			Expect(reg.WriteComponentVectorFile(makeOptions(fs, overrideCV), outputDir)).To(Succeed())
-
-			Expect(componentNames(fs)).To(ConsistOf(
-				"github.com/gardener/gardener",
-				"github.com/gardener/other-component",
-			))
-
-			// The correct default-version comment must have been restored.
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(writtenData)).To(ContainSubstring("# <-- gardener-landscape-kit version default"))
-			Expect(string(writtenData)).To(ContainSubstring("my annotation"))
-		})
-
-		It("should not re-add entries that the user removed from the file", func() {
-			fs := afero.Afero{Fs: afero.NewMemMapFs()}
-
-			// Run 1: write both entries.
-			Expect(reg.WriteComponentVectorFile(makeOptions(fs, componentvector.DefaultComponentsYAML), outputDir)).To(Succeed())
-
-			// User removes the other-component entry entirely.
-			writtenFile := outputDir + "/components.yaml"
-			writtenData, err := fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			idx := strings.Index(string(writtenData), "- name: github.com/gardener/other-component")
-			Expect(idx).To(BeNumerically(">", 0))
-			Expect(fs.WriteFile(writtenFile, writtenData[:idx], 0600)).To(Succeed())
-
-			// Run 2: same vector — the removed entry must not come back.
-			Expect(reg.WriteComponentVectorFile(makeOptions(fs, componentvector.DefaultComponentsYAML), outputDir)).To(Succeed())
-
-			Expect(componentNames(fs)).To(ConsistOf("github.com/gardener/gardener"))
-		})
-	})
-
 	Describe("#RegisterAllComponents", func() {
 		var (
 			mockComp1, mockComp2, mockComp3 *mockComponent
@@ -558,14 +440,3 @@ func (m *mockComponent) GenerateLandscape(opts components.LandscapeOptions) erro
 	}
 	return nil
 }
-
-// testOptions is a minimal components.Options implementation for WriteComponentVectorFile tests.
-type testOptions struct {
-	componentVector utilscomponentvector.Interface
-	filesystem      afero.Afero
-}
-
-func (t *testOptions) GetComponentVector() utilscomponentvector.Interface { return t.componentVector }
-func (t *testOptions) GetTargetPath() string                              { return "/" }
-func (t *testOptions) GetFilesystem() afero.Afero                         { return t.filesystem }
-func (t *testOptions) GetLogger() logr.Logger                             { return logr.Discard() }

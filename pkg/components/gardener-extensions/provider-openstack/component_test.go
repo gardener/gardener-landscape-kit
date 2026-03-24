@@ -92,9 +92,8 @@ var _ = Describe("Component Generation", func() {
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
 				component := provider_openstack.NewComponent()
-				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
-				Expect(err).ToNot(HaveOccurred())
-				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/provider-openstack", componentsVectorFile)
+				Expect(test.CreateComponentsVectorFile(fs, build)).To(Succeed())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/provider-openstack")
 				Expect(err).ToNot(HaveOccurred())
 				expected, err := os.ReadFile(expectedFile)
 				Expect(err).ToNot(HaveOccurred())

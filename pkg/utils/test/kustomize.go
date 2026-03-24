@@ -107,7 +107,6 @@ func KustomizeComponent(
 	fs afero.Afero,
 	component components.Interface,
 	relativeComponentPath string,
-	componentsVectorFile string,
 ) ([]byte, error) {
 	var (
 		cmdOpts      = &cmd.Options{Log: logr.Discard()}
@@ -129,9 +128,6 @@ func KustomizeComponent(
 	}
 
 	generateOpts.TargetDirPath = "/repo/landscapeDir"
-	generateOpts.Config.VersionConfig = &v1alpha1.VersionConfiguration{
-		ComponentsVectorFile: &componentsVectorFile,
-	}
 	landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create landscape options: %w", err)

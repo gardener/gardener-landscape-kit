@@ -44,9 +44,6 @@ var _ = Describe("Validation", func() {
 						Landscape: "landscape",
 					},
 				},
-				VersionConfig: &v1alpha1.VersionConfiguration{
-					ComponentsVectorFile: new("components.yaml"),
-				},
 			}
 
 			errList := validation.ValidateLandscapeKitConfiguration(conf)
@@ -286,49 +283,6 @@ var _ = Describe("Validation", func() {
 		})
 
 		Context("VersionConfig Configuration", func() {
-			It("should fail if ComponentsVectorFile is empty", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(""),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(ConsistOf(
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("versionConfig.componentsVectorFile"),
-					})),
-				))
-			})
-
-			It("should fail if ComponentsVectorFile is whitespace only", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new("   "),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(ConsistOf(
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("versionConfig.componentsVectorFile"),
-					})),
-				))
-			})
-
-			It("should pass with a valid ComponentsVectorFile", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new("path/to/components.yaml"),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(BeEmpty())
-			})
-
 			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
@@ -339,38 +293,6 @@ var _ = Describe("Validation", func() {
 				errList := validation.ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
-
-			It("should fail if WriteEffectiveComponentsVectorFile is an invalid value", func() {
-				mode := v1alpha1.EffectiveComponentsVectorFileMode("Invalid")
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						WriteEffectiveComponentsVectorFile: &mode,
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(ConsistOf(
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeInvalid),
-						"Field": Equal("versionConfig.writeEffectiveComponentsVectorFile"),
-					})),
-				))
-			})
-
-			DescribeTable("should pass with a valid WriteEffectiveComponentsVectorFile",
-				func(mode v1alpha1.EffectiveComponentsVectorFileMode) {
-					conf := &v1alpha1.LandscapeKitConfiguration{
-						VersionConfig: &v1alpha1.VersionConfiguration{
-							WriteEffectiveComponentsVectorFile: &mode,
-						},
-					}
-					Expect(validation.ValidateLandscapeKitConfiguration(conf)).To(BeEmpty())
-				},
-				Entry("None", v1alpha1.EffectiveComponentsVectorFileModeNone),
-				Entry("Base", v1alpha1.EffectiveComponentsVectorFileModeBase),
-				Entry("Landscape", v1alpha1.EffectiveComponentsVectorFileModeLandscape),
-				Entry("Both", v1alpha1.EffectiveComponentsVectorFileModeBoth),
-			)
 		})
 	})
 })

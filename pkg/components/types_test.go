@@ -89,6 +89,12 @@ var _ = Describe("Types", func() {
 		})
 
 		Describe("#GetComponentVector", func() {
+			var componentVectorFile string
+			BeforeEach(func() {
+				opts.TargetDirPath = "/path/to/target"
+				componentVectorFile = opts.TargetDirPath + "/components.yaml"
+			})
+
 			It("should return an empty component vector when no component vector file is provided", func() {
 				componentOpts, err := components.NewOptions(opts, fs)
 
@@ -132,15 +138,8 @@ var _ = Describe("Types", func() {
   sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
   version: v1.45.0
 `
-				componentVectorFile := "/tmp/component-vector.yaml"
 				err := fs.WriteFile(componentVectorFile, []byte(componentVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
-
-				opts.Config = &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(componentVectorFile),
-					},
-				}
 
 				componentOpts, err := components.NewOptions(opts, fs)
 
@@ -156,28 +155,9 @@ var _ = Describe("Types", func() {
 				Expect(version).To(Equal("v1.45.0"))
 			})
 
-			It("should return an error when component vector file does not exist", func() {
-				opts.Config = &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new("/non/existent/file.yaml"),
-					},
-				}
-
-				_, err := components.NewOptions(opts, fs)
-
-				Expect(err).To(MatchError("failed to read component vector override file: open /non/existent/file.yaml: file does not exist"))
-			})
-
 			It("should return an error when component vector file contains invalid YAML", func() {
-				componentVectorFile := "/tmp/invalid-component-vector.yaml"
 				err := fs.WriteFile(componentVectorFile, []byte("invalid: yaml: content: [[["), 0644)
 				Expect(err).NotTo(HaveOccurred())
-
-				opts.Config = &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(componentVectorFile),
-					},
-				}
 
 				_, err = components.NewOptions(opts, fs)
 
@@ -190,15 +170,8 @@ var _ = Describe("Types", func() {
   sourceRepository: https://github.com/gardener/gardener
   version: v9.9.9
 `
-				componentVectorFile := "/tmp/partial-component-vector.yaml"
 				err := fs.WriteFile(componentVectorFile, []byte(partialVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
-
-				opts.Config = &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(componentVectorFile),
-					},
-				}
 
 				componentOpts, err := components.NewOptions(opts, fs)
 
@@ -209,15 +182,8 @@ var _ = Describe("Types", func() {
 			})
 
 			It("should return the default component vector when an empty file is provided", func() {
-				componentVectorFile := "/tmp/empty-component-vector.yaml"
 				err := fs.WriteFile(componentVectorFile, []byte(""), 0644)
 				Expect(err).NotTo(HaveOccurred())
-
-				opts.Config = &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(componentVectorFile),
-					},
-				}
 
 				componentOpts, err := components.NewOptions(opts, fs)
 

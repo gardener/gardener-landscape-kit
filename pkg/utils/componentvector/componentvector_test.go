@@ -5,14 +5,19 @@
 package componentvector_test
 
 import (
+	"strings"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/afero"
+	"sigs.k8s.io/yaml"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
 	. "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 var _ = Describe("Component Vector", func() {
-	Describe("#New", func() {
+	Describe("#NewWithOverride without override", func() {
 		It("should successfully create a component vector from valid YAML", func() {
 			yaml := `
 components:
@@ -23,7 +28,7 @@ components:
     sourceRepository: https://github.com/org/repo2
     version: 2.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -35,7 +40,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -48,7 +53,7 @@ components:
     version: 1.0.0
   invalid yaml syntax here!!!
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`failed to parse base component vector: error converting YAML to JSON: yaml: line 7: could not find expected ':'`))
 			Expect(cv).To(BeNil())
 		})
@@ -57,7 +62,7 @@ components:
 			yaml := `
 components: []
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components: Required value: at least one component must be specified"))
 			Expect(cv).To(BeNil())
 		})
@@ -69,7 +74,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].name: Required value: component name must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -81,7 +86,7 @@ components:
     sourceRepository: ""
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].sourceRepository: Required value: source repository must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -93,7 +98,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: ""
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].version: Required value: component version must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -108,7 +113,7 @@ components:
     sourceRepository: https://github.com/org/repo2
     version: 2.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[1].name: Duplicate value: "duplicate"`))
 			Expect(cv).To(BeNil())
 		})
@@ -120,7 +125,7 @@ components:
     sourceRepository: not-a-valid-url
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[0].sourceRepository: Invalid value: "not-a-valid-url": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
@@ -132,7 +137,7 @@ components:
     sourceRepository: github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[0].sourceRepository: Invalid value: "github.com/org/repo": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
@@ -144,7 +149,7 @@ components:
     sourceRepository: invalid-url
     version: ""
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(HaveOccurred())
 			// The aggregate error should contain multiple validation errors
 			Expect(err.Error()).To(SatisfyAny(
@@ -162,7 +167,7 @@ components:
 		})
 	})
 
-	Describe("#NewWithOverride", func() {
+	Describe("#NewWithOverride with override", func() {
 		const baseYAML = `
 components:
   - name: component1
@@ -217,6 +222,37 @@ components:
 			Expect(v).To(Equal("1.99.0"))
 			v, _ = cv.FindComponentVersion("component2")
 			Expect(v).To(Equal("2.0.0"), "component2 should remain unchanged")
+			v, _ = cv.FindComponentVersion("component3")
+			Expect(v).To(Equal("3.99.0"))
+		})
+
+		It("should override multiple component versions from multiple overrides", func() {
+			baseOverrideYAML := `
+components:
+  - name: component1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.99.0
+  - name: component3
+    sourceRepository: https://github.com/org/repo3
+    version: 3.99.0
+`
+
+			landscapeOverrideYAML := `
+components:
+  - name: component1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.100.0
+  - name: component2
+    sourceRepository: https://github.com/org/repo3
+    version: 2.34.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(baseOverrideYAML), []byte(landscapeOverrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			v, _ := cv.FindComponentVersion("component1")
+			Expect(v).To(Equal("1.100.0"))
+			v, _ = cv.FindComponentVersion("component2")
+			Expect(v).To(Equal("2.34.0"))
 			v, _ = cv.FindComponentVersion("component3")
 			Expect(v).To(Equal("3.99.0"))
 		})
@@ -298,7 +334,7 @@ components:
     version: v1.134.1
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -345,7 +381,7 @@ components:
     version: 1.0.0
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -378,7 +414,7 @@ components:
     version: 1.0.0
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -401,7 +437,7 @@ components:
     sourceRepository: https://github.com/org/repo2
     version: 2.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -413,7 +449,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -426,7 +462,7 @@ components:
     version: 1.0.0
   invalid yaml syntax here!!!
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`failed to parse base component vector: error converting YAML to JSON: yaml: line 7: could not find expected ':'`))
 			Expect(cv).To(BeNil())
 		})
@@ -435,7 +471,7 @@ components:
 			yaml := `
 components: []
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components: Required value: at least one component must be specified"))
 			Expect(cv).To(BeNil())
 		})
@@ -447,7 +483,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].name: Required value: component name must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -459,7 +495,7 @@ components:
     sourceRepository: ""
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].sourceRepository: Required value: source repository must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -471,7 +507,7 @@ components:
     sourceRepository: https://github.com/org/repo
     version: ""
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError("invalid base component vector: [].components[0].version: Required value: component version must not be empty"))
 			Expect(cv).To(BeNil())
 		})
@@ -486,7 +522,7 @@ components:
     sourceRepository: https://github.com/org/repo2
     version: 2.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[1].name: Duplicate value: "duplicate"`))
 			Expect(cv).To(BeNil())
 		})
@@ -498,7 +534,7 @@ components:
     sourceRepository: not-a-valid-url
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[0].sourceRepository: Invalid value: "not-a-valid-url": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
@@ -510,7 +546,7 @@ components:
     sourceRepository: github.com/org/repo
     version: 1.0.0
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(MatchError(`invalid base component vector: [].components[0].sourceRepository: Invalid value: "github.com/org/repo": must have a valid URL scheme (e.g., https, http)`))
 			Expect(cv).To(BeNil())
 		})
@@ -522,7 +558,7 @@ components:
     sourceRepository: invalid-url
     version: ""
 `
-			cv, err := NewWithOverride([]byte(yaml), nil)
+			cv, err := NewWithOverride([]byte(yaml))
 			Expect(err).To(HaveOccurred())
 			// The aggregate error should contain multiple validation errors
 			Expect(err.Error()).To(SatisfyAny(
@@ -557,7 +593,7 @@ components:
     version: v1.134.1
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -604,7 +640,7 @@ components:
     version: 1.0.0
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
@@ -637,13 +673,125 @@ components:
     version: 1.0.0
 `
 			var err error
-			cv, err = NewWithOverride([]byte(yaml), nil)
+			cv, err = NewWithOverride([]byte(yaml))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cv).NotTo(BeNil())
 		})
 
 		It("should return the sorted component names", func() {
 			Expect(cv.ComponentNames()).To(Equal([]string{"component1", "component2"}))
+		})
+	})
+
+	Describe("#WriteComponentVectorFile", func() {
+		const outputDir = "/output"
+
+		// componentNames parses the written components.yaml and returns the list of component names.
+		componentNames := func(fs afero.Afero) []string {
+			data, err := fs.ReadFile(outputDir + "/components.yaml")
+			ExpectWithOffset(1, err).NotTo(HaveOccurred())
+			var comps struct {
+				Components []struct {
+					Name string `json:"name"`
+				} `json:"components"`
+			}
+			ExpectWithOffset(1, yaml.Unmarshal(data, &comps)).NotTo(HaveOccurred())
+			names := make([]string, 0, len(comps.Components))
+			for _, c := range comps.Components {
+				names = append(names, c.Name)
+			}
+			return names
+		}
+
+		cv := func(contents []byte) Interface {
+			cv, err := NewWithOverride(contents)
+			ExpectWithOffset(1, err).NotTo(HaveOccurred())
+			return cv
+		}
+
+		BeforeEach(func() {
+			componentvector.DefaultComponentsYAML = []byte(`components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.137.1
+- name: github.com/gardener/other-component
+  sourceRepository: https://github.com/gardener/other-component
+  version: v2.0.0
+`)
+		})
+
+		It("should not produce duplicate entries when the user edits the injected default-version comment", func() {
+			fs := afero.Afero{Fs: afero.NewMemMapFs()}
+
+			overrideCV := []byte(`components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.99.0
+- name: github.com/gardener/other-component
+  sourceRepository: https://github.com/gardener/other-component
+  version: v2.0.0
+`)
+
+			// Run 1: write from default CV so no comment is injected.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			// User changes the gardener version.
+			writtenFile := outputDir + "/components.yaml"
+			writtenData, err := fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fs.WriteFile(writtenFile,
+				[]byte(strings.ReplaceAll(string(writtenData), "version: v1.137.1", "version: v1.99.0")),
+				0600)).To(Succeed())
+
+			// Run 2: the injected default-version comment appears.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(overrideCV))).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("# version: v1.137.1 # <-- gardener-landscape-kit version default"))
+
+			// User edits the injected comment (e.g. adds a personal annotation).
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fs.WriteFile(writtenFile,
+				[]byte(strings.ReplaceAll(string(writtenData),
+					"# version: v1.137.1 # <-- gardener-landscape-kit version default",
+					"# version: v1.137.1 # <-- default (my annotation)")),
+				0600)).To(Succeed())
+
+			// Run 3: must not duplicate gardener entry and amend the comment with a new default version comment.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(overrideCV))).To(Succeed())
+
+			Expect(componentNames(fs)).To(ConsistOf(
+				"github.com/gardener/gardener",
+				"github.com/gardener/other-component",
+			))
+
+			// The correct default-version comment must have been restored.
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("# <-- gardener-landscape-kit version default"))
+			Expect(string(writtenData)).To(ContainSubstring("my annotation"))
+		})
+
+		It("should not re-add entries that the user removed from the file", func() {
+			fs := afero.Afero{Fs: afero.NewMemMapFs()}
+
+			// Run 1: write both entries.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			// User removes the other-component entry entirely.
+			writtenFile := outputDir + "/components.yaml"
+			writtenData, err := fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			idx := strings.Index(string(writtenData), "- name: github.com/gardener/other-component")
+			Expect(idx).To(BeNumerically(">", 0))
+			Expect(fs.WriteFile(writtenFile, writtenData[:idx], 0600)).To(Succeed())
+
+			// Run 2: same vector — the removed entry must not come back.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			Expect(componentNames(fs)).To(ConsistOf("github.com/gardener/gardener"))
 		})
 	})
 })

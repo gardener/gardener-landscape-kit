@@ -7,9 +7,9 @@ This allows you to generate Kubernetes manifests for your components with extern
 
 To extract these values, the GLK command `resolve --ocm` must be executed first.
 It reads the component descriptors and extracts the versions and image vector overwrites.
-The result is written into the output `ocm-components.yaml` file.
+The result is written into the `components.yaml` file in the target directory.
 
-For each component, the generated `ocm-components.yaml` contains these fields:
+For each component, `components.yaml` contains these fields:
 
 - `name` is the OCM component name, which is the value of the `name` field in the OCM component descriptor.
 - `version` as extracted from the component descriptor.
