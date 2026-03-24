@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package resolveocm
+package resolve
 
 import (
 	"context"
@@ -21,14 +21,22 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 	opts := &Options{Options: globalOpts}
 
 	cmd := &cobra.Command{
-		Use:   "resolve-ocm-components",
-		Short: "Collect all OCM components and their versions and generate component list and image vector files",
-		Long: "Collect all OCM components by walking all dependencies of the root component descriptor. " +
+		Use:   "resolve",
+		Short: "Collect all components and their versions and generate component list and image vector files",
+		Long: "Collect all components by walking all dependencies of the root component descriptor (OCM) " +
+			"or retrieving image vector files. " +
 			"Produce the component list and generate the image vector overwrites for each component.",
 
 		Example: `# Resolve all components starting at the root component. Writes component list, imagevector overwrite files for each component, and dumps all component descriptors.
 
-gardner-landscape-kit resolve-ocm-components \
+gardener-landscape-kit resolve \
+    --ocm \
+    --landscape-dir /path/to/landscape/dir \
+    --config path/to/config-file
+
+# Create or update a default components list.
+
+gardener-landscape-kit resolve \
     --landscape-dir /path/to/landscape/dir \
     --config path/to/config-file
 `,

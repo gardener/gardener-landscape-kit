@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package resolveocm
+package resolve
 
 import (
 	"fmt"
@@ -41,6 +41,9 @@ type Options struct {
 	// Config is the path to the landscape kit configuration file.
 	Config *configv1alpha1.LandscapeKitConfiguration
 
+	// OCM indicates whether to resolve OCM components based on the root component descriptor or only generate the (default) component list.
+	OCM bool
+
 	// Debug enables additional debug output files like resources and image vectors.
 	Debug bool
 
@@ -54,7 +57,7 @@ func (o *Options) validate() error {
 		return fmt.Errorf("landscape dir is required")
 	}
 
-	if o.Config == nil || o.Config.OCM == nil {
+	if o.OCM && (o.Config == nil || o.Config.OCM == nil) {
 		return fmt.Errorf("OCM configuration is required")
 	}
 
@@ -83,6 +86,7 @@ func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.configFilePath, "config", "c", o.configFilePath, "Path to configuration file.")
 	fs.BoolVar(&o.Debug, "debug", false, "Enable debug output files like resources and imagevectors.")
 	fs.IntVar(&o.Workers, "workers", 10, "Number of concurrent workers to use for resolving OCM components.")
+	fs.BoolVar(&o.OCM, "ocm", false, "Whether to resolve OCM components based on the root component descriptor or only generate the (default) component list.")
 }
 
 func (o *Options) effectiveIntermediateOutputDir() string {

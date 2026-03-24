@@ -5,7 +5,7 @@
 The GLK `generate` command typically renders manifests for each component using templates with values provided from a component descriptor of the Open Component Model (OCM).
 This allows you to generate Kubernetes manifests for your components with externally provided versions, image overwrites and similar overwrites for Helm charts.
 
-To extract these values, the GLK command `resolve-ocm-components` must be executed first.
+To extract these values, the GLK command `resolve --ocm` must be executed first.
 It reads the component descriptors and extracts the versions and image vector overwrites.
 The result is written into the output `ocm-components.yaml` file.
 
