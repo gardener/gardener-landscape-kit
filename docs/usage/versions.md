@@ -40,10 +40,10 @@ versionConfig:
 ### Custom Component Vector
 
 You can pin or override component versions by editing the `components.yaml` file in your base or landscape directory.
-This file is created (or updated) by running the `resolve` command without `--ocm`:
+This file is created (or updated) by running the `resolve plain` command:
 
 ```bash
-gardener-landscape-kit resolve \
+gardener-landscape-kit resolve plain \
     --target-dir /path/to/base/dir \
     --config path/to/config-file
 ```
@@ -60,9 +60,30 @@ components:
   version: v1.133.0
 ```
 
-The landscape-level `components.yaml` (if present) overrides the base-level file, which in turn overrides the built-in defaults.
+> [!IMPORTANT]
+> The landscape-level `components.yaml` (if present) overrides the base-level file, which in turn overrides the built-in defaults.
 
-## Version Maintenance and Compatibility
+### Prefer components.yaml Over Editing Generated Manifests
+
+The `components.yaml` file is the recommended way to control component versions for your landscape.
+While GLK's three-way merge preserves user modifications to generated manifests across runs, editing image tags or other version-specific fields directly in generated manifests is not recommended:
+the version pins are scattered across many files, not visible in one place, and the three-way merge will silently keep your value even when a new default would have been a meaningful upgrade.
+
+By maintaining versions in `components.yaml`, your version pins survive regeneration, are visible in one place, and benefit from the three-way merge (i.e., GLK will not silently overwrite your pins with a new default).
+
+### Custom Components
+
+If your landscape includes components that are not part of the GLK default set, add them to `components.yaml` as well:
+
+```yaml
+components:
+- name: github.com/my-org/my-component
+  sourceRepository: https://github.com/my-org/my-component
+  version: v1.2.3
+```
+
+GLK will read and preserve custom component entries from `components.yaml` during `resolve` and `generate` runs.
+This keeps all version information in one place and makes it easy to update or audit.
 
 ### Best Effort Maintenance
 

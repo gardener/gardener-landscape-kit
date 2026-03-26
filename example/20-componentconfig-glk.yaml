@@ -18,6 +18,4 @@ kind: LandscapeKitConfiguration
 #   exclude:
 #   - component-name
 # versionConfig:
-#   componentsVectorFile: components.yaml
 #   defaultVersionsUpdateStrategy: ReleaseBranch
-#   writeEffectiveComponentsVectorFile: Landscape
