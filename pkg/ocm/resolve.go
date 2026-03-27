@@ -216,7 +216,7 @@ func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal component versions to YAML: %w", err)
 	}
-	filename := path.Join(r.landscapeDir, "ocm-components.yaml")
+	filename := path.Join(r.landscapeDir, componentvector.ComponentVectorFilename)
 	if err := os.WriteFile(filename, data, 0600); err != nil {
 		return fmt.Errorf("failed to write components file %s: %w", filename, err)
 	}

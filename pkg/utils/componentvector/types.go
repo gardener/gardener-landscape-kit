@@ -6,6 +6,9 @@ package componentvector
 
 import "github.com/gardener/gardener/pkg/utils/imagevector"
 
+// ComponentVectorFilename is the default filename for component vectors to be placed at the root of either a base or landscape directory.
+const ComponentVectorFilename = "components.yaml"
+
 // Components is a list of components.
 type Components struct {
 	// Components is the list of component vectors.

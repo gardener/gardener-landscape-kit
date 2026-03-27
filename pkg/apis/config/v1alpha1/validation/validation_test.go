@@ -44,9 +44,6 @@ var _ = Describe("Validation", func() {
 						Landscape: "landscape",
 					},
 				},
-				VersionConfig: &v1alpha1.VersionConfiguration{
-					ComponentsVectorFile: new("components.yaml"),
-				},
 			}
 
 			errList := validation.ValidateLandscapeKitConfiguration(conf)
@@ -286,53 +283,10 @@ var _ = Describe("Validation", func() {
 		})
 
 		Context("VersionConfig Configuration", func() {
-			It("should fail if ComponentsVectorFile is empty", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new(""),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(ConsistOf(
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("versionConfig.componentsVectorFile"),
-					})),
-				))
-			})
-
-			It("should fail if ComponentsVectorFile is whitespace only", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new("   "),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(ConsistOf(
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("versionConfig.componentsVectorFile"),
-					})),
-				))
-			})
-
-			It("should pass with a valid ComponentsVectorFile", func() {
-				conf := &v1alpha1.LandscapeKitConfiguration{
-					VersionConfig: &v1alpha1.VersionConfiguration{
-						ComponentsVectorFile: new("path/to/components.yaml"),
-					},
-				}
-
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
-				Expect(errList).To(BeEmpty())
-			})
-
 			It("should pass with a valid DefaultVersionsUpdateStrategy", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &v1alpha1.VersionConfiguration{
-						DefaultVersionsUpdateStrategy: new("ReleaseBranch"),
+						DefaultVersionsUpdateStrategy: new(v1alpha1.DefaultVersionsUpdateStrategyReleaseBranch),
 					},
 				}
 

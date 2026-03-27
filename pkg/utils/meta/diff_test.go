@@ -196,6 +196,25 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			})
 		})
 
+		It("should handle non-kubernetes YAML manifests without apiVersion/kind/name", func() {
+			// Non-kubernetes YAML uses a checksum of sorted top-level keys as the manifest key.
+			// Two documents with the same structure should be treated as the same manifest across generations.
+			nonK8sYaml := []byte("foo: bar\nbaz: qux\n")
+
+			content, err := meta.ThreeWayMergeManifest(nonK8sYaml, nonK8sYaml, nonK8sYaml)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(nonK8sYaml)))
+
+			// A new default changing a value should be reflected while a user modification is retained.
+			edited := []byte("foo: user-value\nbaz: qux\n")
+			newDefault := []byte("foo: bar\nbaz: updated\n")
+			expected := []byte("foo: user-value\nbaz: updated\n")
+
+			content, err = meta.ThreeWayMergeManifest(nonK8sYaml, newDefault, edited)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(MatchYAML(string(expected)))
+		})
+
 		It("should merge single manifest files regardless different namespace and name", func() {
 			oldDefault, err := testdata.ReadFile("testdata/replaced-file-1-initial.yaml")
 			Expect(err).NotTo(HaveOccurred())

@@ -39,18 +39,51 @@ versionConfig:
 
 ### Custom Component Vector
 
-You can override the default component vector by specifying a custom vector file in your GLK configuration:
+You can pin or override component versions by placing a `components.yaml` file in the root of your base or landscape directory.
+This file is created (or updated) by running the `resolve plain` command, pointing `--target-dir` at the respective directory:
 
-```yaml
-apiVersion: landscape.config.gardener.cloud/v1alpha1
-kind: LandscapeKitConfiguration
-versionConfig:
-  componentsVectorFile: ./path/to/your/versions.yaml
+```bash
+gardener-landscape-kit resolve plain \
+    --target-dir /path/to/base/dir \
+    --config path/to/config-file
 ```
 
-When a custom component vector file is configured, GLK will use that file instead of the default one. The custom vector file must follow the same structure as the default component vector.
+The file is written to `<target-dir>/components.yaml`. GLK uses the three-way merge strategy when re-writing it, so any versions you have manually pinned are preserved across subsequent `resolve` runs.
 
-## Version Maintenance and Compatibility
+To pin a version, simply edit the file and set the desired version for a component. On the next `generate` run GLK will use the pinned version and show the default version as a comment next to it:
+
+```yaml
+components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+# version: v1.134.1 # <-- gardener-landscape-kit version default
+  version: v1.133.0
+```
+
+> [!IMPORTANT]
+> The landscape-level `components.yaml` (if present) overrides the base-level file, which in turn overrides the built-in defaults.
+
+### Prefer components.yaml Over Editing Generated Manifests
+
+The `components.yaml` file is the recommended way to control component versions for your landscape.
+While GLK's three-way merge preserves user modifications to generated manifests across runs, editing image tags or other version-specific fields directly in generated manifests is not recommended:
+the version pins are scattered across many files, not visible in one place, and the manual modifications are not updated automatically even when a new default would have been a meaningful upgrade.
+
+By maintaining versions in `components.yaml`, your version pins survive regeneration and are visible in one place.
+
+### Custom Components
+
+If your landscape includes components that are not part of the GLK default set, add them to `components.yaml` as well:
+
+```yaml
+components:
+- name: github.com/my-org/my-component
+  sourceRepository: https://github.com/my-org/my-component
+  version: v1.2.3
+```
+
+GLK will read and preserve custom component entries from `components.yaml` during `resolve` and `generate` runs.
+This keeps all version information in one place and makes it easy to update or audit.
 
 ### Best Effort Maintenance
 

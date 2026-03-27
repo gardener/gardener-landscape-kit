@@ -346,7 +346,7 @@ func (c *Components) DumpComponentRefListAsYAML() (string, error) {
 // GetGLKComponents returns the components as fetched from the OCM component descriptors.
 func (c *Components) GetGLKComponents(customComponents sets.Set[string], ignoreMissing bool) (*utilscomponentvector.Components, error) {
 	componentVectorBytes := componentvector.DefaultComponentsYAML
-	defaultComponentVector, err := utilscomponentvector.New(componentVectorBytes)
+	defaultComponentVector, err := utilscomponentvector.NewWithOverride(componentVectorBytes, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create component vector: %w", err)
 	}

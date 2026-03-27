@@ -55,5 +55,9 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to register components: %w", err)
 	}
 
-	return reg.GenerateBase(componentOpts)
+	if err := reg.GenerateBase(componentOpts); err != nil {
+		return err
+	}
+
+	return nil
 }

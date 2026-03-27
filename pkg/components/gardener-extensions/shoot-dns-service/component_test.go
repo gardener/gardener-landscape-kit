@@ -92,9 +92,8 @@ var _ = Describe("Component Generation", func() {
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
 				component := shoot_dns_service.NewComponent()
-				componentsVectorFile, err := test.CreateComponentsVectorFile(fs, build)
-				Expect(err).ToNot(HaveOccurred())
-				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/shoot-dns-service", componentsVectorFile)
+				Expect(test.CreateComponentsVectorFile(fs, build)).To(Succeed())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/shoot-dns-service")
 				Expect(err).ToNot(HaveOccurred())
 				expected, err := os.ReadFile(expectedFile)
 				Expect(err).ToNot(HaveOccurred())

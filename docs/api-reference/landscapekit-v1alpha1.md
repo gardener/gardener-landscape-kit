@@ -52,6 +52,15 @@ Resource Types:
 </tr>
 </tbody>
 </table>
+<h3 id="landscape.config.gardener.cloud/v1alpha1.DefaultVersionsUpdateStrategy">DefaultVersionsUpdateStrategy
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.VersionConfiguration">VersionConfiguration</a>)
+</p>
+<p>
+<p>DefaultVersionsUpdateStrategy controls whether the versions in the default components vector should be updated from the release branch on generate.</p>
+</p>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.GitRepository">GitRepository
 </h3>
 <p>
@@ -388,28 +397,17 @@ string
 <tbody>
 <tr>
 <td>
-<code>componentsVectorFile</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ComponentsVectorFile is the path to the components vector file. A default vector is applied if not specified.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>defaultVersionsUpdateStrategy</code></br>
 <em>
-string
+<a href="#landscape.config.gardener.cloud/v1alpha1.DefaultVersionsUpdateStrategy">
+DefaultVersionsUpdateStrategy
+</a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on generate.
-Possible values are &ldquo;Disabled&rdquo; (default) and &ldquo;ReleaseBranch&rdquo;.
-Only used if no ComponentsVectorFile is specified.</p>
+<p>UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on resolve.
+Possible values are &ldquo;Disabled&rdquo; (default) and &ldquo;ReleaseBranch&rdquo;.</p>
 </td>
 </tr>
 </tbody>

@@ -161,10 +161,7 @@ func validateOCMComponent(conf configv1alpha1.OCMComponent, fldPath *field.Path)
 func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	if conf.ComponentsVectorFile != nil && strings.TrimSpace(*conf.ComponentsVectorFile) == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("componentsVectorFile"), "components vector file path must be specified"))
-	}
-	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, *conf.DefaultVersionsUpdateStrategy) {
+	if conf.DefaultVersionsUpdateStrategy != nil && !slices.Contains(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, string(*conf.DefaultVersionsUpdateStrategy)) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("defaultVersionsUpdateStrategy"), *conf.DefaultVersionsUpdateStrategy, "allowed values are: "+strings.Join(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, ", ")))
 	}
 
