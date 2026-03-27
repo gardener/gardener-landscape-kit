@@ -39,8 +39,8 @@ versionConfig:
 
 ### Custom Component Vector
 
-You can pin or override component versions by editing the `components.yaml` file in your base or landscape directory.
-This file is created (or updated) by running the `resolve plain` command:
+You can pin or override component versions by placing a `components.yaml` file in the root of your base or landscape directory.
+This file is created (or updated) by running the `resolve plain` command, pointing `--target-dir` at the respective directory:
 
 ```bash
 gardener-landscape-kit resolve plain \
@@ -67,9 +67,9 @@ components:
 
 The `components.yaml` file is the recommended way to control component versions for your landscape.
 While GLK's three-way merge preserves user modifications to generated manifests across runs, editing image tags or other version-specific fields directly in generated manifests is not recommended:
-the version pins are scattered across many files, not visible in one place, and the three-way merge will silently keep your value even when a new default would have been a meaningful upgrade.
+the version pins are scattered across many files, not visible in one place, and the manual modifications are not updated automatically even when a new default would have been a meaningful upgrade.
 
-By maintaining versions in `components.yaml`, your version pins survive regeneration, are visible in one place, and benefit from the three-way merge (i.e., GLK will not silently overwrite your pins with a new default).
+By maintaining versions in `components.yaml`, your version pins survive regeneration and are visible in one place.
 
 ### Custom Components
 

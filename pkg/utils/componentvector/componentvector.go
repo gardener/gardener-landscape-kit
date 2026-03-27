@@ -57,6 +57,7 @@ func (c *components) ComponentNames() []string {
 // NewWithOverride creates a component vector by merging overrides entries on top of the base YAML.
 // The overrides files use the same Components schema but may list only a subset of components.
 // Components present in the override replace their counterparts in base; new names are appended.
+// Overrides are applied in order: later entries take precedence over earlier ones.
 func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 	baseObj := Components{}
 	if err := yaml.Unmarshal(base, &baseObj); err != nil {
@@ -76,8 +77,8 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 	}
 
 	// Validate merged entries (name + version required per entry)
-	for i, ov := range merged.Components {
-		if errList := validateComponentVector(ov, field.NewPath("").Child("components").Index(i)); len(errList) > 0 {
+	for i, cv := range merged.Components {
+		if errList := validateComponentVector(cv, field.NewPath("").Child("components").Index(i)); len(errList) > 0 {
 			return nil, fmt.Errorf("invalid merged component vector: %w", errList.ToAggregate())
 		}
 	}
@@ -104,8 +105,8 @@ func mergeComponents(base, override *Components) *Components {
 	merged := make([]*ComponentVector, 0, len(base.Components)+len(override.Components))
 	seen := make(map[string]struct{}, len(base.Components))
 	for _, bc := range base.Components {
-		ov := nameToOverride[bc.Name]
-		merged = append(merged, mergeComponentVector(ov, bc))
+		oc := nameToOverride[bc.Name]
+		merged = append(merged, mergeComponentVector(oc, bc))
 		seen[bc.Name] = struct{}{}
 	}
 	// Append components from override that were not present in base.

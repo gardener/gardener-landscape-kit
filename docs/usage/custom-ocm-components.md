@@ -16,7 +16,7 @@ But if your component is backed by an OCM component descriptor, you can benefit 
 For additional custom OCM components, GLK can inject information for the OCM component descriptor by rendering templates.
 
 GLK needs two steps to extract and use the information from the OCM component descriptors.
-1. The command `glk resolve --ocm` walks all referenced component descriptors starting from the given root in the GLK configuration file at `.ocm.rootComponent`. It tries to fetch the component descriptors from any of the specified OCI repositories at `.ocm.repositories` and extracts the versions and image vector overrides for all GLK components and all custom OCM components found in the landscape directory tree.
+1. The command `glk resolve ocm` walks all referenced component descriptors starting from the given root in the GLK configuration file at `.ocm.rootComponent`. It tries to fetch the component descriptors from any of the specified OCI repositories at `.ocm.repositories` and extracts the versions and image vector overrides for all GLK components and all custom OCM components found in the landscape directory tree.
 
    - The extracted information is written to `components.yaml` in the provided landscape (or base) directory.
 2. The command `glk generate [base|landscape]` generates the Flux kustomizations for its active components and additionally renders templates for custom OCM components.
@@ -53,9 +53,9 @@ Here the file `ocm-component-name` contains the OCM component name:
 my.private-github.com/gardener/my-gardener-extension
 ```
 
-3. Run the `resolve --ocm` command to extract the versions and image vector overrides:
+3. Run the `resolve ocm` command to extract the versions and image vector overrides:
 ```bash
-glk resolve --ocm -c landscapekitconfiguration.yaml --target-dir /path/to/landscape-or-base-repo
+glk resolve ocm -c landscapekitconfiguration.yaml --target-dir /path/to/landscape-or-base-repo
 ```
 
 4. Make use of the extracted resource information stored in the file `ocm-components.yaml`.

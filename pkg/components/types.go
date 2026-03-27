@@ -95,7 +95,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		isTargetLandscapeDir := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Landscape) == path.Clean(opts.TargetDirPath)
 		if isTargetLandscapeDir {
 			baseCompVectorFile := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Base, utilscomponentvector.ComponentVectorFilename)
-			componentsBytes, err := useComponentsFile(opts, fs, baseCompVectorFile)
+			componentsBytes, err := readCustomComponentsFile(opts, fs, baseCompVectorFile)
 			if err != nil {
 				return nil, err
 			}
@@ -103,7 +103,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		}
 	}
 
-	componentsBytes, err := useComponentsFile(opts, fs, path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename))
+	componentsBytes, err := readCustomComponentsFile(opts, fs, path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 	}, nil
 }
 
-func useComponentsFile(opts *generateoptions.Options, fs afero.Afero, filePath string) ([]byte, error) {
+func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, filePath string) ([]byte, error) {
 	customBytes, err := fs.ReadFile(filePath)
 	if err == nil {
 		opts.Log.Info("Found custom component vector override file", "file", filePath)
