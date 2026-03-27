@@ -8,8 +8,8 @@ require (
 	github.com/fluxcd/kustomize-controller/api v1.8.2
 	github.com/fluxcd/pkg/apis/meta v1.26.0
 	github.com/fluxcd/source-controller/api v1.8.1
-	github.com/gardener/gardener v1.138.0
-	github.com/gardener/gardener/pkg/apis v1.138.0
+	github.com/gardener/gardener v1.138.1
+	github.com/gardener/gardener/pkg/apis v1.138.1
 	github.com/go-logr/logr v1.4.3
 	github.com/go-sprout/sprout v1.0.3
 	github.com/onsi/ginkgo/v2 v2.28.1
