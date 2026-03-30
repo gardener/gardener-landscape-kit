@@ -7,7 +7,7 @@ But if your component is backed by an OCM component descriptor, you can benefit 
 
 ### Requirements for a custom OCM Components
 
-1. The component directory contains a file named `ocm-component-name` containing the OCM component name (e.g. `my.private-github.com/gardener/my-gardener-extension`).
+1. The component directory contains a file named `component-name` containing the OCM component name (e.g. `my.private-github.com/gardener/my-gardener-extension`).
 2. The custom component must be included in the OCM descriptor tree. This means it must be referenced by the root component descriptor or any component referenced directly or indirectly.
 3. The component directory contains template files with suffix `.template` (e.g. `my-extension-deployment.yaml.template`). It can reference values for resources or image vector overrides as extracted from the OCM component descriptor.
 
@@ -42,13 +42,13 @@ ocm:
 2. Create a custom component directory `my-gardener-extension` in your base or landscape directory:
 ```
 components/my-gardener-extension
-  ├── ocm-component-name
+  ├── component-name
   ├── my-extension-deployment.yaml.template
   ├── kustomization.yaml
   ...
 ```
 
-Here the file `ocm-component-name` contains the OCM component name:
+Here the file `component-name` contains the OCM component name:
 ```
 my.private-github.com/gardener/my-gardener-extension
 ```

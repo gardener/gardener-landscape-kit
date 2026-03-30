@@ -22,12 +22,8 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
+	"github.com/gardener/gardener-landscape-kit/pkg/registry"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
-)
-
-const (
-	// CustomOCMComponentNameFilename is the filename containing a custom OCM component name.
-	CustomOCMComponentNameFilename = "ocm-component-name"
 )
 
 type ocmComponentsResolver struct {
@@ -231,7 +227,7 @@ func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error)
 		if err != nil {
 			return err
 		}
-		if d.IsDir() || d.Name() != CustomOCMComponentNameFilename {
+		if d.IsDir() || d.Name() != registry.CustomComponentNameFilename {
 			return nil
 		}
 		content, err := os.ReadFile(path) // #nosec: G304,G122 -- safe, as it's reading within the landscape directory

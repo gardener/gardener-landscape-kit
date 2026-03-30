@@ -13,8 +13,12 @@ import (
 	"github.com/elliotchance/orderedmap/v3"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/ocm"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
+)
+
+const (
+	// CustomComponentNameFilename is the filename containing a custom OCM component name.
+	CustomComponentNameFilename = "component-name"
 )
 
 // Interface is the interface for a component registry.
@@ -63,7 +67,7 @@ func (r *registry) findAndRenderCustomComponents(opts components.Options) error 
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || info.Name() != ocm.CustomOCMComponentNameFilename {
+		if info.IsDir() || info.Name() != CustomComponentNameFilename {
 			return nil
 		}
 
