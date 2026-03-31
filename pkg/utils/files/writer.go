@@ -23,6 +23,9 @@ const (
 	// DefaultDirName is the name of the directory within the GLK system directory that contains the default generated configuration files.
 	DefaultDirName = "defaults"
 
+	// glkGitAttributesContent marks all files under .glk/ as generated so that GitHub collapses them in PR diffs.
+	glkGitAttributesContent = "** linguist-generated=true\n"
+
 	secretEncryptionDisclaimer = `#
 # SECURITY ADVISORY
 #
@@ -46,6 +49,9 @@ func isSecret(contents []byte) bool {
 // Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
 func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero) error {
 	if err := fs.MkdirAll(path.Join(rootDir, relativeFilePath), 0700); err != nil {
+		return err
+	}
+	if err := WriteFileToFilesystem([]byte(glkGitAttributesContent), path.Join(rootDir, GLKSystemDirName, ".gitattributes"), false, fs); err != nil {
 		return err
 	}
 
