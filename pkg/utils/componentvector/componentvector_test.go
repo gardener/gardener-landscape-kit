@@ -774,6 +774,113 @@ components:
 			Expect(string(writtenData)).To(ContainSubstring("my annotation"))
 		})
 
+		It("should bump a component version when GLK updates the default and the user has no override", func() {
+			fs := afero.Afero{Fs: afero.NewMemMapFs()}
+			writtenFile := outputDir + "/components.yaml"
+
+			// Run 1: write with the original default (v1.137.1).
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			// User removes the other-component entry from components.yaml.
+			writtenData, err := fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			idx := strings.Index(string(writtenData), "- name: github.com/gardener/other-component")
+			Expect(idx).To(BeNumerically(">", 0))
+			Expect(fs.WriteFile(writtenFile, writtenData[:idx], 0600)).To(Succeed())
+
+			// Simulate a GLK version bump: gardener goes from v1.137.1 → v1.138.0.
+			componentvector.DefaultComponentsYAML = []byte(`components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.138.0
+- name: github.com/gardener/other-component
+  sourceRepository: https://github.com/gardener/other-component
+  version: v2.0.0
+`)
+
+			// Run 2: user has no pin, so the new default version is passed in directly.
+			// The three-way merge inside WriteComponentVectorFile must accept the new default version.
+			// The user-deleted other-component must not come back.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("version: v1.138.0"))
+			Expect(string(writtenData)).NotTo(ContainSubstring("version: v1.137.1"))
+			Expect(componentNames(fs)).To(ConsistOf("github.com/gardener/gardener"))
+
+			// Run 3 (same GLK version): a subsequent run must be stable.
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("version: v1.138.0"))
+			Expect(string(writtenData)).NotTo(ContainSubstring("version: v1.137.1"))
+			Expect(componentNames(fs)).To(ConsistOf("github.com/gardener/gardener"))
+		})
+
+		It("should preserve a user-pinned version when GLK updates the default", func() {
+			fs := afero.Afero{Fs: afero.NewMemMapFs()}
+			writtenFile := outputDir + "/components.yaml"
+
+			pinnedCV := func() Interface {
+				return cv([]byte(`components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.99.0
+- name: github.com/gardener/other-component
+  sourceRepository: https://github.com/gardener/other-component
+  version: v2.0.0
+`))
+			}
+
+			// Run 1: write with the original default (v1.137.1).
+			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
+
+			// User pins gardener to v1.99.0.
+			writtenData, err := fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fs.WriteFile(writtenFile,
+				[]byte(strings.ReplaceAll(string(writtenData), "version: v1.137.1", "version: v1.99.0")),
+				0600)).To(Succeed())
+
+			// Run 2: GLK picks up the user pin and injects the default-version comment.
+			Expect(WriteComponentVectorFile(fs, outputDir, pinnedCV())).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("version: v1.99.0"))
+			Expect(string(writtenData)).To(ContainSubstring("# version: v1.137.1 # <-- gardener-landscape-kit version default"))
+
+			// GLK bumps its default: v1.137.1 → v1.138.0.
+			componentvector.DefaultComponentsYAML = []byte(`components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.138.0
+- name: github.com/gardener/other-component
+  sourceRepository: https://github.com/gardener/other-component
+  version: v2.0.0
+`)
+
+			// Run 3: the default-version comment must be updated to v1.138.0.
+			// The user's pin (v1.99.0) must be preserved.
+			Expect(WriteComponentVectorFile(fs, outputDir, pinnedCV())).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("version: v1.99.0"))
+			Expect(string(writtenData)).To(ContainSubstring("# version: v1.138.0 # <-- gardener-landscape-kit version default"))
+			Expect(string(writtenData)).NotTo(ContainSubstring("# version: v1.137.1"))
+
+			// Run 4: must be stable, user pin must not be overwritten.
+			Expect(WriteComponentVectorFile(fs, outputDir, pinnedCV())).To(Succeed())
+
+			writtenData, err = fs.ReadFile(writtenFile)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(writtenData)).To(ContainSubstring("version: v1.99.0"))
+			Expect(string(writtenData)).To(ContainSubstring("# version: v1.138.0 # <-- gardener-landscape-kit version default"))
+		})
+
 		It("should not re-add entries that the user removed from the file", func() {
 			fs := afero.Afero{Fs: afero.NewMemMapFs()}
 

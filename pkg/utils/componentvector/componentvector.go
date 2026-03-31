@@ -93,8 +93,8 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 }
 
 // mergeComponents merges override components on top of base components.
-// For each component in override: if its name exists in base, the base entry is merged with the override (override values take precedence);
-// otherwise it is appended. Returns a new Components struct with the merged result.
+// For each component in override: if its name exists in base, the base entry is merged with the override (override values take precedence); otherwise it is appended.
+// Returns a new Components struct with the merged result.
 func mergeComponents(base, override *Components) *Components {
 	// Build an ordered list starting from base, replacing entries found in override.
 	nameToOverride := make(map[string]*ComponentVector, len(override.Components))
@@ -238,6 +238,21 @@ func stripDefaultVersionComments(data []byte) []byte {
 	return []byte(strings.Join(out, "\n"))
 }
 
+// NameVersionBytes marshals cv into a name+version-only Components YAML, stripping all other fields.
+// This compact format is used for the .glk/defaults/ snapshot and as the three-way merge baseline in plain.go.
+func NameVersionBytes(cv Interface) ([]byte, error) {
+	stripped := &Components{}
+	for _, name := range cv.ComponentNames() {
+		version, _ := cv.FindComponentVersion(name)
+		stripped.Components = append(stripped.Components, &ComponentVector{Name: name, Version: version})
+	}
+	data, err := yaml.Marshal(stripped)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal component versions: %w", err)
+	}
+	return data, nil
+}
+
 // WriteComponentVectorFile writes the component vector file effectively used to the target directory if applicable.
 func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVector Interface) error {
 	var (
@@ -269,7 +284,7 @@ func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVec
 
 	header := []byte(strings.Join([]string{
 		"# This file is updated by the gardener-landscape-kit.",
-		"# If this file is specified in the gardener-landscape-kit configuration file, the component versions will be used as overrides.",
+		"# If this file is present in the root of a gardener-landscape-kit-managed repository, the component versions will be used as overrides.",
 		"# If custom component versions should be used, it is recommended to modify the specified versions here and run the `generate` command afterwards.",
 	}, "\n") + "\n")
 
@@ -284,18 +299,30 @@ func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVec
 		}
 	}
 
-	// Pass 1: write without default-version comments so the three-way merge operates on
-	// comment-free content. This establishes a clean baseline in the .glk/defaults/ snapshot.
+	// Pass 1: write without default-version comments so the three-way merge operates on comment-free content.
+	// This establishes a clean baseline in the .glk/defaults/ snapshot.
 	dataWithoutComments := append(header, data...)
 	if err := files.WriteObjectsToFilesystem(map[string][]byte{ComponentVectorFilename: dataWithoutComments}, targetDirPath, "", fs); err != nil {
 		return err
 	}
 
-	// Pass 2: inject default-version comments and write again. Because the .glk/defaults/ snapshot from Pass 1 has no comments,
-	// the comments are always treated as "new" by the three-way merge and are therefore reliably written into the output file.
+	// Pass 2: inject default-version comments and write again.
+	// Because the .glk/defaults/ snapshot from Pass 1 has no comments, the comments are always treated as "new" by the three-way merge and are therefore reliably written into the output file.
 	for _, fn := range postGenerateDefaultVersionCommentFns {
 		data = []byte(fn(string(data)))
 	}
 	dataWithComments := append(header, data...)
-	return files.WriteObjectsToFilesystem(map[string][]byte{ComponentVectorFilename: dataWithComments}, targetDirPath, "", fs)
+	if err := files.WriteObjectsToFilesystem(map[string][]byte{ComponentVectorFilename: dataWithComments}, targetDirPath, "", fs); err != nil {
+		return err
+	}
+
+	// Overwrite the .glk/defaults/ snapshot with the GLK-native default versions so that plain.go's three-way merge sees the right baseline on the next run.
+	// WriteObjectsToFilesystem (Pass 2) would otherwise store the comment-annotated effective bytes there.
+	// Only name+version are stored; comments in the snapshot would confuse nodesEqual and break user-pin detection.
+	snapshotData, err := NameVersionBytes(cvDefault)
+	if err != nil {
+		return err
+	}
+	snapshotPath := filepath.Join(targetDirPath, files.GLKSystemDirName, files.DefaultDirName, ComponentVectorFilename)
+	return files.WriteFileToFilesystem(append(header, snapshotData...), snapshotPath, true, fs)
 }

@@ -103,12 +103,17 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 					oldValue = &yaml.Node{Kind: yaml.SequenceNode}
 				}
 				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue)
-			case oldExists && !nodesEqual(oldValue, newValueNode, false):
+			case oldExists && !nodesEqual(oldValue, newValueNode, false) && nodesEqual(oldValue, currentValue, false):
+				// Default changed and current was not modified: take the new default.
 				resultValue = &yaml.Node{
 					Kind: newValueNode.Kind, Value: newValueNode.Value, Style: newValueNode.Style, Tag: newValueNode.Tag,
 					HeadComment: currentValue.HeadComment, LineComment: currentValue.LineComment, FootComment: currentValue.FootComment,
 					Content: newValueNode.Content,
 				}
+				mergeNodeComments(oldValue, newValueNode, resultValue)
+			case oldExists && !nodesEqual(oldValue, newValueNode, false):
+				// Both default and current changed: keep current (user's value wins).
+				resultValue = currentValue
 				mergeNodeComments(oldValue, newValueNode, resultValue)
 			default:
 				resultValue = currentValue

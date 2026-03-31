@@ -22,6 +22,8 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	utilsfiles "github.com/gardener/gardener-landscape-kit/pkg/utils/files"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
 var configDecoder runtime.Decoder
@@ -133,7 +135,30 @@ func run(_ context.Context, opts *Options) error {
 		}
 	}
 
-	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customBytes)
+	// Read the GLK-native default snapshot to use as the "old default" for three-way merging the on-disk components.yaml.
+	// The snapshot stores only name+version per component (written by WriteComponentVectorFile), which is the right baseline for detecting user pins vs unmodified defaults.
+	oldDefaultFile := path.Join(opts.TargetDirPath, utilsfiles.GLKSystemDirName, utilsfiles.DefaultDirName, utilscomponentvector.ComponentVectorFilename)
+	oldDefaultBytes, err := opts.fs.ReadFile(oldDefaultFile)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("failed to read default component vector snapshot: %w", err)
+	}
+
+	// Build the new-default bytes in name+version-only format (matching the snapshot) and three-way merge
+	// with the on-disk file: components the user never touched accept the new GLK default; user-pinned versions are preserved.
+	cvDefault, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML)
+	if err != nil {
+		return fmt.Errorf("failed to build default component vector: %w", err)
+	}
+	newDefaultBytes, err := utilscomponentvector.NameVersionBytes(cvDefault)
+	if err != nil {
+		return fmt.Errorf("failed to marshal default component vector: %w", err)
+	}
+	mergedBytes, err := meta.ThreeWayMergeManifest(oldDefaultBytes, newDefaultBytes, customBytes)
+	if err != nil {
+		return fmt.Errorf("failed to merge component vector: %w", err)
+	}
+
+	componentVector, err := utilscomponentvector.NewWithOverride(mergedBytes)
 	if err != nil {
 		return fmt.Errorf("failed to create component vector: %w", err)
 	}
