@@ -5,6 +5,7 @@
 package version
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
@@ -12,7 +13,10 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/spf13/afero"
-	"k8s.io/component-base/version"
+	apimachineryversion "k8s.io/apimachinery/pkg/version"
+	componentbaseversion "k8s.io/component-base/version"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 const (
@@ -21,6 +25,22 @@ const (
 	// VersionFileName is the name of the version metadata file
 	VersionFileName = "version.json"
 )
+
+var (
+	//go:embed VERSION
+	fallbackVersion string
+
+	version apimachineryversion.Info
+)
+
+func init() {
+	version = componentbaseversion.Get()
+
+	// Set the fallback version if unset, i.e. it was not passed via ld flags.
+	if strings.HasPrefix(version.GitVersion, "v0.0.0") {
+		version.GitVersion = strings.TrimSpace(fallbackVersion)
+	}
+}
 
 // Info contains version information for a generated base
 type Info struct {
@@ -34,28 +54,26 @@ type Info struct {
 
 // WriteVersionMetadata writes the current version information to .glk/meta/version.json
 func WriteVersionMetadata(targetPath string, fs afero.Afero) error {
-	versionInfo := version.Get()
-
 	metadata := Info{
-		Version:    versionInfo.GitVersion,
-		GitVersion: versionInfo.GitVersion,
-		GitCommit:  versionInfo.GitCommit,
-		BuildDate:  versionInfo.BuildDate,
-		Major:      versionInfo.Major,
-		Minor:      versionInfo.Minor,
+		Version:    version.GitVersion,
+		GitVersion: version.GitVersion,
+		GitCommit:  version.GitCommit,
+		BuildDate:  version.BuildDate,
+		Major:      version.Major,
+		Minor:      version.Minor,
 	}
 
-	metaDir := filepath.Join(targetPath, ".glk", MetaDirName)
+	metaDir := filepath.Join(targetPath, files.GLKSystemDirName, MetaDirName)
 	if err := fs.MkdirAll(metaDir, 0744); err != nil {
 		return fmt.Errorf("failed to create metadata directory: %w", err)
 	}
 
-	versionFilePath := filepath.Join(metaDir, VersionFileName)
 	data, err := json.MarshalIndent(metadata, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal version metadata: %w", err)
 	}
 
+	versionFilePath := filepath.Join(metaDir, VersionFileName)
 	if err := fs.WriteFile(versionFilePath, data, 0644); err != nil {
 		return fmt.Errorf("failed to write version metadata: %w", err)
 	}
@@ -65,7 +83,7 @@ func WriteVersionMetadata(targetPath string, fs afero.Afero) error {
 
 // ReadVersionMetadata reads the version information from .glk/meta/version.json
 func ReadVersionMetadata(targetPath string, fs afero.Afero) (*Info, error) {
-	versionFilePath := filepath.Join(targetPath, ".glk", MetaDirName, VersionFileName)
+	versionFilePath := filepath.Join(targetPath, files.GLKSystemDirName, MetaDirName, VersionFileName)
 
 	exists, err := fs.Exists(versionFilePath)
 	if err != nil {
@@ -89,23 +107,9 @@ func ReadVersionMetadata(targetPath string, fs afero.Afero) (*Info, error) {
 	return &metadata, nil
 }
 
-// sanitizeVersion removes invalid semver characters from version strings.
-// Handles special development versions like "v0.0.0-master+$Format:%H$".
-func sanitizeVersion(v string) string {
-	// Remove anything after '+' (build metadata with invalid characters)
-	if idx := strings.Index(v, "+"); idx != -1 {
-		v = v[:idx]
-	}
-	return v
-}
-
 // ValidateVersionCompatibility checks if the landscape version is compatible with the base version.
 // Returns an error if landscapeVersion > baseVersion.
 func ValidateVersionCompatibility(baseVersion, landscapeVersion string) error {
-	// Sanitize versions before parsing
-	baseVersion = sanitizeVersion(baseVersion)
-	landscapeVersion = sanitizeVersion(landscapeVersion)
-
 	baseVer, err := semver.NewVersion(baseVersion)
 	if err != nil {
 		return fmt.Errorf("failed to parse base version %q: %w", baseVersion, err)
@@ -132,5 +136,10 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 		return err
 	}
 
-	return ValidateVersionCompatibility(baseMetadata.Version, version.Get().GitVersion)
+	return ValidateVersionCompatibility(baseMetadata.Version, version.GitVersion)
+}
+
+// Get returns the version of GLK.
+func Get() apimachineryversion.Info {
+	return version
 }
