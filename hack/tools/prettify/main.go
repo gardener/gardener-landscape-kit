@@ -11,6 +11,7 @@ import (
 
 	flag "github.com/spf13/pflag"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
@@ -31,7 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
 	}
-	prettified, err := meta.ThreeWayMergeManifest(nil, content, nil)
+	prettified, err := meta.ThreeWayMergeManifest(nil, content, nil, configv1alpha1.MergeModeSilent)
 	if err != nil {
 		log.Fatalf("Marshalling failed: %s", err)
 	}

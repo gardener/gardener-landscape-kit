@@ -94,7 +94,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	delete(objects, "flux-system/gitignore")
 	delete(objects, "flux-system/doc.go")
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), DirName, opts.GetFilesystem())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), DirName, opts.GetFilesystem(), opts.GetMergeMode())
 }
 
 func writeGitignoreFile(options components.LandscapeOptions) error {

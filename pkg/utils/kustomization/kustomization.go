@@ -16,6 +16,7 @@ import (
 	kustomize "sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/yaml"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
@@ -51,14 +52,14 @@ func NewKustomization(resources []string, patches []kustomize.Patch) *kustomize.
 // WriteKustomizationComponent writes the objects and a Kustomization file to the fs.
 // The Kustomization file references all other objects.
 // The objects map will be modified to include the Kustomization file.
-func WriteKustomizationComponent(objects map[string][]byte, baseDir, componentDir string, fs afero.Afero) error {
+func WriteKustomizationComponent(objects map[string][]byte, baseDir, componentDir string, fs afero.Afero, mode configv1alpha1.MergeMode) error {
 	kustomization := NewKustomization(slices.Collect(maps.Keys(objects)), nil)
 	content, err := yaml.Marshal(kustomization)
 	if err != nil {
 		return err
 	}
 	objects[KustomizationFileName] = content
-	return files.WriteObjectsToFilesystem(objects, baseDir, componentDir, fs)
+	return files.WriteObjectsToFilesystem(objects, baseDir, componentDir, fs, mode)
 }
 
 // WriteLandscapeComponentsKustomizations traverses through the generated components directory and adds
@@ -68,10 +69,10 @@ func WriteLandscapeComponentsKustomizations(options components.Options) error {
 	targetDir := options.GetTargetPath()
 	componentsDir := filepath.Join(targetDir, components.DirName)
 
-	return fs.Walk(componentsDir, writeKustomizationsToFileTree(fs, targetDir))
+	return fs.Walk(componentsDir, writeKustomizationsToFileTree(fs, targetDir, options.GetMergeMode()))
 }
 
-func writeKustomizationsToFileTree(fs afero.Afero, targetDir string) func(dir string, info os.FileInfo, err error) error {
+func writeKustomizationsToFileTree(fs afero.Afero, targetDir string, mode configv1alpha1.MergeMode) func(dir string, info os.FileInfo, err error) error {
 	var completedPaths []string
 
 	return func(dir string, info os.FileInfo, err error) error {
@@ -115,11 +116,11 @@ func writeKustomizationsToFileTree(fs afero.Afero, targetDir string) func(dir st
 		}
 
 		relativePath, _ := strings.CutPrefix(dir, targetDir)
-		return writeKustomizationFile(fs, targetDir, relativePath, directories)
+		return writeKustomizationFile(fs, targetDir, relativePath, directories, mode)
 	}
 }
 
-func writeKustomizationFile(fs afero.Afero, landscapeDir, relativePath string, directories []string) error {
+func writeKustomizationFile(fs afero.Afero, landscapeDir, relativePath string, directories []string, mode configv1alpha1.MergeMode) error {
 	var (
 		err     error
 		objects = make(map[string][]byte)
@@ -132,5 +133,5 @@ func writeKustomizationFile(fs afero.Afero, landscapeDir, relativePath string, d
 
 	objects[KustomizationFileName] = append([]byte(autoGenerationNotice), objects[KustomizationFileName]...)
 
-	return files.WriteObjectsToFilesystem(objects, landscapeDir, relativePath, fs)
+	return files.WriteObjectsToFilesystem(objects, landscapeDir, relativePath, fs, mode)
 }
