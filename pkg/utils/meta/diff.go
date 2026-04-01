@@ -13,6 +13,8 @@ import (
 
 	"github.com/elliotchance/orderedmap/v3"
 	"go.yaml.in/yaml/v4"
+
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 )
 
 // section represents a single section in a manifest file (either a manifest or a comment)
@@ -41,7 +43,7 @@ type manifestDiff struct {
 // It performs a three-way merge between the old default template, the new default template, and the current user-modified version.
 // It preserves user modifications while applying updates from the new default template.
 // Contents from the current manifest are prioritized and sorted first.
-func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
+func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte, mode configv1alpha1.MergeMode) ([]byte, error) {
 	var (
 		output []byte
 
@@ -61,7 +63,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 		current := sect.content
 		newDefault, _ := diff.newDefault.Get(sect.key)
 		oldDefault, _ := diff.oldDefault.Get(sect.key)
-		merged, err := threeWayMergeSection(oldDefault, newDefault, current)
+		merged, err := threeWayMergeSection(oldDefault, newDefault, current, mode)
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +77,7 @@ func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte) (
 			continue
 		}
 		// Applying threeWayMergeSection with only the new section content to ensure proper formatting (idempotency).
-		merged, err := threeWayMergeSection(nil, sect.content, nil)
+		merged, err := threeWayMergeSection(nil, sect.content, nil, mode)
 		if err != nil {
 			return nil, err
 		}

@@ -7,6 +7,7 @@ package plain
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -134,11 +135,16 @@ func run(_ context.Context, opts *Options) error {
 		return fmt.Errorf("failed to marshal default component vector: %w", err)
 	}
 
-	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs); err != nil {
+	header := []byte(strings.Join([]string{
+		"# This file is updated by the gardener-landscape-kit.",
+		"# If this file is present in the root of a gardener-landscape-kit-managed repository, the component versions will be used as overrides.",
+		"# If custom component versions should be used, it is recommended to modify the specified versions here and run the `generate` command afterwards.",
+	}, "\n") + "\n")
+	newDefaultBytes = append(header, newDefaultBytes...)
+
+	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs, opts.Config.GetMergeMode()); err != nil {
 		return fmt.Errorf("failed to write updated component vector: %w", err)
 	}
-
-	//return utilscomponentvector.WriteComponentVectorFile(opts.fs, opts.TargetDirPath, componentVector)
 
 	return nil
 }
