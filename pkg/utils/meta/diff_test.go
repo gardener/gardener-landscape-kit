@@ -229,5 +229,20 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(expected)))
 		})
+
+		It("should retain user modifications in slices during a three-way-merge", func() {
+			oldDefault, err := testdata.ReadFile("testdata/merge-slice-1-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			newDefault, err := testdata.ReadFile("testdata/merge-slice-3-new-default.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			current, err := testdata.ReadFile("testdata/merge-slice-2-edited.yaml")
+			Expect(err).NotTo(HaveOccurred())
+			expected, err := testdata.ReadFile("testdata/merge-slice-4-expected-generated.yaml")
+			Expect(err).NotTo(HaveOccurred())
+
+			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(Equal(string(expected)))
+		})
 	})
 })
