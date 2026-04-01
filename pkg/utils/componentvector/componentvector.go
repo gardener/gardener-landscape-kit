@@ -269,7 +269,7 @@ func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVec
 
 	header := []byte(strings.Join([]string{
 		"# This file is updated by the gardener-landscape-kit.",
-		"# If this file is specified in the gardener-landscape-kit configuration file, the component versions will be used as overrides.",
+		"# If this file is present in the root of a gardener-landscape-kit-managed repository, the component versions will be used as overrides.",
 		"# If custom component versions should be used, it is recommended to modify the specified versions here and run the `generate` command afterwards.",
 	}, "\n") + "\n")
 
