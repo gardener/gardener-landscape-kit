@@ -242,8 +242,32 @@ VersionConfiguration
 <p>VersionConfig is the configuration for versioning.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>mergeMode</code></br>
+<em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.MergeMode">
+MergeMode
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MergeMode controls how operator overrides conflicting with updated GLK defaults are handled during three-way merge.
+Possible values are &ldquo;Informative&rdquo; (default) and &ldquo;Silent&rdquo;.</p>
+</td>
+</tr>
 </tbody>
 </table>
+<h3 id="landscape.config.gardener.cloud/v1alpha1.MergeMode">MergeMode
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#landscape.config.gardener.cloud/v1alpha1.LandscapeKitConfiguration">LandscapeKitConfiguration</a>)
+</p>
+<p>
+<p>MergeMode controls how operator overrides are handled during three-way merge.</p>
+</p>
 <h3 id="landscape.config.gardener.cloud/v1alpha1.OCMComponent">OCMComponent
 </h3>
 <p>

@@ -112,6 +112,11 @@ func (in *LandscapeKitConfiguration) DeepCopyInto(out *LandscapeKitConfiguration
 		*out = new(VersionConfiguration)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MergeMode != nil {
+		in, out := &in.MergeMode, &out.MergeMode
+		*out = new(MergeMode)
+		**out = **in
+	}
 	return
 }
 

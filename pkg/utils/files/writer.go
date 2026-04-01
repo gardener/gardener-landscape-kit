@@ -10,9 +10,11 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/afero"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
@@ -44,10 +46,34 @@ func isSecret(contents []byte) bool {
 	return bytes.HasPrefix(contents, []byte(kindSecret)) || bytes.Contains(contents, []byte("\n"+kindSecret))
 }
 
+// stripGLKManagedAnnotations removes GLK-managed annotation comments from YAML bytes.
+// A line is annotated when it contains both GLKDefaultPrefix and GLKManagedMarker.
+func stripGLKManagedAnnotations(data []byte) []byte {
+	lines := strings.Split(string(data), "\n")
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		if !strings.Contains(line, meta.GLKManagedMarker) {
+			out = append(out, line)
+			continue
+		}
+		// Strip from the start of the GLK annotation prefix.
+		if idx := strings.Index(line, meta.GLKDefaultPrefix); idx >= 0 {
+			stripped := strings.TrimRight(line[:idx], " \t")
+			// If the entire line was a head comment annotation, drop the line entirely.
+			if strings.TrimSpace(stripped) == "" {
+				continue
+			}
+			out = append(out, stripped)
+		}
+		// If for some reason the marker is present but the prefix is not, drop the line.
+	}
+	return []byte(strings.Join(out, "\n"))
+}
+
 // WriteObjectsToFilesystem writes the given objects to the filesystem at the specified rootDir and relativeFilePath.
 // If the manifest file already exists, it patches changes from the new default.
 // Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero) error {
+func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero, mode configv1alpha1.MergeMode) error {
 	if err := fs.MkdirAll(path.Join(rootDir, relativeFilePath), 0700); err != nil {
 		return err
 	}
@@ -81,7 +107,10 @@ func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePa
 			object = append([]byte(secretEncryptionDisclaimer), object...)
 		}
 
-		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml)
+		// Strip GLK-managed annotations from the current file before merging, so they are always re-evaluated (idempotency: the annotation reflects the *current* GLK default).
+		currentYaml = stripGLKManagedAnnotations(currentYaml)
+
+		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml, mode)
 		if err != nil {
 			return err
 		}

@@ -7,18 +7,12 @@ package componentvector
 import (
 	"fmt"
 	"maps"
-	"path/filepath"
 	"reflect"
 	"slices"
-	"strings"
 
-	"github.com/spf13/afero"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
-
-	"github.com/gardener/gardener-landscape-kit/componentvector"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 const (
@@ -220,24 +214,6 @@ func resourcesToUnstructuredMap(resources map[string]ResourceData) (map[string]a
 	return unstructuredMap, nil
 }
 
-const (
-	defaultVersionCommentMarker = "# <-- gardener-landscape-kit version default"
-)
-
-// stripDefaultVersionComments removes GLK-managed default-version comment lines from a components.yaml file.
-// A line is considered GLK-managed when it contains the unique GLK marker suffix.
-// Stripping them before the three-way merge ensures the canonical comment is always (re-)written on the next run, even when the user has edited the comment text.
-func stripDefaultVersionComments(data []byte) []byte {
-	lines := strings.Split(string(data), "\n")
-	out := make([]string, 0, len(lines))
-	for _, line := range lines {
-		if !strings.Contains(line, defaultVersionCommentMarker) {
-			out = append(out, line)
-		}
-	}
-	return []byte(strings.Join(out, "\n"))
-}
-
 // NameVersionBytes marshals cv into a name+version-only Components YAML, stripping all other fields.
 // This compact format is used for the .glk/defaults/ snapshot and as the three-way merge baseline in plain.go.
 func NameVersionBytes(cv Interface) ([]byte, error) {
@@ -251,66 +227,4 @@ func NameVersionBytes(cv Interface) ([]byte, error) {
 		return nil, fmt.Errorf("failed to marshal component versions: %w", err)
 	}
 	return data, nil
-}
-
-// WriteComponentVectorFile writes the component vector file effectively used to the target directory if applicable.
-func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVector Interface) error {
-	var (
-		comp                                 = &Components{}
-		postGenerateDefaultVersionCommentFns []func(string) string
-	)
-	cvDefault, err := NewWithOverride(componentvector.DefaultComponentsYAML)
-	if err != nil {
-		return fmt.Errorf("failed to build default component vector: %w", err)
-	}
-	for _, componentName := range componentVector.ComponentNames() {
-		componentVersion, _ := componentVector.FindComponentVersion(componentName)
-		comp.Components = append(comp.Components, &ComponentVector{
-			Name:    componentName,
-			Version: componentVersion,
-		})
-		defaultVersion, found := cvDefault.FindComponentVersion(componentName)
-		if found && componentVersion != defaultVersion {
-			defaultVersionComment := "# version: " + defaultVersion + " " + defaultVersionCommentMarker
-			postGenerateDefaultVersionCommentFns = append(postGenerateDefaultVersionCommentFns, func(data string) string {
-				return strings.ReplaceAll(data, componentName+"\n", componentName+"\n"+defaultVersionComment+"\n")
-			})
-		}
-	}
-	data, err := yaml.Marshal(comp)
-	if err != nil {
-		return fmt.Errorf("failed to marshal component vector: %w", err)
-	}
-
-	header := []byte(strings.Join([]string{
-		"# This file is updated by the gardener-landscape-kit.",
-		"# If this file is present in the root of a gardener-landscape-kit-managed repository, the component versions will be used as overrides.",
-		"# If custom component versions should be used, it is recommended to modify the specified versions here and run the `generate` command afterwards.",
-	}, "\n") + "\n")
-
-	// Before writing, strip any GLK-managed default-version comment lines from the on-disk file.
-	// This resets GLK-owned annotations so the canonical comment is always (re-)applied below, even when the user has edited or removed the comment line.
-	filePath := filepath.Join(targetDirPath, ComponentVectorFilename)
-	if existing, readErr := fs.ReadFile(filePath); readErr == nil {
-		if stripped := stripDefaultVersionComments(existing); string(stripped) != string(existing) {
-			if writeErr := fs.WriteFile(filePath, stripped, 0600); writeErr != nil {
-				return writeErr
-			}
-		}
-	}
-
-	// Pass 1: write without default-version comments so the three-way merge operates on
-	// comment-free content. This establishes a clean baseline in the .glk/defaults/ snapshot.
-	dataWithoutComments := append(header, data...)
-	if err := files.WriteObjectsToFilesystem(map[string][]byte{ComponentVectorFilename: dataWithoutComments}, targetDirPath, "", fs); err != nil {
-		return err
-	}
-
-	// Pass 2: inject default-version comments and write again. Because the .glk/defaults/ snapshot from Pass 1 has no comments,
-	// the comments are always treated as "new" by the three-way merge and are therefore reliably written into the output file.
-	for _, fn := range postGenerateDefaultVersionCommentFns {
-		data = []byte(fn(string(data)))
-	}
-	dataWithComments := append(header, data...)
-	return files.WriteObjectsToFilesystem(map[string][]byte{ComponentVectorFilename: dataWithComments}, targetDirPath, "", fs)
 }
