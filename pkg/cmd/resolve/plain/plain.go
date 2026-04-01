@@ -6,10 +6,7 @@ package plain
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
-	"path"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -22,6 +19,7 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	utilsfiles "github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var configDecoder runtime.Decoder
@@ -122,21 +120,25 @@ func run(_ context.Context, opts *Options) error {
 		}
 	}
 
-	compVectorFile := path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename)
-	opts.Log.Info("Writing component vector file", "file", compVectorFile)
-
-	var customBytes []byte
-	var err error
-	if customBytes, err = opts.fs.ReadFile(compVectorFile); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("failed to read component vector override file: %w", err)
-		}
-	}
-
-	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customBytes)
+	var (
+		err             error
+		newDefaultCV    utilscomponentvector.Interface
+		newDefaultBytes []byte
+	)
+	newDefaultCV, err = utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML)
 	if err != nil {
-		return fmt.Errorf("failed to create component vector: %w", err)
+		return fmt.Errorf("failed to build default component vector: %w", err)
+	}
+	newDefaultBytes, err = utilscomponentvector.NameVersionBytes(newDefaultCV)
+	if err != nil {
+		return fmt.Errorf("failed to marshal default component vector: %w", err)
 	}
 
-	return utilscomponentvector.WriteComponentVectorFile(opts.fs, opts.TargetDirPath, componentVector)
+	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs); err != nil {
+		return fmt.Errorf("failed to write updated component vector: %w", err)
+	}
+
+	//return utilscomponentvector.WriteComponentVectorFile(opts.fs, opts.TargetDirPath, componentVector)
+
+	return nil
 }

@@ -238,6 +238,21 @@ func stripDefaultVersionComments(data []byte) []byte {
 	return []byte(strings.Join(out, "\n"))
 }
 
+// NameVersionBytes marshals cv into a name+version-only Components YAML, stripping all other fields.
+// This compact format is used for the .glk/defaults/ snapshot and as the three-way merge baseline in plain.go.
+func NameVersionBytes(cv Interface) ([]byte, error) {
+	stripped := &Components{}
+	for _, name := range cv.ComponentNames() {
+		version, _ := cv.FindComponentVersion(name)
+		stripped.Components = append(stripped.Components, &ComponentVector{Name: name, Version: version})
+	}
+	data, err := yaml.Marshal(stripped)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal component versions: %w", err)
+	}
+	return data, nil
+}
+
 // WriteComponentVectorFile writes the component vector file effectively used to the target directory if applicable.
 func WriteComponentVectorFile(fs afero.Afero, targetDirPath string, componentVector Interface) error {
 	var (
