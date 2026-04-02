@@ -16,6 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
@@ -59,7 +60,7 @@ var _ = Describe("Kustomization", func() {
 				}
 			)
 
-			Expect(WriteKustomizationComponent(objects, landscapeDir, componentDir, fs)).To(Succeed())
+			Expect(WriteKustomizationComponent(objects, landscapeDir, componentDir, fs, configv1alpha1.MergeModeSilent)).To(Succeed())
 
 			contents, err := fs.ReadFile(filepath.Join(landscapeDir, componentDir, "configmap.yaml"))
 			Expect(err).NotTo(HaveOccurred())

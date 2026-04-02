@@ -80,7 +80,7 @@ func writeBaseTemplateFiles(opts components.Options) error {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
 }
 
 func getTemplateValues(opts components.Options) (map[string]any, error) {
@@ -134,7 +134,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
 }
 
 func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvector.ComponentVector) (string, error) {

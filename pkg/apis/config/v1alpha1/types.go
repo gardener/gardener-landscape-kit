@@ -26,6 +26,10 @@ type LandscapeKitConfiguration struct {
 	// VersionConfig is the configuration for versioning.
 	// +optional
 	VersionConfig *VersionConfiguration `json:"versionConfig,omitempty"`
+	// MergeMode controls how operator overrides conflicting with updated GLK defaults are handled during three-way merge.
+	// Possible values are "Informative" (default) and "Silent".
+	// +optional
+	MergeMode *MergeMode `json:"mergeMode,omitempty"`
 }
 
 // ComponentsConfiguration contains configuration for components.
@@ -118,4 +122,29 @@ type VersionConfiguration struct {
 	// Possible values are "Disabled" (default) and "ReleaseBranch".
 	// +optional
 	DefaultVersionsUpdateStrategy *DefaultVersionsUpdateStrategy `json:"defaultVersionsUpdateStrategy,omitempty"`
+}
+
+// MergeMode controls how operator overrides are handled during three-way merge.
+type MergeMode string
+
+const (
+	// MergeModeInformative annotates operator-overridden values with a comment showing the current GLK default.
+	MergeModeInformative MergeMode = "Informative"
+	// MergeModeSilent retains operator overrides without annotation.
+	MergeModeSilent MergeMode = "Silent"
+)
+
+// AllowedMergeModes lists all allowed merge modes.
+var AllowedMergeModes = []string{
+	string(MergeModeInformative),
+	string(MergeModeSilent),
+}
+
+// GetMergeMode returns the configured MergeMode, defaulting to MergeModeInformative.
+// It is safe to call on a nil receiver.
+func (c *LandscapeKitConfiguration) GetMergeMode() MergeMode {
+	if c != nil && c.MergeMode != nil {
+		return *c.MergeMode
+	}
+	return MergeModeInformative
 }

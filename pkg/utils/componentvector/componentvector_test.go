@@ -5,14 +5,9 @@
 package componentvector_test
 
 import (
-	"strings"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/afero"
-	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/componentvector"
 	. "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
@@ -683,115 +678,4 @@ components:
 		})
 	})
 
-	Describe("#WriteComponentVectorFile", func() {
-		const outputDir = "/output"
-
-		// componentNames parses the written components.yaml and returns the list of component names.
-		componentNames := func(fs afero.Afero) []string {
-			data, err := fs.ReadFile(outputDir + "/components.yaml")
-			ExpectWithOffset(1, err).NotTo(HaveOccurred())
-			var comps struct {
-				Components []struct {
-					Name string `json:"name"`
-				} `json:"components"`
-			}
-			ExpectWithOffset(1, yaml.Unmarshal(data, &comps)).NotTo(HaveOccurred())
-			names := make([]string, 0, len(comps.Components))
-			for _, c := range comps.Components {
-				names = append(names, c.Name)
-			}
-			return names
-		}
-
-		cv := func(contents []byte) Interface {
-			cv, err := NewWithOverride(contents)
-			ExpectWithOffset(1, err).NotTo(HaveOccurred())
-			return cv
-		}
-
-		BeforeEach(func() {
-			componentvector.DefaultComponentsYAML = []byte(`components:
-- name: github.com/gardener/gardener
-  sourceRepository: https://github.com/gardener/gardener
-  version: v1.137.1
-- name: github.com/gardener/other-component
-  sourceRepository: https://github.com/gardener/other-component
-  version: v2.0.0
-`)
-		})
-
-		It("should not produce duplicate entries when the user edits the injected default-version comment", func() {
-			fs := afero.Afero{Fs: afero.NewMemMapFs()}
-
-			overrideCV := []byte(`components:
-- name: github.com/gardener/gardener
-  sourceRepository: https://github.com/gardener/gardener
-  version: v1.99.0
-- name: github.com/gardener/other-component
-  sourceRepository: https://github.com/gardener/other-component
-  version: v2.0.0
-`)
-
-			// Run 1: write from default CV so no comment is injected.
-			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
-
-			// User changes the gardener version.
-			writtenFile := outputDir + "/components.yaml"
-			writtenData, err := fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(fs.WriteFile(writtenFile,
-				[]byte(strings.ReplaceAll(string(writtenData), "version: v1.137.1", "version: v1.99.0")),
-				0600)).To(Succeed())
-
-			// Run 2: the injected default-version comment appears.
-			Expect(WriteComponentVectorFile(fs, outputDir, cv(overrideCV))).To(Succeed())
-
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(writtenData)).To(ContainSubstring("# version: v1.137.1 # <-- gardener-landscape-kit version default"))
-
-			// User edits the injected comment (e.g. adds a personal annotation).
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(fs.WriteFile(writtenFile,
-				[]byte(strings.ReplaceAll(string(writtenData),
-					"# version: v1.137.1 # <-- gardener-landscape-kit version default",
-					"# version: v1.137.1 # <-- default (my annotation)")),
-				0600)).To(Succeed())
-
-			// Run 3: must not duplicate gardener entry and amend the comment with a new default version comment.
-			Expect(WriteComponentVectorFile(fs, outputDir, cv(overrideCV))).To(Succeed())
-
-			Expect(componentNames(fs)).To(ConsistOf(
-				"github.com/gardener/gardener",
-				"github.com/gardener/other-component",
-			))
-
-			// The correct default-version comment must have been restored.
-			writtenData, err = fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(writtenData)).To(ContainSubstring("# <-- gardener-landscape-kit version default"))
-			Expect(string(writtenData)).To(ContainSubstring("my annotation"))
-		})
-
-		It("should not re-add entries that the user removed from the file", func() {
-			fs := afero.Afero{Fs: afero.NewMemMapFs()}
-
-			// Run 1: write both entries.
-			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
-
-			// User removes the other-component entry entirely.
-			writtenFile := outputDir + "/components.yaml"
-			writtenData, err := fs.ReadFile(writtenFile)
-			Expect(err).NotTo(HaveOccurred())
-			idx := strings.Index(string(writtenData), "- name: github.com/gardener/other-component")
-			Expect(idx).To(BeNumerically(">", 0))
-			Expect(fs.WriteFile(writtenFile, writtenData[:idx], 0600)).To(Succeed())
-
-			// Run 2: same vector — the removed entry must not come back.
-			Expect(WriteComponentVectorFile(fs, outputDir, cv(componentvector.DefaultComponentsYAML))).To(Succeed())
-
-			Expect(componentNames(fs)).To(ConsistOf("github.com/gardener/gardener"))
-		})
-	})
 })

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/afero"
 	"go.yaml.in/yaml/v4"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
@@ -68,7 +69,7 @@ var _ = Describe("YAML Preprocessing", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fs.WriteFile("/landscape/manifest/test.yaml", testFile, 0600)).To(Succeed())
-				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": {}}, "/landscape", "manifest", fs)).To(Succeed())
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": {}}, "/landscape", "manifest", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
 
 				content, err := fs.ReadFile("/landscape/manifest/test.yaml")
 				Expect(err).ToNot(HaveOccurred())
@@ -82,7 +83,7 @@ var _ = Describe("YAML Preprocessing", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fs.WriteFile("/landscape/manifest/test.yaml", testFile, 0600)).To(Succeed())
-				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": {}}, "/landscape", "manifest", fs)).To(Succeed())
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": {}}, "/landscape", "manifest", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
 
 				content, err := fs.ReadFile("/landscape/manifest/test.yaml")
 				Expect(err).ToNot(HaveOccurred())
