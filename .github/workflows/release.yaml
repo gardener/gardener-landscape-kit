@@ -33,6 +33,7 @@ jobs:
     with:
       release-commit-target: branch
       next-version: ${{ inputs.next-version }}
+      next-version-callback-action-path: .github/actions/prepare-release
       assets: |
         - name: gardener-landscape-kit-darwin-amd64
           type: ocm-resource
