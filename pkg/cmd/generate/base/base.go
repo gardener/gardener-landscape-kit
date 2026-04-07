@@ -56,6 +56,10 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to register components: %w", err)
 	}
 
+	if err := version.CheckGLKComponentVersion(componentOpts.GetComponentVector()); err != nil {
+		return fmt.Errorf("version check failed: %w", err)
+	}
+
 	if err := reg.GenerateBase(componentOpts); err != nil {
 		return err
 	}

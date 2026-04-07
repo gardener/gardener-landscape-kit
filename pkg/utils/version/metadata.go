@@ -16,6 +16,8 @@ import (
 	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	componentbaseversion "k8s.io/component-base/version"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -137,6 +139,23 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 	}
 
 	return ValidateVersionCompatibility(baseMetadata.Version, version.GitVersion)
+}
+
+// CheckGLKComponentVersion validates that the tool version matches the gardener-landscape-kit
+// component version in the component vector. Returns an error if they don't match exactly.
+func CheckGLKComponentVersion(cv utilscomponentvector.Interface) error {
+	toolVersion := version.GitVersion
+	componentVersion, found := cv.FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
+
+	if !found {
+		return fmt.Errorf("gardener-landscape-kit component not found in component vector - this should not happen as it's part of the default component vector")
+	}
+
+	if toolVersion != componentVersion {
+		return fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscap-kit version or adjust the component vector", toolVersion, componentVersion)
+	}
+
+	return nil
 }
 
 // Get returns the version of GLK.

@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
 
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
@@ -229,6 +230,85 @@ var _ = Describe("Version Metadata", func() {
 
 			err = version.ValidateLandscapeVersionCompatibility(targetPath, fs)
 			Expect(err).To(MatchError(ContainSubstring("is newer than base generation version")))
+		})
+	})
+
+	Describe("#CheckGLKComponentVersion", func() {
+		It("should pass when versions match exactly", func() {
+			// Get the current tool version
+			currentVersion := version.Get().GitVersion
+
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: ` + currentVersion + `
+`)
+			cv, err := componentvector.NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = version.CheckGLKComponentVersion(cv)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should fail when tool version is different from component version", func() {
+			currentVersion := version.Get().GitVersion
+			differentVersion := "v0.99.99-test"
+
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: ` + differentVersion + `
+`)
+			cv, err := componentvector.NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = version.CheckGLKComponentVersion(cv)
+			Expect(err).To(MatchError(And(
+				ContainSubstring("version mismatch"),
+				ContainSubstring(currentVersion),
+				ContainSubstring(differentVersion),
+			)))
+		})
+
+		It("should fail when GLK component is not found", func() {
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/other-component
+    sourceRepository: https://github.com/gardener/other-component
+    version: v1.0.0
+`)
+			cv, err := componentvector.NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = version.CheckGLKComponentVersion(cv)
+			Expect(err).To(MatchError(ContainSubstring("gardener-landscape-kit component not found")))
+		})
+
+		It("should use exact string matching (not semantic versioning)", func() {
+			currentVersion := version.Get().GitVersion
+
+			// If current is v0.2.0-dev, test with v0.2.0 (different string, semantically related)
+			var differentButRelated string
+			if currentVersion == "v0.2.0-dev" {
+				differentButRelated = "v0.2.0"
+			} else {
+				differentButRelated = currentVersion + "-modified"
+			}
+
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: ` + differentButRelated + `
+`)
+			cv, err := componentvector.NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = version.CheckGLKComponentVersion(cv)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("version mismatch"))
 		})
 	})
 })
