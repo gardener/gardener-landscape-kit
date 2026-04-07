@@ -12,11 +12,13 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	componentbaseversion "k8s.io/component-base/version"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
@@ -142,8 +144,11 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 }
 
 // CheckGLKComponentVersion validates that the tool version matches the gardener-landscape-kit
-// component version in the component vector. Returns an error if they don't match exactly.
-func CheckGLKComponentVersion(cv utilscomponentvector.Interface) error {
+// component version in the component vector.
+// The behavior depends on the checkMode in the configuration:
+// - If checkMode is "Strict" (or nil/default), returns an error on mismatch.
+// - If checkMode is "Warning", logs a warning on mismatch and returns nil.
+func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv1alpha1.LandscapeKitConfiguration, log logr.Logger) error {
 	toolVersion := version.GitVersion
 	componentVersion, found := cv.FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
 
@@ -152,7 +157,18 @@ func CheckGLKComponentVersion(cv utilscomponentvector.Interface) error {
 	}
 
 	if toolVersion != componentVersion {
-		return fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscap-kit version or adjust the component vector", toolVersion, componentVersion)
+		// Determine the check mode (default to Strict)
+		checkMode := configv1alpha1.VersionCheckModeStrict
+		if config != nil && config.VersionConfig != nil && config.VersionConfig.CheckMode != nil {
+			checkMode = *config.VersionConfig.CheckMode
+		}
+
+		if checkMode == configv1alpha1.VersionCheckModeWarning {
+			log.Info("WARNING: version mismatch - tool version does not match gardener-landscape-kit component version in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", "toolVersion", toolVersion, "componentVersion", componentVersion)
+			return nil
+		}
+
+		return fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
 	}
 
 	return nil
