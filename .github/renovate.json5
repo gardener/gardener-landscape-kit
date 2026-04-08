@@ -4,6 +4,7 @@
     'github>gardener/gardener//.github/renovate.json5',
     'github>gardener/ci-infra//config/renovate/group-go-updates.json5',
   ],
+  labels: ['kind/enhancement'],
   postUpgradeTasks: {
     commands: ['make generate MODE=sequential'],
     fileFilters: ['.github/**', 'pkg/**', 'docs/**'],
