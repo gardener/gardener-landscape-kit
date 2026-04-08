@@ -24,7 +24,7 @@ services:
       kind:
   glk-registry:
     container_name: glk-registry
-    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0
+    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.0
     restart: unless-stopped
     ports:
       - "6001:5001"
@@ -37,7 +37,7 @@ services:
           - glk-registry.local.gardener.cloud
   glk-registry-cache-gcr:
     container_name: glk-registry-cache-gcr
-    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0
+    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.0
     restart: unless-stopped
     environment:
       REGISTRY_PROXY_REMOTEURL: https://gcr.io
@@ -50,7 +50,7 @@ services:
           - gcr.registry-cache.local.gardener.cloud
   glk-registry-cache-k8s:
     container_name: glk-registry-cache-k8s
-    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0
+    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.0
     restart: unless-stopped
     environment:
       REGISTRY_PROXY_REMOTEURL: https://registry.k8s.io
@@ -63,7 +63,7 @@ services:
           - k8s.registry-cache.local.gardener.cloud
   glk-registry-cache-quay:
     container_name: glk-registry-cache-quay
-    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0
+    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.0
     restart: unless-stopped
     environment:
       REGISTRY_PROXY_REMOTEURL: https://quay.io
@@ -76,7 +76,7 @@ services:
           - quay.registry-cache.local.gardener.cloud
   glk-registry-cache-europe-docker-pkg-dev:
     container_name: glk-registry-cache-europe-docker-pkg-dev
-    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.0.0
+    image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.0
     restart: unless-stopped
     environment:
       REGISTRY_PROXY_REMOTEURL: https://europe-docker.pkg.dev
