@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/component-base/version"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
 // NewCommand creates a new cobra.Command.
