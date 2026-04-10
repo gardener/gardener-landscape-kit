@@ -163,12 +163,14 @@ func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv
 			checkMode = *config.VersionConfig.CheckMode
 		}
 
+		err := fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
+
 		if checkMode == configv1alpha1.VersionCheckModeWarning {
-			log.Info("WARNING: version mismatch - tool version does not match gardener-landscape-kit component version in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", "toolVersion", toolVersion, "componentVersion", componentVersion)
+			log.Error(err, "Precheck failed")
 			return nil
 		}
 
-		return fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
+		return err
 	}
 
 	return nil

@@ -40,7 +40,7 @@ GLK_COMPONENT_NAME="github.com/gardener/gardener-landscape-kit"
 REPO_URL="https://$GLK_COMPONENT_NAME"
 
 # Check if the GLK component already exists in the file
-if yq eval ".components[] | select(.name == \"$GLK_COMPONENT_NAME\") | .name" "$COMPONENTS_FILE" | grep -q "$GLK_COMPONENT_NAME"; then
+if [[ $(yq eval '[.components[] | select(.name == "'"$GLK_COMPONENT_NAME"'")] | length' "$COMPONENTS_FILE") -gt 0 ]]; then
   # Component exists - update its version
   yq eval -i --indent 2 -c "(.components[] | select(.name == \"$GLK_COMPONENT_NAME\") | .version) = \"$VERSION\"" "$COMPONENTS_FILE"
   echo "Updated $GLK_COMPONENT_NAME component version to $VERSION"
