@@ -9,8 +9,8 @@ require (
 	github.com/fluxcd/kustomize-controller/api v1.8.3
 	github.com/fluxcd/pkg/apis/meta v1.26.0
 	github.com/fluxcd/source-controller/api v1.8.2
-	github.com/gardener/gardener v1.139.1
-	github.com/gardener/gardener/pkg/apis v1.139.1
+	github.com/gardener/gardener v1.140.0
+	github.com/gardener/gardener/pkg/apis v1.140.0
 	github.com/go-logr/logr v1.4.3
 	github.com/go-sprout/sprout v1.0.3
 	github.com/onsi/ginkgo/v2 v2.28.1
@@ -53,7 +53,7 @@ require (
 	github.com/VictoriaMetrics/metrics v1.40.2 // indirect
 	github.com/VictoriaMetrics/metricsql v0.84.8 // indirect
 	github.com/VictoriaMetrics/operator/api v0.66.1 // indirect
-	github.com/andybalholm/brotli v1.2.0 // indirect
+	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.39.6 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.31.17 // indirect
@@ -89,7 +89,7 @@ require (
 	github.com/gardener/etcd-druid/api v0.36.1 // indirect
 	github.com/gardener/machine-controller-manager v0.61.3 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.3.0 // indirect
 	github.com/go-openapi/errors v0.22.6 // indirect
@@ -223,12 +223,12 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	helm.sh/helm/v3 v3.20.1 // indirect
-	istio.io/api v1.27.8 // indirect
-	istio.io/client-go v1.27.2 // indirect
+	istio.io/api v1.29.1 // indirect
+	istio.io/client-go v1.29.1 // indirect
 	k8s.io/apiextensions-apiserver v0.35.3 // indirect
-	k8s.io/autoscaler/vertical-pod-autoscaler v1.5.1 // indirect
+	k8s.io/autoscaler/vertical-pod-autoscaler v1.6.0 // indirect
 	k8s.io/gengo v0.0.0-20230829151522-9cce18d56c01 // indirect
-	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
+	k8s.io/gengo/v2 v2.0.0-20251215205346-5ee0d033ba5b // indirect
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-aggregator v0.35.3 // indirect
