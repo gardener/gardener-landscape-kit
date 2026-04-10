@@ -140,22 +140,20 @@ spec:
 				Not(ContainSubstring(`# SECURITY ADVISORY`)),
 			))
 		})
-	})
 
-	Describe("#WriteObjectsToFilesystem - MergeModeInformative", func() {
-		It("should annotate operator-overridden scalar values with the GLK default and preserve user comments idempotently", func() {
-			initial := []byte(`apiVersion: v1
+		DescribeTable("should annotate operator-overwritten values only in Informative mode",
+			func(mode configv1alpha1.MergeMode, expectAnnotation bool) {
+				initial := []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
 data:
   version: v1.0.0
 `)
-			// First generate: establish defaults
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "manifest", fs, mode)).To(Succeed())
 
-			// Operator pins to a custom version with a comment explaining why
-			Expect(fs.WriteFile("/landscape/manifest/test.yaml", []byte(`apiVersion: v1
+				// Operator pins to a custom version with a comment explaining why
+				Expect(fs.WriteFile("/landscape/manifest/test.yaml", []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
@@ -163,46 +161,50 @@ data:
   version: v1.0.5 # pinned for production
 `), 0600)).To(Succeed())
 
-			// GLK ships a new default with a newer version
-			updated := []byte(`apiVersion: v1
+				// GLK ships a new default with a newer version
+				updated := []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
 data:
   version: v1.1.0
 `)
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "manifest", fs, mode)).To(Succeed())
 
-			content, err := fs.ReadFile("/landscape/manifest/test.yaml")
-			Expect(err).NotTo(HaveOccurred())
-			// Operator's override is preserved
-			Expect(string(content)).To(ContainSubstring("version: v1.0.5"))
-			// User comment is preserved
-			Expect(string(content)).To(ContainSubstring("pinned for production"))
-			// GLK default annotation is added
-			Expect(string(content)).To(ContainSubstring("# glk default: v1.1.0"))
-			Expect(string(content)).To(ContainSubstring(meta.GLKManagedMarker))
+				content, err := fs.ReadFile("/landscape/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("version: v1.0.5"))
+				Expect(string(content)).To(ContainSubstring("pinned for production"))
 
-			// Re-run with the same inputs — annotation and user comment must not be doubled
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				if expectAnnotation {
+					Expect(string(content)).To(ContainSubstring(meta.GLKDefaultPrefix + "v1.1.0"))
 
-			content2, err := fs.ReadFile("/landscape/manifest/test.yaml")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content2)).To(Equal(string(content)))
-		})
+					// Re-run with the same default — annotation persists because the user did not remove it.
+					Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "manifest", fs, mode)).To(Succeed())
+					content2, err := fs.ReadFile("/landscape/manifest/test.yaml")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(string(content2)).To(Equal(string(content)))
+				} else {
+					Expect(string(content)).NotTo(ContainSubstring(meta.GLKDefaultPrefix))
+				}
+			},
+			Entry("Silent", configv1alpha1.MergeModeSilent, false),
+			Entry("Informative", configv1alpha1.MergeModeInformative, true),
+		)
 
-		It("should remove the annotation entirely when the GLK default reverts to the operator's value", func() {
-			initial := []byte(`apiVersion: v1
+		Context("MergeMode Informative", func() {
+			It("should not re-add the annotation after the user removed it, until the default changes again", func() {
+				initial := []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
 data:
   version: v1.0.0
 `)
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
 
-			// Operator pins to v1.0.5
-			Expect(fs.WriteFile("/landscape/revert/test.yaml", []byte(`apiVersion: v1
+				// Operator pins to v1.0.5
+				Expect(fs.WriteFile("/landscape/manifest/test.yaml", []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
@@ -210,32 +212,96 @@ data:
   version: v1.0.5
 `), 0600)).To(Succeed())
 
-			// GLK ships v1.1.0 — annotation appears
-			updated := []byte(`apiVersion: v1
+				// GLK ships v1.1.0 — annotation appears
+				v110 := []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
 data:
   version: v1.1.0
 `)
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
-			content, err := fs.ReadFile("/landscape/revert/test.yaml")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).To(ContainSubstring(meta.GLKManagedMarker))
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": v110}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				content, err := fs.ReadFile("/landscape/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring(meta.GLKDefaultPrefix))
 
-			// GLK reverts to v1.0.5 — operator's value now matches the default, no annotation
-			reverted := []byte(`apiVersion: v1
+				// User acknowledges the annotation and removes it manually
+				Expect(fs.WriteFile("/landscape/manifest/test.yaml", []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test
+data:
+  version: v1.0.5
+`), 0600)).To(Succeed())
+
+				// Re-run with the same default — annotation stays removed
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": v110}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				content, err = fs.ReadFile("/landscape/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("version: v1.0.5"))
+				Expect(string(content)).NotTo(ContainSubstring(meta.GLKDefaultPrefix))
+
+				// GLK ships v1.2.0 — annotation re-appears because the default changed
+				v120 := []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test
+data:
+  version: v1.2.0
+`)
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": v120}, "/landscape", "manifest", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				content, err = fs.ReadFile("/landscape/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("version: v1.0.5"))
+				Expect(string(content)).To(ContainSubstring(meta.GLKDefaultPrefix + "v1.2.0"))
+			})
+
+			It("should remove the annotation entirely when the GLK default reverts to the operator's value", func() {
+				initial := []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test
+data:
+  version: v1.0.0
+`)
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+
+				// Operator pins to v1.0.5
+				Expect(fs.WriteFile("/landscape/revert/test.yaml", []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test
+data:
+  version: v1.0.5
+`), 0600)).To(Succeed())
+
+				// GLK ships v1.1.0 — annotation appears
+				updated := []byte(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test
+data:
+  version: v1.1.0
+`)
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				content, err := fs.ReadFile("/landscape/revert/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring(meta.GLKDefaultPrefix))
+
+				// GLK reverts to v1.0.5 — operator's value now matches the default, no annotation
+				reverted := []byte(`apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test
 data:
   version: v1.0.5
 `)
-			Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": reverted}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
-			content, err = fs.ReadFile("/landscape/revert/test.yaml")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(content)).NotTo(ContainSubstring(meta.GLKManagedMarker))
-			Expect(string(content)).NotTo(ContainSubstring("# glk default:"))
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"test.yaml": reverted}, "/landscape", "revert", fs, configv1alpha1.MergeModeInformative)).To(Succeed())
+				content, err = fs.ReadFile("/landscape/revert/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).NotTo(ContainSubstring(meta.GLKDefaultPrefix))
+				Expect(string(content)).NotTo(ContainSubstring("# Attention - new default:"))
+			})
 		})
 	})
 

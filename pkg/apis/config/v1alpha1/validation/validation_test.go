@@ -324,7 +324,7 @@ var _ = Describe("Validation", func() {
 				errList := validation.ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":     Equal(field.ErrorTypeInvalid),
+						"Type":     Equal(field.ErrorTypeNotSupported),
 						"Field":    Equal("mergeMode"),
 						"BadValue": Equal(invalid),
 					})),

@@ -277,14 +277,13 @@ data:
 			result, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeInformative)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(result)).To(ContainSubstring("version: v1.0.5"))
-			Expect(string(result)).To(ContainSubstring("# glk default: v1.1.0"))
-			Expect(string(result)).To(ContainSubstring(meta.GLKManagedMarker))
+			Expect(string(result)).To(ContainSubstring("# Attention - new default: v1.1.0"))
 
 			// No conflict: operator did not change the value → new default taken silently, no annotation
 			result, err = meta.ThreeWayMergeManifest(oldDefault, newDefault, oldDefault, configv1alpha1.MergeModeInformative)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(result)).To(ContainSubstring("version: v1.1.0"))
-			Expect(string(result)).NotTo(ContainSubstring(meta.GLKManagedMarker))
+			Expect(string(result)).NotTo(ContainSubstring(meta.GLKDefaultPrefix))
 		})
 	})
 })

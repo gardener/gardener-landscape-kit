@@ -36,7 +36,7 @@ type Options interface {
 	GetFilesystem() afero.Afero
 	// GetLogger returns the logger instance.
 	GetLogger() logr.Logger
-	// GetMergeMode returns the configured merge mode for three-way merges.
+	// GetMergeMode returns the configured mode to solve merge conflicts.
 	GetMergeMode() configv1alpha1.MergeMode
 }
 

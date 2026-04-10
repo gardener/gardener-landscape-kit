@@ -5,20 +5,53 @@
 package meta
 
 import (
+	"strings"
+
 	"go.yaml.in/yaml/v4"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 )
 
 const (
-	// GLKManagedMarker is the suffix that marks a comment as GLK-managed.
-	// It is used to strip GLK-owned annotations before re-running the merge (idempotency).
-	GLKManagedMarker = "# <-- glk-managed"
-
 	// GLKDefaultPrefix is the comment prefix for GLK-managed default annotations.
 	// It is exported so callers can use it as the strip anchor when removing annotations.
-	GLKDefaultPrefix = "# glk default: "
+	GLKDefaultPrefix = "# Attention - new default: "
 )
+
+// stripGLKAnnotation removes a GLK-managed annotation from a single comment string.
+// If the annotation is part of a multi-line comment, only the annotation line is removed.
+// If the annotation is appended to a value's line comment (e.g. "# user note  # Attention …"), the prefix and everything after it is stripped.
+func stripGLKAnnotation(comment string) string {
+	if !strings.Contains(comment, GLKDefaultPrefix) {
+		return comment
+	}
+	lines := strings.Split(comment, "\n")
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		idx := strings.Index(line, GLKDefaultPrefix)
+		if idx < 0 {
+			out = append(out, line)
+			continue
+		}
+		stripped := strings.TrimRight(line[:idx], " \t")
+		if stripped != "" {
+			out = append(out, stripped)
+		}
+	}
+	return strings.Join(out, "\n")
+}
+
+// stripGLKAnnotations removes GLK-managed annotations from all comment fields of a node.
+func stripGLKAnnotations(nodes ...*yaml.Node) {
+	for _, n := range nodes {
+		if n == nil {
+			continue
+		}
+		n.HeadComment = stripGLKAnnotation(n.HeadComment)
+		n.LineComment = stripGLKAnnotation(n.LineComment)
+		n.FootComment = stripGLKAnnotation(n.FootComment)
+	}
+}
 
 // threeWayMergeSection performs a three-way merge on a single YAML section
 func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte, mode configv1alpha1.MergeMode) ([]byte, error) {
@@ -127,16 +160,21 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alph
 				// Both default and current changed: keep current (user's value wins).
 				resultValue = currentValue
 				mergeNodeComments(oldValue, newValueNode, resultValue)
-				if mode == configv1alpha1.MergeModeInformative && !nodesEqual(newValueNode, currentValue, false) {
-					annotateConflict(resultKeyNode, resultValue, newValueNode)
+				if mode == configv1alpha1.MergeModeInformative {
+					if !nodesEqual(newValueNode, currentValue, false) {
+						annotateConflict(resultKeyNode, resultValue, newValueNode)
+					} else {
+						// Values converged — strip any lingering GLK annotation.
+						stripGLKAnnotations(resultKeyNode, resultValue)
+					}
 				}
 			default:
 				resultValue = currentValue
 				if oldExists {
 					mergeNodeComments(oldValue, newValueNode, resultValue)
-					if mode == configv1alpha1.MergeModeInformative && !nodesEqual(newValueNode, currentValue, false) {
-						// The operator's value differs from the current GLK default: annotate it.
-						annotateConflict(resultKeyNode, resultValue, newValueNode)
+					if mode == configv1alpha1.MergeModeInformative && nodesEqual(newValueNode, currentValue, false) {
+						// Values converged — strip any lingering GLK annotation.
+						stripGLKAnnotations(resultKeyNode, resultValue)
 					}
 				}
 			}
@@ -183,12 +221,12 @@ func annotateConflict(resultKeyNode, resultValue, newDefaultNode *yaml.Node) {
 
 // glkManagedLineComment returns a GLK-managed line comment for a scalar value conflict.
 func glkManagedLineComment(newValue string) string {
-	return GLKDefaultPrefix + newValue + "  " + GLKManagedMarker
+	return GLKDefaultPrefix + newValue
 }
 
 // glkManagedHeadComment returns a GLK-managed head comment for a complex node conflict.
 func glkManagedHeadComment(existingHead string) string {
-	annotation := GLKDefaultPrefix + "(complex node changed)  " + GLKManagedMarker
+	annotation := GLKDefaultPrefix + "(complex node changed)"
 	if existingHead == "" {
 		return annotation
 	}
@@ -306,7 +344,19 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node, mode conf
 		return result
 	}
 
-	// No identity key: fall back to full-string set-based merge.
+	// No identity key found.
+	// When all three sequences have the same length and all items are mappings,
+	// match items by position and three-way merge each pair. This handles cases
+	// where list items are modified but their count and order stay the same
+	// (e.g., a single scalar field in a mapping item is changed).
+	if len(oldDefault.Content) == len(newDefault.Content) && len(newDefault.Content) == len(current.Content) && allMappings(oldDefault, newDefault, current) {
+		for i := range current.Content {
+			result.Content = append(result.Content, threeWayMerge(oldDefault.Content[i], newDefault.Content[i], current.Content[i], mode))
+		}
+		return result
+	}
+
+	// Fall back to full-string set-based merge.
 	oldSet := make(map[string]bool)
 	for _, item := range oldDefault.Content {
 		oldSet[nodeToString(item)] = true
@@ -397,4 +447,16 @@ func mappingValue(node *yaml.Node, key string) string {
 		}
 	}
 	return ""
+}
+
+// allMappings reports whether every item in each of the given sequences is a mapping node.
+func allMappings(seqs ...*yaml.Node) bool {
+	for _, seq := range seqs {
+		for _, item := range seq.Content {
+			if item.Kind != yaml.MappingNode {
+				return false
+			}
+		}
+	}
+	return true
 }
