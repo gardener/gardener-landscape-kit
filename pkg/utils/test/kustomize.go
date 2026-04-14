@@ -118,6 +118,7 @@ func KustomizeComponent(
 			},
 		}
 	)
+	v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
 
 	baseOpts, err := components.NewOptions(generateOpts, fs)
 	if err != nil {

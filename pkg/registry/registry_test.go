@@ -35,10 +35,14 @@ var _ = Describe("Registry", func() {
 		config = &v1alpha1.LandscapeKitConfiguration{
 			Git: &v1alpha1.GitRepository{},
 		}
+		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
 
 		var err error
 		options, err = components.NewOptions(
-			&generateoptions.Options{Options: &cmd.Options{Log: logr.Discard()}},
+			&generateoptions.Options{
+				Options: &cmd.Options{Log: logr.Discard()},
+				Config:  config,
+			},
 			afero.Afero{Fs: afero.NewMemMapFs()},
 		)
 		Expect(err).NotTo(HaveOccurred())

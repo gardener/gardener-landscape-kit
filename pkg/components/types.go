@@ -127,7 +127,7 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 		targetPath:      path.Clean(opts.TargetDirPath),
 		filesystem:      fs,
 		logger:          opts.Log,
-		mergeMode:       opts.Config.GetMergeMode(),
+		mergeMode:       *opts.Config.MergeMode,
 	}, nil
 }
 

@@ -54,6 +54,16 @@ var _ = Describe("Flux Component Generation", func() {
 
 		fs = afero.Afero{Fs: afero.NewMemMapFs()}
 
+		config := &v1alpha1.LandscapeKitConfiguration{
+			Git: &v1alpha1.GitRepository{
+				URL: repoURL,
+				Paths: v1alpha1.PathConfiguration{
+					Landscape: relativeLandscapePath,
+				},
+			},
+		}
+		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
+
 		var err error
 		opts, err = components.NewLandscapeOptions(
 			&generateoptions.Options{
@@ -61,14 +71,7 @@ var _ = Describe("Flux Component Generation", func() {
 					Log: logr.Discard(),
 				},
 				TargetDirPath: targetPath,
-				Config: &v1alpha1.LandscapeKitConfiguration{
-					Git: &v1alpha1.GitRepository{
-						URL: repoURL,
-						Paths: v1alpha1.PathConfiguration{
-							Landscape: relativeLandscapePath,
-						},
-					},
-				},
+				Config:        config,
 			},
 			fs,
 		)

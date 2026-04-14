@@ -110,7 +110,7 @@ func (o *Options) loadConfigFile(filename string) error {
 
 func run(_ context.Context, opts *Options) error {
 	if opts.Config != nil && opts.Config.VersionConfig != nil {
-		if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == configv1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
+		if *opts.Config.VersionConfig.DefaultVersionsUpdateStrategy == configv1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
 			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
 			var err error
 			// The componentvector.DefaultComponentsYAML is intentionally overridden, so that subsequently it can be used to extract the updated default component vector versions.
@@ -142,7 +142,7 @@ func run(_ context.Context, opts *Options) error {
 	}, "\n") + "\n")
 	newDefaultBytes = append(header, newDefaultBytes...)
 
-	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs, opts.Config.GetMergeMode()); err != nil {
+	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs, *opts.Config.MergeMode); err != nil {
 		return fmt.Errorf("failed to write updated component vector: %w", err)
 	}
 

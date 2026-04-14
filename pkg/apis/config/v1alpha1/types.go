@@ -140,11 +140,3 @@ var AllowedMergeModes = []string{
 	string(MergeModeInformative),
 	string(MergeModeSilent),
 }
-
-// GetMergeMode returns the configured MergeMode, defaulting to MergeModeInformative.
-func (c *LandscapeKitConfiguration) GetMergeMode() MergeMode {
-	if c == nil || c.MergeMode == nil {
-		return MergeModeInformative
-	}
-	return *c.MergeMode
-}

@@ -81,11 +81,15 @@ var _ = Describe("Kustomization", func() {
 		BeforeEach(func() {
 			fs = afero.Afero{Fs: afero.NewMemMapFs()}
 
+			config := &configv1alpha1.LandscapeKitConfiguration{}
+			configv1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
+
 			var err error
 			opts, err = components.NewOptions(&generateoptions.Options{
 				Options: &cmd.Options{
 					Log: logr.Discard(),
 				},
+				Config:        config,
 				TargetDirPath: "/absolute/path/with/../to/repo/landscape",
 			}, fs)
 			Expect(err).NotTo(HaveOccurred())
