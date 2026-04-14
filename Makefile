@@ -58,7 +58,7 @@ generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./componentvector/... ./pkg/...
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-github-templates.sh
-	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/generate-renovate-ignore-deps.sh
+	@ARRAY_KEY=matchPackageNames NEEDLE='// GENERATOR-PIN' GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) RENOVATE_CONFIG=$(REPO_ROOT)/.github/renovate.json5 bash $(GARDENER_HACK_DIR)/generate-renovate-ignore-deps.sh
 	$(MAKE) format
 
 .PHONY: check
