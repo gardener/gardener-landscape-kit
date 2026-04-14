@@ -28,12 +28,12 @@ func stripGLKAnnotation(comment string) string {
 	lines := strings.Split(comment, "\n")
 	out := make([]string, 0, len(lines))
 	for _, line := range lines {
-		idx := strings.Index(line, GLKDefaultPrefix)
-		if idx < 0 {
+		before, _, found := strings.Cut(line, GLKDefaultPrefix)
+		if !found {
 			out = append(out, line)
 			continue
 		}
-		stripped := strings.TrimRight(line[:idx], " \t")
+		stripped := strings.TrimRight(before, " \t")
 		if stripped != "" {
 			out = append(out, stripped)
 		}
@@ -209,12 +209,16 @@ func annotateConflict(resultKeyNode, resultValue, newDefaultNode *yaml.Node) {
 	switch newDefaultNode.Kind {
 	case yaml.ScalarNode:
 		annotation := glkManagedLineComment(newDefaultNode.Value)
-		if resultValue.LineComment != "" {
-			resultValue.LineComment = resultValue.LineComment + "  " + annotation
+		// Strip any pre-existing GLK annotation before appending the current one, so repeated runs replace rather than accumulate the comment.
+		stripped := stripGLKAnnotation(resultValue.LineComment)
+		if stripped != "" {
+			resultValue.LineComment = stripped + "  " + annotation
 		} else {
 			resultValue.LineComment = annotation
 		}
 	default:
+		// Strip existing GLK annotation from head comment before re-annotating.
+		resultKeyNode.HeadComment = stripGLKAnnotation(resultKeyNode.HeadComment)
 		resultKeyNode.HeadComment = glkManagedHeadComment(resultKeyNode.HeadComment)
 	}
 }
