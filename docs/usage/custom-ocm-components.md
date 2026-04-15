@@ -9,7 +9,7 @@ But if your component is backed by an OCM component descriptor, you can benefit 
 
 1. The component directory contains a file named `component-name` containing the OCM component name (e.g. `my.private-github.com/gardener/my-gardener-extension`).
 2. The custom component must be included in the OCM descriptor tree. This means it must be referenced by the root component descriptor or any component referenced directly or indirectly.
-3. The component directory contains template files with suffix `.template` (e.g. `my-extension-deployment.yaml.template`). It can reference values for resources or image vector overrides as extracted from the OCM component descriptor.
+3. The component directory contains template files with suffix `.tpl` (e.g. `my-extension-deployment.yaml.tpl`). It can reference values for resources or image vector overrides as extracted from the OCM component descriptor.
 
 ### How it works
 
@@ -43,7 +43,7 @@ ocm:
 ```
 components/my-gardener-extension
   ├── component-name
-  ├── my-extension-deployment.yaml.template
+  ├── my-extension-deployment.yaml.tpl
   ├── kustomization.yaml
   ...
 ```
@@ -60,7 +60,7 @@ glk resolve ocm -c landscapekitconfiguration.yaml --target-dir /path/to/landscap
 
 4. Make use of the extracted resource information stored in the file `ocm-components.yaml`.
 
-If your component is a gardener extension, the `my-extension-deployment.yaml.template` may look like this:
+If your component is a gardener extension, the `my-extension-deployment.yaml.tpl` may look like this:
 ```yaml
 apiVersion: operator.gardener.cloud/v1alpha1
 kind: Extension

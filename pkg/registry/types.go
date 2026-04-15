@@ -19,6 +19,8 @@ import (
 const (
 	// CustomComponentNameFilename is the filename containing a custom OCM component name.
 	CustomComponentNameFilename = "component-name"
+	// TemplateSuffix is the file extension used to identify custom component template files.
+	TemplateSuffix = ".tpl"
 )
 
 // Interface is the interface for a component registry.
@@ -92,7 +94,7 @@ func (r *registry) renderCustomComponents(ocmComponentName, componentDir string,
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || !strings.HasSuffix(info.Name(), ".template") {
+		if info.IsDir() || !strings.HasSuffix(info.Name(), TemplateSuffix) {
 			return nil
 		}
 		content, err := opts.GetFilesystem().ReadFile(path)
@@ -107,7 +109,7 @@ func (r *registry) renderCustomComponents(ocmComponentName, componentDir string,
 		if err != nil {
 			return fmt.Errorf("error rendering template file %s for custom component %s: %w", path, ocmComponentName, err)
 		}
-		targetFile := strings.TrimSuffix(path, ".template")
+		targetFile := strings.TrimSuffix(path, TemplateSuffix)
 		if err := opts.GetFilesystem().WriteFile(targetFile, renderedContent, 0600); err != nil {
 			return fmt.Errorf("error writing rendered template file %s for custom component %s: %w", targetFile, ocmComponentName, err)
 		}
