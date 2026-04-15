@@ -28,10 +28,10 @@ import (
 )
 
 const (
-	// GlkOcmRegUsernameEnvKey is the environment variable for the OCI registry username.
-	GlkOcmRegUsernameEnvKey = "GLK_OCM_REG_USERNAME"
-	// GlkOcmRegPasswordEnvKey is the environment variable for the OCI registry password or token.
-	GlkOcmRegPasswordEnvKey = "GLK_OCM_REG_PASSWORD" // #nosec: G101 -- just the env var name, not the value
+	// GlkOCMRegUsernameEnvKey is the environment variable for the OCI registry username.
+	GlkOCMRegUsernameEnvKey = "GLK_OCM_REG_USERNAME"
+	// GlkOCMRegPasswordEnvKey is the environment variable for the OCI registry password or token.
+	GlkOCMRegPasswordEnvKey = "GLK_OCM_REG_PASSWORD" // #nosec: G101 -- just the env var name, not the value
 
 	userAgentPrefix = "gardener-landscape-kit/"
 )
@@ -63,8 +63,8 @@ func NewRepoAccess(repositoryURL string) (*RepoAccess, error) {
 		return nil, fmt.Errorf("failed to create URL resolver: %w", err)
 	}
 
-	user := os.Getenv(GlkOcmRegUsernameEnvKey)
-	password := os.Getenv(GlkOcmRegPasswordEnvKey)
+	user := os.Getenv(GlkOCMRegUsernameEnvKey)
+	password := os.Getenv(GlkOCMRegPasswordEnvKey)
 	resolver.SetClient(CreateAuthClient(repositoryURL, user, password))
 
 	logOutput := &bytes.Buffer{}
