@@ -25,10 +25,10 @@ GLK needs two steps to extract and use the information from the OCM component de
 
 To access private OCI registries, GLK reads credentials from two environment variables:
 
-| Variable | Description |
-|---|---|
-| `GLK_OCM_REG_USERNAME` | Registry username |
-| `GLK_OCM_REG_PASSWORD` | Registry password or token |
+| Variable               | Description                |
+|------------------------|----------------------------|
+| `GLK_OCI_REG_USERNAME` | Registry username          |
+| `GLK_OCI_REG_PASSWORD` | Registry password or token |
 
 Both variables must be set to access private registries. Without them, only anonymous access is attempted.
 
@@ -37,7 +37,7 @@ Both variables must be set to access private registries. Without them, only anon
 ```bash
 # Authenticate with gcloud and export credentials for GLK
 gcloud auth login
-eval "$(echo "europe-docker.pkg.dev" | docker-credential-gcloud get | jq -r '"export GLK_OCM_REG_USERNAME=\(.Username)\nexport GLK_OCM_REG_PASSWORD=\(.Secret)"')"
+eval "$(echo "europe-docker.pkg.dev" | docker-credential-gcloud get | jq -r '"export GLK_OCI_REG_USERNAME=\(.Username)\nexport GLK_OCI_REG_PASSWORD=\(.Secret)"')"
 ```
 
 > [!NOTE]
