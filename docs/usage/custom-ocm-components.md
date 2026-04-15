@@ -21,6 +21,30 @@ GLK needs two steps to extract and use the information from the OCM component de
    - The extracted information is written to `components.yaml` in the provided landscape (or base) directory.
 2. The command `glk generate [base|landscape]` generates the Flux kustomizations for its active components and additionally renders templates for custom OCM components.
 
+### OCI Registry Authentication
+
+To access private OCI registries, GLK reads credentials from two environment variables:
+
+| Variable | Description |
+|---|---|
+| `GLK_OCM_REG_USERNAME` | Registry username |
+| `GLK_OCM_REG_PASSWORD` | Registry password or token |
+
+Both variables must be set to access private registries. Without them, only anonymous access is attempted.
+
+#### Example: Google Artifact Registry / GCR
+
+```bash
+# Authenticate with gcloud and export credentials for GLK
+gcloud auth login
+eval "$(echo "europe-docker.pkg.dev" | docker-credential-gcloud get | jq -r '"export GLK_OCM_REG_USERNAME=\(.Username)\nexport GLK_OCM_REG_PASSWORD=\(.Secret)"')"
+```
+
+> [!NOTE]
+> Replace `europe-docker.pkg.dev` with your registry host if it differs.
+
+After exporting the variables, run `glk resolve ocm` as usual.
+
 ### Example
 
 Assuming you have a custom OCM component named `my.private-github.com/gardener/my-gardener-extension` stored in a private OCI registry and it is somehow referenced in the OCM descriptor tree starting from the root component descriptor `my.private-github.com/gardener/my-root-compoment`.
