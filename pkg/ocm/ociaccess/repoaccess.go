@@ -31,7 +31,7 @@ const (
 	// GlkOcmRegUsernameEnvKey is the environment variable for the OCI registry username.
 	GlkOcmRegUsernameEnvKey = "GLK_OCM_REG_USERNAME"
 	// GlkOcmRegPasswordEnvKey is the environment variable for the OCI registry password or token.
-	GlkOcmRegPasswordEnvKey = "GLK_OCM_REG_PASSWORD"
+	GlkOcmRegPasswordEnvKey = "GLK_OCM_REG_PASSWORD" // #nosec: G101 -- just the env var name, not the value
 
 	userAgentPrefix = "gardener-landscape-kit/"
 )
