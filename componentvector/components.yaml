@@ -116,7 +116,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service
 - name: github.com/gardener/gardener-extension-shoot-dns-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-dns-service
-  version: v1.80.1
+  version: v1.81.0
   resources:
     shootDnsServiceAdmissionRuntime:
       helmChart:
