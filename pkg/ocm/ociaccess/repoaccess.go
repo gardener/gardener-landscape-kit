@@ -27,7 +27,14 @@ import (
 	"oras.land/oras-go/v2/registry/remote/retry"
 )
 
-const userAgentPrefix = "gardener-landscape-kit/"
+const (
+	// OCIRegUsernameEnvKey is the environment variable for the OCI registry username.
+	OCIRegUsernameEnvKey = "GLK_OCI_REG_USERNAME"
+	// OCIRegPasswordEnvKey is the environment variable for the OCI registry password or token.
+	OCIRegPasswordEnvKey = "GLK_OCI_REG_PASSWORD" // #nosec: G101 -- just the env var name, not the value
+
+	userAgentPrefix = "gardener-landscape-kit/"
+)
 
 // DefaultScheme is the scheme used by RepoAccess.
 var DefaultScheme = ocmruntime.NewScheme()
@@ -56,9 +63,8 @@ func NewRepoAccess(repositoryURL string) (*RepoAccess, error) {
 		return nil, fmt.Errorf("failed to create URL resolver: %w", err)
 	}
 
-	// TODO (MartinWeindel): Support other authentication methods.
-	user := "_json_key"
-	password := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+	user := os.Getenv(OCIRegUsernameEnvKey)
+	password := os.Getenv(OCIRegPasswordEnvKey)
 	resolver.SetClient(CreateAuthClient(repositoryURL, user, password))
 
 	logOutput := &bytes.Buffer{}

@@ -42,8 +42,8 @@ type ocmComponentsResolver struct {
 func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfiguration, landscapeDir, outputDir string,
 	workers int, debug bool) error {
 	// TODO (MartinWeindel): This is a temporary workaround to inform users about potential authentication issues.
-	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
-		log.Info("Warning: Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set. Accessing private GCR repositories may fail.")
+	if os.Getenv(ociaccess.OCIRegUsernameEnvKey) == "" || os.Getenv(ociaccess.OCIRegPasswordEnvKey) == "" {
+		log.Info("Warning: Environment variables " + ociaccess.OCIRegUsernameEnvKey + " and/or " + ociaccess.OCIRegPasswordEnvKey + " are not set. Accessing private OCI repositories may fail.")
 	}
 
 	repos, err := createRepoAccesses(cfg.OCM)
