@@ -27,7 +27,7 @@ type LandscapeKitConfiguration struct {
 	// +optional
 	VersionConfig *VersionConfiguration `json:"versionConfig,omitempty"`
 	// MergeMode determines how merge conflicts are resolved:
-	// - "Informative" (default): New default values from GLK are added as comments after any customized values.
+	// - "Hint" (default): New default values from GLK are added as comments after any customized values.
 	// - "Silent": Operator-customized values are retained, new default values are omitted.
 	// +optional
 	MergeMode *MergeMode `json:"mergeMode,omitempty"`
@@ -129,14 +129,14 @@ type VersionConfiguration struct {
 type MergeMode string
 
 const (
-	// MergeModeInformative annotates operator-overwritten values with a comment showing the current GLK default.
-	MergeModeInformative MergeMode = "Informative"
+	// MergeModeHint annotates operator-overwritten values with a comment showing the current GLK default.
+	MergeModeHint MergeMode = "Hint"
 	// MergeModeSilent retains operator overwrites without annotation.
 	MergeModeSilent MergeMode = "Silent"
 )
 
 // AllowedMergeModes lists all allowed merge modes.
 var AllowedMergeModes = []string{
-	string(MergeModeInformative),
+	string(MergeModeHint),
 	string(MergeModeSilent),
 }

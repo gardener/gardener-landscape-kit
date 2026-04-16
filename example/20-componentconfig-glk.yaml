@@ -19,4 +19,4 @@ kind: LandscapeKitConfiguration
 #   - component-name
 # versionConfig:
 #   defaultVersionsUpdateStrategy: ReleaseBranch
-# mergeMode: Informative
+# mergeMode: Hint

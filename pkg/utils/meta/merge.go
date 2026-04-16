@@ -160,7 +160,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alph
 				// Both default and current changed: keep current (user's value wins).
 				resultValue = currentValue
 				mergeNodeComments(oldValue, newValueNode, resultValue)
-				if mode == configv1alpha1.MergeModeInformative {
+				if mode == configv1alpha1.MergeModeHint {
 					if !nodesEqual(newValueNode, currentValue, false) {
 						annotateConflict(resultKeyNode, resultValue, newValueNode)
 					} else {
@@ -172,7 +172,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alph
 				resultValue = currentValue
 				if oldExists {
 					mergeNodeComments(oldValue, newValueNode, resultValue)
-					if mode == configv1alpha1.MergeModeInformative && nodesEqual(newValueNode, currentValue, false) {
+					if mode == configv1alpha1.MergeModeHint && nodesEqual(newValueNode, currentValue, false) {
 						// Values converged — strip any lingering GLK annotation.
 						stripGLKAnnotations(resultKeyNode, resultValue)
 					}
@@ -201,7 +201,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alph
 }
 
 // annotateConflict adds a GLK-managed annotation comment to resultValue (or resultKeyNode for complex nodes) indicating the current GLK default.
-// This is used in MergeModeInformative when an operator override conflicts with an updated GLK default, so the user is informed of the divergence.
+// This is used in MergeModeHint when an operator override conflicts with an updated GLK default, so the user is hinted about the divergence.
 //
 // For scalar nodes, the annotation is a line comment on the value node (same line as the value).
 // For complex nodes (mappings/sequences), the annotation is a head comment on the key node (line above the key).

@@ -94,7 +94,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `Informative` | MergeModeInformative annotates operator-overwritten values with a comment showing the current GLK default.<br /> |
+| `Hint` | MergeModeHint annotates operator-overwritten values with a comment showing the current GLK default.<br /> |
 | `Silent` | MergeModeSilent retains operator overwrites without annotation.<br /> |
 
 

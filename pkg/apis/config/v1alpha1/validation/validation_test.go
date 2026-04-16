@@ -298,7 +298,7 @@ var _ = Describe("Validation", func() {
 		Context("MergeMode Configuration", func() {
 			It("should pass with valid MergeMode values", func() {
 				for _, mode := range []v1alpha1.MergeMode{
-					v1alpha1.MergeModeInformative,
+					v1alpha1.MergeModeHint,
 					v1alpha1.MergeModeSilent,
 				} {
 					conf := &v1alpha1.LandscapeKitConfiguration{

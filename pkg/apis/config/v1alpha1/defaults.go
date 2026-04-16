@@ -14,6 +14,6 @@ func SetDefaults_LandscapeKitConfiguration(obj *LandscapeKitConfiguration) {
 	}
 
 	if obj.MergeMode == nil {
-		obj.MergeMode = new(MergeModeInformative)
+		obj.MergeMode = new(MergeModeHint)
 	}
 }
