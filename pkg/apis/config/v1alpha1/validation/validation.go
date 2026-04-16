@@ -36,6 +36,10 @@ func ValidateLandscapeKitConfiguration(conf *configv1alpha1.LandscapeKitConfigur
 		allErrs = append(allErrs, ValidateVersionConfig(conf.VersionConfig, field.NewPath("versionConfig"))...)
 	}
 
+	if conf.MergeMode != nil && !slices.Contains(configv1alpha1.AllowedMergeModes, string(*conf.MergeMode)) {
+		allErrs = append(allErrs, field.NotSupported(field.NewPath("mergeMode"), *conf.MergeMode, configv1alpha1.AllowedMergeModes))
+	}
+
 	return allErrs
 }
 

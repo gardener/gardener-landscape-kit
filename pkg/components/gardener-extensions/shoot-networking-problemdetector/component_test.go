@@ -35,7 +35,9 @@ var _ = Describe("Component Generation", func() {
 		generateOpts = &generateoptions.Options{
 			TargetDirPath: "/repo/baseDir",
 			Options:       cmdOpts,
+			Config:        &v1alpha1.LandscapeKitConfiguration{},
 		}
+		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
 	})
 
 	Describe("#GenerateBase", func() {
@@ -68,6 +70,7 @@ var _ = Describe("Component Generation", func() {
 			generateOpts.Config = &v1alpha1.LandscapeKitConfiguration{
 				Git: &v1alpha1.GitRepository{Paths: v1alpha1.PathConfiguration{Landscape: "./landscapeDir", Base: "./baseDir"}},
 			}
+			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {

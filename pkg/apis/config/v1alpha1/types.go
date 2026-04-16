@@ -26,6 +26,11 @@ type LandscapeKitConfiguration struct {
 	// VersionConfig is the configuration for versioning.
 	// +optional
 	VersionConfig *VersionConfiguration `json:"versionConfig,omitempty"`
+	// MergeMode determines how merge conflicts are resolved:
+	// - "Hint" (default): New default values from GLK are added as comments after any customized values.
+	// - "Silent": Operator-customized values are retained, new default values are omitted.
+	// +optional
+	MergeMode *MergeMode `json:"mergeMode,omitempty"`
 }
 
 // ComponentsConfiguration contains configuration for components.
@@ -118,4 +123,20 @@ type VersionConfiguration struct {
 	// Possible values are "Disabled" (default) and "ReleaseBranch".
 	// +optional
 	DefaultVersionsUpdateStrategy *DefaultVersionsUpdateStrategy `json:"defaultVersionsUpdateStrategy,omitempty"`
+}
+
+// MergeMode controls how operator overwrites are handled during three-way merge.
+type MergeMode string
+
+const (
+	// MergeModeHint annotates operator-overwritten values with a comment showing the current GLK default.
+	MergeModeHint MergeMode = "Hint"
+	// MergeModeSilent retains operator overwrites without annotation.
+	MergeModeSilent MergeMode = "Silent"
+)
+
+// AllowedMergeModes lists all allowed merge modes.
+var AllowedMergeModes = []string{
+	string(MergeModeHint),
+	string(MergeModeSilent),
 }

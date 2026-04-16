@@ -6,10 +6,8 @@ package plain
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
-	"path"
+	"strings"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -22,6 +20,7 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
+	utilsfiles "github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var configDecoder runtime.Decoder
@@ -111,7 +110,7 @@ func (o *Options) loadConfigFile(filename string) error {
 
 func run(_ context.Context, opts *Options) error {
 	if opts.Config != nil && opts.Config.VersionConfig != nil {
-		if updateStrategy := opts.Config.VersionConfig.DefaultVersionsUpdateStrategy; updateStrategy != nil && *updateStrategy == configv1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
+		if *opts.Config.VersionConfig.DefaultVersionsUpdateStrategy == configv1alpha1.DefaultVersionsUpdateStrategyReleaseBranch {
 			opts.Log.Info("Updating default component vector file from the release branch", "branch", utilscomponentvector.GetReleaseBranchName())
 			var err error
 			// The componentvector.DefaultComponentsYAML is intentionally overridden, so that subsequently it can be used to extract the updated default component vector versions.
@@ -122,21 +121,30 @@ func run(_ context.Context, opts *Options) error {
 		}
 	}
 
-	compVectorFile := path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename)
-	opts.Log.Info("Writing component vector file", "file", compVectorFile)
-
-	var customBytes []byte
-	var err error
-	if customBytes, err = opts.fs.ReadFile(compVectorFile); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("failed to read component vector override file: %w", err)
-		}
-	}
-
-	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customBytes)
+	var (
+		err             error
+		newDefaultCV    utilscomponentvector.Interface
+		newDefaultBytes []byte
+	)
+	newDefaultCV, err = utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML)
 	if err != nil {
-		return fmt.Errorf("failed to create component vector: %w", err)
+		return fmt.Errorf("failed to build default component vector: %w", err)
+	}
+	newDefaultBytes, err = utilscomponentvector.NameVersionBytes(newDefaultCV)
+	if err != nil {
+		return fmt.Errorf("failed to marshal default component vector: %w", err)
 	}
 
-	return utilscomponentvector.WriteComponentVectorFile(opts.fs, opts.TargetDirPath, componentVector)
+	header := []byte(strings.Join([]string{
+		"# This file is updated by the gardener-landscape-kit.",
+		"# If this file is present in the root of a gardener-landscape-kit-managed repository, the component versions will be used as overrides.",
+		"# If custom component versions should be used, it is recommended to modify the specified versions here and run the `generate` command afterwards.",
+	}, "\n") + "\n")
+	newDefaultBytes = append(header, newDefaultBytes...)
+
+	if err := utilsfiles.WriteObjectsToFilesystem(map[string][]byte{utilscomponentvector.ComponentVectorFilename: newDefaultBytes}, opts.TargetDirPath, "", opts.fs, *opts.Config.MergeMode); err != nil {
+		return fmt.Errorf("failed to write updated component vector: %w", err)
+	}
+
+	return nil
 }

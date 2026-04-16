@@ -34,7 +34,9 @@ var _ = Describe("Types", func() {
 			opts = &options.Options{
 				Options:       &cmd.Options{},
 				TargetDirPath: "",
+				Config:        &v1alpha1.LandscapeKitConfiguration{},
 			}
+			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
 		Describe("#GetTargetPath", func() {
@@ -105,20 +107,9 @@ var _ = Describe("Types", func() {
 				Expect(exists).To(BeFalse())
 			})
 
-			It("should return an empty component vector when config is nil", func() {
-				opts.Config = nil
-
-				componentOpts, err := components.NewOptions(opts, fs)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
-
-				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
-				Expect(exists).To(BeFalse())
-			})
-
-			It("should return an empty component vector when VersionConfig is nil", func() {
+			It("should return an empty component vector when config is empty", func() {
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{}
+				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
 				componentOpts, err := components.NewOptions(opts, fs)
 
@@ -199,7 +190,9 @@ var _ = Describe("Types", func() {
 						Log: logger,
 					},
 					TargetDirPath: "/path/to/target",
+					Config:        &v1alpha1.LandscapeKitConfiguration{},
 				}
+				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
 				result, err := components.NewOptions(opts, fs)
 
@@ -232,6 +225,7 @@ var _ = Describe("Types", func() {
 				},
 				TargetDirPath: "",
 			}
+			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
 		Describe("#GetGitRepository", func() {
@@ -285,6 +279,7 @@ var _ = Describe("Types", func() {
 						},
 					},
 				}
+				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
 				result, err := components.NewLandscapeOptions(opts, fs)
 

@@ -5,11 +5,56 @@
 package meta
 
 import (
+	"strings"
+
 	"go.yaml.in/yaml/v4"
+
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 )
 
+const (
+	// GLKDefaultPrefix is the comment prefix for GLK-managed default annotations.
+	// It is exported so callers can use it as the strip anchor when removing annotations.
+	GLKDefaultPrefix = "# Attention - new default: "
+)
+
+// stripGLKAnnotation removes a GLK-managed annotation from a single comment string.
+// If the annotation is part of a multi-line comment, only the annotation line is removed.
+// If the annotation is appended to a value's line comment (e.g. "# user note  # Attention …"), the prefix and everything after it is stripped.
+func stripGLKAnnotation(comment string) string {
+	if !strings.Contains(comment, GLKDefaultPrefix) {
+		return comment
+	}
+	lines := strings.Split(comment, "\n")
+	out := make([]string, 0, len(lines))
+	for _, line := range lines {
+		before, _, found := strings.Cut(line, GLKDefaultPrefix)
+		if !found {
+			out = append(out, line)
+			continue
+		}
+		stripped := strings.TrimRight(before, " \t")
+		if stripped != "" {
+			out = append(out, stripped)
+		}
+	}
+	return strings.Join(out, "\n")
+}
+
+// stripGLKAnnotations removes GLK-managed annotations from all comment fields of a node.
+func stripGLKAnnotations(nodes ...*yaml.Node) {
+	for _, n := range nodes {
+		if n == nil {
+			continue
+		}
+		n.HeadComment = stripGLKAnnotation(n.HeadComment)
+		n.LineComment = stripGLKAnnotation(n.LineComment)
+		n.FootComment = stripGLKAnnotation(n.FootComment)
+	}
+}
+
 // threeWayMergeSection performs a three-way merge on a single YAML section
-func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([]byte, error) {
+func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte, mode configv1alpha1.MergeMode) ([]byte, error) {
 	// Parse all three versions
 	var oldDefault, newDefault, current yaml.Node
 	if err := yaml.Unmarshal(newDefaultYaml, &newDefault); err != nil {
@@ -26,14 +71,14 @@ func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte) ([
 		}
 	}
 
-	return EncodeResult(threeWayMerge(&oldDefault, &newDefault, &current))
+	return EncodeResult(threeWayMerge(&oldDefault, &newDefault, &current, mode))
 }
 
 // threeWayMerge performs a three-way merge of YAML nodes
 // oldDefault: the previous default template
 // newDefault: the new default template
 // current: the user's current version (possibly modified)
-func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
+func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
 	// Unwrap document nodes
 	if oldDefault.Kind == yaml.DocumentNode {
 		oldDefault = oldDefault.Content[0]
@@ -44,7 +89,7 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 	if current.Kind == yaml.DocumentNode {
 		return &yaml.Node{
 			Kind:    yaml.DocumentNode,
-			Content: []*yaml.Node{threeWayMerge(oldDefault, newDefault, current.Content[0])},
+			Content: []*yaml.Node{threeWayMerge(oldDefault, newDefault, current.Content[0], mode)},
 		}
 	}
 
@@ -97,23 +142,40 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 				if !oldExists {
 					oldValue = &yaml.Node{Kind: yaml.MappingNode}
 				}
-				resultValue = threeWayMerge(oldValue, newValueNode, currentValue)
+				resultValue = threeWayMerge(oldValue, newValueNode, currentValue, mode)
 			case currentValue.Kind == yaml.SequenceNode && newValueNode.Kind == yaml.SequenceNode:
 				if !oldExists {
 					oldValue = &yaml.Node{Kind: yaml.SequenceNode}
 				}
-				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue)
-			case oldExists && !nodesEqual(oldValue, newValueNode, false):
+				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue, mode)
+			case oldExists && !nodesEqual(oldValue, newValueNode, false) && nodesEqual(oldValue, currentValue, false):
+				// Default changed and current was not modified: take the new default.
 				resultValue = &yaml.Node{
 					Kind: newValueNode.Kind, Value: newValueNode.Value, Style: newValueNode.Style, Tag: newValueNode.Tag,
 					HeadComment: currentValue.HeadComment, LineComment: currentValue.LineComment, FootComment: currentValue.FootComment,
 					Content: newValueNode.Content,
 				}
 				mergeNodeComments(oldValue, newValueNode, resultValue)
+			case oldExists && !nodesEqual(oldValue, newValueNode, false):
+				// Both default and current changed: keep current (user's value wins).
+				resultValue = currentValue
+				mergeNodeComments(oldValue, newValueNode, resultValue)
+				if mode == configv1alpha1.MergeModeHint {
+					if !nodesEqual(newValueNode, currentValue, false) {
+						annotateConflict(resultKeyNode, resultValue, newValueNode)
+					} else {
+						// Values converged — strip any lingering GLK annotation.
+						stripGLKAnnotations(resultKeyNode, resultValue)
+					}
+				}
 			default:
 				resultValue = currentValue
 				if oldExists {
 					mergeNodeComments(oldValue, newValueNode, resultValue)
+					if mode == configv1alpha1.MergeModeHint && nodesEqual(newValueNode, currentValue, false) {
+						// Values converged — strip any lingering GLK annotation.
+						stripGLKAnnotations(resultKeyNode, resultValue)
+					}
 				}
 			}
 		}
@@ -136,6 +198,43 @@ func threeWayMerge(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
 	}
 
 	return result
+}
+
+// annotateConflict adds a GLK-managed annotation comment to resultValue (or resultKeyNode for complex nodes) indicating the current GLK default.
+// This is used in MergeModeHint when an operator override conflicts with an updated GLK default, so the user is hinted about the divergence.
+//
+// For scalar nodes, the annotation is a line comment on the value node (same line as the value).
+// For complex nodes (mappings/sequences), the annotation is a head comment on the key node (line above the key).
+func annotateConflict(resultKeyNode, resultValue, newDefaultNode *yaml.Node) {
+	switch newDefaultNode.Kind {
+	case yaml.ScalarNode:
+		annotation := glkManagedLineComment(newDefaultNode.Value)
+		// Strip any pre-existing GLK annotation before appending the current one, so repeated runs replace rather than accumulate the comment.
+		stripped := stripGLKAnnotation(resultValue.LineComment)
+		if stripped != "" {
+			resultValue.LineComment = stripped + "  " + annotation
+		} else {
+			resultValue.LineComment = annotation
+		}
+	default:
+		// Strip existing GLK annotation from head comment before re-annotating.
+		resultKeyNode.HeadComment = stripGLKAnnotation(resultKeyNode.HeadComment)
+		resultKeyNode.HeadComment = glkManagedHeadComment(resultKeyNode.HeadComment)
+	}
+}
+
+// glkManagedLineComment returns a GLK-managed line comment for a scalar value conflict.
+func glkManagedLineComment(newValue string) string {
+	return GLKDefaultPrefix + newValue
+}
+
+// glkManagedHeadComment returns a GLK-managed head comment for a complex node conflict.
+func glkManagedHeadComment(existingHead string) string {
+	annotation := GLKDefaultPrefix + "(complex node changed)"
+	if existingHead == "" {
+		return annotation
+	}
+	return existingHead + "\n" + annotation
 }
 
 // mergeComment performs a three-way merge on a single comment string.
@@ -172,7 +271,7 @@ func mergeNodeComments(oldNode, newNode, resultNode *yaml.Node) {
 }
 
 // Order is preserved based on newDefault, with user additions appended at the end
-func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Node {
+func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
 	if nodesEqual(oldDefault, current, true) {
 		return newDefault
 	}
@@ -229,7 +328,7 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Nod
 			if !existsInOld {
 				oldItem = &yaml.Node{Kind: yaml.MappingNode}
 			}
-			result.Content = append(result.Content, threeWayMerge(oldItem, newItem, currentItem))
+			result.Content = append(result.Content, threeWayMerge(oldItem, newItem, currentItem, mode))
 		}
 
 		// Append items from newDefault that are truly new (not in old) and not already in current.
@@ -249,7 +348,19 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node) *yaml.Nod
 		return result
 	}
 
-	// No identity key: fall back to full-string set-based merge.
+	// No identity key found.
+	// When all three sequences have the same length and all items are mappings,
+	// match items by position and three-way merge each pair. This handles cases
+	// where list items are modified but their count and order stay the same
+	// (e.g., a single scalar field in a mapping item is changed).
+	if len(oldDefault.Content) == len(newDefault.Content) && len(newDefault.Content) == len(current.Content) && allMappings(oldDefault, newDefault, current) {
+		for i := range current.Content {
+			result.Content = append(result.Content, threeWayMerge(oldDefault.Content[i], newDefault.Content[i], current.Content[i], mode))
+		}
+		return result
+	}
+
+	// Fall back to full-string set-based merge.
 	oldSet := make(map[string]bool)
 	for _, item := range oldDefault.Content {
 		oldSet[nodeToString(item)] = true
@@ -340,4 +451,16 @@ func mappingValue(node *yaml.Node, key string) string {
 		}
 	}
 	return ""
+}
+
+// allMappings reports whether every item in each of the given sequences is a mapping node.
+func allMappings(seqs ...*yaml.Node) bool {
+	for _, seq := range seqs {
+		for _, item := range seq.Content {
+			if item.Kind != yaml.MappingNode {
+				return false
+			}
+		}
+	}
+	return true
 }

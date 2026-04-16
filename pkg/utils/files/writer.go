@@ -13,6 +13,7 @@ import (
 
 	"github.com/spf13/afero"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
@@ -47,7 +48,7 @@ func isSecret(contents []byte) bool {
 // WriteObjectsToFilesystem writes the given objects to the filesystem at the specified rootDir and relativeFilePath.
 // If the manifest file already exists, it patches changes from the new default.
 // Additionally, it maintains a default version of the manifest in a separate directory for future diff checks.
-func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero) error {
+func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePath string, fs afero.Afero, mode configv1alpha1.MergeMode) error {
 	if err := fs.MkdirAll(path.Join(rootDir, relativeFilePath), 0700); err != nil {
 		return err
 	}
@@ -81,7 +82,7 @@ func WriteObjectsToFilesystem(objects map[string][]byte, rootDir, relativeFilePa
 			object = append([]byte(secretEncryptionDisclaimer), object...)
 		}
 
-		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml)
+		output, err := meta.ThreeWayMergeManifest(oldDefaultYaml, object, currentYaml, mode)
 		if err != nil {
 			return err
 		}

@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/afero"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
-	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
@@ -36,6 +36,8 @@ type Options interface {
 	GetFilesystem() afero.Afero
 	// GetLogger returns the logger instance.
 	GetLogger() logr.Logger
+	// GetMergeMode returns the configured mode to solve merge conflicts.
+	GetMergeMode() configv1alpha1.MergeMode
 }
 
 // LandscapeOptions is an interface for options passed to components for generating the landscape.
@@ -43,7 +45,7 @@ type LandscapeOptions interface {
 	Options
 
 	// GetGitRepository returns the git repository information.
-	GetGitRepository() *v1alpha1.GitRepository
+	GetGitRepository() *configv1alpha1.GitRepository
 	// GetRelativeBasePath returns the base directory that is relative to the target path.
 	GetRelativeBasePath() string
 	// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
@@ -65,6 +67,7 @@ type options struct {
 	targetPath      string
 	filesystem      afero.Afero
 	logger          logr.Logger
+	mergeMode       configv1alpha1.MergeMode
 }
 
 // GetComponentVector returns the component vector.
@@ -85,6 +88,11 @@ func (o *options) GetFilesystem() afero.Afero {
 // GetLogger returns the logger instance.
 func (o *options) GetLogger() logr.Logger {
 	return o.logger
+}
+
+// GetMergeMode returns the configured merge mode for three-way merges.
+func (o *options) GetMergeMode() configv1alpha1.MergeMode {
+	return o.mergeMode
 }
 
 // NewOptions returns a new Options instance.
@@ -113,11 +121,13 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create component vector: %w", err)
 	}
+
 	return &options{
 		componentVector: componentVector,
 		targetPath:      path.Clean(opts.TargetDirPath),
 		filesystem:      fs,
 		logger:          opts.Log,
+		mergeMode:       *opts.Config.MergeMode,
 	}, nil
 }
 
@@ -134,11 +144,11 @@ func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, fil
 type landscapeOptions struct {
 	Options
 
-	gitRepository *v1alpha1.GitRepository
+	gitRepository *configv1alpha1.GitRepository
 }
 
 // GetGitRepository returns the git repository information.
-func (l *landscapeOptions) GetGitRepository() *v1alpha1.GitRepository {
+func (l *landscapeOptions) GetGitRepository() *configv1alpha1.GitRepository {
 	return l.gitRepository
 }
 

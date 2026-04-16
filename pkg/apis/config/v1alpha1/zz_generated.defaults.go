@@ -17,5 +17,10 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&LandscapeKitConfiguration{}, func(obj interface{}) { SetObjectDefaults_LandscapeKitConfiguration(obj.(*LandscapeKitConfiguration)) })
 	return nil
+}
+
+func SetObjectDefaults_LandscapeKitConfiguration(in *LandscapeKitConfiguration) {
+	SetDefaults_LandscapeKitConfiguration(in)
 }

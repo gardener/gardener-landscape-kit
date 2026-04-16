@@ -294,6 +294,43 @@ var _ = Describe("Validation", func() {
 				Expect(errList).To(BeEmpty())
 			})
 		})
+
+		Context("MergeMode Configuration", func() {
+			It("should pass with valid MergeMode values", func() {
+				for _, mode := range []v1alpha1.MergeMode{
+					v1alpha1.MergeModeHint,
+					v1alpha1.MergeModeSilent,
+				} {
+					conf := &v1alpha1.LandscapeKitConfiguration{
+						MergeMode: &mode,
+					}
+					errList := validation.ValidateLandscapeKitConfiguration(conf)
+					Expect(errList).To(BeEmpty(), fmt.Sprintf("MergeMode %q should be valid", mode))
+				}
+			})
+
+			It("should pass when MergeMode is not set", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{}
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should fail with an invalid MergeMode value", func() {
+				invalid := v1alpha1.MergeMode("Invalid")
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					MergeMode: &invalid,
+				}
+
+				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":     Equal(field.ErrorTypeNotSupported),
+						"Field":    Equal("mergeMode"),
+						"BadValue": Equal(invalid),
+					})),
+				))
+			})
+		})
 	})
 })
 

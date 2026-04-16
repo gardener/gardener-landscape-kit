@@ -81,6 +81,23 @@ _Appears in:_
 
 
 
+#### MergeMode
+
+_Underlying type:_ _string_
+
+MergeMode controls how operator overwrites are handled during three-way merge.
+
+
+
+_Appears in:_
+- [LandscapeKitConfiguration](#landscapekitconfiguration)
+
+| Field | Description |
+| --- | --- |
+| `Hint` | MergeModeHint annotates operator-overwritten values with a comment showing the current GLK default.<br /> |
+| `Silent` | MergeModeSilent retains operator overwrites without annotation.<br /> |
+
+
 #### OCMComponent
 
 
