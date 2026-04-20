@@ -88,6 +88,9 @@ type OCMConfig struct {
 	RootComponent OCMComponent `json:"rootComponent"`
 	// OriginalRefs is a flag to output original image references in the image vectors.
 	OriginalRefs bool `json:"originalRefs"`
+	// IgnoreMissingComponents indicates whether to ignore missing components during resolution.
+	// +optional
+	IgnoreMissingComponents *bool `json:"ignoreMissingComponents,omitempty"`
 }
 
 // OCMComponent specifies a OCM component.

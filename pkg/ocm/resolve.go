@@ -204,7 +204,7 @@ func (r *ocmComponentsResolver) writeLandscapeKitComponents() error {
 	if err != nil {
 		return err
 	}
-	componentVersions, err := r.components.GetGLKComponents(customComponents, false)
+	componentVersions, err := r.components.GetGLKComponents(customComponents, *r.cfg.OCM.IgnoreMissingComponents)
 	if err != nil {
 		return err
 	}

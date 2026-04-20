@@ -23,4 +23,7 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 
 func SetObjectDefaults_LandscapeKitConfiguration(in *LandscapeKitConfiguration) {
 	SetDefaults_LandscapeKitConfiguration(in)
+	if in.OCM != nil {
+		SetDefaults_OCMConfig(in.OCM)
+	}
 }

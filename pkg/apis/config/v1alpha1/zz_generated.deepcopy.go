@@ -163,6 +163,11 @@ func (in *OCMConfig) DeepCopyInto(out *OCMConfig) {
 		copy(*out, *in)
 	}
 	out.RootComponent = in.RootComponent
+	if in.IgnoreMissingComponents != nil {
+		in, out := &in.IgnoreMissingComponents, &out.IgnoreMissingComponents
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 
