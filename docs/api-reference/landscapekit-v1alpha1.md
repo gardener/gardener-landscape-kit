@@ -131,6 +131,7 @@ _Appears in:_
 | `repositories` _string array_ | Repositories is a map from repository name to URL. |  |  |
 | `rootComponent` _[OCMComponent](#ocmcomponent)_ | RootComponent is the configuration of the root component. |  |  |
 | `originalRefs` _boolean_ | OriginalRefs is a flag to output original image references in the image vectors. |  |  |
+| `ignoreMissingComponents` _boolean_ | IgnoreMissingComponents indicates whether to ignore missing components during resolution. |  | Optional: \{\} <br /> |
 
 
 #### PathConfiguration

@@ -32,7 +32,7 @@ Example:
 Notes:
   - Fetches component descriptors from: oci://europe-docker.pkg.dev/gardener-project/releases
   - Uses temporary directory for intermediate files (automatically cleaned up)
-  - Runs 'resolve ocm' command with --ignore-missing-components flag
+  - Runs 'resolve ocm' command with ignoreMissingComponents set to true in configuration
 USAGE
   exit 1
 fi
@@ -53,11 +53,12 @@ ocm:
   rootComponent:
     name: $componentName
     version: $componentVersion
+  ignoreMissingComponents: true
 EOF
 
 # Fake component as custom OCM component, to be resolved by the landscapekit and written to the components vector file.
 echo $componentName > "$tmp_dir/ocm-component-name"
 
-go run ./cmd/gardener-landscape-kit resolve ocm -c "$tmp_dir/landscapekitconfiguration.yaml" -d "$tmp_dir" --ignore-missing-components > /dev/null
+go run ./cmd/gardener-landscape-kit resolve ocm -c "$tmp_dir/landscapekitconfiguration.yaml" -d "$tmp_dir" > /dev/null
 
 cat "$tmp_dir/components.yaml"

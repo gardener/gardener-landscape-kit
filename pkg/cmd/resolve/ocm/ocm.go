@@ -48,8 +48,6 @@ type Options struct {
 	Debug bool
 	// Workers is the number of concurrent workers to use for resolving OCM components.
 	Workers int
-	// IgnoreMissingComponents indicates whether to ignore missing components during resolution.
-	IgnoreMissingComponents bool
 }
 
 // NewCommand creates a new cobra.Command for running gardener-landscape-kit resolve ocm.
@@ -112,7 +110,6 @@ func (o *Options) addFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.ConfigFilePath, "config", "c", o.ConfigFilePath, "Path to configuration file.")
 	fs.BoolVar(&o.Debug, "debug", false, "Enable debug output files like resources and imagevectors.")
 	fs.IntVar(&o.Workers, "workers", 10, "Number of concurrent workers to use for resolving OCM components.")
-	fs.BoolVar(&o.IgnoreMissingComponents, "ignore-missing-components", false, "Ignore missing components during resolution. By default, the command will fail if a component cannot be resolved or is not referenced.")
 }
 
 func (o *Options) effectiveIntermediateOutputDir() string {
@@ -144,7 +141,7 @@ func run(_ context.Context, opts *Options) error {
 	if err := writeGitIgnoreFile(opts); err != nil {
 		return err
 	}
-	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.TargetDirPath, outputDir, opts.Workers, opts.Debug, opts.IgnoreMissingComponents)
+	return ocm.ResolveOCMComponents(opts.Log, opts.Config, opts.TargetDirPath, outputDir, opts.Workers, opts.Debug)
 }
 
 func writeGitIgnoreFile(opts *Options) error {

@@ -17,3 +17,10 @@ func SetDefaults_LandscapeKitConfiguration(obj *LandscapeKitConfiguration) {
 		obj.MergeMode = new(MergeModeHint)
 	}
 }
+
+// SetDefaults_OCMConfig sets defaults for OCMConfig.
+func SetDefaults_OCMConfig(obj *OCMConfig) {
+	if obj.IgnoreMissingComponents == nil {
+		obj.IgnoreMissingComponents = new(false)
+	}
+}

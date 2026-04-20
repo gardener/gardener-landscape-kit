@@ -7,6 +7,7 @@ kind: LandscapeKitConfiguration
 #     name: <component-name>
 #     version: <component-version>
 #   originalRefs: true
+#   ignoreMissingComponents: false
 # git:
 #   url: https://github.com/<org>/<repo>
 #   ref:
