@@ -245,7 +245,7 @@ var _ = Describe("Version Metadata", func() {
 
 		type testCase struct {
 			componentVersion string
-			checkMode        *configv1alpha1.VersionCheckMode
+			checkMode        configv1alpha1.VersionCheckMode
 			expectError      bool
 			errorContains    []string
 		}
@@ -261,13 +261,10 @@ components:
 				cv, err := componentvector.NewWithOverride(baseYAML)
 				Expect(err).NotTo(HaveOccurred())
 
-				var config *configv1alpha1.LandscapeKitConfiguration
-				if tc.checkMode != nil {
-					config = &configv1alpha1.LandscapeKitConfiguration{
-						VersionConfig: &configv1alpha1.VersionConfiguration{
-							CheckMode: tc.checkMode,
-						},
-					}
+				config := &configv1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &configv1alpha1.VersionConfiguration{
+						CheckMode: &tc.checkMode,
+					},
 				}
 
 				err = version.CheckGLKComponentVersion(cv, config, log)
@@ -281,35 +278,29 @@ components:
 					Expect(err).NotTo(HaveOccurred())
 				}
 			},
-			Entry("should pass when versions match with nil config (default strict)",
-				testCase{
-					componentVersion: version.Get().GitVersion,
-					checkMode:        nil,
-					expectError:      false,
-				}),
 			Entry("should pass when versions match in strict mode",
 				testCase{
 					componentVersion: version.Get().GitVersion,
-					checkMode:        ptr(configv1alpha1.VersionCheckModeStrict),
+					checkMode:        configv1alpha1.VersionCheckModeStrict,
 					expectError:      false,
 				}),
 			Entry("should pass when versions match in warning mode",
 				testCase{
 					componentVersion: version.Get().GitVersion,
-					checkMode:        ptr(configv1alpha1.VersionCheckModeWarning),
+					checkMode:        configv1alpha1.VersionCheckModeWarning,
 					expectError:      false,
 				}),
 			Entry("should fail when versions differ in strict mode",
 				testCase{
 					componentVersion: "v0.99.99-test",
-					checkMode:        ptr(configv1alpha1.VersionCheckModeStrict),
+					checkMode:        configv1alpha1.VersionCheckModeStrict,
 					expectError:      true,
 					errorContains:    []string{"version mismatch", version.Get().GitVersion, "v0.99.99-test"},
 				}),
 			Entry("should not fail when versions differ in warning mode",
 				testCase{
 					componentVersion: "v0.99.99-test",
-					checkMode:        ptr(configv1alpha1.VersionCheckModeWarning),
+					checkMode:        configv1alpha1.VersionCheckModeWarning,
 					expectError:      false,
 				}),
 			Entry("should use exact string matching - v0.2.0-dev vs v0.2.0 in strict mode",
@@ -323,7 +314,7 @@ components:
 					}
 					return testCase{
 						componentVersion: differentButRelated,
-						checkMode:        ptr(configv1alpha1.VersionCheckModeStrict),
+						checkMode:        configv1alpha1.VersionCheckModeStrict,
 						expectError:      true,
 						errorContains:    []string{"version mismatch"},
 					}
@@ -339,7 +330,7 @@ components:
 					}
 					return testCase{
 						componentVersion: differentButRelated,
-						checkMode:        ptr(configv1alpha1.VersionCheckModeWarning),
+						checkMode:        configv1alpha1.VersionCheckModeWarning,
 						expectError:      false,
 					}
 				}()),
@@ -379,8 +370,3 @@ components:
 		})
 	})
 })
-
-// ptr is a helper function to create a pointer to a value
-func ptr[T any](v T) *T {
-	return &v
-}

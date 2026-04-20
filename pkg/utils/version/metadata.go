@@ -7,6 +7,7 @@ package version
 import (
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -146,7 +147,7 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 // CheckGLKComponentVersion validates that the tool version matches the gardener-landscape-kit
 // component version in the component vector.
 // The behavior depends on the checkMode in the configuration:
-// - If checkMode is "Strict" (or nil/default), returns an error on mismatch.
+// - If checkMode is "Strict", returns an error on mismatch.
 // - If checkMode is "Warning", logs a warning on mismatch and returns nil.
 func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv1alpha1.LandscapeKitConfiguration, log logr.Logger) error {
 	toolVersion := version.GitVersion
@@ -157,20 +158,16 @@ func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv
 	}
 
 	if toolVersion != componentVersion {
-		// Determine the check mode (default to Strict)
-		checkMode := configv1alpha1.VersionCheckModeStrict
-		if config != nil && config.VersionConfig != nil && config.VersionConfig.CheckMode != nil {
-			checkMode = *config.VersionConfig.CheckMode
-		}
+		checkMode := *config.VersionConfig.CheckMode
 
-		err := fmt.Errorf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
+		msg := fmt.Sprintf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
 
 		if checkMode == configv1alpha1.VersionCheckModeWarning {
-			log.Error(err, "Precheck failed")
+			log.Info("Precheck failed", "warning", msg)
 			return nil
 		}
 
-		return err
+		return errors.New(msg)
 	}
 
 	return nil

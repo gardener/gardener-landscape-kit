@@ -9,8 +9,13 @@ func SetDefaults_LandscapeKitConfiguration(obj *LandscapeKitConfiguration) {
 	if obj.VersionConfig == nil {
 		obj.VersionConfig = &VersionConfiguration{}
 	}
+
 	if obj.VersionConfig.DefaultVersionsUpdateStrategy == nil {
 		obj.VersionConfig.DefaultVersionsUpdateStrategy = new(DefaultVersionsUpdateStrategyDisabled)
+	}
+
+	if obj.VersionConfig.CheckMode == nil {
+		obj.VersionConfig.CheckMode = new(VersionCheckModeStrict)
 	}
 
 	if obj.MergeMode == nil {
