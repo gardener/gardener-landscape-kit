@@ -37,4 +37,6 @@ const (
 	NameGardenerGardenerExtensionShootNetworkingProblemdetector = "github.com/gardener/gardener-extension-shoot-networking-problemdetector"
 	// NameGardenerGardenerExtensionShootOidcService is a constant for a component in the component vector with name 'github.com/gardener/gardener-extension-shoot-oidc-service'.
 	NameGardenerGardenerExtensionShootOidcService = "github.com/gardener/gardener-extension-shoot-oidc-service"
+	// NameGardenerGardenerLandscapeKit is a constant for a component in the component vector with name 'github.com/gardener/gardener-landscape-kit'.
+	NameGardenerGardenerLandscapeKit = "github.com/gardener/gardener-landscape-kit"
 )

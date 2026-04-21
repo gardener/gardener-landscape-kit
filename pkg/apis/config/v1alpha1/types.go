@@ -120,12 +120,33 @@ var AllowedDefaultVersionsUpdateStrategies = []string{
 	string(DefaultVersionsUpdateStrategyDisabled),
 }
 
+// VersionCheckMode controls the behavior when the tool version doesn't match the component version.
+type VersionCheckMode string
+
+const (
+	// VersionCheckModeStrict indicates that version mismatches should cause an error.
+	VersionCheckModeStrict VersionCheckMode = "Strict"
+	// VersionCheckModeWarning indicates that version mismatches should only log a warning.
+	VersionCheckModeWarning VersionCheckMode = "Warning"
+)
+
+// AllowedVersionCheckModes lists all allowed version check modes.
+var AllowedVersionCheckModes = []string{
+	string(VersionCheckModeStrict),
+	string(VersionCheckModeWarning),
+}
+
 // VersionConfiguration contains configuration for versioning.
 type VersionConfiguration struct {
 	// UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on resolve.
 	// Possible values are "Disabled" (default) and "ReleaseBranch".
 	// +optional
 	DefaultVersionsUpdateStrategy *DefaultVersionsUpdateStrategy `json:"defaultVersionsUpdateStrategy,omitempty"`
+	// CheckMode determines the behavior when the tool version doesn't match the gardener-landscape-kit version in the component vector.
+	// Possible values are "Strict" (default) and "Warning".
+	// In strict mode, version mismatches cause errors. In warning mode, only warnings are logged.
+	// +optional
+	CheckMode *VersionCheckMode `json:"checkMode,omitempty"`
 }
 
 // MergeMode controls how operator overwrites are handled during three-way merge.

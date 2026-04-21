@@ -205,6 +205,11 @@ func (in *VersionConfiguration) DeepCopyInto(out *VersionConfiguration) {
 		*out = new(DefaultVersionsUpdateStrategy)
 		**out = **in
 	}
+	if in.CheckMode != nil {
+		in, out := &in.CheckMode, &out.CheckMode
+		*out = new(VersionCheckMode)
+		**out = **in
+	}
 	return
 }
 

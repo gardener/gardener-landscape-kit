@@ -8,10 +8,14 @@ import (
 	"encoding/json"
 	"path/filepath"
 
+	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
@@ -229,6 +233,140 @@ var _ = Describe("Version Metadata", func() {
 
 			err = version.ValidateLandscapeVersionCompatibility(targetPath, fs)
 			Expect(err).To(MatchError(ContainSubstring("is newer than base generation version")))
+		})
+	})
+
+	Describe("#CheckGLKComponentVersion", func() {
+		var log logr.Logger
+
+		BeforeEach(func() {
+			log = zap.New(zap.WriteTo(GinkgoWriter))
+		})
+
+		type testCase struct {
+			componentVersion string
+			checkMode        configv1alpha1.VersionCheckMode
+			expectError      bool
+			errorContains    []string
+		}
+
+		DescribeTable("version checking behavior",
+			func(tc testCase) {
+				baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: ` + tc.componentVersion + `
+`)
+				cv, err := componentvector.NewWithOverride(baseYAML)
+				Expect(err).NotTo(HaveOccurred())
+
+				config := &configv1alpha1.LandscapeKitConfiguration{
+					VersionConfig: &configv1alpha1.VersionConfiguration{
+						CheckMode: &tc.checkMode,
+					},
+				}
+
+				err = version.CheckGLKComponentVersion(cv, config, log)
+
+				if tc.expectError {
+					Expect(err).To(HaveOccurred())
+					for _, substr := range tc.errorContains {
+						Expect(err.Error()).To(ContainSubstring(substr))
+					}
+				} else {
+					Expect(err).NotTo(HaveOccurred())
+				}
+			},
+			Entry("should pass when versions match in strict mode",
+				testCase{
+					componentVersion: version.Get().GitVersion,
+					checkMode:        configv1alpha1.VersionCheckModeStrict,
+					expectError:      false,
+				}),
+			Entry("should pass when versions match in warning mode",
+				testCase{
+					componentVersion: version.Get().GitVersion,
+					checkMode:        configv1alpha1.VersionCheckModeWarning,
+					expectError:      false,
+				}),
+			Entry("should fail when versions differ in strict mode",
+				testCase{
+					componentVersion: "v0.99.99-test",
+					checkMode:        configv1alpha1.VersionCheckModeStrict,
+					expectError:      true,
+					errorContains:    []string{"version mismatch", version.Get().GitVersion, "v0.99.99-test"},
+				}),
+			Entry("should not fail when versions differ in warning mode",
+				testCase{
+					componentVersion: "v0.99.99-test",
+					checkMode:        configv1alpha1.VersionCheckModeWarning,
+					expectError:      false,
+				}),
+			Entry("should use exact string matching - v0.2.0-dev vs v0.2.0 in strict mode",
+				func() testCase {
+					currentVersion := version.Get().GitVersion
+					var differentButRelated string
+					if currentVersion == "v0.2.0-dev" {
+						differentButRelated = "v0.2.0"
+					} else {
+						differentButRelated = currentVersion + "-modified"
+					}
+					return testCase{
+						componentVersion: differentButRelated,
+						checkMode:        configv1alpha1.VersionCheckModeStrict,
+						expectError:      true,
+						errorContains:    []string{"version mismatch"},
+					}
+				}()),
+			Entry("should use exact string matching - v0.2.0-dev vs v0.2.0 in warning mode",
+				func() testCase {
+					currentVersion := version.Get().GitVersion
+					var differentButRelated string
+					if currentVersion == "v0.2.0-dev" {
+						differentButRelated = "v0.2.0"
+					} else {
+						differentButRelated = currentVersion + "-modified"
+					}
+					return testCase{
+						componentVersion: differentButRelated,
+						checkMode:        configv1alpha1.VersionCheckModeWarning,
+						expectError:      false,
+					}
+				}()),
+		)
+
+		It("should fail when GLK component is not found in both modes", func() {
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/other-component
+    sourceRepository: https://github.com/gardener/other-component
+    version: v1.0.0
+`)
+			cv, err := componentvector.NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			// Test strict mode
+			strictMode := configv1alpha1.VersionCheckModeStrict
+			strictConfig := &configv1alpha1.LandscapeKitConfiguration{
+				VersionConfig: &configv1alpha1.VersionConfiguration{
+					CheckMode: &strictMode,
+				},
+			}
+
+			err = version.CheckGLKComponentVersion(cv, strictConfig, log)
+			Expect(err).To(MatchError(ContainSubstring("gardener-landscape-kit component not found")))
+
+			// Test warning mode
+			warningMode := configv1alpha1.VersionCheckModeWarning
+			warningConfig := &configv1alpha1.LandscapeKitConfiguration{
+				VersionConfig: &configv1alpha1.VersionConfiguration{
+					CheckMode: &warningMode,
+				},
+			}
+
+			err = version.CheckGLKComponentVersion(cv, warningConfig, log)
+			Expect(err).To(MatchError(ContainSubstring("gardener-landscape-kit component not found")))
 		})
 	})
 })

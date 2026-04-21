@@ -1,4 +1,7 @@
 components:
+- name: github.com/gardener/gardener-landscape-kit
+  sourceRepository: https://github.com/gardener/gardener-landscape-kit
+  version: v0.2.0-dev
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.140.1
@@ -122,11 +125,11 @@ components:
       helmChart:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-runtime
     shootDnsServiceAdmissionApplication:
-     helmChart:
-       repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-application
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service-admission-application
     shootDnsService:
-       helmChart:
-         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service
 - name: github.com/gardener/gardener-extension-shoot-oidc-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
   version: v0.38.0

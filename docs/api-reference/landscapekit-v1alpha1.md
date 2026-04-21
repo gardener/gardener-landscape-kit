@@ -151,6 +151,23 @@ _Appears in:_
 | `landscape` _string_ | Landscape is the relative path to the landscape directory within the Git repository. |  | Required: \{\} <br /> |
 
 
+#### VersionCheckMode
+
+_Underlying type:_ _string_
+
+VersionCheckMode controls the behavior when the tool version doesn't match the component version.
+
+
+
+_Appears in:_
+- [VersionConfiguration](#versionconfiguration)
+
+| Field | Description |
+| --- | --- |
+| `Strict` | VersionCheckModeStrict indicates that version mismatches should cause an error.<br /> |
+| `Warning` | VersionCheckModeWarning indicates that version mismatches should only log a warning.<br /> |
+
+
 #### VersionConfiguration
 
 
@@ -165,5 +182,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `defaultVersionsUpdateStrategy` _[DefaultVersionsUpdateStrategy](#defaultversionsupdatestrategy)_ | UpdateStrategy determines whether the versions in the default vector should be updated from the release branch on resolve.<br />Possible values are "Disabled" (default) and "ReleaseBranch". |  | Optional: \{\} <br /> |
+| `checkMode` _[VersionCheckMode](#versioncheckmode)_ | CheckMode determines the behavior when the tool version doesn't match the gardener-landscape-kit version in the component vector.<br />Possible values are "Strict" (default) and "Warning".<br />In strict mode, version mismatches cause errors. In warning mode, only warnings are logged. |  | Optional: \{\} <br /> |
 
 

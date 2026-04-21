@@ -7,15 +7,20 @@ package version
 import (
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
 	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	componentbaseversion "k8s.io/component-base/version"
 
+	"github.com/gardener/gardener-landscape-kit/componentvector"
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -137,6 +142,35 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 	}
 
 	return ValidateVersionCompatibility(baseMetadata.Version, version.GitVersion)
+}
+
+// CheckGLKComponentVersion validates that the tool version matches the gardener-landscape-kit
+// component version in the component vector.
+// The behavior depends on the checkMode in the configuration:
+// - If checkMode is "Strict", returns an error on mismatch.
+// - If checkMode is "Warning", logs a warning on mismatch and returns nil.
+func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv1alpha1.LandscapeKitConfiguration, log logr.Logger) error {
+	toolVersion := version.GitVersion
+	componentVersion, found := cv.FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
+
+	if !found {
+		return fmt.Errorf("gardener-landscape-kit component not found in component vector - this should not happen as it's part of the default component vector")
+	}
+
+	if toolVersion != componentVersion {
+		checkMode := *config.VersionConfig.CheckMode
+
+		msg := fmt.Sprintf("version mismatch: tool version (%s) does not match gardener-landscape-kit component version (%s) in component vector - obtain the matching gardener-landscape-kit version or adjust the component vector", toolVersion, componentVersion)
+
+		if checkMode == configv1alpha1.VersionCheckModeWarning {
+			log.Info("Precheck failed", "warning", msg)
+			return nil
+		}
+
+		return errors.New(msg)
+	}
+
+	return nil
 }
 
 // Get returns the version of GLK.

@@ -169,5 +169,9 @@ func ValidateVersionConfig(conf *configv1alpha1.VersionConfiguration, fldPath *f
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("defaultVersionsUpdateStrategy"), *conf.DefaultVersionsUpdateStrategy, "allowed values are: "+strings.Join(configv1alpha1.AllowedDefaultVersionsUpdateStrategies, ", ")))
 	}
 
+	if conf.CheckMode != nil && !slices.Contains(configv1alpha1.AllowedVersionCheckModes, string(*conf.CheckMode)) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("checkMode"), *conf.CheckMode, "allowed values are: "+strings.Join(configv1alpha1.AllowedVersionCheckModes, ", ")))
+	}
+
 	return allErrs
 }
