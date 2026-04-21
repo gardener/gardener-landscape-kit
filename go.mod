@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/elastic/crd-ref-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
-	github.com/fluxcd/kustomize-controller/api v1.8.3
+	github.com/fluxcd/kustomize-controller/api v1.8.4
 	github.com/fluxcd/pkg/apis/meta v1.26.0
 	github.com/fluxcd/source-controller/api v1.8.3
 	github.com/gardener/gardener v1.140.1
