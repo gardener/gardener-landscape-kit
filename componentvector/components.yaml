@@ -112,7 +112,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-alicloud
 - name: github.com/gardener/gardener-extension-shoot-cert-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-cert-service
-  version: v1.59.0
+  version: v1.60.0
   resources:
     shootCertService:
       helmChart:
