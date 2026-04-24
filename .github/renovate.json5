@@ -109,6 +109,7 @@ The following dependencies have been updated:\n\
         "github.com/aws/aws-sdk-go-v2/internal/ini",
         "github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding",
         "github.com/aws/aws-sdk-go-v2/service/internal/presigned-url",
+        "github.com/aws/aws-sdk-go-v2/service/signin",
         "github.com/aws/aws-sdk-go-v2/service/sso",
         "github.com/aws/aws-sdk-go-v2/service/ssooidc",
         "github.com/aws/aws-sdk-go-v2/service/sts",
