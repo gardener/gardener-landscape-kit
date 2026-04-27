@@ -22,4 +22,5 @@ ns      IN      AAAA    fd00:ff::54
 registry        IN      NS      docker-dns.local.gardener.cloud.
 glk-registry    IN      NS      docker-dns.local.gardener.cloud.
 registry-cache  IN      NS      docker-dns.local.gardener.cloud.
+git             IN      NS      docker-dns.local.gardener.cloud.
 docker-dns      IN      A       127.0.0.11

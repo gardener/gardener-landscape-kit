@@ -40,7 +40,6 @@ check_local_dns_record() {
 }
 
 check_local_dns_records() {
-  check_local_dns_record $GIT_SERVER_HOSTNAME
   check_local_dns_record $REGISTRY_HOSTNAME
 }
 
@@ -86,7 +85,7 @@ for i in {1..150}; do
     break
   fi
   if (( $i % 10 == 9 )); then
-    echo "waiting for Forjo startup..."
+    echo "waiting for Forgejo startup..."
   fi
   sleep 0.1
 done

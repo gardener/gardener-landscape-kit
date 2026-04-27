@@ -13,9 +13,6 @@ http://git.local.gardener.cloud:6080/gitops
 > Password: `testtest`
 ```
 
-> [!NOTE]
-> Ensure that the host `git.local.gardener.cloud` resolves to `127.0.0.1`
-
 ## Clone
 
 - Base repo

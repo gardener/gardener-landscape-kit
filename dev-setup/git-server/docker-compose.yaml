@@ -2,13 +2,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-volumes:
-  docker_certs:
-
 services:
-  git:
-    container_name: glk-git-server
+  forgejo:
+    container_name: glk-forgejo
     image: codeberg.org/forgejo/forgejo:15.0.0
+    healthcheck:
+      test: [ "CMD-SHELL", "test -f /data/runner/config.yaml" ]
+      interval: 10s
+      retries: 5
+      start_period: 2s
+      timeout: 10s
     ports:
     - "6080:6080"
     volumes:
@@ -16,19 +19,14 @@ services:
     - ./runner-config.yaml:/runner-config.yaml:ro
     - ../../dev/git-server/data:/data
     - ./entrypoint.sh:/entrypoint.sh:ro
-    entrypoint: ["/bin/sh", "/entrypoint.sh"]
-    healthcheck:
-      test: [ "CMD-SHELL", "test -f /data/runner/config.yaml" ]
-      interval: 10s
-      retries: 5
-      start_period: 2s
-      timeout: 10s
+    restart: unless-stopped
     networks:
-      kind:
+      default:
         aliases:
         - git.local.gardener.cloud
 
   docker-in-docker:
+    container_name: glk-forgejo-dind
     image: data.forgejo.org/oci/docker:dind
     hostname: docker  # Must set hostname as TLS certificates are only valid for docker or localhost
     privileged: true
@@ -36,29 +34,29 @@ services:
       DOCKER_TLS_CERTDIR: /certs
       DOCKER_HOST: docker-in-docker
     volumes:
-    - docker_certs:/certs
-    networks:
-      kind:
+    - ../../dev/git-server/data/docker_certs:/certs
+    restart: unless-stopped
 
   runner:
+    container_name: glk-forgejo-runner
     image: data.forgejo.org/forgejo/runner:12.7.2
+    command: >-
+      forgejo-runner --config /data/config.yaml daemon
     environment:
       DOCKER_HOST: tcp://docker:2376
       DOCKER_CERT_PATH: /certs/client
       DOCKER_TLS_VERIFY: "1"
     volumes:
     - ../../dev/git-server/data/runner:/data
-    - docker_certs:/certs
+    - ../../dev/git-server/data/docker_certs:/certs
     restart: unless-stopped
     depends_on:
-      git:
+      forgejo:
         condition: service_healthy
-    command: >-
-      forgejo-runner --config /data/config.yaml daemon
-    networks:
-      kind:
+      docker-in-docker:
+        condition: service_started
 
 networks:
-  kind:
+  default:
     external: true
     name: kind
