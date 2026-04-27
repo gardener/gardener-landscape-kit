@@ -89,6 +89,25 @@ var _ = Describe("YAML Preprocessing", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(content)).To(Equal(string(testFileExpect)))
 			})
+
+			It("should preserve comment indentation between sequence items", func() {
+				gardenTemplate, err := testdata.ReadFile("testdata/garden-template-input.yaml")
+				Expect(err).ToNot(HaveOccurred())
+
+				// First generate: no existing files on disk
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"garden.yaml": gardenTemplate}, "/landscape", "components/garden", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
+
+				content, err := fs.ReadFile("/landscape/components/garden/garden.yaml")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("          # User group used by Gardenlet"), "first generate")
+
+				// Second generate: oldDefault and current exist from first run
+				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"garden.yaml": gardenTemplate}, "/landscape", "components/garden", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
+
+				content, err = fs.ReadFile("/landscape/components/garden/garden.yaml")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(content)).To(ContainSubstring("          # User group used by Gardenlet"), "second generate")
+			})
 		})
 	})
 })

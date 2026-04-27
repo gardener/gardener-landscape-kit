@@ -1,0 +1,16 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Garden
+metadata:
+  name: garden
+spec:
+  virtualCluster:
+    gardener:
+#     some comment - important for reproducing the comment indentation bug as it destroys the indentation of the following lines in the PreProcessing
+      gardenerAdmissionController:
+        resourceAdmissionConfiguration:
+          operationMode: block
+          unrestrictedSubjects:
+          # User group used by Gardenlet
+          - kind: Group
+            name: gardener.cloud:system:seeds
+            apiGroup: rbac.authorization.k8s.io
