@@ -2,21 +2,61 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+volumes:
+  docker_certs:
+
 services:
   git:
     container_name: glk-git-server
     image: codeberg.org/forgejo/forgejo:15.0.0
     ports:
-      - "6080:6080"
+    - "6080:6080"
     volumes:
-      - ./forgejo.conf:/app.ini.sample:ro
-      - ../../dev/git-server/data:/data
-      - ./entrypoint.sh:/entrypoint.sh:ro
+    - ./forgejo.conf:/app.ini.sample:ro
+    - ./runner-config.yaml:/runner-config.yaml:ro
+    - ../../dev/git-server/data:/data
+    - ./entrypoint.sh:/entrypoint.sh:ro
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    healthcheck:
+      test: [ "CMD-SHELL", "test -f /data/runner/config.yaml" ]
+      interval: 10s
+      retries: 5
+      start_period: 2s
+      timeout: 10s
     networks:
       kind:
         aliases:
-          - git.local.gardener.cloud
+        - git.local.gardener.cloud
+
+  docker-in-docker:
+    image: data.forgejo.org/oci/docker:dind
+    hostname: docker  # Must set hostname as TLS certificates are only valid for docker or localhost
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_HOST: docker-in-docker
+    volumes:
+    - docker_certs:/certs
+    networks:
+      kind:
+
+  runner:
+    image: data.forgejo.org/forgejo/runner:12.7.2
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: "1"
+    volumes:
+    - ../../dev/git-server/data/runner:/data
+    - docker_certs:/certs
+    restart: unless-stopped
+    depends_on:
+      git:
+        condition: service_healthy
+    command: >-
+      forgejo-runner --config /data/config.yaml daemon
+    networks:
+      kind:
 
 networks:
   kind:
