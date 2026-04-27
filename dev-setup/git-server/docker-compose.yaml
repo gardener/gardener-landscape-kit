@@ -21,7 +21,7 @@ services:
       test: [ "CMD-SHELL", "test -f /data/runner/config.yaml" ]
       interval: 10s
       retries: 5
-      start_period: 5s
+      start_period: 2s
       timeout: 10s
     networks:
       kind:
