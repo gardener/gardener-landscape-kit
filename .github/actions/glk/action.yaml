@@ -1,0 +1,64 @@
+name: GLK
+description: Run gardener-landscape-kit commands using the container image version from components.yaml
+
+inputs:
+  components-file:
+    description: Path to the GLK components.yaml
+    required: true
+  commands:
+    description: |
+      GLK commands to execute, one per line. If not provided, runs default commands.
+      Lines starting with # are treated as comments and ignored.
+      Example:
+        generate base -c landscape/glk.yaml ./base
+        generate landscape -c landscape/glk.yaml .
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+  - name: Extract GLK version from components.yaml
+    id: glk-version
+    shell: bash
+    run: |
+      version=$(grep -A1 'name: github.com/gardener/gardener-landscape-kit' "${{ inputs.components-file }}" | grep 'version:' | awk '{print $2}')
+      echo "version=${version}" >> "$GITHUB_OUTPUT"
+      echo "GLK version: ${version}"
+
+  - name: Run GLK resolve and generate
+    shell: bash
+    env:
+      GLK_IMAGE: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit:${{ steps.glk-version.outputs.version }}
+      GLK_COMMANDS: ${{ inputs.commands }}
+    run: |
+      set -euo pipefail
+      # GLK wrapper function
+      glk() {
+        docker run --rm --user "$(id -u):$(id -g)" -v "${{ github.workspace }}:/workspace" -w /workspace "${GLK_IMAGE}" "$@"
+      }
+      
+      # GLK commands
+      echo "Running GLK commands"
+      
+      command_number=0
+      while IFS= read -r line; do
+        # Skip empty lines and comments
+        if [ -n "$line" ] && [[ ! "$line" =~ ^[[:space:]]*# ]]; then
+          command_number=$((command_number + 1))
+      
+          # Strip 'glk' prefix if present
+          if [[ "$line" =~ ^glk[[:space:]]+ ]]; then
+            line="${line#glk }"
+          fi
+      
+          echo "[$command_number] Executing: glk ${line}"
+          eval "glk ${line}"
+        fi
+      done <<< "${GLK_COMMANDS}"
+      
+      if [ $command_number -eq 0 ]; then
+        echo "Warning: No valid commands found in input"
+      else
+        echo "Successfully executed $command_number command(s)"
+      fi

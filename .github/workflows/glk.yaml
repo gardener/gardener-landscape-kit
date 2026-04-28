@@ -1,0 +1,61 @@
+# Reusable workflow for running GLK commands in a pull request context.
+# It checks out the PR branch, runs specified GLK commands, and commits any changes back to the PR branch.
+name: GLK PR Workflow
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: 'Runner to use for the job'
+        required: false
+        type: string
+        default: 'ubuntu-latest'
+      glk-commands:
+        description: 'GLK commands to execute (newline-separated)'
+        required: true
+        type: string
+      components-file:
+        description: 'Path to components.yaml file'
+        required: false
+        type: string
+      commit-message:
+        description: 'Commit message for generated changes'
+        required: false
+        type: string
+        default: 'chore: run gardener-landscape-kit'
+
+jobs:
+  glk:
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: ${{ github.event.pull_request.head.ref || github.ref }}
+        repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+    - name: Set up Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: GLK Commands
+      uses: ./.github/actions/glk
+      with:
+        components-file: ${{ inputs.components-file }}
+        commands: ${{ inputs.glk-commands }}
+
+    - name: Commit and push changes
+      run: |
+        git add .
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "${{ inputs.commit-message }}"
+          git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+        fi
