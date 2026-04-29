@@ -13,4 +13,11 @@ spec:
           # User group used by Gardenlet
           - kind: Group
             name: gardener.cloud:system:seeds
+            # a comment at apiGroup
             apiGroup: rbac.authorization.k8s.io
+          moreSubjectsForTesting:
+            # this should be unindented by one level
+            - kind: Group
+              name: gardener.cloud:system:seeds
+              # this should also be unindented by one level
+              apiGroup: rbac.authorization.k8s.io

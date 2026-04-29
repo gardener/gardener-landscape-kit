@@ -6,7 +6,6 @@ package meta
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"unicode"
 )
@@ -15,75 +14,44 @@ const (
 	// commentLevelPrefix marks a comment with its position in the indentation stack.
 	// PostProcess maps the stored level back to a column via the rebuilt stack.
 	commentLevelPrefix = "###LEVEL="
-
-	// commentSeqPeerPrefix marks a comment that precedes a sequence item ("- ").
-	// PostProcess resolves it by peeking at the next content line's indentation,
-	// so it is immune to indentation-stack drift caused by the YAML encoder.
-	commentSeqPeerPrefix = "###SEQPEER#"
 )
 
 // PreProcess marks standalone comment lines with indentation metadata so that
 // PostProcess can restore their original alignment after a YAML encode round-trip.
 //
-// Two marker types are used:
-//   - ###SEQPEER#  — for comments immediately before a sequence item ("- ").
-//     Resolved by matching the next content line's indentation.
-//   - ###LEVEL=N   — for all other comments.
-//     N is the comment's depth in the indentation stack.
+// Each comment is tagged with ###LEVEL=N where N is the comment's depth in the
+// indentation stack. PostProcess maps N back to a column via the rebuilt stack.
 func PreProcess(yamlContent []byte) []byte {
-	return processLines(yamlContent, func(lines [][]byte, i, indent int, levels []int) []byte {
-		line := lines[i]
-		trimmed := line[indent:]
-		if !bytes.HasPrefix(trimmed, []byte("#")) {
+	return processLines(yamlContent, func(line, trimmed []byte, indent int, levels []int) []byte {
+		if trimmed[0] != '#' {
 			return line
 		}
-
-		if nextContentIsSeqItem(lines, i) {
-			return indentBytes(indent, commentSeqPeerPrefix, trimmed)
-		}
-		level := len(levels) - 1
-		return indentBytes(indent, fmt.Sprintf("%s%d", commentLevelPrefix, level), trimmed)
+		return appendLevel(indent, len(levels)-1, trimmed)
 	})
 }
 
 // PostProcess strips markers added by PreProcess and restores comment indentation.
 func PostProcess(yamlContent []byte) []byte {
-	return processLines(yamlContent, func(lines [][]byte, i, indent int, levels []int) []byte {
-		line := lines[i]
-		trimmed := line[indent:]
-
-		switch {
-		case bytes.HasPrefix(trimmed, []byte(commentSeqPeerPrefix)):
-			comment := trimmed[len(commentSeqPeerPrefix):]
-			if peerIndent := nextContentIndent(lines, i); peerIndent >= 0 {
-				indent = peerIndent
-			}
-			return indentBytes(indent, "", comment)
-
-		case bytes.HasPrefix(trimmed, []byte(commentLevelPrefix)):
-			comment, level := parseLevelMarker(trimmed[len(commentLevelPrefix):])
-			if level >= len(levels) {
-				level = len(levels) - 1
-			}
-			col := 0
-			if level >= 0 {
-				col = levels[level]
-			}
-			return indentBytes(col, "", comment)
-
-		default:
+	return processLines(yamlContent, func(line, trimmed []byte, _ int, levels []int) []byte {
+		if !bytes.HasPrefix(trimmed, []byte(commentLevelPrefix)) {
 			return line
 		}
+
+		comment, level := parseLevelMarker(trimmed[len(commentLevelPrefix):])
+		if level >= len(levels) {
+			level = len(levels) - 1
+		}
+		if level < 0 {
+			level = 0
+		}
+		return indentBytes(levels[level], comment)
 	})
 }
 
-// lineCallback is called for each non-blank line. It may return a modified line.
-type lineCallback func(lines [][]byte, i, indent int, levels []int) []byte
-
-// processLines iterates YAML lines, maintains the indentation stack, and
-// dispatches each non-blank line to fn. This is the shared loop that both
-// PreProcess and PostProcess rely on — the stack-tracking logic is identical.
-func processLines(yamlContent []byte, fn lineCallback) []byte {
+// processLines iterates YAML lines, maintains an indentation stack, and calls
+// fn for each non-blank line. Comments do not permanently alter the stack:
+// they compute their level from a temporary stack state, which is discarded.
+func processLines(yamlContent []byte, fn func(line, trimmed []byte, indent int, levels []int) []byte) []byte {
 	if len(yamlContent) == 0 {
 		return yamlContent
 	}
@@ -97,30 +65,44 @@ func processLines(yamlContent []byte, fn lineCallback) []byte {
 	for i, line := range lines {
 		indent := lineIndent(line)
 		if indent < 0 {
-			continue // blank line
+			continue
 		}
+		trimmed := line[indent:]
 
-		// Update the indentation stack. Must mirror the original algorithm exactly.
-		if indent < oldIndent {
-			for len(levels) > 0 && indent < oldIndent {
-				oldIndent = levels[len(levels)-1]
-				levels = levels[:len(levels)-1]
-			}
-			if len(levels) == 0 {
-				levels = []int{0}
-			} else {
-				levels = append(levels, indent)
-			}
-		}
-		if indent > oldIndent {
-			levels = append(levels, indent)
-			oldIndent = indent
-		}
+		newLevels, newOld := pushPop(levels, oldIndent, indent)
+		lines[i] = fn(line, trimmed, indent, newLevels)
 
-		lines[i] = fn(lines, i, indent, levels)
+		if trimmed[0] != '#' {
+			levels = newLevels
+			oldIndent = newOld
+		}
 	}
 
 	return bytes.Join(lines, []byte("\n"))
+}
+
+// pushPop returns an updated indentation stack after incorporating indent.
+// Always returns a new slice to avoid aliasing.
+func pushPop(levels []int, oldIndent, indent int) ([]int, int) {
+	out := make([]int, len(levels))
+	copy(out, levels)
+
+	if indent < oldIndent {
+		for len(out) > 0 && indent < oldIndent {
+			oldIndent = out[len(out)-1]
+			out = out[:len(out)-1]
+		}
+		if len(out) == 0 {
+			out = []int{0}
+		} else {
+			out = append(out, indent)
+		}
+	}
+	if indent > oldIndent {
+		out = append(out, indent)
+		oldIndent = indent
+	}
+	return out, oldIndent
 }
 
 // lineIndent returns the column of the first non-space character, or -1 for blank lines.
@@ -128,49 +110,32 @@ func lineIndent(line []byte) int {
 	return bytes.IndexFunc(line, func(r rune) bool { return !unicode.IsSpace(r) })
 }
 
-// indentBytes builds a line: <indent spaces> + prefix + content.
-func indentBytes(indent int, prefix string, content []byte) []byte {
-	out := make([]byte, 0, indent+len(prefix)+len(content))
-	out = append(out, bytes.Repeat([]byte(" "), indent)...)
-	out = append(out, prefix...)
-	out = append(out, content...)
+// indentBytes builds a line: <indent spaces> + content.
+func indentBytes(indent int, content []byte) []byte {
+	out := make([]byte, indent+len(content))
+	for j := range indent {
+		out[j] = ' '
+	}
+	copy(out[indent:], content)
 	return out
 }
 
-// nextContentIsSeqItem reports whether the next non-blank, non-comment line starts with "- ".
-func nextContentIsSeqItem(lines [][]byte, after int) bool {
-	for j := after + 1; j < len(lines); j++ {
-		indent := lineIndent(lines[j])
-		if indent < 0 {
-			continue
-		}
-		trimmed := lines[j][indent:]
-		if bytes.HasPrefix(trimmed, []byte("#")) {
-			continue
-		}
-		return bytes.HasPrefix(trimmed, []byte("- "))
+// appendLevel builds a marker line: <indent spaces> + ###LEVEL=N + comment.
+func appendLevel(indent, level int, comment []byte) []byte {
+	prefix := []byte(commentLevelPrefix)
+	levelStr := strconv.AppendInt(nil, int64(level), 10)
+	out := make([]byte, indent+len(prefix)+len(levelStr)+len(comment))
+	for j := range indent {
+		out[j] = ' '
 	}
-	return false
+	n := indent
+	n += copy(out[n:], prefix)
+	n += copy(out[n:], levelStr)
+	copy(out[n:], comment)
+	return out
 }
 
-// nextContentIndent returns the indentation of the next non-blank, non-marker line.
-// Returns -1 if no such line exists.
-func nextContentIndent(lines [][]byte, after int) int {
-	for j := after + 1; j < len(lines); j++ {
-		indent := lineIndent(lines[j])
-		if indent < 0 {
-			continue
-		}
-		trimmed := lines[j][indent:]
-		if bytes.HasPrefix(trimmed, []byte(commentLevelPrefix)) || bytes.HasPrefix(trimmed, []byte(commentSeqPeerPrefix)) {
-			continue
-		}
-		return indent
-	}
-	return -1
-}
-
-// parseLevelMarker extracts the level number and the original comment text from a LEVEL marker.
+// parseLevelMarker extracts the level number and the original comment text.
 // Input is everything after the "###LEVEL=" prefix, e.g. "3# some comment".
 func parseLevelMarker(after []byte) (comment []byte, level int) {
 	idx := bytes.IndexByte(after, '#')

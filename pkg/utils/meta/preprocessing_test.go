@@ -99,14 +99,24 @@ var _ = Describe("YAML Preprocessing", func() {
 
 				content, err := fs.ReadFile("/landscape/components/garden/garden.yaml")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(content)).To(ContainSubstring("          # User group used by Gardenlet"), "first generate")
+				Expect(string(content)).To(And(
+					ContainSubstring("          # User group used by Gardenlet"),
+					ContainSubstring("            # a comment at apiGroup"),
+					MatchRegexp(`(?m)^\s{10}# this should be unindented by one level$`),
+					MatchRegexp(`(?m)^\s{12}# this should also be unindented by one level$`),
+				), "first generate")
 
 				// Second generate: oldDefault and current exist from first run
 				Expect(files.WriteObjectsToFilesystem(map[string][]byte{"garden.yaml": gardenTemplate}, "/landscape", "components/garden", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
 
 				content, err = fs.ReadFile("/landscape/components/garden/garden.yaml")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(content)).To(ContainSubstring("          # User group used by Gardenlet"), "second generate")
+				Expect(string(content)).To(And(
+					ContainSubstring("          # User group used by Gardenlet"),
+					ContainSubstring("            # a comment at apiGroup"),
+					MatchRegexp(`(?m)^\s{10}# this should be unindented by one level$`),
+					MatchRegexp(`(?m)^\s{12}# this should also be unindented by one level$`),
+				), "second generate")
 			})
 		})
 	})
