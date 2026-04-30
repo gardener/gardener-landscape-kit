@@ -56,8 +56,8 @@ ocm:
   ignoreMissingComponents: true
 EOF
 
-# Fake component as custom OCM component, to be resolved by the landscapekit and written to the components vector file.
-echo $componentName > "$tmp_dir/ocm-component-name"
+# Fake component as custom component, to be resolved by the landscapekit and written to the components vector file.
+echo $componentName > "$tmp_dir/component-name"
 
 go run ./cmd/gardener-landscape-kit resolve ocm -c "$tmp_dir/landscapekitconfiguration.yaml" -d "$tmp_dir" > /dev/null
 
