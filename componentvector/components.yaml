@@ -132,7 +132,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-dns-service
 - name: github.com/gardener/gardener-extension-shoot-oidc-service
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-oidc-service
-  version: v0.38.0
+  version: v0.39.0
   resources:
     shootOidcService:
       helmChart:
