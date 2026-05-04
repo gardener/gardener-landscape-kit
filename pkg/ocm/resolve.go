@@ -232,11 +232,11 @@ func (r *ocmComponentsResolver) findCustomComponents() (sets.Set[string], error)
 		}
 		content, err := os.ReadFile(path) // #nosec: G304,G122 -- safe, as it's reading within the landscape directory
 		if err != nil {
-			return fmt.Errorf("failed to read custom OCM component name file %s: %w", path, err)
+			return fmt.Errorf("failed to read custom component name file %s: %w", path, err)
 		}
 		name := strings.TrimSpace(string(content))
 		customComponents.Insert(name)
-		r.log.Info("Found custom OCM component", "name", name, "file", path)
+		r.log.Info("Found custom component", "name", name, "file", path)
 		return nil
 	}); err != nil {
 		return nil, fmt.Errorf("failed to walk landscape directory %s: %w", r.landscapeDir, err)
