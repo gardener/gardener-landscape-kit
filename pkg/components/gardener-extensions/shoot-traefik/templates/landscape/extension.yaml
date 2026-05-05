@@ -1,0 +1,30 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  name: shoot-traefik
+spec:
+  deployment:
+    extension:
+      helm:
+        ociRepository:
+          ref: {{ .resources.shootTraefik.helmChart.ref }}
+      {{- if (or .resources.shootTraefik.helmChart.imageMap .imageVectorOverwrite) }}
+      runtimeClusterValues:
+        {{- if .resources.shootTraefik.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootTraefik.helmChart.imageMap.gardenerExtensionShootTraefik | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite:
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}
+      {{- if (or .resources.shootTraefik.helmChart.imageMap .imageVectorOverwrite) }}
+      values:
+        {{- if .resources.shootTraefik.helmChart.imageMap }}
+{{ toIndentYAML 2 .resources.shootTraefik.helmChart.imageMap.gardenerExtensionShootTraefik | indent 8 }}
+        {{- end }}
+        {{- if .imageVectorOverwrite }}
+        imageVectorOverwrite:
+{{ indent 10 .imageVectorOverwrite }}
+        {{- end }}
+      {{- end }}

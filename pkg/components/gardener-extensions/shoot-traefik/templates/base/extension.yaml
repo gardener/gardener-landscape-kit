@@ -1,0 +1,13 @@
+apiVersion: operator.gardener.cloud/v1alpha1
+kind: Extension
+metadata:
+  annotations:
+    security.gardener.cloud/pod-security-enforce: baseline
+  name: shoot-traefik
+spec:
+  resources:
+  - clusterCompatibility:
+    - shoot
+    kind: Extension
+    type: shoot-traefik
+    workerlessSupported: false

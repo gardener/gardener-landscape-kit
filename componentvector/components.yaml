@@ -137,6 +137,13 @@ components:
     shootOidcService:
       helmChart:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service
+- name: github.com/gardener/gardener-extension-shoot-traefik
+  sourceRepository: https://github.com/gardener/gardener-extension-shoot-traefik
+  version: v0.4.0
+  resources:
+    shootTraefik:
+      helmChart:
+        repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-traefik
 - name: github.com/gardener/gardener-extension-shoot-networking-problemdetector
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-networking-problemdetector
   version: v0.32.1

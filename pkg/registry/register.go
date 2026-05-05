@@ -29,6 +29,7 @@ import (
 	dnsservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-dns-service"
 	networkingproblemdetector "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-networking-problemdetector"
 	oidcservice "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-oidc-service"
+	traefik "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/shoot-traefik"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 	virtualgardenaccess "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/virtual-garden-access"
@@ -52,6 +53,7 @@ var ComponentList = []func() components.Interface{
 	certservice.NewComponent,
 	dnsservice.NewComponent,
 	oidcservice.NewComponent,
+	traefik.NewComponent,
 	networkingproblemdetector.NewComponent,
 	gvisor.NewComponent,
 	virtualgardenaccess.NewComponent,
