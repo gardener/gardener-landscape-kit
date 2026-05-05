@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	virtualgardenaccess "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/virtual-garden-access"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/virtual-garden-access"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -45,7 +45,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := virtualgardenaccess.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			for _, file := range []string{
@@ -76,7 +76,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := virtualgardenaccess.NewComponent()
+			component := NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())

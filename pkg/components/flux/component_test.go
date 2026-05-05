@@ -24,7 +24,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/components/flux"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 )
 
 var (
@@ -81,12 +81,12 @@ var _ = Describe("Flux Component Generation", func() {
 
 	Describe("#GenerateLandscape", func() {
 		It("should correctly generate the flux landscape directory", func() {
-			component := flux.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 		})
 
 		It("should not recreate a deleted gitignore file", func() {
-			component := flux.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 			Expect(fs.Exists("/landscapeDir/flux/flux-system/.gitignore")).To(BeTrue())
 
@@ -98,7 +98,7 @@ var _ = Describe("Flux Component Generation", func() {
 		})
 
 		It("should not reformat previously generated manifests (idempotency)", func() {
-			component := flux.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 			initialContents, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-sync.yaml")
@@ -114,7 +114,7 @@ var _ = Describe("Flux Component Generation", func() {
 
 		Context("GOTK Sync Manifest", func() {
 			test := func(opts components.LandscapeOptions, refMatcher types.GomegaMatcher) {
-				component := flux.NewComponent()
+				component := NewComponent()
 				Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 				gotkData, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-sync.yaml")

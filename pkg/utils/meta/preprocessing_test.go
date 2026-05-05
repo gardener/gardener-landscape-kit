@@ -12,7 +12,7 @@ import (
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
 var _ = Describe("YAML Preprocessing", func() {
@@ -21,11 +21,11 @@ var _ = Describe("YAML Preprocessing", func() {
 			input := []byte("# This is a comment\nkey: value\n# Another comment")
 
 			// PreProcess should add markers to comment lines
-			preprocessed := meta.PreProcess(input)
+			preprocessed := PreProcess(input)
 			Expect(string(preprocessed)).To(ContainSubstring("###LEVEL=0#"))
 
 			// PostProcess should remove markers and re-align comments
-			postprocessed := meta.PostProcess(preprocessed)
+			postprocessed := PostProcess(preprocessed)
 			Expect(string(postprocessed)).To(Equal(string(input)))
 			Expect(string(postprocessed)).NotTo(ContainSubstring("###LEVEL="))
 		})
@@ -33,10 +33,10 @@ var _ = Describe("YAML Preprocessing", func() {
 		It("should handle empty content", func() {
 			input := []byte("")
 
-			preprocessed := meta.PreProcess(input)
+			preprocessed := PreProcess(input)
 			Expect(preprocessed).To(BeEmpty())
 
-			postprocessed := meta.PostProcess(preprocessed)
+			postprocessed := PostProcess(preprocessed)
 			Expect(postprocessed).To(BeEmpty())
 		})
 
@@ -46,12 +46,12 @@ var _ = Describe("YAML Preprocessing", func() {
 			expected, err := testdata.ReadFile("testdata/preprocessing-1-expected.yaml")
 			Expect(err).ToNot(HaveOccurred())
 
-			preprocessed := meta.PreProcess(input)
+			preprocessed := PreProcess(input)
 			var node yaml.Node
 			Expect(yaml.Unmarshal(preprocessed, &node)).ToNot(HaveOccurred())
-			formatted, err := meta.EncodeResult(&node)
+			formatted, err := EncodeResult(&node)
 			Expect(err).ToNot(HaveOccurred())
-			postprocessed := meta.PostProcess(formatted)
+			postprocessed := PostProcess(formatted)
 			Expect(string(postprocessed)).To(Equal(string(expected)))
 		})
 

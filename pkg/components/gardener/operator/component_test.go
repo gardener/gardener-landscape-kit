@@ -18,7 +18,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/operator"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
@@ -52,7 +52,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := operator.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			for _, file := range []string{
@@ -92,7 +92,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := operator.NewComponent()
+			component := NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
@@ -112,7 +112,7 @@ var _ = Describe("Component Generation", func() {
 
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
-				component := operator.NewComponent()
+				component := NewComponent()
 				Expect(test.CreateComponentsVectorFile(fs, build)).To(Succeed())
 				result, err := test.KustomizeComponent(fs, component, "components/gardener/operator")
 				Expect(err).ToNot(HaveOccurred())

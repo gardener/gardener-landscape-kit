@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
-	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
+	. "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
 )
 
 var _ = Describe("Validation", func() {
@@ -21,7 +21,7 @@ var _ = Describe("Validation", func() {
 		It("should pass if no OCM or Git config is provided", func() {
 			conf := &v1alpha1.LandscapeKitConfiguration{}
 
-			errList := validation.ValidateLandscapeKitConfiguration(conf)
+			errList := ValidateLandscapeKitConfiguration(conf)
 			Expect(errList).To(BeEmpty())
 		})
 
@@ -46,7 +46,7 @@ var _ = Describe("Validation", func() {
 				},
 			}
 
-			errList := validation.ValidateLandscapeKitConfiguration(conf)
+			errList := ValidateLandscapeKitConfiguration(conf)
 			Expect(errList).To(BeEmpty())
 		})
 
@@ -63,7 +63,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
@@ -92,7 +92,7 @@ var _ = Describe("Validation", func() {
 						},
 					}
 
-					return validation.ValidateLandscapeKitConfiguration(conf)
+					return ValidateLandscapeKitConfiguration(conf)
 				}
 
 				It("should pass with valid URL", func() {
@@ -127,7 +127,7 @@ var _ = Describe("Validation", func() {
 						},
 					}
 
-					return validation.ValidateLandscapeKitConfiguration(conf)
+					return ValidateLandscapeKitConfiguration(conf)
 				}
 
 				It("should pass with valid refs", func() {
@@ -167,7 +167,7 @@ var _ = Describe("Validation", func() {
 						},
 					}
 
-					return validation.ValidateLandscapeKitConfiguration(conf)
+					return ValidateLandscapeKitConfiguration(conf)
 				}
 
 				It("should pass with valid relative paths", func() {
@@ -197,7 +197,7 @@ var _ = Describe("Validation", func() {
 			It("should pass with empty include and exclude lists", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
 
@@ -208,7 +208,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
 
@@ -219,7 +219,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeDuplicate),
@@ -235,7 +235,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
 
@@ -246,7 +246,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeDuplicate),
@@ -263,7 +263,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeForbidden),
@@ -278,7 +278,7 @@ var _ = Describe("Validation", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
 					OCM: ocmConf,
 				}
-				return validation.ValidateLandscapeKitConfiguration(conf)
+				return ValidateLandscapeKitConfiguration(conf)
 			}, field.NewPath("ocm"))
 		})
 
@@ -290,7 +290,7 @@ var _ = Describe("Validation", func() {
 					},
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
 		})
@@ -304,14 +304,14 @@ var _ = Describe("Validation", func() {
 					conf := &v1alpha1.LandscapeKitConfiguration{
 						MergeMode: &mode,
 					}
-					errList := validation.ValidateLandscapeKitConfiguration(conf)
+					errList := ValidateLandscapeKitConfiguration(conf)
 					Expect(errList).To(BeEmpty(), fmt.Sprintf("MergeMode %q should be valid", mode))
 				}
 			})
 
 			It("should pass when MergeMode is not set", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{}
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(BeEmpty())
 			})
 
@@ -321,7 +321,7 @@ var _ = Describe("Validation", func() {
 					MergeMode: &invalid,
 				}
 
-				errList := validation.ValidateLandscapeKitConfiguration(conf)
+				errList := ValidateLandscapeKitConfiguration(conf)
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":     Equal(field.ErrorTypeNotSupported),

@@ -17,25 +17,25 @@ import (
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
 	"sigs.k8s.io/yaml"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
+	. "github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
 const resourcesDir = "testdata"
 
 const (
-	refTestExtension                  = components.ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
-	refGardener                       = components.ComponentReference("github.com/gardener/gardener:v1.128.3")
-	refRoot                           = components.ComponentReference("example.com/kubernetes-root-example:0.1499.0")
-	refRuntimeGvisor                  = components.ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.30.0")
+	refTestExtension                  = ComponentReference("github.com/gardener/gardener-extension-shoot-cert-service:v1.53.0")
+	refGardener                       = ComponentReference("github.com/gardener/gardener:v1.128.3")
+	refRoot                           = ComponentReference("example.com/kubernetes-root-example:0.1499.0")
+	refRuntimeGvisor                  = ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.30.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
 )
 
 var _ = Describe("Components", func() {
 	var (
-		c *components.Components
+		c *Components
 
-		loadDescriptor = func(cref components.ComponentReference) *descriptorruntime.Descriptor {
+		loadDescriptor = func(cref ComponentReference) *descriptorruntime.Descriptor {
 			filename := cref.ToFilename(resourcesDir)
 			data, err := os.ReadFile(filename)
 			Expect(err).NotTo(HaveOccurred())
@@ -46,13 +46,13 @@ var _ = Describe("Components", func() {
 			return desc
 		}
 
-		loadWithDep = func(levels int, roots ...components.ComponentReference) {
+		loadWithDep = func(levels int, roots ...ComponentReference) {
 			Expect(levels).To(BeNumerically(">=", 0))
 			loadWithDepRecursive(c, loadDescriptor, levels, roots...)
 		}
 	)
 	BeforeEach(func() {
-		c = components.NewComponents()
+		c = NewComponents()
 	})
 
 	It("should produce correct image vector for extension-shoot-cert-service", func() {
@@ -89,26 +89,26 @@ var _ = Describe("Components", func() {
 		resources := c.GetResources(refTestExtension)
 		Expect(resources).To(HaveLen(4))
 		Expect(resources).To(ContainElements(
-			components.Resource{
+			Resource{
 				Name:    "gardener-extension-shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "ociImage",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/gardener/extensions/shoot-cert-service:v1.53.0@sha256:73d1016d52140655c444d1189ad90826a81eb2418126fbbae365b9c9ee0ddcfd",
 				Local:   new(true),
 			},
-			components.Resource{
+			Resource{
 				Name:    "shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "helmChart/v1",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/extensions/shoot-cert-service:v1.53.0@sha256:1236fb136e6951d2c438d6ae315721425f866fc494e2d811582b43c0a579e90e",
 			},
-			components.Resource{
+			Resource{
 				Name:    "shoot-cert-service",
 				Version: "v1.53.0",
 				Type:    "helmchart-imagemap",
 				Value:   "{\"helmchartResource\": {\"name\": \"shoot-cert-service\"}, \"imageMapping\": []}",
 			},
-			components.Resource{
+			Resource{
 				Name:    "cert-management",
 				Version: "v0.17.7",
 				Type:    "ociImage",
@@ -237,31 +237,31 @@ var _ = Describe("Components", func() {
 		resources := c.GetResources(refGardener)
 		Expect(resources).To(HaveLen(52))
 		Expect(resources).To(ContainElements(
-			components.Resource{
+			Resource{
 				Name:    "resource-manager",
 				Version: "v1.128.3",
 				Type:    "helmChart/v1",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/resource-manager:v1.128.3@sha256:ce1e87bde456347a364035314092ff699a7522bb3f90c65a2f21a88915ad4e7e",
 			},
-			components.Resource{
+			Resource{
 				Name:    "resource-manager",
 				Version: "v1.128.3",
 				Type:    "helmchart-imagemap",
 				Value:   "{\"helmchartResource\": {\"name\": \"resource-manager\"}, \"imageMapping\": []}",
 			},
-			components.Resource{
+			Resource{
 				Name:    "gardenlet",
 				Version: "v1.128.3",
 				Type:    "helmChart/v1",
 				Value:   "registry.example.com/path/to/repo/europe-docker_pkg_dev/gardener-project/releases/charts/gardener/gardenlet:v1.128.3@sha256:a5880e6933465e58536fdfb381acee013905ecd6888d94f0d484dff081ab0b11",
 			},
-			components.Resource{
+			Resource{
 				Name:    "gardenlet",
 				Version: "v1.128.3",
 				Type:    "helmchart-imagemap",
 				Value:   gardenletHelmChartImageMapContent,
 			},
-			components.Resource{
+			Resource{
 				Name:    "gardenlet",
 				Version: "v1.128.3",
 				Type:    "ociImage",
@@ -491,7 +491,7 @@ func countImagesByName(images []imagevector.ImageSource, name string) int {
 	return count
 }
 
-func loadWithDepRecursive(c *components.Components, loadDescriptor func(cref components.ComponentReference) *descriptorruntime.Descriptor, levels int, roots ...components.ComponentReference) {
+func loadWithDepRecursive(c *Components, loadDescriptor func(cref ComponentReference) *descriptorruntime.Descriptor, levels int, roots ...ComponentReference) {
 	Expect(levels).To(BeNumerically(">=", 0))
 	for _, root := range roots {
 		desc := loadDescriptor(root)
@@ -504,13 +504,13 @@ func loadWithDepRecursive(c *components.Components, loadDescriptor func(cref com
 	}
 }
 
-func addFakeLocalBlobs(desc *descriptorruntime.Descriptor) components.Blobs {
-	var blobs components.Blobs
+func addFakeLocalBlobs(desc *descriptorruntime.Descriptor) Blobs {
+	var blobs Blobs
 	for _, res := range desc.Component.Resources {
-		if res.Type == components.ResourceTypeHelmChartImageMap {
+		if res.Type == ResourceTypeHelmChartImageMap {
 			// simulate that we have the ociImage blobs available locally
 			if blobs == nil {
-				blobs = components.Blobs{}
+				blobs = Blobs{}
 			}
 			json := fmt.Sprintf(`{"helmchartResource": {"name": %q}, "imageMapping": []}`, res.Name)
 			if res.Name == "gardenlet" {

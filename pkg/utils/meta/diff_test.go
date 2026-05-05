@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utils/meta"
 )
 
 var (
@@ -42,7 +42,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			objYaml, err := yaml.Marshal(obj)
 			Expect(err).NotTo(HaveOccurred())
 
-			newContents, err := meta.ThreeWayMergeManifest(nil, objYaml, nil, configv1alpha1.MergeModeSilent)
+			newContents, err := ThreeWayMergeManifest(nil, objYaml, nil, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 
 			// Modify the manifest on disk
@@ -58,7 +58,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			newObjYaml, err := yaml.Marshal(obj)
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err = meta.ThreeWayMergeManifest(objYaml, newObjYaml, content, configv1alpha1.MergeModeSilent)
+			content, err = ThreeWayMergeManifest(objYaml, newObjYaml, content, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedConfigMapOutputWithNewKey, err := testdata.ReadFile("testdata/expected_configmap_output_newkey.yaml")
@@ -77,7 +77,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			manifestGenerated, err := testdata.ReadFile("testdata/manifest-4-expected-generated.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			mergedManifest, err := meta.ThreeWayMergeManifest(manifestDefault, manifestDefaultNew, manifestEdited, configv1alpha1.MergeModeSilent)
+			mergedManifest, err := ThreeWayMergeManifest(manifestDefault, manifestDefaultNew, manifestEdited, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(mergedManifest)).To(Equal(string(manifestGenerated)))
 		})
@@ -88,7 +88,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			expectedConfigMapOutputWithNewKey, err := testdata.ReadFile("testdata/expected_configmap_output_newkey.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err := meta.ThreeWayMergeManifest(nil, expectedConfigMapOutputWithNewKey, []byte(strings.ReplaceAll(string(expectedDefaultConfigMapOutput), "key: value", "key: newDefaultValue")), configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(nil, expectedConfigMapOutputWithNewKey, []byte(strings.ReplaceAll(string(expectedDefaultConfigMapOutput), "key: value", "key: newDefaultValue")), configv1alpha1.MergeModeSilent)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(content)).To(Equal(strings.ReplaceAll(string(expectedConfigMapOutputWithNewKey), "key: value", "key: newDefaultValue") + "\n"))
 		})
@@ -103,21 +103,21 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			multipleManifestsExpectedGenerated, err := testdata.ReadFile("testdata/multiple-manifests-4-expected-generated.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err := meta.ThreeWayMergeManifest(nil, multipleManifestsInitial, nil, configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(nil, multipleManifestsInitial, nil, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(multipleManifestsInitial)))
 
-			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsInitial, configv1alpha1.MergeModeSilent)
+			content, err = ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsInitial, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(multipleManifestsInitial)))
 
 			// Editing the written manifest and updating the manifest with the same default content should not overwrite anything
-			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsEdited, configv1alpha1.MergeModeSilent)
+			content, err = ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsInitial, multipleManifestsEdited, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(multipleManifestsEdited)))
 
 			// New default manifest changes should be applied, while custom edits should be retained.
-			content, err = meta.ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsNewDefault, multipleManifestsEdited, configv1alpha1.MergeModeSilent)
+			content, err = ThreeWayMergeManifest(multipleManifestsInitial, multipleManifestsNewDefault, multipleManifestsEdited, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(multipleManifestsExpectedGenerated)))
 		})
@@ -132,7 +132,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			expected, err := testdata.ReadFile("testdata/order-4-expected.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(expected)))
 		})
@@ -146,22 +146,22 @@ var _ = Describe("Meta Dir Config Diff", func() {
 				invalidYaml = []byte(`keyWith: colonSuffix:`)
 			)
 
-			_, err = meta.ThreeWayMergeManifest(emptyYaml, invalidYaml, emptyYaml, configv1alpha1.MergeModeSilent)
+			_, err = ThreeWayMergeManifest(emptyYaml, invalidYaml, emptyYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("parsing newDefault file for manifest diff failed"))
 
-			_, err = meta.ThreeWayMergeManifest(invalidYaml, validYaml, validYaml, configv1alpha1.MergeModeSilent)
+			_, err = ThreeWayMergeManifest(invalidYaml, validYaml, validYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("parsing oldDefault file for manifest diff failed"))
 
-			_, err = meta.ThreeWayMergeManifest(validYaml, validYaml, invalidYaml, configv1alpha1.MergeModeSilent)
+			_, err = ThreeWayMergeManifest(validYaml, validYaml, invalidYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("parsing current file for manifest diff failed"))
 
-			_, err = meta.ThreeWayMergeManifest(validYaml, validYaml, validYaml, configv1alpha1.MergeModeSilent)
+			_, err = ThreeWayMergeManifest(validYaml, validYaml, validYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 
-			_, err = meta.ThreeWayMergeManifest(emptyYaml, emptyYaml, emptyYaml, configv1alpha1.MergeModeSilent)
+			_, err = ThreeWayMergeManifest(emptyYaml, emptyYaml, emptyYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -176,7 +176,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 				expected, err := testdata.ReadFile("testdata/replaced-file-4-expected-generated.yaml")
 				Expect(err).NotTo(HaveOccurred())
 
-				content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
+				content, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(Equal(string(expected)))
 			})
@@ -191,7 +191,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 				expected, err := testdata.ReadFile("testdata/replaced-file-2-new-default.yaml")
 				Expect(err).NotTo(HaveOccurred())
 
-				content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
+				content, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(content)).To(Equal(string(expected)))
 			})
@@ -202,7 +202,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			// Two documents with the same structure should be treated as the same manifest across generations.
 			nonK8sYaml := []byte("foo: bar\nbaz: qux\n")
 
-			content, err := meta.ThreeWayMergeManifest(nonK8sYaml, nonK8sYaml, nonK8sYaml, configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(nonK8sYaml, nonK8sYaml, nonK8sYaml, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(nonK8sYaml)))
 
@@ -211,7 +211,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			newDefault := []byte("foo: bar\nbaz: updated\n")
 			expected := []byte("foo: user-value\nbaz: updated\n")
 
-			content, err = meta.ThreeWayMergeManifest(nonK8sYaml, newDefault, edited, configv1alpha1.MergeModeSilent)
+			content, err = ThreeWayMergeManifest(nonK8sYaml, newDefault, edited, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(MatchYAML(string(expected)))
 		})
@@ -226,7 +226,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			expected, err := testdata.ReadFile("testdata/replaced-file-6-different-name-merged.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(expected)))
 		})
@@ -241,7 +241,7 @@ var _ = Describe("Meta Dir Config Diff", func() {
 			expected, err := testdata.ReadFile("testdata/merge-slice-4-expected-generated.yaml")
 			Expect(err).NotTo(HaveOccurred())
 
-			content, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
+			content, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeSilent)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(Equal(string(expected)))
 		})
@@ -274,16 +274,16 @@ metadata:
 data:
   version: v1.0.5
 `)
-			result, err := meta.ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeHint)
+			result, err := ThreeWayMergeManifest(oldDefault, newDefault, current, configv1alpha1.MergeModeHint)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(result)).To(ContainSubstring("version: v1.0.5"))
 			Expect(string(result)).To(ContainSubstring("# Attention - new default: v1.1.0"))
 
 			// No conflict: operator did not change the value → new default taken silently, no annotation
-			result, err = meta.ThreeWayMergeManifest(oldDefault, newDefault, oldDefault, configv1alpha1.MergeModeHint)
+			result, err = ThreeWayMergeManifest(oldDefault, newDefault, oldDefault, configv1alpha1.MergeModeHint)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(result)).To(ContainSubstring("version: v1.1.0"))
-			Expect(string(result)).NotTo(ContainSubstring(meta.GLKDefaultPrefix))
+			Expect(string(result)).NotTo(ContainSubstring(GLKDefaultPrefix))
 		})
 	})
 })

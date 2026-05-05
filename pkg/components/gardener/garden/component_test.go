@@ -14,7 +14,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components/gardener/garden"
 )
 
 var _ = Describe("Component Generation", func() {
@@ -45,7 +45,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := garden.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			content, err := fs.ReadFile("/repo/baseDir/components/gardener/garden/garden.yaml")
@@ -68,7 +68,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := garden.NewComponent()
+			component := NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())

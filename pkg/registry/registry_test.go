@@ -17,12 +17,12 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	"github.com/gardener/gardener-landscape-kit/pkg/registry"
+	. "github.com/gardener/gardener-landscape-kit/pkg/registry"
 )
 
 var _ = Describe("Registry", func() {
 	var (
-		reg registry.Interface
+		reg Interface
 
 		config           *v1alpha1.LandscapeKitConfiguration
 		options          components.Options
@@ -30,7 +30,7 @@ var _ = Describe("Registry", func() {
 	)
 
 	BeforeEach(func() {
-		reg = registry.New()
+		reg = New()
 
 		config = &v1alpha1.LandscapeKitConfiguration{
 			Git: &v1alpha1.GitRepository{},
@@ -355,7 +355,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			DeferCleanup(test.WithVars(&registry.ComponentList, mockComponents))
+			DeferCleanup(test.WithVars(&ComponentList, mockComponents))
 		})
 
 		It("should register all components except excluded ones", func() {
@@ -363,7 +363,7 @@ var _ = Describe("Registry", func() {
 				Exclude: []string{"mockComp2"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(RegisterAllComponents(reg, config)).To(Succeed())
 			Expect(reg.GenerateBase(options)).To(Succeed())
 
 			Expect(mockComp1.generateBaseCalled).To(BeTrue())
@@ -376,7 +376,7 @@ var _ = Describe("Registry", func() {
 				Exclude: []string{"unknown", "mockComp2", "unknown2"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(And(
+			Expect(RegisterAllComponents(reg, config)).To(MatchError(And(
 				ContainSubstring(`configuration contains invalid component excludes`),
 				ContainSubstring(`unknown`),
 				ContainSubstring(`unknown2`),
@@ -389,7 +389,7 @@ var _ = Describe("Registry", func() {
 				Include: []string{"mockComp2", "mockComp3"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(RegisterAllComponents(reg, config)).To(Succeed())
 			Expect(reg.GenerateBase(options)).To(Succeed())
 
 			Expect(mockComp1.generateBaseCalled).To(BeFalse())
@@ -402,7 +402,7 @@ var _ = Describe("Registry", func() {
 				Include: []string{"unknown", "mockComp1", "unknown2"},
 			}
 
-			Expect(registry.RegisterAllComponents(reg, config)).To(MatchError(And(
+			Expect(RegisterAllComponents(reg, config)).To(MatchError(And(
 				ContainSubstring(`configuration contains invalid component includes`),
 				ContainSubstring(`unknown`),
 				ContainSubstring(`unknown2`),
@@ -411,7 +411,7 @@ var _ = Describe("Registry", func() {
 		})
 
 		It("should succeed when config is nil", func() {
-			Expect(registry.RegisterAllComponents(reg, nil)).To((Succeed()))
+			Expect(RegisterAllComponents(reg, nil)).To((Succeed()))
 		})
 	})
 })

@@ -17,7 +17,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
-	networking_cilium "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components/gardener-extensions/networking-cilium"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
@@ -50,7 +50,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := networking_cilium.NewComponent()
+			component := NewComponent()
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			content, err := fs.ReadFile("/repo/baseDir/components/gardener-extensions/networking-cilium/extension.yaml")
@@ -74,7 +74,7 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := networking_cilium.NewComponent()
+			component := NewComponent()
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
 			Expect(err).ToNot(HaveOccurred())
@@ -94,7 +94,7 @@ var _ = Describe("Component Generation", func() {
 
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
-				component := networking_cilium.NewComponent()
+				component := NewComponent()
 				Expect(test.CreateComponentsVectorFile(fs, build)).To(Succeed())
 				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/networking-cilium")
 				Expect(err).ToNot(HaveOccurred())

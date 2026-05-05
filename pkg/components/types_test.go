@@ -13,7 +13,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
-	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	. "github.com/gardener/gardener-landscape-kit/pkg/components"
 )
 
 var _ = Describe("Types", func() {
@@ -43,7 +43,7 @@ var _ = Describe("Types", func() {
 			It("should return the target path", func() {
 				opts.TargetDirPath = "/path/to/target"
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/target"))
@@ -52,7 +52,7 @@ var _ = Describe("Types", func() {
 			It("should return empty path when not set", func() {
 				opts.TargetDirPath = ""
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("."))
@@ -61,7 +61,7 @@ var _ = Describe("Types", func() {
 			It("should return a cleaned path", func() {
 				opts.TargetDirPath = "/path/to/target/../landscape"
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/landscape"))
@@ -70,7 +70,7 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetFilesystem", func() {
 			It("should return the filesystem", func() {
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetFilesystem()).To(Equal(fs))
@@ -83,7 +83,7 @@ var _ = Describe("Types", func() {
 					Log: logger,
 				}
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetLogger()).To(Equal(logger))
@@ -98,7 +98,7 @@ var _ = Describe("Types", func() {
 			})
 
 			It("should return an empty component vector when no component vector file is provided", func() {
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -111,7 +111,7 @@ var _ = Describe("Types", func() {
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -132,7 +132,7 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(componentVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -150,7 +150,7 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte("invalid: yaml: content: [[["), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
-				_, err = components.NewOptions(opts, fs)
+				_, err = NewOptions(opts, fs)
 
 				Expect(err).To(MatchError("failed to create component vector: failed to parse override component vector: error converting YAML to JSON: yaml: mapping values are not allowed in this context"))
 			})
@@ -164,7 +164,7 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(partialVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
@@ -176,7 +176,7 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(""), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
-				componentOpts, err := components.NewOptions(opts, fs)
+				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -194,7 +194,7 @@ var _ = Describe("Types", func() {
 				}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				result, err := components.NewOptions(opts, fs)
+				result, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
@@ -230,7 +230,7 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetGitRepository", func() {
 			It("should return the git repository", func() {
-				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetGitRepository()).To(Equal(opts.Config.Git))
@@ -241,7 +241,7 @@ var _ = Describe("Types", func() {
 			It("should return the base path", func() {
 				opts.Config.Git.Paths.Base = "./base"
 
-				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("./base"))
@@ -252,7 +252,7 @@ var _ = Describe("Types", func() {
 			It("should return the landscape path", func() {
 				opts.Config.Git.Paths.Landscape = "./landscape"
 
-				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeLandscapePath()).To(Equal("./landscape"))
@@ -281,7 +281,7 @@ var _ = Describe("Types", func() {
 				}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				result, err := components.NewLandscapeOptions(opts, fs)
+				result, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())

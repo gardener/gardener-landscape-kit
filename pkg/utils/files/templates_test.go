@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
+	. "github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 var _ = Describe("Templates", func() {
 	Describe("#RenderTemplateFiles", func() {
 		It("should render all template files, including subdirectories, correctly", func() {
-			objects, err := files.RenderTemplateFiles(testdata, "testdata", map[string]any{
+			objects, err := RenderTemplateFiles(testdata, "testdata", map[string]any{
 				"key":        "RenderedValue",
 				"anotherKey": "anotherValue",
 			})
