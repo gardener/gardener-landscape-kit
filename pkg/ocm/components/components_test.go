@@ -29,6 +29,7 @@ const (
 	refRoot                           = ComponentReference("example.com/kubernetes-root-example:0.1499.0")
 	refRuntimeGvisor                  = ComponentReference("github.com/gardener/gardener-extension-runtime-gvisor:v0.30.0")
 	gardenletHelmChartImageMapContent = `{"helmchartResource": {"name": "gardenlet"}, "imageMapping": [{"resource": {"name": "gardenlet"}, "repository": "image.repository", "tag": "image.tag"}]}`
+	expectedComponentCount            = 25
 )
 
 var _ = Describe("Components", func() {
@@ -119,7 +120,7 @@ var _ = Describe("Components", func() {
 
 	It("should produce correct image vector for gardener/gardener for rewritten images in OCM components", func() {
 		loadWithDep(3, refRoot)
-		Expect(c.ComponentsCount()).To(Equal(24))
+		Expect(c.ComponentsCount()).To(Equal(expectedComponentCount))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 		imageVector, err := c.GetImageVector(refGardener, false)
@@ -353,7 +354,7 @@ scheduler:
 
 	It("should produce correct image vector for gardener/gardener with original reference", func() {
 		loadWithDep(3, refRoot)
-		Expect(c.ComponentsCount()).To(Equal(24))
+		Expect(c.ComponentsCount()).To(Equal(expectedComponentCount))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 		imageVector, err := c.GetImageVector(refGardener, true)
@@ -463,7 +464,7 @@ scheduler:
 
 	It("should produce correct image vector for runtime-gvisor", func() {
 		loadWithDep(3, refRoot)
-		Expect(c.ComponentsCount()).To(Equal(24))
+		Expect(c.ComponentsCount()).To(Equal(expectedComponentCount))
 		roots := c.GetRootComponents()
 		Expect(roots).To(ConsistOf(refRoot))
 
@@ -478,6 +479,13 @@ scheduler:
 				Tag:        new("v0.30.0@sha256:86e26f6190ef103e9431a2897e38053e0ef2e06b30d20cdcc303827dac966a18"),
 				Version:    new("v0.30.0"),
 			}))
+	})
+
+	It("should contain extra component reference", func() {
+		loadWithDep(3, refRoot)
+		Expect(c.ComponentsCount()).To(Equal(expectedComponentCount))
+
+		Expect(c.GetSortedComponents()).To(ContainElements(ComponentReference("github.com/gardener/diki:v0.25.0")))
 	})
 })
 
