@@ -19,7 +19,7 @@ The initial usage phase is typically executed on a local operator machine to boo
 
 When using GLK for the first time, operators need to:
 
-1. **Prepare Repository Structure**: Set up the base and landscape repositories according to the [repository organization patterns](../usage/repositories.md).
+1. **Prepare Repository Structure**: Set up the base and landscape repositories according to the [repository organization patterns](repositories.md).
 
 2. **Generate Base Manifests**: Create the base directory structure and generate core manifests that are common across multiple landscapes:
    ```bash
@@ -107,7 +107,7 @@ GLK operations should be triggered based on specific events in the repository li
 - Landscape-specific manifests are changed
 - Landscape configuration is modified
 - Component versions in `components.yaml` are updated
-- The referenced base repository is updated (e.g., Git submodule update - see [Repositories](../usage/repositories.md))
+- The referenced base repository is updated (e.g., Git submodule update - see [Repositories](repositories.md))
 
 **Impact**: Changes affect only the specific landscape being generated.
 
@@ -209,7 +209,7 @@ For organizations using multiple landscape stages (`Development` → `QA` → `P
 4. After validation, `QA` landscape updates its base reference
 5. After validation, `Production` landscape updates its base reference
 
-See [Repository Organization](../usage/repositories.md#organization) for more details on base graduation.
+See [Repository Organization](repositories.md#organization) for more details on base graduation.
 
 #### Pattern 4: GLK Version Update
 
