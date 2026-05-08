@@ -31,6 +31,7 @@ ensure_gardener_dir() {
     chmod -R u+w apis
     mv apis gardener/pkg/apis
     chmod u+x gardener/hack/*.sh
+    chmod u+x gardener/dev-setup/*.sh
     mkdir gardener/local
     echo "$gardenerVersion" > gardener/local/VERSION
   fi
@@ -48,9 +49,9 @@ skaffold_build_and_push_provider_local() {
   export SKAFFOLD_PUSH=true
   export SOURCE_DATE_EPOCH=$(date -d $BUILD_DATE +%s)
   export GARDENER_VERSION=$(cat VERSION)
-  sed "s/- registry.local.gardener.cloud:5001/- glk-registry.local.gardener.cloud:6001/g" skaffold-operator.yaml > skaffold-operator-patched.yaml
+  sed "s/- registry.local.gardener.cloud:5001/- glk-registry.local.gardener.cloud:6001/g" dev-setup/skaffold-operator.yaml > dev-setup/skaffold-operator-patched.yaml
 
-  skaffold build -f skaffold-operator-patched.yaml -m provider-local --file-output=local/build-output.json
+  skaffold build -f dev-setup/skaffold-operator-patched.yaml -m provider-local --file-output=local/build-output.json
 }
 
 generate_extension_yaml() {
