@@ -182,7 +182,6 @@ The following dependencies have been updated:\n\
         "github.com/muhlemmer/gu",
         "github.com/munnerz/goautoneg",
         "github.com/mwitkow/go-conntrack",
-        "github.com/mxk/go-flowrate",
         "github.com/nexucis/lamenv",
         "github.com/opencontainers/go-digest",
         "github.com/opencontainers/image-spec",
