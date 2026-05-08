@@ -285,6 +285,20 @@ func (c *Components) AddComponentDependencies(descriptor *descriptorruntime.Desc
 			dependency.ImageVector = append(dependency.ImageVector, *imageSource)
 		}
 	}
+	extraRefs, err := extraReferences(descriptor)
+	if err != nil {
+		return nil, err
+	}
+	for _, ref := range extraRefs {
+		cref := ComponentReference(fmt.Sprintf("%s:%s", ref.ComponentReference.Name, ref.ComponentReference.Version))
+		dependency := dependencies[cref]
+		if dependency == nil {
+			dependency = &Dependency{
+				ComponentReference: cref,
+			}
+			dependencies[cref] = dependency
+		}
+	}
 
 	var newComponents []ComponentReference
 	for cref, dep := range dependencies {
@@ -853,4 +867,30 @@ func dashToCamelCaseForMapKeys(m map[string]*utilscomponentvector.ResourceData) 
 		result[newKey] = *value
 	}
 	return result
+}
+
+type extraComponentReference struct {
+	ComponentReference struct {
+		Name    string `json:"name"`
+		Version string `json:"version"`
+	} `json:"component_reference"`
+}
+
+// extraReferences extracts extra component references from the descriptor's labels.
+func extraReferences(descriptor *descriptorruntime.Descriptor) ([]extraComponentReference, error) {
+	for _, label := range descriptor.Component.Labels {
+		if label.Name == LabelExtraComponentReferences {
+			var refs []extraComponentReference
+			data, err := label.Value.MarshalJSON()
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal label value: %w", err)
+			}
+			err = json.Unmarshal(data, &refs)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal label value into []extraComponentReference: %w", err)
+			}
+			return refs, nil
+		}
+	}
+	return nil, nil
 }
