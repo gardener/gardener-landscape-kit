@@ -9,6 +9,17 @@
       {
         "name": "imagevector.gardener.cloud/application",
         "value": "kubernetes"
+      },
+      {
+        "name": "ocm.software/ocm-gear/extra-component-references",
+        "value": [
+          {
+            "component_reference": {
+              "name": "github.com/gardener/diki",
+              "version": "v0.25.0"
+            }
+          }
+        ]
       }
     ],
     "provider": "test-resources",

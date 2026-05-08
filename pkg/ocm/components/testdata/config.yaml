@@ -41,4 +41,8 @@ components:
     version: v0.30.0
     componentName: "github.com/gardener/gardener-extension-runtime-gvisor"
 
+extraComponentReferences:
+  - componentName: "github.com/gardener/diki"
+    version: "v0.25.0"
+
 targetRepositoryURL: registry.example.com/path/to/repo

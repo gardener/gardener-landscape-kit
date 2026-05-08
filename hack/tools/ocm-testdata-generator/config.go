@@ -20,6 +20,8 @@ type Config struct {
 	ExternalResources []ExternalResource `json:"externalResources"`
 	// Components is a list of additional components to be added to the root component.
 	Components []Component `json:"components"`
+	// ExtraComponentReferences is a list of extra component references to be added to the root component.
+	ExtraComponentReferences []ExtraComponentRef `json:"extraComponentReferences"`
 	// TargetRepositoryURL is the URL of the target repository containing the overwrites.
 	TargetRepositoryURL string `json:"targetRepositoryURL"`
 }
@@ -29,6 +31,12 @@ type Component struct {
 	Name          string `json:"name"`
 	Version       string `json:"version"`
 	ComponentName string `json:"componentName"`
+}
+
+// ExtraComponentRef represents an extra component reference to be included in the configuration.
+type ExtraComponentRef struct {
+	ComponentName string `json:"componentName"`
+	Version       string `json:"version"`
 }
 
 // ExternalResource represents an external resource to be included in the configuration.

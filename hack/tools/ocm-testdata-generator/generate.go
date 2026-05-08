@@ -53,8 +53,19 @@ type OCMComponent struct {
 
 // OCMLabel represents a label in the OCM component descriptor.
 type OCMLabel struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	Name  string          `json:"name"`
+	Value json.RawMessage `json:"value"`
+}
+
+// OCMExtraComponentReference represents an extra component reference to be added to the root component.
+type OCMExtraComponentReference struct {
+	ComponentReference OCMExtraComponentReferenceData `json:"component_reference"`
+}
+
+// OCMExtraComponentReferenceData contains the name and version of an extra component reference.
+type OCMExtraComponentReferenceData struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 // NewGenerator creates a new generator for OCM component descriptors test data with the given config.
@@ -79,6 +90,13 @@ func (g *generator) Generate(targetDir string) error {
 	}
 
 	toBeProcessed := slices.Clone(g.config.Components)
+	for _, component := range g.config.ExtraComponentReferences {
+		toBeProcessed = append(toBeProcessed, Component{
+			Name:          component.ComponentName,
+			Version:       component.Version,
+			ComponentName: component.ComponentName,
+		})
+	}
 	processedComponents := set.New[components.ComponentReference]()
 	for len(toBeProcessed) > 0 {
 		current := toBeProcessed[0]
@@ -180,13 +198,33 @@ func (g *generator) generateKubernetesRootComponent(targetDir string) error {
 			Labels: []OCMLabel{
 				{
 					Name:  components.LabelImageVectorApplication,
-					Value: "kubernetes",
+					Value: json.RawMessage(`"kubernetes"`),
 				},
 			},
 			Provider:            "test-resources",
 			Resources:           resourceSlice,
 			ComponentReferences: componentSlice,
 		},
+	}
+
+	if len(g.config.ExtraComponentReferences) > 0 {
+		var refs []OCMExtraComponentReference
+		for _, ref := range g.config.ExtraComponentReferences {
+			refs = append(refs, OCMExtraComponentReference{
+				ComponentReference: OCMExtraComponentReferenceData{
+					Name:    ref.ComponentName,
+					Version: ref.Version,
+				},
+			})
+		}
+		value, err := json.Marshal(refs)
+		if err != nil {
+			return fmt.Errorf("failed to marshal extra component references: %w", err)
+		}
+		ocm.Component.Labels = append(ocm.Component.Labels, OCMLabel{
+			Name:  components.LabelExtraComponentReferences,
+			Value: json.RawMessage(value),
+		})
 	}
 
 	data, err := json.MarshalIndent(ocm, "", "  ")
