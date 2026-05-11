@@ -17,7 +17,7 @@ const (
 	// LabelNameOriginalRef is the label name for storing the original reference of a component
 	LabelNameOriginalRef = "cloud.gardener.cnudie/migration/original_ref"
 
-	// LabelExtraComponentReferences is a component label to add extra component references. Such references are used to add components without replication in RBSC.
+	// LabelExtraComponentReferences is a component label to add extra component references. Such references are used to add components without replication.
 	LabelExtraComponentReferences = "ocm.software/ocm-gear/extra-component-references"
 
 	labelNameImageVectorRepository       = "imagevector.gardener.cloud/repository"
