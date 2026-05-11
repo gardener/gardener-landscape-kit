@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: 'chore: run gardener-landscape-kit'
+      status-context:
+        description: 'GitHub commit status context name to set on the pushed commit (must match the required check name in branch protection)'
+        required: false
+        type: string
+        default: 'glk-generate / glk'
 
 jobs:
   glk:
@@ -30,6 +35,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      statuses: write
 
     steps:
     - name: Checkout PR branch
@@ -51,6 +57,7 @@ jobs:
         commands: ${{ inputs.glk-commands }}
 
     - name: Commit and push changes
+      id: push
       run: |
         git add .
         if git diff --cached --quiet; then
@@ -58,4 +65,15 @@ jobs:
         else
           git commit -m "${{ inputs.commit-message }}"
           git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         fi
+
+    - name: Set status on pushed commit
+      if: steps.push.outputs.pushed == 'true'
+      run: |
+        curl -sfS -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ steps.push.outputs.sha }}" \
+          -d "{\"state\":\"success\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"GLK generation completed\"}"
