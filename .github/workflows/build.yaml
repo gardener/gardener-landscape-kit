@@ -24,6 +24,14 @@ jobs:
     permissions:
       id-token: write
 
+  build-date:
+    runs-on: ubuntu-latest
+    outputs:
+      date: ${{ steps.capture.outputs.date }}
+    steps:
+      - id: capture
+        run: echo "date=$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
   tests:
     permissions:
       contents: read
@@ -77,6 +85,7 @@ jobs:
       contents: read
     needs:
       - tests
+      - build-date
     strategy:
       matrix:
         args:
@@ -119,6 +128,7 @@ jobs:
 
           GOOS=${os} \
           GOARCH=${arch} \
+          BUILD_DATE=${{ needs.build-date.outputs.date }} \
           BUILD_PACKAGES=./cmd/gardener-landscape-kit \
           BUILD_OUTPUT_FILE=${outpath} \
             make build
@@ -156,6 +166,7 @@ jobs:
     needs:
     - prepare
     - tests
+    - build-date
     secrets: inherit
     permissions:
       contents: read
@@ -167,3 +178,5 @@ jobs:
       oci-registry: ${{ needs.prepare.outputs.oci-registry }}
       oci-repository: gardener/gardener-landscape-kit
       oci-platforms: linux/arm64,linux/amd64
+      build-args: |
+        BUILD_DATE=${{ needs.build-date.outputs.date }}

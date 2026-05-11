@@ -2,10 +2,12 @@
 FROM --platform=$BUILDPLATFORM golang:1.26.3 AS builder
 
 ARG EFFECTIVE_VERSION
+ARG BUILD_DATE
 ARG TARGETOS
 ARG TARGETARCH
 ARG GOPROXY=https://proxy.golang.org,direct
 ENV GOPROXY=$GOPROXY
+ENV BUILD_DATE=$BUILD_DATE
 WORKDIR /go/src/github.com/gardener/gardener-landscape-kit
 
 COPY go.mod go.sum ./
