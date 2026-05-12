@@ -5,7 +5,7 @@
 services:
   forgejo:
     container_name: glk-forgejo
-    image: codeberg.org/forgejo/forgejo:15.0.1
+    image: codeberg.org/forgejo/forgejo:15.0.2
     entrypoint: [ "/bin/sh", "/entrypoint.sh" ]
     healthcheck:
       test: [ "CMD-SHELL", "test -f /runner/config.yaml" ]
