@@ -92,12 +92,27 @@ jobs:
           - os: linux
             arch: amd64
             runner: ubuntu-latest
+            archive_suffix: .tar.gz
+          - os: linux
+            arch: arm64
+            runner: ubuntu-latest
+            archive_suffix: .tar.gz
           - os: darwin
             arch: amd64
             runner: ubuntu-latest
+            archive_suffix: .tar.gz
+          - os: darwin
+            arch: arm64
+            runner: ubuntu-latest
+            archive_suffix: .tar.gz
           - os: windows
             arch: amd64
             runner: ubuntu-latest
+            archive_suffix: .zip
+          - os: windows
+            arch: arm64
+            runner: ubuntu-latest
+            archive_suffix: .zip
     runs-on: ${{ matrix.args.runner }}
     steps:
       - uses: gardener/cc-utils/.github/actions/trusted-checkout@v1
@@ -114,17 +129,15 @@ jobs:
 
           if [ ${os} == 'windows' ]; then
             exe_suffix='.exe'
-            archive_suffix='.zip'
           else
             exe_suffix=''
-            archive_suffix='.tar.gz'
           fi
 
           mkdir -p /tmp/blobs.d
           prefix=/tmp/blobs.d/gardener-landscape-kit
           platform_suffix="-${os}-${arch}"
-          outpath="${prefix}${platform_suffix}${exe_suffix}${archive_suffix}"
-          archive="${prefix}${platform_suffix}.archive"
+          outpath="${prefix}${platform_suffix}${exe_suffix}"
+          archive="${prefix}${platform_suffix}${{ matrix.args.archive_suffix }}.archive"
 
           GOOS=${os} \
           GOARCH=${arch} \
@@ -141,7 +154,7 @@ jobs:
               zip -j ${archive} $(basename ${outpath})
             )
           else
-            tar cvzf ${archive} -C/tmp/blobs.d $(basename ${outpath})
+            tar cvzf ${archive} -C /tmp/blobs.d $(basename ${outpath})
           fi
 
           unlink ${outpath}
@@ -158,7 +171,7 @@ jobs:
             access:
               type: localBlob
               localReference: >-
-                gardener-landscape-kit-${{ matrix.args.os }}-${{ matrix.args.arch }}.archive
+                gardener-landscape-kit-${{ matrix.args.os }}-${{ matrix.args.arch }}${{ matrix.args.archive_suffix }}.archive
 
   oci-images:
     name: Build OCI-Images

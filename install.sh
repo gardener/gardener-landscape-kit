@@ -109,7 +109,13 @@ download() {
 
 # ── resolve download URL ──────────────────────────────────────────────────────
 
-DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}"
+if [[ "$OS" == "windows" ]]; then
+  ARCHIVE_SUFFIX=".zip"
+else
+  ARCHIVE_SUFFIX=".tar.gz"
+fi
+
+DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}${ARCHIVE_SUFFIX}"
 
 # ── prepare install directory and target path ─────────────────────────────────
 
@@ -117,26 +123,58 @@ mkdir -p "$INSTALL_DIR"
 VERSIONED_BINARY="${INSTALL_DIR}/${ASSET_NAME}-${VERSION}"
 SYMLINK_PATH="${INSTALL_DIR}/glk"
 
+# ── extract helper ────────────────────────────────────────────────────────────
+
+extract_asset() {
+  local archive="$1" dest_dir="$2" binary_name="$3"
+  local dest="${dest_dir}/${binary_name}"
+
+  if [[ "$OS" == "windows" ]]; then
+    unzip -o -d "$dest_dir" "$archive"
+  else
+    tar xzf "$archive" -C "$dest_dir"
+  fi
+
+  if [[ -f "$dest" ]]; then
+    mv "$dest" "${VERSIONED_BINARY}"
+  else
+    die "Expected binary '${binary_name}' not found in archive."
+  fi
+}
+
+# ── download and install ──────────────────────────────────────────────────────
+
 # Skip download if the exact versioned binary already exists
 if [[ -f "$VERSIONED_BINARY" ]]; then
   log "Binary already cached at '${VERSIONED_BINARY}', skipping download."
 else
+  ARCHIVE_TMP="$(mktemp)"
+  trap 'rm -f "$ARCHIVE_TMP"' EXIT
+
   log "Downloading ${DOWNLOAD_URL} ..."
-  if ! download "$DOWNLOAD_URL" "$VERSIONED_BINARY"; then
-    rm -f "$VERSIONED_BINARY"
+  if ! download "$DOWNLOAD_URL" "$ARCHIVE_TMP"; then
     # On darwin/arm64, older releases may only ship amd64 — fall back via Rosetta
     if [[ "$OS" == "darwin" && "$ARCH" == "arm64" ]]; then
       log "arm64 asset not found, falling back to amd64 (runs via Rosetta 2)."
-      ASSET_NAME="${BINARY_NAME}-${OS}-amd64"
-      DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}"
+      ARCH="amd64"
+      ASSET_NAME="${BINARY_NAME}-${OS}-${ARCH}"
+      DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}${ARCHIVE_SUFFIX}"
       VERSIONED_BINARY="${INSTALL_DIR}/${ASSET_NAME}-${VERSION}"
-      download "$DOWNLOAD_URL" "$VERSIONED_BINARY" \
+      download "$DOWNLOAD_URL" "$ARCHIVE_TMP" \
         || die "Download failed. Check that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
     else
       die "Download failed. Check that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
     fi
   fi
-  log "Downloaded to '${VERSIONED_BINARY}'."
+
+  if [[ "$OS" == "windows" ]]; then
+    INNER_BINARY="${BINARY_NAME}-${OS}-${ARCH}.exe"
+  else
+    INNER_BINARY="${BINARY_NAME}-${OS}-${ARCH}"
+  fi
+
+  extract_asset "$ARCHIVE_TMP" "$INSTALL_DIR" "$INNER_BINARY"
+  log "Installed to '${VERSIONED_BINARY}'."
 fi
 
 chmod +x "$VERSIONED_BINARY"
