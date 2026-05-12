@@ -11,15 +11,25 @@ GLK usage typically follows two main phases:
 
 ![Integration Diagram](content/integration.png)
 
+> [!NOTE]
+> This document uses terms like "base directory" and "landscape directory" throughout. See the [Glossary](../glossary.md) for precise definitions.
+
 ## Initial Usage
 
 The initial usage phase is typically executed on a local operator machine to bootstrap a new landscape or migrate an existing one to the structures and concepts provided by GLK.
+
+### Prerequisites
+
+Before running GLK for the first time, operators need:
+1. A GLK configuration file (typically `componentconfig-glk.yaml`) - see [LandscapeKit Configuration API Reference](../api-reference/landscapekit-v1alpha1.md)
+2. `base` and `landscape` repository structures prepared - see [Repository Concepts](repositories.md)
+3. (Optional) [OCM](https://ocm.software/) component descriptors if using component version management
 
 ### First-Time Setup
 
 When using GLK for the first time, operators need to:
 
-1. **Prepare Repository Structure**: Set up the base and landscape repositories according to the [repository organization patterns](repositories.md).
+1. **Prepare Repository Structure**: Set up the `base` and `landscape` repositories according to the [repository organization patterns](repositories.md).
 
 2. **Generate Base Manifests**: Create the base directory structure and generate core manifests that are common across multiple landscapes:
    ```bash
@@ -183,7 +193,7 @@ on:
 
 #### Pattern 2: Scheduled Component Resolution
 
-Run `resolve ocm` on a schedule to check for new component versions:
+Run `resolve` on a schedule to check for new component versions:
 
 ```yaml
 on:
@@ -232,14 +242,14 @@ When a new GLK version is released with new features or templates:
    - Enables code review of generated manifests
    - Atomic rollout of changes to the landscape upon merge
 
-3. **Separate resolution and generation**: Run `resolve ocm` before `generate` commands to ensure component data is current:
+3. **Separate resolution and generation**: Run `resolve` before `generate` commands to ensure component version data is current:
    ```bash
    glk resolve ocm -c landscape/glk.yaml .
    glk generate base -c landscape/glk.yaml ./base
    glk generate landscape -c landscape/glk.yaml .
    ```
 
-4. **Test in lower environments first**: For multi-stage landscapes, validate generated changes in development and staging before applying to production.
+4. **Test in lower environments first**: For multi-stage landscapes, validate generated changes in Development and QA before applying to Production.
 
 5. **Document organization-specific triggers**: Since GLK doesn't prescribe when to run operations, document your organization's specific triggers and workflows.
 
@@ -249,7 +259,7 @@ GLK integration consists of:
 
 1. **Initial Setup**: One-time bootstrapping or migration on a local machine
 2. **Workflow Integration**: Embedding GLK into CI/CD pipelines tied to Git repositories
-3. **Automated Operations**: Running `resolve ocm` and `generate` commands based on organizational triggers
+3. **Automated Operations**: Running `resolve` and `generate` commands based on organizational triggers
 4. **Continuous Deployment**: Flux automatically applies generated manifests from Git
 
 By integrating GLK into an automated workflow, operators ensure that landscapes remain consistent, up-to-date, and auditable while reducing manual operational overhead.
