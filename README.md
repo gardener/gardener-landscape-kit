@@ -5,6 +5,18 @@
 > [!WARNING]
 > This project is under active development. Breaking changes may occur frequently. Not ready for production use.
 
+## Getting Started
+
+1. Obtain the `components.yaml` for the desired GLK release.
+2. Run the install script, pointing it at that file:
+
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
+     --components-file path/to/components.yaml
+   ```
+
+   This downloads the matching `glk` binary to `~/.glk/bin/` and prints next steps.
+
 `gardener-landscape-kit`, short GLK, is a toolkit for generating manifests to facilitate GitOps-based management of Gardener landscapes.
 
 ## Scope
