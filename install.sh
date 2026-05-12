@@ -94,6 +94,19 @@ esac
 ASSET_NAME="${BINARY_NAME}-${OS}-${ARCH}"
 log "Platform: ${OS}/${ARCH} → asset '${ASSET_NAME}'"
 
+# ── download helper ───────────────────────────────────────────────────────────
+
+download() {
+  local url="$1" dest="$2"
+  if command -v curl &>/dev/null; then
+    curl -fSL --progress-bar -o "$dest" "$url"
+  elif command -v wget &>/dev/null; then
+    wget -q --show-progress -O "$dest" "$url"
+  else
+    die "Neither curl nor wget found. Install one and retry."
+  fi
+}
+
 # ── resolve download URL ──────────────────────────────────────────────────────
 
 DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}"
@@ -109,14 +122,19 @@ if [[ -f "$VERSIONED_BINARY" ]]; then
   log "Binary already cached at '${VERSIONED_BINARY}', skipping download."
 else
   log "Downloading ${DOWNLOAD_URL} ..."
-  if command -v curl &>/dev/null; then
-    curl -fSL --progress-bar -o "$VERSIONED_BINARY" "$DOWNLOAD_URL" \
-      || die "Download failed. Verify that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
-  elif command -v wget &>/dev/null; then
-    wget -q --show-progress -O "$VERSIONED_BINARY" "$DOWNLOAD_URL" \
-      || die "Download failed. Verify that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
-  else
-    die "Neither curl nor wget found. Install one and retry."
+  if ! download "$DOWNLOAD_URL" "$VERSIONED_BINARY"; then
+    rm -f "$VERSIONED_BINARY"
+    # On darwin/arm64, older releases may only ship amd64 — fall back via Rosetta
+    if [[ "$OS" == "darwin" && "$ARCH" == "arm64" ]]; then
+      log "arm64 asset not found, falling back to amd64 (runs via Rosetta 2)."
+      ASSET_NAME="${BINARY_NAME}-${OS}-amd64"
+      DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/${ASSET_NAME}"
+      VERSIONED_BINARY="${INSTALL_DIR}/${ASSET_NAME}-${VERSION}"
+      download "$DOWNLOAD_URL" "$VERSIONED_BINARY" \
+        || die "Download failed. Check that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
+    else
+      die "Download failed. Check that version '${VERSION}' exists at https://github.com/${GITHUB_REPO}/releases"
+    fi
   fi
   log "Downloaded to '${VERSIONED_BINARY}'."
 fi
