@@ -14,7 +14,7 @@ GIT_SERVER_BASE_URL="http://gitops:testtest@git.local.gardener.cloud:6080"
 
 ensure_glk_configuration() {
   echo "⚙️  Ensuring GLK configuration"
-  cp "$SCRIPT_DIR/landscapekitconfiguration.yaml" "${WORK_DIR}/landscapekitconfiguration.yaml"
+  cp "$SCRIPT_DIR/landscapekitconfiguration.yaml" "${GLK_CONFIG_PATH}"
 }
 
 clone_or_update_repo() {
@@ -43,9 +43,9 @@ checkout_base_repo() {
 
 generate_base() {
   echo "🌱 Generating base"
-  glk generate base -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/base"
+  glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_PATH}"
 
-  cd "${WORK_DIR}/base"
+  cd "${GLK_BASE_PATH}"
   git add .
   git commit -m "Generate base" || echo "No changes to commit"
   git push
@@ -58,9 +58,9 @@ checkout_landscape_repo() {
 
 generate_landscape() {
   echo "🌱 Generating test landscape"
-  glk generate landscape -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
+  glk generate landscape -c "${GLK_CONFIG_PATH}" "${GLK_LANDSCAPE_PATH}"
 
-  cd "${WORK_DIR}/test-landscape"
+  cd "${GLK_LANDSCAPE_PATH}"
   git add .
   git commit -m "Generate test landscape" || echo "No changes to commit"
   git push
@@ -68,7 +68,7 @@ generate_landscape() {
 
 ensure_base_as_submodule() {
   echo "🔗 Ensuring base is a submodule of test-landscape"
-  cd "${WORK_DIR}/test-landscape"
+  cd "${GLK_LANDSCAPE_PATH}"
 
   if [ ! -f .gitmodules ] || ! grep -q "\[submodule \"base\"\]" .gitmodules; then
     git submodule add $GIT_SERVER_BASE_URL/gitops/base.git base

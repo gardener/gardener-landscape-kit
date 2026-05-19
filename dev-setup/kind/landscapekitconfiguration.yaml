@@ -13,6 +13,6 @@ repositories:
     ref:
       branch: main
     baseLink: ./base
-# components:
-#   exclude:
-#   - component-name
+components:
+  include:
+  - flux

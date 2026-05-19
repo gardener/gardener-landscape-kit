@@ -5,13 +5,20 @@
 package e2e
 
 import (
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	_ "github.com/gardener/gardener-landscape-kit/test/e2e/glk"
 )
+
+var _ = BeforeSuite(func() {
+	BasePath = os.Getenv("GLK_BASE_PATH")
+	LandscapePath = os.Getenv("GLK_LANDSCAPE_PATH")
+	ConfigPath = os.Getenv("GLK_CONFIG_PATH")
+
+	PrepareBinary()
+})
 
 func TestE2E(t *testing.T) {
 	RegisterFailHandler(Fail)

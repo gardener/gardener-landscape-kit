@@ -153,7 +153,6 @@ e2e-prepare: export BUILD_OUTPUT_FILE=$(TOOLS_BIN_DIR)
 e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)
 	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
-	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh
 	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh
 
 .PHONY: ci-e2e-kind
@@ -162,4 +161,4 @@ ci-e2e-kind:
 
 .PHONY: test-e2e-local
 test-e2e-local: $(GINKGO)
-	KUBECONFIG=$(KIND_LOCAL_KUBECONFIG) $(REPO_ROOT)/dev/gardener/hack/test-e2e-local.sh --procs=$(PARALLEL_E2E_TESTS) --label-filter="default" ./test/e2e/...
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/test-e2e-local.sh --procs=$(PARALLEL_E2E_TESTS) --label-filter="default" ./test/e2e/...

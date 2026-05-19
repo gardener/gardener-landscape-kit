@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-export REPO_ROOT="$(readlink -f "$(dirname ${0})/../..")"
+export REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 if [ -z "$GLK_KIND_CLUSTER_PREFIX" ]; then
   export GLK_KIND_CLUSTER_PREFIX=glk
@@ -15,6 +15,10 @@ export GLK_KUBECONFIG=${REPO_ROOT}/dev/kind-$GLK_CLUSTER_NAME-kubeconfig.yaml
 
 WORK_DIR="$REPO_ROOT/dev/e2e"
 mkdir -p "${WORK_DIR}"
+
+export GLK_CONFIG_PATH="${WORK_DIR}/landscapekitconfiguration.yaml"
+export GLK_BASE_PATH="${WORK_DIR}/base"
+export GLK_LANDSCAPE_PATH="${WORK_DIR}/test-landscape"
 
 glk() {
   gardener-landscape-kit "$@"
