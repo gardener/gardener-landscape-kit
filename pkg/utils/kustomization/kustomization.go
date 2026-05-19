@@ -5,6 +5,7 @@
 package kustomization
 
 import (
+	"fmt"
 	"maps"
 	"os"
 	"path"
@@ -68,6 +69,14 @@ func WriteLandscapeComponentsKustomizations(options components.Options) error {
 	fs := options.GetFilesystem()
 	targetDir := options.GetTargetPath()
 	componentsDir := filepath.Join(targetDir, components.DirName)
+
+	componentsExist, err := fs.Exists(componentsDir)
+	if err != nil {
+		return fmt.Errorf("failed checking components dir: %w", err)
+	}
+	if !componentsExist {
+		return nil
+	}
 
 	return fs.Walk(componentsDir, writeKustomizationsToFileTree(fs, targetDir, options.GetMergeMode()))
 }
