@@ -130,7 +130,7 @@ install_metallb() {
   echo "🚀 install metal loadbalancer on kind cluster $clusterName"
   # install metal loadbalancer (see https://kind.sigs.k8s.io/docs/user/loadbalancer/)
   kubectl apply -k "$REPO_ROOT/dev-setup/kind/metallb" --server-side
-  kubectl wait --namespace metallb-system --for=condition=available deployment --selector=app=metallb --timeout=90s
+  kubectl wait --namespace metallb-system --for=condition=available deployment --selector=app=metallb --timeout=120s
 
   kindIPAM=$(docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}} {{end}}' kind)
   if [[ "$kindIPAM" =~ ([0-9]+\.[0-9]+)(".0.0/24 ") ]]; then
