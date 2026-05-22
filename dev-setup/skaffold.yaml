@@ -1,0 +1,121 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: gardener-landscape-kit
+build:
+  insecureRegistries:
+    - glk-registry.local.gardener.cloud:6001
+  artifacts:
+    - image: local-skaffold/gardener-landscape-kit
+      ko:
+        dependencies:
+          paths:
+            - cmd/gardener-landscape-kit
+            - cmd/gardener-landscape-kit/app
+            - componentvector
+            - componentvector/components.yaml
+            - pkg/apis/config/v1alpha1
+            - pkg/apis/config/v1alpha1/validation
+            - pkg/cmd
+            - pkg/cmd/generate
+            - pkg/cmd/generate/base
+            - pkg/cmd/generate/landscape
+            - pkg/cmd/generate/options
+            - pkg/cmd/resolve
+            - pkg/cmd/resolve/ocm
+            - pkg/cmd/resolve/plain
+            - pkg/cmd/version
+            - pkg/components
+            - pkg/components/flux
+            - pkg/components/flux/templates/landscape
+            - pkg/components/gardener-extensions/networking-calico
+            - pkg/components/gardener-extensions/networking-calico/templates/base
+            - pkg/components/gardener-extensions/networking-calico/templates/landscape
+            - pkg/components/gardener-extensions/networking-cilium
+            - pkg/components/gardener-extensions/networking-cilium/templates/base
+            - pkg/components/gardener-extensions/networking-cilium/templates/landscape
+            - pkg/components/gardener-extensions/os-gardenlinux
+            - pkg/components/gardener-extensions/os-gardenlinux/templates/base
+            - pkg/components/gardener-extensions/os-gardenlinux/templates/landscape
+            - pkg/components/gardener-extensions/os-suse-chost
+            - pkg/components/gardener-extensions/os-suse-chost/templates/base
+            - pkg/components/gardener-extensions/os-suse-chost/templates/landscape
+            - pkg/components/gardener-extensions/provider-alicloud
+            - pkg/components/gardener-extensions/provider-alicloud/templates/base
+            - pkg/components/gardener-extensions/provider-alicloud/templates/landscape
+            - pkg/components/gardener-extensions/provider-aws
+            - pkg/components/gardener-extensions/provider-aws/templates/base
+            - pkg/components/gardener-extensions/provider-aws/templates/landscape
+            - pkg/components/gardener-extensions/provider-azure
+            - pkg/components/gardener-extensions/provider-azure/templates/base
+            - pkg/components/gardener-extensions/provider-azure/templates/landscape
+            - pkg/components/gardener-extensions/provider-gcp
+            - pkg/components/gardener-extensions/provider-gcp/templates/base
+            - pkg/components/gardener-extensions/provider-gcp/templates/landscape
+            - pkg/components/gardener-extensions/provider-openstack
+            - pkg/components/gardener-extensions/provider-openstack/templates/base
+            - pkg/components/gardener-extensions/provider-openstack/templates/landscape
+            - pkg/components/gardener-extensions/runtime-gvisor
+            - pkg/components/gardener-extensions/runtime-gvisor/templates/base
+            - pkg/components/gardener-extensions/runtime-gvisor/templates/landscape
+            - pkg/components/gardener-extensions/shoot-cert-service
+            - pkg/components/gardener-extensions/shoot-cert-service/templates/base
+            - pkg/components/gardener-extensions/shoot-cert-service/templates/landscape
+            - pkg/components/gardener-extensions/shoot-dns-service
+            - pkg/components/gardener-extensions/shoot-dns-service/templates/base
+            - pkg/components/gardener-extensions/shoot-dns-service/templates/landscape
+            - pkg/components/gardener-extensions/shoot-networking-problemdetector
+            - pkg/components/gardener-extensions/shoot-networking-problemdetector/templates/base
+            - pkg/components/gardener-extensions/shoot-networking-problemdetector/templates/landscape
+            - pkg/components/gardener-extensions/shoot-oidc-service
+            - pkg/components/gardener-extensions/shoot-oidc-service/templates/base
+            - pkg/components/gardener-extensions/shoot-oidc-service/templates/landscape
+            - pkg/components/gardener-extensions/shoot-traefik
+            - pkg/components/gardener-extensions/shoot-traefik/templates/base
+            - pkg/components/gardener-extensions/shoot-traefik/templates/landscape
+            - pkg/components/gardener/garden
+            - pkg/components/gardener/garden/templates/base
+            - pkg/components/gardener/garden/templates/landscape
+            - pkg/components/gardener/operator
+            - pkg/components/gardener/operator/templates/base
+            - pkg/components/gardener/operator/templates/landscape
+            - pkg/components/gardener/virtual-garden-access
+            - pkg/components/gardener/virtual-garden-access/templates/base
+            - pkg/components/gardener/virtual-garden-access/templates/landscape
+            - pkg/components/virtual-garden/garden-config
+            - pkg/components/virtual-garden/garden-config/templates/base
+            - pkg/components/virtual-garden/garden-config/templates/landscape
+            - pkg/ocm
+            - pkg/ocm/components
+            - pkg/ocm/components/helpers
+            - pkg/ocm/imagevector
+            - pkg/ocm/ociaccess
+            - pkg/registry
+            - pkg/utils/componentvector
+            - pkg/utils/files
+            - pkg/utils/kustomization
+            - pkg/utils/meta
+            - pkg/utils/version
+            - pkg/utils/version/VERSION
+            - VERSION
+        ldflags:
+          - '{{.LD_FLAGS}}'
+        main: ./cmd/gardener-landscape-kit
+      hooks:
+        after:
+          - command:
+              - "bash"
+              - "-c"
+              - "echo $SKAFFOLD_IMAGE > dev-setup/glk-dev-image"
+  tagPolicy:
+    customTemplate:
+      template: '{{.version}}-{{.sha}}-{{.digest}}'
+      components:
+        - name: version
+          envTemplate:
+            template: '{{.VERSION}}'
+        - name: sha
+          gitCommit:
+            variant: AbbrevCommitSha
+        - name: digest
+          inputDigest: {}
