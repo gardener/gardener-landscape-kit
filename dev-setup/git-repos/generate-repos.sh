@@ -8,7 +8,7 @@ set -o errexit
 set -o pipefail
 
 SCRIPT_DIR=$(dirname ${0})
-source $(dirname ${0})/common.sh
+source $(dirname ${0})/../kind/common.sh
 
 GIT_SERVER_BASE_URL="http://gitops:testtest@git.local.gardener.cloud:6080"
 
