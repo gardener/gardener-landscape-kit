@@ -28,6 +28,11 @@ on:
         required: false
         type: string
         default: 'glk-generate / glk'
+      set-commit-status:
+        description: 'Whether to set a GitHub commit status on the pushed commit'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   glk:
@@ -70,7 +75,7 @@ jobs:
         fi
 
     - name: Set status on pushed commit
-      if: steps.push.outputs.pushed == 'true'
+      if: ${{ inputs.set-commit-status && steps.push.outputs.pushed == 'true' }}
       run: |
         curl -sfS -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
