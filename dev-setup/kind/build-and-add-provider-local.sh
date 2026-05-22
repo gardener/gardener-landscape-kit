@@ -93,7 +93,6 @@ EOF
   done
 
   # patch extension.yaml for usage in kind cluster with different registry port
-  sed -i "s/:6001/:5001/g" ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.admission.values.image = (.spec.deployment.admission.runtimeCluster.helm.ociRepository.ref | sub("_charts_runtime","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.runtimeClusterValues.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.values.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml

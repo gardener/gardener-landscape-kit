@@ -27,7 +27,7 @@ services:
     image: europe-docker.pkg.dev/gardener-project/releases/3rd/registry:3.1.1
     restart: unless-stopped
     ports:
-      - "6001:5001"
+      - "6001:6001"
     volumes:
       - ../../dev/local-registry/localhost:/var/lib/registry
       - ./registry/config.yaml:/etc/distribution/config.yml
