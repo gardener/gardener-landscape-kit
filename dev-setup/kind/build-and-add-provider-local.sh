@@ -49,9 +49,16 @@ skaffold_build_and_push_provider_local() {
   export SKAFFOLD_PUSH=true
   export SOURCE_DATE_EPOCH=$(date -d $BUILD_DATE +%s)
   export GARDENER_VERSION=$(cat VERSION)
-  sed "s/- registry.local.gardener.cloud:5001/- glk-registry.local.gardener.cloud:6001/g" dev-setup/skaffold-operator.yaml > dev-setup/skaffold-operator-patched.yaml
 
+  sed "s/- registry.local.gardener.cloud:5001/- glk-registry.local.gardener.cloud:6001/g" dev-setup/skaffold-operator.yaml |\
+    sed "s/push-helm.sh/push-helm-patched.sh/g" > dev-setup/skaffold-operator-patched.yaml
+
+  sed 's/"registry.local.gardener.cloud:5001"/"glk-registry.local.gardener.cloud:6001"/g' hack/push-helm.sh > hack/push-helm-patched.sh
+  chmod +x hack/push-helm-patched.sh
+
+  echo "🚀 Building and pushing provider-local images with Skaffold"
   skaffold build -f dev-setup/skaffold-operator-patched.yaml -m provider-local --file-output=local/build-output.json
+  echo "✅ Built and pushed provider-local images with Skaffold"
 }
 
 generate_extension_yaml() {
