@@ -62,7 +62,7 @@ Once the initial setup is complete, operators should integrate GLK into their re
 GLK is designed to be integrated into workflow engines that are tightly coupled with the Git repositories hosting `base` and `landscape` configurations. This allows the workflow to react automatically to changes introduced via pull requests or other means.
 
 > [!IMPORTANT]
-> Workflow automation engines (such as [GitHub Actions](https://github.com/features/actions) or [GitLab CI/CD](https://docs.gitlab.com/ci/)) should not be confused with [Flux](https://fluxcd.io/), which is the backing deployment engine for Gardener, extensions, and related configurations. Flux is responsible for continuously deploying manifests from Git to the Kubernetes cluster. In a production-grade setup, however, usually more automation is required around the landscape deployment. Many operational processes — such as testing, release workflows, validation jobs, and similar tasks — are better integrated with the version control system itself (i.e., the CI/CD platform) rather than running within Flux.
+> Workflow automation engines (such as [GitHub Actions](https://github.com/features/actions) or [GitLab CI/CD](https://docs.gitlab.com/ci/)) should not be confused with [Flux](https://fluxcd.io/), which is the backing deployment engine for Gardener, extensions, and related configurations. Flux is responsible for continuously deploying manifests from Git to the Kubernetes cluster. In a production-grade setup, however, usually more automation is required around the landscape deployment. Many operational processes, such as testing, release workflows, validation jobs, and similar tasks, are better integrated with the version control system itself (i.e., the CI/CD platform) rather than running within Flux.
 
 **Recommended workflow engines:**
 - [GitHub Actions](https://github.com/features/actions)
@@ -123,16 +123,22 @@ GLK operations should be triggered based on specific events in the repository li
 
 ### GitHub Actions Integration
 
-GLK provides reusable GitHub Actions and workflows to facilitate automation:
+GLK ships a reusable GitHub Action and a reusable workflow that automate `glk` invocations.
+They can be consumed in two ways:
 
-#### Reusable Workflow: `.github/workflows/glk.yaml`
+1. **Reference them directly from `github.com/gardener/gardener-landscape-kit`.** This is the simplest option for repositories hosted on github.com.
+2. **Have GLK materialize them into your own repository's `.github/` directory** via the [`github` component](#github-component). This is intended for GitHub Enterprise (GHE) or other custom VCS instances where referencing external repositories is not possible.
 
-This workflow can be called from other workflows to execute GLK commands in a pull request context. It:
+Both options expose the same action and workflow.
+
+#### Reusable Workflow: `workflows/glk.yaml`
+
+This workflow can be called from another workflow to execute GLK commands in a pull request context. It:
 - Checks out the PR branch
-- Runs specified GLK commands
+- Runs the specified GLK commands
 - Commits any changes back to the PR branch
 
-**Example usage in a repository workflow**:
+**Example: referencing the published workflow on github.com**:
 
 ```yaml
 name: GLK Generate on PR
@@ -150,17 +156,27 @@ jobs:
       commit-message: 'chore: run gardener-landscape-kit'
 ```
 
-#### GitHub Action: `.github/actions/glk/action.yaml`
+**Example: referencing a copy materialized into your own repo by the `github` component**:
 
-This composite action runs GLK commands using the container image version specified in `components.yaml`. It can be used directly in workflow steps.
+```yaml
+jobs:
+  generate:
+    uses: ./.github/workflows/glk.yaml
+    with:
+      ...
+```
 
-**Example usage**:
+#### Composite Action: `actions/glk/action.yaml`
+
+This composite action runs GLK commands using the container image version specified in `components.yaml`. Use it directly from a step.
+
+**Example: referencing the published action on github.com**:
 
 ```yaml
 steps:
   - name: Checkout
     uses: actions/checkout@v6
-  
+
   - name: Run GLK
     uses: gardener/gardener-landscape-kit/.github/actions/glk@main
     with:
@@ -168,6 +184,30 @@ steps:
       commands: |
         resolve ocm -c landscape/glk.yaml .
         generate landscape -c landscape/glk.yaml .
+```
+
+**Example: referencing a copy materialized into your own repo by the `github` component**:
+
+```yaml
+steps:
+  - uses: actions/checkout@v6
+  - uses: ./.github/actions/glk
+    with:
+      ...
+```
+
+#### `github` component
+
+The `github` GLK component materializes reusable actions and workflows into the consumer repository's `.github/` directory at the repository root. It is the alternative consumption model for the action and workflow above, primarily intended for GitHub Enterprise instances or other restricted environments where direct cross-repository references to `github.com/gardener/...` are not possible.
+
+It runs as part of both `glk generate base` and `glk generate landscape`, and follows the same path convention as all other GLK components: `glk` is invoked from the repository root, with `paths.base` and `paths.landscape` in the configuration being repo-relative paths.
+
+The `github` component is **included by default**. If you reference the published versions on github.com (or manage your own copies of these files), add `github` to `components.exclude` in your `glk.yaml` to prevent GLK from overwriting them:
+
+```yaml
+components:
+  exclude:
+  - github
 ```
 
 ### Automation Patterns
