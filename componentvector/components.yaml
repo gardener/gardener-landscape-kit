@@ -33,7 +33,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-cilium
 - name: github.com/gardener/gardener-extension-os-suse-chost
   sourceRepository: https://github.com/gardener/gardener-extension-os-suse-chost
-  version: v1.41.0
+  version: v1.42.0
   resources:
     osSuseChost:
       helmChart:
