@@ -139,7 +139,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/shoot-oidc-service
 - name: github.com/gardener/gardener-extension-shoot-traefik
   sourceRepository: https://github.com/gardener/gardener-extension-shoot-traefik
-  version: v0.4.0
+  version: v0.5.0
   resources:
     shootTraefik:
       helmChart:
