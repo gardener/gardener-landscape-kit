@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 	descriptorruntime "ocm.software/open-component-model/bindings/go/descriptor/runtime"
 	descriptorv2 "ocm.software/open-component-model/bindings/go/descriptor/v2"
+	ocmruntime "ocm.software/open-component-model/bindings/go/runtime"
 	"sigs.k8s.io/yaml"
 
 	. "github.com/gardener/gardener-landscape-kit/pkg/ocm/components"
@@ -487,7 +488,59 @@ scheduler:
 
 		Expect(c.GetSortedComponents()).To(ContainElements(ComponentReference("github.com/gardener/diki:v0.25.0")))
 	})
+
+	It("should resolve relativeOciReference resources against the repository URL", func() {
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", "my-image", "v0.0.1", "img/sub-path:v0.0.1@sha256:deadbeef")
+		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:    desc,
+			RepositoryURL: "registry.example.com/path/to/repo",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		ref := ComponentReferenceFromNameAndVersion(desc.Component.Name, desc.Component.Version)
+		imageVector, err := c.GetImageVector(ref, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(imageVector).To(ConsistOf(imagevector.ImageSource{
+			Name:       "my-image",
+			Repository: new("registry.example.com/path/to/repo/img/sub-path"),
+			Tag:        new("v0.0.1@sha256:deadbeef"),
+			Version:    new("v0.0.1"),
+		}))
+	})
+
+	It("should fail for malformed relativeOciReference resources", func() {
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", "my-image", "v0.0.1", "no-tag-no-digest")
+		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:    desc,
+			RepositoryURL: "registry.example.com/path/to/repo",
+		})
+		Expect(err).To(MatchError(ContainSubstring("failed to convert resource my-image to image source")))
+		Expect(err).To(MatchError(ContainSubstring("invalid reference format")))
+	})
 })
+
+func buildRelativeOciDescriptor(componentName, componentVersion, resourceName, resourceVersion, relativeRef string) *descriptorruntime.Descriptor {
+	res := descriptorruntime.Resource{
+		Type: ResourceTypeOCIImage,
+		Access: &ociaccess.RelativeOciReference{
+			Type:      ocmruntime.Type{Name: ociaccess.RelativeOciReferenceTypeName},
+			Reference: relativeRef,
+		},
+	}
+	res.Name = resourceName
+	res.Version = resourceVersion
+	labelValue, err := json.Marshal(resourceName)
+	Expect(err).NotTo(HaveOccurred())
+	res.Labels = []descriptorruntime.Label{{
+		Name:  LabelNameImageVectorName,
+		Value: labelValue,
+	}}
+	desc := &descriptorruntime.Descriptor{}
+	desc.Component.Name = componentName
+	desc.Component.Version = componentVersion
+	desc.Component.Resources = []descriptorruntime.Resource{res}
+	return desc
+}
 
 func countImagesByName(images []imagevector.ImageSource, name string) int {
 	var count int
@@ -504,7 +557,11 @@ func loadWithDepRecursive(c *Components, loadDescriptor func(cref ComponentRefer
 	for _, root := range roots {
 		desc := loadDescriptor(root)
 		blobs := addFakeLocalBlobs(desc)
-		deps, err := c.AddComponentDependencies(desc, blobs)
+		deps, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:    desc,
+			LocalBlobs:    blobs,
+			RepositoryURL: "registry.example.com/path/to/repo",
+		})
 		Expect(err).NotTo(HaveOccurred())
 		if levels > 0 && len(deps) > 0 {
 			loadWithDepRecursive(c, loadDescriptor, levels-1, deps...)
@@ -512,13 +569,13 @@ func loadWithDepRecursive(c *Components, loadDescriptor func(cref ComponentRefer
 	}
 }
 
-func addFakeLocalBlobs(desc *descriptorruntime.Descriptor) Blobs {
-	var blobs Blobs
+func addFakeLocalBlobs(desc *descriptorruntime.Descriptor) ociaccess.LocalBlobs {
+	var blobs ociaccess.LocalBlobs
 	for _, res := range desc.Component.Resources {
 		if res.Type == ResourceTypeHelmChartImageMap {
 			// simulate that we have the ociImage blobs available locally
 			if blobs == nil {
-				blobs = Blobs{}
+				blobs = ociaccess.LocalBlobs{}
 			}
 			json := fmt.Sprintf(`{"helmchartResource": {"name": %q}, "imageMapping": []}`, res.Name)
 			if res.Name == "gardenlet" {

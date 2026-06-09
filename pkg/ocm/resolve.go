@@ -119,13 +119,13 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 		if err != nil {
 			return nil, err
 		}
-		descriptor, blobs, err := ociaccess.FindComponentVersion(ctx, r.log, r.repos, name, version, components.ResourceTypeHelmChartImageMap)
+		result, err := ociaccess.FindComponentVersion(ctx, r.log, r.repos, name, version, components.ResourceTypeHelmChartImageMap)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find component version %s: %w", cref, err)
 		}
 		r.log.Info("Processing component", "component", cref)
 
-		dv2, err := runtime.ConvertToV2(ociaccess.DefaultScheme, descriptor)
+		dv2, err := runtime.ConvertToV2(ociaccess.DefaultScheme, result.Descriptor)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert to v2: %w", err)
 		}
@@ -138,7 +138,7 @@ func (r *ocmComponentsResolver) walkComponents(ctx context.Context) error {
 			return nil, fmt.Errorf("failed to write file %s: %w", filename, err)
 		}
 
-		return r.components.AddComponentDependencies(descriptor, blobs)
+		return r.components.AddComponentDependencies(result)
 	}
 
 	walker := components.NewComponentWalker(r.log, r.components, r.workers, itemFunc)
