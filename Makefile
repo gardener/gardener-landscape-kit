@@ -156,6 +156,7 @@ e2e-prepare: export BUILD_OUTPUT_FILE=$(TOOLS_BIN_DIR)
 
 .PHONY: e2e-prepare
 e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)
+	@SKAFFOLD_FILENAME=$(REPO_ROOT)/dev-setup/skaffold.yaml skaffold build
 	@$(REPO_ROOT)/dev-setup/git-repos/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
 	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh

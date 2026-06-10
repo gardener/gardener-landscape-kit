@@ -131,7 +131,7 @@ spec:
     namespace: garden
 EOF
 
-  glk generate landscape -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
+  glk generate landscape -c "${WORK_DIR}/base/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
 
   cd "${WORK_DIR}/test-landscape"
   git add components/provider-local components/kustomization.yaml

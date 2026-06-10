@@ -8,6 +8,8 @@ set -o errexit
 set -o pipefail
 
 SCRIPT_DIR=$(dirname ${0})
+REPO_ROOT=$SCRIPT_DIR/../..
+
 source $(dirname ${0})/../kind/common.sh
 
 GIT_SERVER_BASE_URL="http://gitops:testtest@git.local.gardener.cloud:6080"
@@ -41,9 +43,33 @@ checkout_base_repo() {
   clone_or_update_repo base base
 }
 
+ACTION_SRC="$REPO_ROOT/.github/actions/glk/action.yaml"
+WORKFLOW_SRC="$REPO_ROOT/.github/workflows/glk.yaml"
+
 generate_base() {
   echo "🌱 Generating base"
   glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_PATH}"
+
+  # TODO(timuthy): Remove this once the GitHub component is implemented.
+  local actions_path="${GLK_BASE_PATH}/.github/actions/glk"
+  mkdir -p "$actions_path"
+  cp "$ACTION_SRC" "$actions_path"
+  sed -i 's|europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit:||g' "$actions_path/action.yaml"
+
+  local workflows_path="${GLK_BASE_PATH}/.github/workflows"
+  mkdir -p "$workflows_path"
+  cp "$WORKFLOW_SRC" "$workflows_path"
+  cp "$SCRIPT_DIR/workflow-pr-post-change.yaml" "$workflows_path"
+  sed -i 's|<COMMAND>|base|g' "$workflows_path/workflow-pr-post-change.yaml"
+    sed -i 's|<BASE-PATH>|./|g' "$workflows_path/workflow-pr-post-change.yaml"
+
+  cp "$SCRIPT_DIR/components.yaml" "${GLK_BASE_PATH}/components.yaml"
+  local glk_dev_image=$(cat $SCRIPT_DIR/../glk-dev-image)
+  if [ -z "$glk_dev_image" ]; then
+    echo "GLK_DEV_IMAGE is empty. Please build a dev version with Skaffold before setting up the repositories."
+    exit 1
+  fi
+  sed -i "s|<DEV-IMAGE>|$glk_dev_image|g" "${GLK_BASE_PATH}/components.yaml"
 
   cd "${GLK_BASE_PATH}"
   git add .
@@ -59,6 +85,19 @@ checkout_landscape_repo() {
 generate_landscape() {
   echo "🌱 Generating test landscape"
   glk generate landscape -c "${GLK_CONFIG_PATH}" "${GLK_LANDSCAPE_PATH}"
+
+  # TODO(timuthy): Remove this once the GitHub component is implemented.
+  local actions_path="${GLK_LANDSCAPE_PATH}/.github/actions/glk"
+  mkdir -p "$actions_path"
+  cp "$ACTION_SRC" "$actions_path"
+  sed -i 's|europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit:||g' "$actions_path/action.yaml"
+
+  local workflows_path="${GLK_LANDSCAPE_PATH}/.github/workflows"
+  mkdir -p "$workflows_path"
+  cp "$WORKFLOW_SRC" "$workflows_path"
+  cp "$SCRIPT_DIR/workflow-pr-post-change.yaml" "$workflows_path"
+  sed -i 's|<COMMAND>|landscape|g' "$workflows_path/workflow-pr-post-change.yaml"
+  sed -i 's|<BASE-PATH>|./base/|g' "$workflows_path/workflow-pr-post-change.yaml"
 
   cd "${GLK_LANDSCAPE_PATH}"
   git add .
@@ -85,8 +124,8 @@ ensure_base_as_submodule() {
   git submodule update --init
 }
 
-ensure_glk_configuration
 checkout_base_repo
+ensure_glk_configuration
 generate_base
 checkout_landscape_repo
 ensure_base_as_submodule

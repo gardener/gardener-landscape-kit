@@ -16,9 +16,9 @@ export GLK_KUBECONFIG=${REPO_ROOT}/dev/kind-$GLK_CLUSTER_NAME-kubeconfig.yaml
 WORK_DIR="$REPO_ROOT/dev/e2e"
 mkdir -p "${WORK_DIR}"
 
-export GLK_CONFIG_PATH="${WORK_DIR}/landscapekitconfiguration.yaml"
 export GLK_BASE_PATH="${WORK_DIR}/base"
 export GLK_LANDSCAPE_PATH="${WORK_DIR}/test-landscape"
+export GLK_CONFIG_PATH="${GLK_BASE_PATH}/landscapekitconfiguration.yaml"
 
 glk() {
   gardener-landscape-kit "$@"
