@@ -65,9 +65,15 @@ var _ = Describe("Component Generation", func() {
 
 	Describe("#GenerateLandscape", func() {
 		BeforeEach(func() {
-			generateOpts.TargetDirPath = "/repo/landscapeDir"
+			generateOpts.TargetDirPath = "/repo"
 			generateOpts.Config = &v1alpha1.LandscapeKitConfiguration{
-				Git: &v1alpha1.GitRepository{Paths: v1alpha1.PathConfiguration{Landscape: "./landscapeDir", Base: "./baseDir"}},
+				Repositories: &v1alpha1.RepositoriesConfig{
+					Base: &v1alpha1.BaseRepositoryConfig{Target: "."},
+					Landscape: &v1alpha1.LandscapeRepositoryConfig{
+						BaseLink: "./baseDir",
+						Target:   "./landscapeDir",
+					},
+				},
 			}
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
 		})

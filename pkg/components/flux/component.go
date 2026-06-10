@@ -65,14 +65,15 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 }
 
 func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
+	ref := opts.GetLandscapeRef()
 	var repoRef string
 	switch {
-	case opts.GetGitRepository().Ref.Commit != nil:
-		repoRef = "commit: " + *opts.GetGitRepository().Ref.Commit
-	case opts.GetGitRepository().Ref.Tag != nil:
-		repoRef = "tag: " + *opts.GetGitRepository().Ref.Tag
-	case opts.GetGitRepository().Ref.Branch != nil:
-		repoRef = "branch: " + *opts.GetGitRepository().Ref.Branch
+	case ref.Commit != nil:
+		repoRef = "commit: " + *ref.Commit
+	case ref.Tag != nil:
+		repoRef = "tag: " + *ref.Tag
+	case ref.Branch != nil:
+		repoRef = "branch: " + *ref.Branch
 	default:
 		repoRef = "branch: main"
 	}
@@ -81,7 +82,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
-		"repo_url":        opts.GetGitRepository().URL,
+		"repo_url":        opts.GetLandscapeURL(),
 		"repo_ref":        repoRef,
 		"flux_path":       fluxPath,
 		"components_path": path.Join(opts.GetRelativeLandscapePath(), components.DirName),

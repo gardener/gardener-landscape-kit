@@ -115,10 +115,7 @@ func getTemplateValues(opts components.Options) (map[string]any, error) {
 }
 
 func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
-	var (
-		relativeComponentPath = path.Join(components.DirName, ComponentDirectory)
-		relativeRepoRoot      = files.CalculatePathToComponentBase(opts.GetRelativeLandscapePath(), relativeComponentPath)
-	)
+	relativeComponentPath := path.Join(components.DirName, ComponentDirectory)
 
 	values, err := getTemplateValues(opts)
 	if err != nil {
@@ -126,7 +123,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	}
 
 	values = utils.MergeMaps(values, map[string]any{
-		"relativePathToBaseComponent": path.Join(relativeRepoRoot, opts.GetRelativeBasePath(), relativeComponentPath),
+		"relativePathToBaseComponent": opts.GetRelativeBaseComponentPath(ComponentDirectory),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)

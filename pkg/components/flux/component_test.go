@@ -43,29 +43,14 @@ var _ = Describe("Flux Component Generation", func() {
 		relativeLandscapePath string
 		repoURL               string
 
-		fs   afero.Afero
-		opts components.LandscapeOptions
+		fs     afero.Afero
+		config *v1alpha1.LandscapeKitConfiguration
+		opts   components.LandscapeOptions
 	)
 
-	BeforeEach(func() {
-		targetPath = "/landscapeDir"
-		relativeLandscapePath = "./test"
-		repoURL = "https://github.com/gardener/gardener-ref-landscape"
-
-		fs = afero.Afero{Fs: afero.NewMemMapFs()}
-
-		config := &v1alpha1.LandscapeKitConfiguration{
-			Git: &v1alpha1.GitRepository{
-				URL: repoURL,
-				Paths: v1alpha1.PathConfiguration{
-					Landscape: relativeLandscapePath,
-				},
-			},
-		}
+	buildOpts := func() components.LandscapeOptions {
 		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
-
-		var err error
-		opts, err = components.NewLandscapeOptions(
+		o, err := components.NewLandscapeOptions(
 			&generateoptions.Options{
 				Options: &cmd.Options{
 					Log: logr.Discard(),
@@ -75,8 +60,27 @@ var _ = Describe("Flux Component Generation", func() {
 			},
 			fs,
 		)
-
 		Expect(err).NotTo(HaveOccurred())
+		return o
+	}
+
+	BeforeEach(func() {
+		targetPath = "/"
+		relativeLandscapePath = "./landscapeDir"
+		repoURL = "https://github.com/gardener/gardener-ref-landscape"
+
+		fs = afero.Afero{Fs: afero.NewMemMapFs()}
+
+		config = &v1alpha1.LandscapeKitConfiguration{
+			Repositories: &v1alpha1.RepositoriesConfig{
+				Landscape: &v1alpha1.LandscapeRepositoryConfig{
+					URL:    repoURL,
+					Target: relativeLandscapePath,
+				},
+			},
+		}
+
+		opts = buildOpts()
 	})
 
 	Describe("#GenerateLandscape", func() {
@@ -160,9 +164,10 @@ var _ = Describe("Flux Component Generation", func() {
 			})
 
 			It("should contain the correct repository URL, path and branch", func() {
-				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
+				config.Repositories.Landscape.Ref = v1alpha1.GitRepositoryRef{
 					Branch: new("develop"),
 				}
+				opts = buildOpts()
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
 					"Branch": Equal("develop"),
@@ -170,9 +175,10 @@ var _ = Describe("Flux Component Generation", func() {
 			})
 
 			It("should contain the correct repository URL, path and tag", func() {
-				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
+				config.Repositories.Landscape.Ref = v1alpha1.GitRepositoryRef{
 					Tag: new("v1.0.0"),
 				}
+				opts = buildOpts()
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
 					"Tag": Equal("v1.0.0"),
@@ -180,9 +186,10 @@ var _ = Describe("Flux Component Generation", func() {
 			})
 
 			It("should contain the correct repository URL, path and commit", func() {
-				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
+				config.Repositories.Landscape.Ref = v1alpha1.GitRepositoryRef{
 					Commit: new("a1b2c3d4"),
 				}
+				opts = buildOpts()
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
 					"Commit": Equal("a1b2c3d4"),
@@ -190,10 +197,11 @@ var _ = Describe("Flux Component Generation", func() {
 			})
 
 			It("should contain prefer the branch configuration", func() {
-				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
+				config.Repositories.Landscape.Ref = v1alpha1.GitRepositoryRef{
 					Branch: new("develop"),
 					Tag:    new("v1.0.0"),
 				}
+				opts = buildOpts()
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
 					"Tag": Equal("v1.0.0"),
@@ -201,11 +209,12 @@ var _ = Describe("Flux Component Generation", func() {
 			})
 
 			It("should contain prefer the commit configuration", func() {
-				opts.GetGitRepository().Ref = v1alpha1.GitRepositoryRef{
+				config.Repositories.Landscape.Ref = v1alpha1.GitRepositoryRef{
 					Branch: new("develop"),
 					Tag:    new("v1.0.0"),
 					Commit: new("a1b2c3d4"),
 				}
+				opts = buildOpts()
 
 				test(opts, MatchFields(IgnoreExtras, Fields{
 					"Commit": Equal("a1b2c3d4"),
