@@ -32,6 +32,8 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 				return err
 			}
 
+			options.WarnIfTargetNotRepoRoot(opts.TargetDirPath, afero.Afero{Fs: afero.NewOsFs()}, opts.Log)
+
 			if err := opts.Validate(); err != nil {
 				return err
 			}

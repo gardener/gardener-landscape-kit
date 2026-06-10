@@ -34,6 +34,8 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 				return err
 			}
 
+			options.WarnIfTargetNotRepoRoot(opts.TargetDirPath, afero.Afero{Fs: afero.NewOsFs()}, opts.Log)
+
 			// general config validation
 			if err := opts.Validate(); err != nil {
 				return err
@@ -68,6 +70,7 @@ func validate(opts *options.Options) error {
 	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink, baseTarget)
 
 	// Validate version compatibility
+	opts.Log.V(1).Info("Validating version compatibility", "pathToBase", pathToBase)
 	fs := afero.Afero{Fs: afero.NewOsFs()}
 	if err := version.ValidateLandscapeVersionCompatibility(pathToBase, fs); err != nil {
 		return fmt.Errorf("version compatibility check failed: %w", err)

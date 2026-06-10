@@ -8,7 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
+	"github.com/go-logr/logr"
+	"github.com/spf13/afero"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -76,4 +79,24 @@ func (o *Options) Complete(args []string) error {
 // AddFlags adds flags for the options to the given FlagSet.
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.ConfigFilePath, "config", "c", o.ConfigFilePath, "Path to configuration file.")
+}
+
+// WarnIfTargetNotRepoRoot logs a warning if TargetDirPath does not contain a `.git` directory.
+// As of the `repositories:` config migration, generate commands expect the *repository root*, not the inner content directory.
+// This catches users still passing the old-style inner path.
+//
+// TODO(LucaBernstein): remove a few releases after the `repositories:` config rollout.
+func WarnIfTargetNotRepoRoot(targetDirPath string, fs afero.Afero, log logr.Logger) {
+	gitDir := filepath.Join(targetDirPath, ".git")
+	exists, err := fs.DirExists(gitDir)
+	if err != nil || exists {
+		return
+	}
+	log.Info(
+		"WARNING: target directory does not look like a git repository root (no .git directory found). "+
+			"As of the `repositories:` config migration, `generate base` and `generate landscape` expect the repository root, "+
+			"not the inner content directory. The content sub-paths are now taken from `repositories.base.target` and "+
+			"`repositories.landscape.target` in the config. If this directory is intentionally not a git repo yet, ignore this warning.",
+		"targetDirPath", targetDirPath,
+	)
 }
