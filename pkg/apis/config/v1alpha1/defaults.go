@@ -29,3 +29,17 @@ func SetDefaults_OCMConfig(obj *OCMConfig) {
 		obj.IgnoreMissingComponents = new(false)
 	}
 }
+
+// SetDefaults_BaseRepositoryConfig sets defaults for BaseRepositoryConfig.
+func SetDefaults_BaseRepositoryConfig(obj *BaseRepositoryConfig) {
+	if obj.Target == "" {
+		obj.Target = "./"
+	}
+}
+
+// SetDefaults_LandscapeRepositoryConfig sets defaults for LandscapeRepositoryConfig.
+func SetDefaults_LandscapeRepositoryConfig(obj *LandscapeRepositoryConfig) {
+	if obj.Target == "" {
+		obj.Target = "./"
+	}
+}

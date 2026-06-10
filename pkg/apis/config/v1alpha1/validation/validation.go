@@ -24,8 +24,8 @@ func ValidateLandscapeKitConfiguration(conf *configv1alpha1.LandscapeKitConfigur
 		allErrs = append(allErrs, ValidateOCMConfig(conf.OCM, field.NewPath("ocm"))...)
 	}
 
-	if conf.Git != nil {
-		allErrs = append(allErrs, validateGitRepository(conf.Git, field.NewPath("git"))...)
+	if conf.Repositories != nil {
+		allErrs = append(allErrs, validateRepositories(conf.Repositories, field.NewPath("repositories"))...)
 	}
 
 	if conf.Components != nil {
@@ -69,19 +69,42 @@ func validateComponentsConfiguration(compConf *configv1alpha1.ComponentsConfigur
 	return allErrs
 }
 
-func validateGitRepository(repo *configv1alpha1.GitRepository, fldPath *field.Path) field.ErrorList {
+func validateRepositories(repos *configv1alpha1.RepositoriesConfig, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	u, err := url.Parse(repo.URL)
-	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("url"), repo.URL, "must be a valid URL"))
-	}
-	if u.Scheme != "https" && u.Scheme != "http" && u.Scheme != "ssh" {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("url"), repo.URL, "must have http(s) or ssh scheme"))
+	if repos.Base != nil {
+		basePath := fldPath.Child("base")
+		if path.IsAbs(repos.Base.Target) {
+			allErrs = append(allErrs, field.Invalid(basePath.Child("target"), repos.Base.Target, "target must be a relative path within the base repository"))
+		}
 	}
 
-	allErrs = append(allErrs, validateGitRepositoryRef(&repo.Ref, fldPath.Child("ref"))...)
-	allErrs = append(allErrs, validatePathConfiguration(&repo.Paths, fldPath.Child("paths"))...)
+	if repos.Landscape != nil {
+		lsPath := fldPath.Child("landscape")
+
+		if strings.TrimSpace(repos.Landscape.URL) == "" {
+			allErrs = append(allErrs, field.Required(lsPath.Child("url"), "url must be specified"))
+		} else {
+			u, err := url.Parse(repos.Landscape.URL)
+			if err != nil {
+				allErrs = append(allErrs, field.Invalid(lsPath.Child("url"), repos.Landscape.URL, "must be a valid URL"))
+			} else if u.Scheme != "https" && u.Scheme != "http" && u.Scheme != "ssh" {
+				allErrs = append(allErrs, field.Invalid(lsPath.Child("url"), repos.Landscape.URL, "must have http(s) or ssh scheme"))
+			}
+		}
+
+		allErrs = append(allErrs, validateGitRepositoryRef(&repos.Landscape.Ref, lsPath.Child("ref"))...)
+
+		if strings.TrimSpace(repos.Landscape.BaseLink) == "" {
+			allErrs = append(allErrs, field.Required(lsPath.Child("baseLink"), "baseLink must be specified"))
+		} else if path.IsAbs(repos.Landscape.BaseLink) {
+			allErrs = append(allErrs, field.Invalid(lsPath.Child("baseLink"), repos.Landscape.BaseLink, "baseLink must be a relative path within the landscape repository"))
+		}
+
+		if strings.TrimSpace(repos.Landscape.Target) != "" && path.IsAbs(repos.Landscape.Target) {
+			allErrs = append(allErrs, field.Invalid(lsPath.Child("target"), repos.Landscape.Target, "target must be a relative path within the landscape repository"))
+		}
+	}
 
 	return allErrs
 }
@@ -99,28 +122,6 @@ func validateGitRepositoryRef(ref *configv1alpha1.GitRepositoryRef, fldPath *fie
 
 	if ref.Commit != nil && strings.TrimSpace(*ref.Commit) == "" {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("commit"), *ref.Commit, "commit SHA must not be empty"))
-	}
-
-	return allErrs
-}
-
-func validatePathConfiguration(paths *configv1alpha1.PathConfiguration, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-
-	if strings.TrimSpace(paths.Base) == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("base"), "base path must be specified"))
-	}
-
-	if path.IsAbs(paths.Base) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("base"), paths.Base, "base path must be a relative path to the base dir within the git repository"))
-	}
-
-	if strings.TrimSpace(paths.Landscape) == "" {
-		allErrs = append(allErrs, field.Required(fldPath.Child("landscape"), "landscape path must be specified"))
-	}
-
-	if path.IsAbs(paths.Landscape) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("landscape"), paths.Landscape, "landscape path must be a relative path to the landscape dir within the git repository"))
 	}
 
 	return allErrs

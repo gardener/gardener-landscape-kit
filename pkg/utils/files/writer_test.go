@@ -368,24 +368,4 @@ data:
 			})
 		})
 	})
-
-	Describe("#RelativePathFromDirDepth", func() {
-		It("should not go up if the passed relativeDir has no real depth", func() {
-			Expect(RelativePathFromDirDepth("")).To(Equal("."))
-			Expect(RelativePathFromDirDepth(".")).To(Equal("."))
-			Expect(RelativePathFromDirDepth("./")).To(Equal("."))
-		})
-
-		It("should go up the depth of the passed relativeDir", func() {
-			Expect(RelativePathFromDirDepth("examples")).To(Equal(".."))
-			Expect(RelativePathFromDirDepth("some/directory")).To(Equal("../.."))
-			Expect(RelativePathFromDirDepth("some/path/to/dir")).To(Equal("../../../.."))
-		})
-
-		It("should resolve path switches within relativeDir correctly", func() {
-			Expect(RelativePathFromDirDepth("enter/../not/../only/destination")).To(Equal("../.."))
-			Expect(RelativePathFromDirDepth("./././")).To(Equal("."))
-			Expect(RelativePathFromDirDepth("/")).To(Equal("."))
-		})
-	})
 })

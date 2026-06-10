@@ -26,4 +26,12 @@ func SetObjectDefaults_LandscapeKitConfiguration(in *LandscapeKitConfiguration) 
 	if in.OCM != nil {
 		SetDefaults_OCMConfig(in.OCM)
 	}
+	if in.Repositories != nil {
+		if in.Repositories.Base != nil {
+			SetDefaults_BaseRepositoryConfig(in.Repositories.Base)
+		}
+		if in.Repositories.Landscape != nil {
+			SetDefaults_LandscapeRepositoryConfig(in.Repositories.Landscape)
+		}
+	}
 }

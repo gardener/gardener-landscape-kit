@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
@@ -18,7 +19,6 @@ import (
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
 const (
@@ -30,7 +30,11 @@ const (
 type Options interface {
 	// GetComponentVector returns the component vector.
 	GetComponentVector() utilscomponentvector.Interface
-	// GetTargetPath returns the target directory path the components should be generated into.
+	// GetRepoRoot returns the path on disk to the root of the repository being generated into
+	// (the value the user passed as TARGET_DIR).
+	GetRepoRoot() string
+	// GetTargetPath returns the directory the component should write its content into.
+	// This is the repository root joined with the repository-relative target (base.target or landscape.target).
 	GetTargetPath() string
 	// GetFilesystem returns the filesystem to use.
 	GetFilesystem() afero.Afero
@@ -44,12 +48,21 @@ type Options interface {
 type LandscapeOptions interface {
 	Options
 
-	// GetGitRepository returns the git repository information.
-	GetGitRepository() *configv1alpha1.GitRepository
-	// GetRelativeBasePath returns the base directory that is relative to the target path.
+	// GetLandscapeURL returns the URL of the landscape git repository.
+	GetLandscapeURL() string
+	// GetLandscapeRef returns the git reference of the landscape repository.
+	GetLandscapeRef() configv1alpha1.GitRepositoryRef
+	// GetRelativeBasePath returns the path inside the landscape repository
+	// where the base repository's generated content lives, i.e., landscape.baseLink joined with base.target.
 	GetRelativeBasePath() string
-	// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
+	// GetRelativeLandscapePath returns landscape.target — i.e. the
+	// landscape directory within the landscape repository.
 	GetRelativeLandscapePath() string
+	// GetRelativeBaseComponentPath returns the path from a landscape
+	// component directory to the corresponding base component directory,
+	// suitable for kustomize "resources:" entries. componentDir is the
+	// component-specific path beneath DirName (e.g. "gardener/garden").
+	GetRelativeBaseComponentPath(componentDir string) string
 }
 
 // Interface is the components interface that each component must implement.
@@ -64,6 +77,7 @@ type Interface interface {
 
 type options struct {
 	componentVector utilscomponentvector.Interface
+	repoRoot        string
 	targetPath      string
 	filesystem      afero.Afero
 	logger          logr.Logger
@@ -75,7 +89,12 @@ func (o *options) GetComponentVector() utilscomponentvector.Interface {
 	return o.componentVector
 }
 
-// GetTargetPath returns the target directory path the components should be generated into.
+// GetRepoRoot returns the on-disk path to the root of the repository being generated into.
+func (o *options) GetRepoRoot() string {
+	return o.repoRoot
+}
+
+// GetTargetPath returns the directory the component should write its content into.
 func (o *options) GetTargetPath() string {
 	return o.targetPath
 }
@@ -96,22 +115,34 @@ func (o *options) GetMergeMode() configv1alpha1.MergeMode {
 }
 
 // NewOptions returns a new Options instance.
+//
+// opts.TargetDirPath is treated as the on-disk root of the repository the caller is generating into.
+// The component target directory is repoRoot/<base.target>.
+// For landscape generation, NewLandscapeOptions overrides this to repoRoot/<landscape.target>.
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
+	repoRoot := path.Clean(opts.TargetDirPath)
+
+	baseTarget := ""
+	if opts.Config != nil && opts.Config.Repositories != nil && opts.Config.Repositories.Base != nil {
+		baseTarget = opts.Config.Repositories.Base.Target
+	}
+	targetPath := path.Clean(path.Join(repoRoot, baseTarget))
+
 	var customComponentVectors [][]byte
-	if opts.Config != nil && opts.Config.Git != nil {
-		// isTargetLandscapeDir: when the target dir is the landscape dir, also check for a components.yaml in the base dir.
-		isTargetLandscapeDir := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Landscape) == path.Clean(opts.TargetDirPath)
-		if isTargetLandscapeDir {
-			baseCompVectorFile := path.Join(opts.TargetDirPath, files.CalculatePathToComponentBase(opts.Config.Git.Paths.Landscape), opts.Config.Git.Paths.Base, utilscomponentvector.ComponentVectorFilename)
-			componentsBytes, err := readCustomComponentsFile(opts, fs, baseCompVectorFile)
-			if err != nil {
-				return nil, err
-			}
-			customComponentVectors = append(customComponentVectors, componentsBytes)
+	if opts.Config != nil && opts.Config.Repositories != nil && opts.Config.Repositories.Landscape != nil {
+		// Locate the base components.yaml inside the landscape repository.
+		// landscape.BaseLink is the path inside the landscape repo where the base repository's content is mounted.
+		// base.Target points within that mount at the directory containing components.yaml.
+		landscape := opts.Config.Repositories.Landscape
+		baseCompVectorFile := path.Join(repoRoot, landscape.BaseLink, baseTarget, utilscomponentvector.ComponentVectorFilename)
+		componentsBytes, err := readCustomComponentsFile(opts, fs, baseCompVectorFile)
+		if err != nil {
+			return nil, err
 		}
+		customComponentVectors = append(customComponentVectors, componentsBytes)
 	}
 
-	componentsBytes, err := readCustomComponentsFile(opts, fs, path.Join(opts.TargetDirPath, utilscomponentvector.ComponentVectorFilename))
+	componentsBytes, err := readCustomComponentsFile(opts, fs, path.Join(targetPath, utilscomponentvector.ComponentVectorFilename))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +155,8 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 
 	return &options{
 		componentVector: componentVector,
-		targetPath:      path.Clean(opts.TargetDirPath),
+		repoRoot:        repoRoot,
+		targetPath:      targetPath,
 		filesystem:      fs,
 		logger:          opts.Log,
 		mergeMode:       *opts.Config.MergeMode,
@@ -144,33 +176,71 @@ func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, fil
 type landscapeOptions struct {
 	Options
 
-	gitRepository *configv1alpha1.GitRepository
+	landscape  *configv1alpha1.LandscapeRepositoryConfig
+	baseTarget string
+	targetPath string
 }
 
-// GetGitRepository returns the git repository information.
-func (l *landscapeOptions) GetGitRepository() *configv1alpha1.GitRepository {
-	return l.gitRepository
+// GetTargetPath overrides Options.GetTargetPath: for landscape generation the
+// content directory is the landscape repository root joined with landscape.target.
+func (l *landscapeOptions) GetTargetPath() string {
+	return l.targetPath
 }
 
-// GetRelativeBasePath returns the base directory that is relative to the target path.
+// GetLandscapeURL returns the URL of the landscape git repository.
+func (l *landscapeOptions) GetLandscapeURL() string {
+	return l.landscape.URL
+}
+
+// GetLandscapeRef returns the git reference of the landscape repository.
+func (l *landscapeOptions) GetLandscapeRef() configv1alpha1.GitRepositoryRef {
+	return l.landscape.Ref
+}
+
+// GetRelativeBasePath returns the path inside the landscape repository where the base repository's generated content lives.
 func (l *landscapeOptions) GetRelativeBasePath() string {
-	return l.gitRepository.Paths.Base
+	return path.Join(l.landscape.BaseLink, l.baseTarget)
 }
 
-// GetRelativeLandscapePath returns the landscape directory that is relative to the target path.
+// GetRelativeLandscapePath returns landscape.target
+// This is the landscape directory within the landscape repository.
 func (l *landscapeOptions) GetRelativeLandscapePath() string {
-	return l.gitRepository.Paths.Landscape
+	return l.landscape.Target
+}
+
+// GetRelativeBaseComponentPath returns the path from a landscape component
+// directory to the corresponding base component directory, suitable for kustomize "resources:" entries.
+// Both endpoints are relative to the landscape repository root:
+// the landscape side at landscape.target/components/<dir>,
+// the base side at landscape.baseLink/base.target/components/<dir>.
+func (l *landscapeOptions) GetRelativeBaseComponentPath(componentDir string) string {
+	from := path.Join("/", l.landscape.Target, DirName, componentDir)
+	to := path.Join("/", l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
+	rel, err := filepath.Rel(from, to)
+	if err != nil {
+		// from/to are both absolute and well-formed; this should never error.
+		return path.Join(l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
+	}
+	return rel
 }
 
 // NewLandscapeOptions returns a new LandscapeOptions instance.
 func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (LandscapeOptions, error) {
-	options, err := NewOptions(opts, fs)
+	base, err := NewOptions(opts, fs)
 	if err != nil {
 		return nil, err
 	}
 
+	landscape := opts.Config.Repositories.Landscape
+	baseTarget := ""
+	if opts.Config.Repositories.Base != nil {
+		baseTarget = opts.Config.Repositories.Base.Target
+	}
+
 	return &landscapeOptions{
-		Options:       options,
-		gitRepository: opts.Config.Git,
+		Options:    base,
+		landscape:  landscape,
+		baseTarget: baseTarget,
+		targetPath: path.Clean(path.Join(base.GetRepoRoot(), landscape.Target)),
 	}, nil
 }

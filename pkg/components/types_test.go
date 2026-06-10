@@ -212,14 +212,15 @@ var _ = Describe("Types", func() {
 			opts = &options.Options{
 				Options: &cmd.Options{},
 				Config: &v1alpha1.LandscapeKitConfiguration{
-					Git: &v1alpha1.GitRepository{
-						URL: "https://github.com/example/repo.git",
-						Ref: v1alpha1.GitRepositoryRef{
-							Branch: new("main"),
-						},
-						Paths: v1alpha1.PathConfiguration{
-							Base:      "base",
-							Landscape: "landscape",
+					Repositories: &v1alpha1.RepositoriesConfig{
+						Base: &v1alpha1.BaseRepositoryConfig{Target: "content"},
+						Landscape: &v1alpha1.LandscapeRepositoryConfig{
+							URL: "https://github.com/example/repo.git",
+							Ref: v1alpha1.GitRepositoryRef{
+								Branch: new("main"),
+							},
+							BaseLink: "base",
+							Target:   "landscape",
 						},
 					},
 				},
@@ -228,34 +229,65 @@ var _ = Describe("Types", func() {
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
-		Describe("#GetGitRepository", func() {
-			It("should return the git repository", func() {
+		Describe("#GetLandscapeURL", func() {
+			It("should return the landscape repository URL", func() {
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(landscapeOpts.GetGitRepository()).To(Equal(opts.Config.Git))
+				Expect(landscapeOpts.GetLandscapeURL()).To(Equal("https://github.com/example/repo.git"))
+			})
+		})
+
+		Describe("#GetLandscapeRef", func() {
+			It("should return the landscape repository ref", func() {
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(landscapeOpts.GetLandscapeRef()).To(Equal(opts.Config.Repositories.Landscape.Ref))
 			})
 		})
 
 		Describe("#GetRelativeBasePath", func() {
-			It("should return the base path", func() {
-				opts.Config.Git.Paths.Base = "./base"
+			It("should return baseLink joined with base.target", func() {
+				opts.Config.Repositories.Landscape.BaseLink = "./base"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("./base"))
+				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("base/content"))
 			})
 		})
 
 		Describe("#GetRelativeLandscapePath", func() {
 			It("should return the landscape path", func() {
-				opts.Config.Git.Paths.Landscape = "./landscape"
+				opts.Config.Repositories.Landscape.Target = "./landscape"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeLandscapePath()).To(Equal("./landscape"))
+			})
+		})
+
+		Describe("#GetRelativeBaseComponentPath", func() {
+			It("should return the relative path from a landscape component dir to the corresponding base component dir", func() {
+				opts.Config.Repositories.Landscape.Target = "landscapes/showroom"
+				opts.Config.Repositories.Landscape.BaseLink = "base"
+
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(landscapeOpts.GetRelativeBaseComponentPath("gardener/garden")).To(Equal("../../../../../base/content/components/gardener/garden"))
+			})
+
+			It("should handle a single-segment landscape target", func() {
+				opts.Config.Repositories.Landscape.Target = "landscape"
+				opts.Config.Repositories.Landscape.BaseLink = "base"
+
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(landscapeOpts.GetRelativeBaseComponentPath("gardener/garden")).To(Equal("../../../../base/content/components/gardener/garden"))
 			})
 		})
 
@@ -267,14 +299,15 @@ var _ = Describe("Types", func() {
 					},
 					TargetDirPath: "/path/to/target",
 					Config: &v1alpha1.LandscapeKitConfiguration{
-						Git: &v1alpha1.GitRepository{
-							URL: "https://github.com/example/repo.git",
-							Ref: v1alpha1.GitRepositoryRef{
-								Branch: new("main"),
-							},
-							Paths: v1alpha1.PathConfiguration{
-								Base:      "base",
-								Landscape: "landscape",
+						Repositories: &v1alpha1.RepositoriesConfig{
+							Base: &v1alpha1.BaseRepositoryConfig{Target: "base"},
+							Landscape: &v1alpha1.LandscapeRepositoryConfig{
+								URL: "https://github.com/example/repo.git",
+								Ref: v1alpha1.GitRepositoryRef{
+									Branch: new("main"),
+								},
+								BaseLink: "base",
+								Target:   "landscape",
 							},
 						},
 					},
@@ -285,10 +318,12 @@ var _ = Describe("Types", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
-				Expect(result.GetTargetPath()).To(Equal("/path/to/target"))
+				Expect(result.GetTargetPath()).To(Equal("/path/to/target/landscape"))
+				Expect(result.GetRepoRoot()).To(Equal("/path/to/target"))
 				Expect(result.GetFilesystem()).To(Equal(fs))
-				Expect(result.GetGitRepository()).To(Equal(opts.Config.Git))
-				Expect(result.GetRelativeBasePath()).To(Equal("base"))
+				Expect(result.GetLandscapeURL()).To(Equal("https://github.com/example/repo.git"))
+				Expect(result.GetLandscapeRef()).To(Equal(opts.Config.Repositories.Landscape.Ref))
+				Expect(result.GetRelativeBasePath()).To(Equal("base/base"))
 				Expect(result.GetRelativeLandscapePath()).To(Equal("landscape"))
 			})
 		})

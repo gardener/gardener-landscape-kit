@@ -9,6 +9,22 @@
 
 
 
+#### BaseRepositoryConfig
+
+
+
+BaseRepositoryConfig configures the base repository.
+
+
+
+_Appears in:_
+- [RepositoriesConfig](#repositoriesconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `target` _string_ | Target is the directory of the base content within the base repository.<br />Defaults to "./" if not specified. |  | Optional: \{\} <br /> |
+
+
 #### ComponentsConfiguration
 
 
@@ -43,24 +59,6 @@ _Appears in:_
 | `Disabled` | DefaultVersionsUpdateStrategyDisabled indicates that the versions in the default vector should not be updated on generate.<br /> |
 
 
-#### GitRepository
-
-
-
-GitRepository contains information the Git repository containing landscape deployments and configurations.
-
-
-
-_Appears in:_
-- [LandscapeKitConfiguration](#landscapekitconfiguration)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `url` _string_ | URL specifies the Git repository URL, it can be an HTTP/S or SSH address. |  | Required: \{\} <br /> |
-| `ref` _[GitRepositoryRef](#gitrepositoryref)_ | Reference specifies the Git reference to resolve and monitor for<br />changes, defaults to the 'master' branch. |  | Required: \{\} <br /> |
-| `paths` _[PathConfiguration](#pathconfiguration)_ | Paths specifies the path configuration within the Git repository. |  | Required: \{\} <br /> |
-
-
 #### GitRepositoryRef
 
 
@@ -70,7 +68,7 @@ GitRepositoryRef specifies the Git reference to resolve and checkout.
 
 
 _Appears in:_
-- [GitRepository](#gitrepository)
+- [LandscapeRepositoryConfig](#landscaperepositoryconfig)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -79,6 +77,25 @@ _Appears in:_
 | `commit` _string_ | Commit SHA to check out, takes precedence over all reference fields. |  | Optional: \{\} <br /> |
 
 
+
+
+#### LandscapeRepositoryConfig
+
+
+
+LandscapeRepositoryConfig configures the landscape repository.
+
+
+
+_Appears in:_
+- [RepositoriesConfig](#repositoriesconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `url` _string_ | URL of the landscape Git repository (http/s or ssh). |  | Required: \{\} <br /> |
+| `ref` _[GitRepositoryRef](#gitrepositoryref)_ | Ref to check out (branch / tag / commit). |  | Required: \{\} <br /> |
+| `baseLink` _string_ | BaseLink is the path inside the landscape repository where the base repository's content is mounted (e.g. via a Git submodule). |  | Required: \{\} <br /> |
+| `target` _string_ | Target is the landscape directory within the landscape repository.<br />Defaults to "./" if not specified. |  | Optional: \{\} <br /> |
 
 
 #### MergeMode
@@ -134,21 +151,22 @@ _Appears in:_
 | `ignoreMissingComponents` _boolean_ | IgnoreMissingComponents indicates whether to ignore missing components during resolution. |  | Optional: \{\} <br /> |
 
 
-#### PathConfiguration
+#### RepositoriesConfig
 
 
 
-PathConfiguration contains path configuration within the Git repository.
+RepositoriesConfig describes the base and landscape repositories.
+All paths inside each section are relative to that repository's root.
 
 
 
 _Appears in:_
-- [GitRepository](#gitrepository)
+- [LandscapeKitConfiguration](#landscapekitconfiguration)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `base` _string_ | Base is the relative path to the base directory within the Git repository. |  | Required: \{\} <br /> |
-| `landscape` _string_ | Landscape is the relative path to the landscape directory within the Git repository. |  | Required: \{\} <br /> |
+| `base` _[BaseRepositoryConfig](#baserepositoryconfig)_ | Base configures the base repository. |  | Optional: \{\} <br /> |
+| `landscape` _[LandscapeRepositoryConfig](#landscaperepositoryconfig)_ | Landscape configures the landscape repository. |  | Optional: \{\} <br /> |
 
 
 #### VersionCheckMode

@@ -33,7 +33,9 @@ var _ = Describe("Registry", func() {
 		reg = New()
 
 		config = &v1alpha1.LandscapeKitConfiguration{
-			Git: &v1alpha1.GitRepository{},
+			Repositories: &v1alpha1.RepositoriesConfig{
+				Landscape: &v1alpha1.LandscapeRepositoryConfig{},
+			},
 		}
 		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
 

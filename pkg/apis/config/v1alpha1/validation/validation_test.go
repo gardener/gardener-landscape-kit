@@ -18,7 +18,7 @@ import (
 
 var _ = Describe("Validation", func() {
 	Describe("#ValidateLandscapeKitConfiguration", func() {
-		It("should pass if no OCM or Git config is provided", func() {
+		It("should pass if no OCM or Repositories config is provided", func() {
 			conf := &v1alpha1.LandscapeKitConfiguration{}
 
 			errList := ValidateLandscapeKitConfiguration(conf)
@@ -34,14 +34,17 @@ var _ = Describe("Validation", func() {
 						Version: "1.0.0",
 					},
 				},
-				Git: &v1alpha1.GitRepository{
-					URL: "https://github.com/gardener/gardener-landscape-kit",
-					Ref: v1alpha1.GitRepositoryRef{
-						Branch: new("main"),
+				Repositories: &v1alpha1.RepositoriesConfig{
+					Base: &v1alpha1.BaseRepositoryConfig{
+						Target: "base",
 					},
-					Paths: v1alpha1.PathConfiguration{
-						Base:      "base",
-						Landscape: "landscape",
+					Landscape: &v1alpha1.LandscapeRepositoryConfig{
+						URL: "https://github.com/gardener/gardener-landscape-kit",
+						Ref: v1alpha1.GitRepositoryRef{
+							Branch: new("main"),
+						},
+						BaseLink: "base",
+						Target:   "landscape",
 					},
 				},
 			}
@@ -50,15 +53,37 @@ var _ = Describe("Validation", func() {
 			Expect(errList).To(BeEmpty())
 		})
 
-		Context("Git Configuration", func() {
-			It("should fail if Git config is invalid", func() {
+		Context("Repositories Configuration", func() {
+			It("should pass with a valid configuration", func() {
 				conf := &v1alpha1.LandscapeKitConfiguration{
-					Git: &v1alpha1.GitRepository{
-						URL: "invalid-url",
-						Ref: v1alpha1.GitRepositoryRef{},
-						Paths: v1alpha1.PathConfiguration{
-							Base:      "",
-							Landscape: "",
+					Repositories: &v1alpha1.RepositoriesConfig{
+						Base: &v1alpha1.BaseRepositoryConfig{
+							Target: "base",
+						},
+						Landscape: &v1alpha1.LandscapeRepositoryConfig{
+							URL:      "https://github.com/gardener/gardener-landscape-kit",
+							Ref:      v1alpha1.GitRepositoryRef{Branch: new("main")},
+							BaseLink: "base",
+							Target:   "landscape",
+						},
+					},
+				}
+
+				errList := ValidateLandscapeKitConfiguration(conf)
+				Expect(errList).To(BeEmpty())
+			})
+
+			It("should fail if Repositories config is invalid", func() {
+				conf := &v1alpha1.LandscapeKitConfiguration{
+					Repositories: &v1alpha1.RepositoriesConfig{
+						Base: &v1alpha1.BaseRepositoryConfig{
+							Target: "",
+						},
+						Landscape: &v1alpha1.LandscapeRepositoryConfig{
+							URL:      "ftp://github.com/gardener/gardener-landscape-kit",
+							Ref:      v1alpha1.GitRepositoryRef{},
+							BaseLink: "",
+							Target:   "",
 						},
 					},
 				}
@@ -67,27 +92,24 @@ var _ = Describe("Validation", func() {
 				Expect(errList).To(ConsistOf(
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
-						"Field": Equal("git.url"),
+						"Field": Equal("repositories.landscape.url"),
 					})),
 					PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("git.paths.base"),
-					})),
-					PointTo(MatchFields(IgnoreExtras, Fields{
-						"Type":  Equal(field.ErrorTypeRequired),
-						"Field": Equal("git.paths.landscape"),
+						"Field": Equal("repositories.landscape.baseLink"),
 					})),
 				))
 			})
 
-			Context("URL", func() {
+			Context("Landscape URL", func() {
 				test := func(url string) field.ErrorList {
 					conf := &v1alpha1.LandscapeKitConfiguration{
-						Git: &v1alpha1.GitRepository{
-							URL: url,
-							Paths: v1alpha1.PathConfiguration{
-								Base:      "base",
-								Landscape: "landscape",
+						Repositories: &v1alpha1.RepositoriesConfig{
+							Base: &v1alpha1.BaseRepositoryConfig{Target: "base"},
+							Landscape: &v1alpha1.LandscapeRepositoryConfig{
+								URL:      url,
+								BaseLink: "base",
+								Target:   "landscape",
 							},
 						},
 					}
@@ -109,20 +131,29 @@ var _ = Describe("Validation", func() {
 					Expect(test("ftp://github.com/gardener/gardener-landscape-kit")).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
 							"Type":  Equal(field.ErrorTypeInvalid),
-							"Field": Equal("git.url"),
+							"Field": Equal("repositories.landscape.url"),
+						}))))
+				})
+
+				It("should fail with empty URL", func() {
+					Expect(test("")).To(ConsistOf(
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeRequired),
+							"Field": Equal("repositories.landscape.url"),
 						}))))
 				})
 			})
 
-			Context("Reference", func() {
+			Context("Landscape Reference", func() {
 				test := func(ref v1alpha1.GitRepositoryRef) field.ErrorList {
 					conf := &v1alpha1.LandscapeKitConfiguration{
-						Git: &v1alpha1.GitRepository{
-							URL: "https://github.com/gardener/gardener-landscape-kit",
-							Ref: ref,
-							Paths: v1alpha1.PathConfiguration{
-								Base:      "base",
-								Landscape: "landscape",
+						Repositories: &v1alpha1.RepositoriesConfig{
+							Base: &v1alpha1.BaseRepositoryConfig{Target: "base"},
+							Landscape: &v1alpha1.LandscapeRepositoryConfig{
+								URL:      "https://github.com/gardener/gardener-landscape-kit",
+								Ref:      ref,
+								BaseLink: "base",
+								Target:   "landscape",
 							},
 						},
 					}
@@ -141,28 +172,33 @@ var _ = Describe("Validation", func() {
 				})
 
 				It("should fail with empty refs", func() {
-					for _, ref := range []v1alpha1.GitRepositoryRef{
-						{Branch: new("")},
-						{Tag: new("")},
-						{Commit: new("")},
+					for _, refAndField := range []struct {
+						ref   v1alpha1.GitRepositoryRef
+						field string
+					}{
+						{v1alpha1.GitRepositoryRef{Branch: new("")}, "repositories.landscape.ref.branch"},
+						{v1alpha1.GitRepositoryRef{Tag: new("")}, "repositories.landscape.ref.tag"},
+						{v1alpha1.GitRepositoryRef{Commit: new("")}, "repositories.landscape.ref.commit"},
 					} {
-						Expect(test(ref)).To(ConsistOf(
+						Expect(test(refAndField.ref)).To(ConsistOf(
 							PointTo(MatchFields(IgnoreExtras, Fields{
-								"Type": Equal(field.ErrorTypeInvalid),
+								"Type":  Equal(field.ErrorTypeInvalid),
+								"Field": Equal(refAndField.field),
 							}))))
 					}
 				})
 			})
 
 			Context("Paths", func() {
-				test := func(basePath, landscapePath string) field.ErrorList {
+				test := func(baseTarget, baseLink, landscapeTarget string) field.ErrorList {
 					conf := &v1alpha1.LandscapeKitConfiguration{
-						Git: &v1alpha1.GitRepository{
-							URL: "https://github.com/gardener/gardener-landscape-kit",
-							Ref: v1alpha1.GitRepositoryRef{},
-							Paths: v1alpha1.PathConfiguration{
-								Base:      basePath,
-								Landscape: landscapePath,
+						Repositories: &v1alpha1.RepositoriesConfig{
+							Base: &v1alpha1.BaseRepositoryConfig{Target: baseTarget},
+							Landscape: &v1alpha1.LandscapeRepositoryConfig{
+								URL:      "https://github.com/gardener/gardener-landscape-kit",
+								Ref:      v1alpha1.GitRepositoryRef{},
+								BaseLink: baseLink,
+								Target:   landscapeTarget,
 							},
 						},
 					}
@@ -171,22 +207,35 @@ var _ = Describe("Validation", func() {
 				}
 
 				It("should pass with valid relative paths", func() {
-					Expect(test("base", "landscape")).To(BeEmpty())
-					Expect(test("base/path", "landscape/path")).To(BeEmpty())
-					Expect(test("./base", "./landscape")).To(BeEmpty())
-					Expect(test("./", "./")).To(BeEmpty())
-					Expect(test(".", ".")).To(BeEmpty())
+					Expect(test("base", "base", "landscape")).To(BeEmpty())
+					Expect(test("base/path", "base/path", "landscape/path")).To(BeEmpty())
+					Expect(test("./base", "./base", "./landscape")).To(BeEmpty())
+					Expect(test("./", "./", "./")).To(BeEmpty())
+					Expect(test(".", ".", ".")).To(BeEmpty())
+				})
+
+				It("should fail with empty baseLink while target paths are optional", func() {
+					Expect(test("", "", "")).To(ConsistOf(
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeRequired),
+							"Field": Equal("repositories.landscape.baseLink"),
+						})),
+					))
 				})
 
 				It("should fail with absolute paths", func() {
-					Expect(test("/base", "/landscape")).To(ConsistOf(
+					Expect(test("/base", "/base", "/landscape")).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
 							"Type":  Equal(field.ErrorTypeInvalid),
-							"Field": Equal("git.paths.base"),
+							"Field": Equal("repositories.base.target"),
 						})),
 						PointTo(MatchFields(IgnoreExtras, Fields{
 							"Type":  Equal(field.ErrorTypeInvalid),
-							"Field": Equal("git.paths.landscape"),
+							"Field": Equal("repositories.landscape.baseLink"),
+						})),
+						PointTo(MatchFields(IgnoreExtras, Fields{
+							"Type":  Equal(field.ErrorTypeInvalid),
+							"Field": Equal("repositories.landscape.target"),
 						})),
 					))
 				})

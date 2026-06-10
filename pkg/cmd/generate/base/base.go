@@ -23,7 +23,7 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 	opts := &options.Options{Options: globalOpts}
 
 	cmd := &cobra.Command{
-		Use:     "base (-c CONFIG_FILE) TARGET_DIR",
+		Use:     "base (-c CONFIG_FILE) BASE_REPO_ROOT",
 		Short:   "Generate or update the base directory",
 		Example: "gardener-landscape-kit generate base -c ./example/20-componentconfig-glk.yaml ./base",
 		Args:    cobra.ExactArgs(1),
@@ -64,9 +64,10 @@ func run(_ context.Context, opts *options.Options) error {
 		return err
 	}
 
-	// Write version metadata after successful generation
+	// Write version metadata after successful generation,
+	// alongside the generated base content (TargetDirPath joined with base.Target).
 	if err := version.WriteVersionMetadata(
-		opts.TargetDirPath,
+		componentOpts.GetTargetPath(),
 		afero.Afero{Fs: afero.NewOsFs()},
 	); err != nil {
 		return fmt.Errorf("failed to write version metadata: %w", err)

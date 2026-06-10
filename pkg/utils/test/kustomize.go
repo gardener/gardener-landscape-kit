@@ -108,19 +108,28 @@ func KustomizeComponent(
 	component components.Interface,
 	relativeComponentPath string,
 ) ([]byte, error) {
-	var (
-		cmdOpts      = &cmd.Options{Log: logr.Discard()}
-		generateOpts = &generateoptions.Options{
-			TargetDirPath: "/repo/baseDir",
-			Options:       cmdOpts,
-			Config: &v1alpha1.LandscapeKitConfiguration{
-				Git: &v1alpha1.GitRepository{Paths: v1alpha1.PathConfiguration{Landscape: "./landscapeDir", Base: "./baseDir"}},
+	// Both repos share an on-disk root "/repo". The landscape repo's root is /repo (TargetDirPath for landscape gen),
+	// and its content lives at landscape.Target = "./landscapeDir".
+	// The base repo's root maps to /repo/baseDir on disk; landscape.BaseLink = "./baseDir" mirrors that
+	// inside the landscape repo so kustomize references resolve.
+	cfg := &v1alpha1.LandscapeKitConfiguration{
+		Repositories: &v1alpha1.RepositoriesConfig{
+			Base: &v1alpha1.BaseRepositoryConfig{Target: "./"},
+			Landscape: &v1alpha1.LandscapeRepositoryConfig{
+				BaseLink: "./baseDir",
+				Target:   "./landscapeDir",
 			},
-		}
-	)
-	v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
+		},
+	}
+	v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(cfg)
 
-	baseOpts, err := components.NewOptions(generateOpts, fs)
+	cmdOpts := &cmd.Options{Log: logr.Discard()}
+	baseGenOpts := &generateoptions.Options{
+		TargetDirPath: "/repo/baseDir",
+		Options:       cmdOpts,
+		Config:        cfg,
+	}
+	baseOpts, err := components.NewOptions(baseGenOpts, fs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create base options: %w", err)
 	}
@@ -128,8 +137,12 @@ func KustomizeComponent(
 		return nil, fmt.Errorf("failed to generate component base: %w", err)
 	}
 
-	generateOpts.TargetDirPath = "/repo/landscapeDir"
-	landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
+	landscapeGenOpts := &generateoptions.Options{
+		TargetDirPath: "/repo",
+		Options:       cmdOpts,
+		Config:        cfg,
+	}
+	landscapeOpts, err := components.NewLandscapeOptions(landscapeGenOpts, fs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create landscape options: %w", err)
 	}

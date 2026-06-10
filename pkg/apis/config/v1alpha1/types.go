@@ -17,9 +17,10 @@ type LandscapeKitConfiguration struct {
 	// OCM is the configuration for the OCM version processing.
 	// +optional
 	OCM *OCMConfig `json:"ocm,omitempty"`
-	// Git is the configuration for the Git repository.
+	// Repositories is the configuration for the base and landscape repositories.
+	// All paths inside each section are relative to that repository's root.
 	// +optional
-	Git *GitRepository `json:"git,omitempty"`
+	Repositories *RepositoriesConfig `json:"repositories,omitempty"`
 	// Components is the configuration for the components.
 	// +optional
 	Components *ComponentsConfiguration `json:"components,omitempty"`
@@ -43,30 +44,6 @@ type ComponentsConfiguration struct {
 	Include []string `json:"include,omitempty"`
 }
 
-// GitRepository contains information the Git repository containing landscape deployments and configurations.
-type GitRepository struct {
-	// URL specifies the Git repository URL, it can be an HTTP/S or SSH address.
-	// +required
-	URL string `json:"url"`
-	// Reference specifies the Git reference to resolve and monitor for
-	// changes, defaults to the 'master' branch.
-	// +required
-	Ref GitRepositoryRef `json:"ref"`
-	// Paths specifies the path configuration within the Git repository.
-	// +required
-	Paths PathConfiguration `json:"paths"`
-}
-
-// PathConfiguration contains path configuration within the Git repository.
-type PathConfiguration struct {
-	// Base is the relative path to the base directory within the Git repository.
-	// +required
-	Base string `json:"base"`
-	// Landscape is the relative path to the landscape directory within the Git repository.
-	// +required
-	Landscape string `json:"landscape"`
-}
-
 // GitRepositoryRef specifies the Git reference to resolve and checkout.
 type GitRepositoryRef struct {
 	// Branch to check out, defaults to 'main' if no other field is defined.
@@ -78,6 +55,42 @@ type GitRepositoryRef struct {
 	// Commit SHA to check out, takes precedence over all reference fields.
 	// +optional
 	Commit *string `json:"commit,omitempty"`
+}
+
+// RepositoriesConfig describes the base and landscape repositories.
+// All paths inside each section are relative to that repository's root.
+type RepositoriesConfig struct {
+	// Base configures the base repository.
+	// +optional
+	Base *BaseRepositoryConfig `json:"base,omitempty"`
+	// Landscape configures the landscape repository.
+	// +optional
+	Landscape *LandscapeRepositoryConfig `json:"landscape,omitempty"`
+}
+
+// BaseRepositoryConfig configures the base repository.
+type BaseRepositoryConfig struct {
+	// Target is the directory of the base content within the base repository.
+	// Defaults to "./" if not specified.
+	// +optional
+	Target string `json:"target,omitempty"`
+}
+
+// LandscapeRepositoryConfig configures the landscape repository.
+type LandscapeRepositoryConfig struct {
+	// URL of the landscape Git repository (http/s or ssh).
+	// +required
+	URL string `json:"url"`
+	// Ref to check out (branch / tag / commit).
+	// +required
+	Ref GitRepositoryRef `json:"ref"`
+	// BaseLink is the path inside the landscape repository where the base repository's content is mounted (e.g. via a Git submodule).
+	// +required
+	BaseLink string `json:"baseLink"`
+	// Target is the landscape directory within the landscape repository.
+	// Defaults to "./" if not specified.
+	// +optional
+	Target string `json:"target,omitempty"`
 }
 
 // OCMConfig contains information about root component.
