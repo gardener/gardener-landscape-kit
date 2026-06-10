@@ -7,14 +7,15 @@ kind: LandscapeKitConfiguration
 #     name: <component-name>
 #     version: <component-version>
 #   originalRefs: true
-git:
-  url: http://gitops:testtest@git.local.gardener.cloud:6080/gitops/test-landscape.git
-  ref:
-    branch: main
-  paths:
-    base: ./base
-    landscape: ./
+repositories:
+  base:
+    target: ./
+  landscape:
+    url: http://gitops:testtest@git.local.gardener.cloud:6080/gitops/test-landscape.git
+    ref:
+      branch: main
+    target: ./
+    baseLink: ./base
 # components:
 #   exclude:
 #   - component-name
-

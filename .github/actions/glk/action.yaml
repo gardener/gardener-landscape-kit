@@ -10,7 +10,7 @@ inputs:
       GLK commands to execute, one per line. If not provided, runs default commands.
       Lines starting with # are treated as comments and ignored.
       Example:
-        generate base -c landscape/glk.yaml ./base
+        generate base      -c landscape/glk.yaml .
         generate landscape -c landscape/glk.yaml .
     required: false
     default: ''
