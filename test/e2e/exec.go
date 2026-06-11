@@ -10,23 +10,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-var glkBinaryPath string
-
-// PrepareBinary builds the GLK binary.
-func PrepareBinary() {
-	By("Building gardener-landscape-kit binary")
-	var err error
-	glkBinaryPath, err = gexec.Build("../../cmd/gardener-landscape-kit")
-	Expect(err).NotTo(HaveOccurred())
-	logf.Log.Info("Using binary", "path", glkBinaryPath)
-
-	DeferCleanup(gexec.CleanupBuildArtifacts)
-}
-
-// NewCommand creates a new exec.Cmd for gardenadm.
+// NewCommand creates a new exec.Cmd.
 func NewCommand(binaryPath string, workDir string, args ...string) *exec.Cmd { // #nosec G204 -- Used for e2e tests only.
 	cmd := exec.Command(binaryPath, args...)
 	cmd.Dir = workDir
@@ -45,11 +31,6 @@ func runCommand(cmd *exec.Cmd) *gexec.Session {
 	Expect(err).NotTo(HaveOccurred())
 
 	return session
-}
-
-// GardenerLandscapeKit runs GLK with the given arguments and returns the gexec.Session.
-func GardenerLandscapeKit(args ...string) *gexec.Session {
-	return runCommand(NewCommand(glkBinaryPath, ".", append([]string{"--log-level=debug"}, args...)...))
 }
 
 // Git runs Git with the given arguments and returns the gexec.Session.
