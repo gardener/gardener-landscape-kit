@@ -7,6 +7,7 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3"
@@ -86,4 +87,65 @@ func forgejoMergePR(c *forgejo.Client, repoName string, prIndex int64) {
 		Message: "Merge generated content from e2e test",
 	})
 	Expect(err).NotTo(HaveOccurred(), "merging PR %d in %s", prIndex, repoName)
+}
+
+type gitCommand struct {
+	repoPath string
+}
+
+func (g *gitCommand) checkout(branchName string, createBranch bool) {
+	GinkgoHelper()
+
+	args := []string{"checkout"}
+	if createBranch {
+		args = append(args, "-b")
+	}
+
+	session := Git(g.repoPath, append(args, branchName)...)
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) add(paths ...string) {
+	GinkgoHelper()
+
+	session := Git(g.repoPath, append([]string{"add"}, paths...)...)
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) commit(message string) {
+	GinkgoHelper()
+
+	session := Git(g.repoPath, "commit", "--allow-empty", "-m", message)
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) headCommit() string {
+	GinkgoHelper()
+
+	session := Git(g.repoPath, "rev-parse", "HEAD")
+	Eventually(session).Should(gexec.Exit(0))
+	return strings.TrimRight(string(session.Out.Contents()), "\n")
+}
+
+func (g *gitCommand) submoduleUpdate() {
+	session := Git(g.repoPath, "submodule", "update", "--remote", "--rebase", "base")
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) rebase(branchName string) {
+	session := Git(g.repoPath, "fetch", "origin")
+	Eventually(session).Should(gexec.Exit(0))
+
+	session = Git(g.repoPath, "rebase", fmt.Sprintf("origin/%s", branchName))
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) push(branchName string) {
+	session := Git(g.repoPath, "push", "origin", branchName)
+	Eventually(session).Should(gexec.Exit(0))
+}
+
+func (g *gitCommand) deleteBranch(branchName string) {
+	session := Git(g.repoPath, "branch", "-D", branchName)
+	Eventually(session).Should(gexec.Exit(0))
 }

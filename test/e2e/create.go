@@ -22,7 +22,6 @@ import (
 	. "github.com/gardener/gardener/test/e2e/gardener"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
@@ -49,6 +48,10 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 	})
 
 	It("Should generate Gardener components", func(ctx SpecContext) {
+		git := &gitCommand{
+			repoPath: BasePath,
+		}
+
 		// patch GLK config
 		config := &v1alpha1.LandscapeKitConfiguration{}
 		configBytes, err := os.ReadFile(ConfigPath)
@@ -68,29 +71,20 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 
 		By("Committing config changes")
 		branchName := fmt.Sprintf("e2e/generate-%d", time.Now().Unix())
-		session := Git(BasePath, "checkout", "-b", branchName)
-		Eventually(session).Should(gexec.Exit(0))
-
+		git.checkout(branchName, true)
 		DeferCleanup(func() {
-			session = Git(BasePath, "checkout", "main")
-			Eventually(session).Should(gexec.Exit(0))
+			git.checkout("main", false)
+			git.deleteBranch(branchName)
 		})
 
-		session = Git(BasePath, "add", ".")
-		Eventually(session).Should(gexec.Exit(0))
-
-		session = Git(BasePath, "commit", "--allow-empty", "-m", "Update components")
-		Eventually(session).Should(gexec.Exit(0))
+		git.add(".")
+		git.commit("Update components")
 
 		By("Opening PR to trigger base generation action")
 		baseBranch, basePRIndex := forgejoPushAndCreatePR(c, branchName, ForgejoBaseRepo, BasePath)
 
 		By("Waiting for base generation action to succeed")
-		session = Git(BasePath, "rev-parse", "HEAD")
-		Eventually(session).Should(gexec.Exit(0))
-		commitSHA := strings.TrimRight(string(session.Out.Contents()), "\n")
-
-		forgejoWaitForActionSuccess(ctx, c, ForgejoBaseRepo, baseBranch, commitSHA)
+		forgejoWaitForActionSuccess(ctx, c, ForgejoBaseRepo, baseBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
 		forgejoVerifyActionCommit(ctx, c, ForgejoBaseRepo, baseBranch)
@@ -100,45 +94,36 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 	}, SpecTimeout(20*time.Minute))
 
 	It("Should prepare the Garden resource", func(ctx SpecContext) {
+		git := &gitCommand{
+			repoPath: LandscapePath,
+		}
+
 		By("Updating base submodule in landscape")
 		branchName := fmt.Sprintf("e2e/generate-%d", time.Now().Unix())
-		session := Git(LandscapePath, "checkout", "-b", branchName)
-		Eventually(session).Should(gexec.Exit(0))
+		git.checkout(branchName, true)
 
 		DeferCleanup(func() {
-			session = Git(BasePath, "checkout", "main")
-			Eventually(session).Should(gexec.Exit(0))
+			git.checkout("main", false)
+			git.deleteBranch(branchName)
 		})
 
-		session = Git(LandscapePath, "submodule", "update", "--remote", "--rebase", "base")
-		Eventually(session).Should(gexec.Exit(0))
+		git.submoduleUpdate()
 
 		By("Committing base submodule update")
-		session = Git(LandscapePath, "add", "base")
-		Eventually(session).Should(gexec.Exit(0))
-
-		session = Git(LandscapePath, "commit", "--allow-empty", "-m", "Update base submodule")
-		Eventually(session).Should(gexec.Exit(0))
+		git.add("base")
+		git.commit("Update base submodule")
 
 		By("Opening PR to trigger landscape generation action")
 		landscapeBranch, landscapePRIndex := forgejoPushAndCreatePR(c, branchName, ForgejoLandscapeRepo, LandscapePath)
 
 		By("Waiting for landscape generation action to succeed")
-		session = Git(LandscapePath, "rev-parse", "HEAD")
-		Eventually(session).Should(gexec.Exit(0))
-		commitSHA := strings.TrimRight(string(session.Out.Contents()), "\n")
-
-		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, commitSHA)
+		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
 		forgejoVerifyActionCommit(ctx, c, ForgejoLandscapeRepo, landscapeBranch)
 
 		By("Configuring the Garden resource")
-		session = Git(LandscapePath, "fetch", "origin")
-		Eventually(session).Should(gexec.Exit(0))
-
-		session = Git(LandscapePath, "rebase", fmt.Sprintf("origin/%s", branchName))
-		Eventually(session).Should(gexec.Exit(0))
+		git.rebase(branchName)
 
 		gardenComponentDir := filepath.Join(LandscapePath, "components", "gardener", "garden")
 		gardenYamlPath := filepath.Join(gardenComponentDir, "garden.yaml")
@@ -254,21 +239,13 @@ data: {}
 		Expect(err).NotTo(HaveOccurred())
 		Expect(os.WriteFile(kustomizationPath, patchedKustomizationBytes, 0600)).To(Succeed())
 
-		session = Git(LandscapePath, "add", "components")
-		Eventually(session).Should(gexec.Exit(0))
-
-		session = Git(LandscapePath, "commit", "--allow-empty", "-m", "Prepare garden component")
-		Eventually(session).Should(gexec.Exit(0))
-
-		session = Git(LandscapePath, "push", "origin", fmt.Sprintf("HEAD:refs/heads/%s", branchName))
-		Eventually(session).Should(gexec.Exit(0))
+		By("Committing Garden changes")
+		git.add("components")
+		git.commit("Prepare garden component")
+		git.push(branchName)
 
 		By("Waiting for landscape generation action to succeed")
-		session = Git(LandscapePath, "rev-parse", "HEAD")
-		Eventually(session).Should(gexec.Exit(0))
-		commitSHA = strings.TrimRight(string(session.Out.Contents()), "\n")
-
-		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, commitSHA)
+		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
 		forgejoVerifyActionCommit(ctx, c, ForgejoLandscapeRepo, landscapeBranch)
