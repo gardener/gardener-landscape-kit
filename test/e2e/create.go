@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3"
 	fluxv1 "github.com/fluxcd/kustomize-controller/api/v1"
 	fluxmeta "github.com/fluxcd/pkg/apis/meta"
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
@@ -40,17 +39,11 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 		runtimeClusterClient kubernetes.Interface
 
 		s *GardenContext
-		c *forgejo.Client
 	)
 
-	BeforeEach(func() {
-		c = newForgejoClient()
-	})
-
 	It("Should generate Gardener components", func(ctx SpecContext) {
-		git := &gitCommand{
-			repoPath: BasePath,
-		}
+		git := newGitCommand(BasePath)
+		forgejo := newForgejoCommand(GitServerURL, GitUserName, GitUserPassword)
 
 		// patch GLK config
 		config := &v1alpha1.LandscapeKitConfiguration{}
@@ -81,22 +74,21 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 		git.commit("Update components")
 
 		By("Opening PR to trigger base generation action")
-		baseBranch, basePRIndex := forgejoPushAndCreatePR(c, branchName, ForgejoBaseRepo, BasePath)
+		baseBranch, basePRIndex := forgejo.pushAndCreatePR(branchName, GLKBaseRepoName, BasePath)
 
 		By("Waiting for base generation action to succeed")
-		forgejoWaitForActionSuccess(ctx, c, ForgejoBaseRepo, baseBranch, git.headCommit())
+		forgejo.waitForActionSuccess(ctx, GLKBaseRepoName, baseBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
-		forgejoVerifyActionCommit(ctx, c, ForgejoBaseRepo, baseBranch)
+		forgejo.verifyActionCommit(GLKBaseRepoName, baseBranch)
 
 		By("Merging base PR")
-		forgejoMergePR(c, ForgejoBaseRepo, basePRIndex)
+		forgejo.mergePR(GLKBaseRepoName, basePRIndex)
 	}, SpecTimeout(20*time.Minute))
 
 	It("Should prepare the Garden resource", func(ctx SpecContext) {
-		git := &gitCommand{
-			repoPath: LandscapePath,
-		}
+		git := newGitCommand(LandscapePath)
+		forgejo := newForgejoCommand(GitServerURL, GitUserName, GitUserPassword)
 
 		By("Updating base submodule in landscape")
 		branchName := fmt.Sprintf("e2e/generate-%d", time.Now().Unix())
@@ -114,13 +106,13 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 		git.commit("Update base submodule")
 
 		By("Opening PR to trigger landscape generation action")
-		landscapeBranch, landscapePRIndex := forgejoPushAndCreatePR(c, branchName, ForgejoLandscapeRepo, LandscapePath)
+		landscapeBranch, landscapePRIndex := forgejo.pushAndCreatePR(branchName, GLKLandscapeRepoName, LandscapePath)
 
 		By("Waiting for landscape generation action to succeed")
-		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, git.headCommit())
+		forgejo.waitForActionSuccess(ctx, GLKLandscapeRepoName, landscapeBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
-		forgejoVerifyActionCommit(ctx, c, ForgejoLandscapeRepo, landscapeBranch)
+		forgejo.verifyActionCommit(GLKLandscapeRepoName, landscapeBranch)
 
 		By("Configuring the Garden resource")
 		git.rebase(branchName)
@@ -245,13 +237,13 @@ data: {}
 		git.push(branchName)
 
 		By("Waiting for landscape generation action to succeed")
-		forgejoWaitForActionSuccess(ctx, c, ForgejoLandscapeRepo, landscapeBranch, git.headCommit())
+		forgejo.waitForActionSuccess(ctx, GLKLandscapeRepoName, landscapeBranch, git.headCommit())
 
 		By("Verifying action committed generated content")
-		forgejoVerifyActionCommit(ctx, c, ForgejoLandscapeRepo, landscapeBranch)
+		forgejo.verifyActionCommit(GLKLandscapeRepoName, landscapeBranch)
 
 		By("Merging landscape PR")
-		forgejoMergePR(c, ForgejoLandscapeRepo, landscapePRIndex)
+		forgejo.mergePR(GLKLandscapeRepoName, landscapePRIndex)
 	}, SpecTimeout(20*time.Minute))
 
 	It("Create Kubernetes client", func() {
