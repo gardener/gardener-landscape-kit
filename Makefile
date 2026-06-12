@@ -119,10 +119,6 @@ git-server-up:
 git-server-down:
 	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-down.sh
 
-.PHONY: git-server-cleanup # cleanup git server data
-git-server-cleanup: git-server-down $(YQ)
-	@rm -rf $(REPO_ROOT)/dev/git-server/data
-
 .PHONY: infra-up
 infra-up:
 	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml up -d
@@ -160,6 +156,11 @@ e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)
 	@$(REPO_ROOT)/dev-setup/git-repos/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
 	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh
+
+.PHONY: e2e-cleanup
+e2e-cleanup: kind-down
+	@rm -rf $(REPO_ROOT)/dev/git-server
+	@rm -rf $(REPO_ROOT)/dev/e2e
 
 .PHONY: ci-e2e-kind
 ci-e2e-kind:
