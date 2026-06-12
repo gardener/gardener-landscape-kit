@@ -134,7 +134,7 @@ EOF
   glk generate landscape -c "${WORK_DIR}/base/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
 
   cd "${WORK_DIR}/test-landscape"
-  git add components/provider-local components/kustomization.yaml
+  git add .glk components/provider-local components/kustomization.yaml
   git commit -m "Update provider-local" || echo "No changes to commit"
   git push
   echo "✅ Updated component provider-local"
