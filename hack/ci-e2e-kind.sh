@@ -22,6 +22,7 @@ make kind-up e2e-prepare
 trap "
   ( export_artifacts "glk-single" )
   ( export_resource_yamls_for garden )
+  ( export_forgejo_runner_logs  )
   ( make kind-down )
 " EXIT
 
