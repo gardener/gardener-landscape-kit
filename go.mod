@@ -20,12 +20,12 @@ require (
 	github.com/spf13/pflag v1.0.10
 	go.yaml.in/yaml/v4 v4.0.0-rc.3
 	golang.org/x/tools v0.45.0
-	k8s.io/api v0.35.5
-	k8s.io/apimachinery v0.36.1
-	k8s.io/cli-runtime v0.35.5
-	k8s.io/client-go v0.35.5
-	k8s.io/code-generator v0.35.5
-	k8s.io/component-base v0.35.5
+	k8s.io/api v0.35.6
+	k8s.io/apimachinery v0.36.2
+	k8s.io/cli-runtime v0.35.6
+	k8s.io/client-go v0.35.6
+	k8s.io/code-generator v0.35.6
+	k8s.io/component-base v0.35.6
 	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2
 	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260107102143-2796cd3fe478
 	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha8
@@ -231,7 +231,7 @@ require (
 	k8s.io/kube-aggregator v0.35.5 // indirect
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // indirect
 	k8s.io/metrics v0.35.5 // indirect
-	k8s.io/streaming v0.36.1 // indirect
+	k8s.io/streaming v0.36.2 // indirect
 	ocm.software/open-component-model/bindings/go/blob v0.0.10 // indirect
 	ocm.software/open-component-model/bindings/go/repository v0.0.4 // indirect
 	sigs.k8s.io/gateway-api v1.5.0 // indirect
