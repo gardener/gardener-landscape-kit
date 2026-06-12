@@ -47,7 +47,7 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 
 		// patch GLK config
 		config := &v1alpha1.LandscapeKitConfiguration{}
-		configBytes, err := os.ReadFile(ConfigPath)
+		configBytes, err := os.ReadFile(ConfigPath) // #nosec G304 -- controlled by test.
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(yaml.Unmarshal(configBytes, config)).To(Succeed())
@@ -119,7 +119,7 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 
 		gardenComponentDir := filepath.Join(LandscapePath, "components", "gardener", "garden")
 		gardenYamlPath := filepath.Join(gardenComponentDir, "garden.yaml")
-		gardenBytes, err := os.ReadFile(gardenYamlPath)
+		gardenBytes, err := os.ReadFile(gardenYamlPath) // #nosec G304 -- controlled by test.
 		Expect(err).NotTo(HaveOccurred())
 
 		// Unmarshal into map to preserve structure and avoid empty fields
@@ -193,12 +193,12 @@ metadata:
   namespace: garden
 type: Opaque
 data: {}
-`
+` // #nosec G101 -- No credential.
 		Expect(os.WriteFile(secretYamlPath, []byte(secretYaml), 0600)).To(Succeed())
 
 		By("Patch kustomization.yaml")
 		kustomizationPath := filepath.Join(gardenComponentDir, "kustomization.yaml")
-		kustomizationBytes, err := os.ReadFile(kustomizationPath)
+		kustomizationBytes, err := os.ReadFile(kustomizationPath) // #nosec G304 -- controlled by test.
 		Expect(err).NotTo(HaveOccurred())
 
 		kustomizationMap := make(map[string]any)
