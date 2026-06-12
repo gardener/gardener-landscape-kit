@@ -4,6 +4,9 @@
 
 services:
   forgejo:
+    environment:
+    - GIT_USER_NAME
+    - GIT_USER_PASSWORD
     container_name: glk-forgejo
     image: codeberg.org/forgejo/forgejo:15.0.3
     entrypoint: [ "/bin/sh", "/entrypoint.sh" ]

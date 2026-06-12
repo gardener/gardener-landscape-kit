@@ -7,10 +7,10 @@
 set -o errexit
 set -o pipefail
 
-SCRIPT_DIR=$(dirname ${0})
-REPO_ROOT=$SCRIPT_DIR/../..
 
 source $(dirname ${0})/../kind/common.sh
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 GIT_SERVER_BASE_URL="http://gitops:testtest@git.local.gardener.cloud:6080"
 
