@@ -26,6 +26,7 @@ Learn about the fundamental concepts and architecture of GLK:
 Practical guides for working with GLK:
 
 - **[Components](usage/components.md)** - How GLK renders component manifests using values from OCM component descriptors
+  - **[Relative OCI References](concepts/relative-oci-reference.md)** - Compatibility note on the non-standard `relativeOciReference` access type used by CTT/RBSC-produced component descriptors
 - **[Component Versions](usage/versions.md)** - Managing component versions and component vector configuration
 - **[Custom OCM Components](usage/custom-ocm-components.md)** - Creating and using custom Open Component Model components
 
