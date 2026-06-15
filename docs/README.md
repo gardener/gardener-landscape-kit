@@ -31,6 +31,8 @@ Practical guides for working with GLK:
 
 - **[Components](usage/ocm/components.md)** - How GLK renders component manifests using values from OCM component descriptors
 - **[Relative OCI References](usage/ocm/relative-oci-reference.md)** - Compatibility note on the non-standard `relativeOciReference` access type used by legacy component descriptors
+- **[Extra Component References](usage/ocm/extra-component-references.md)** - Adding components to the descriptor tree via the non-standard `ocm.software/ocm-gear/extra-component-references` label, without modifying the upstream descriptor
+- **[Kubernetes Application Label](usage/ocm/kubernetes-application-label.md)** - How the non-standard `imagevector.gardener.cloud/application: kubernetes` label marks the component that supplies Kubernetes image versions for cross-component image-vector mapping
 - **[Custom OCM Components](usage/ocm/custom-ocm-components.md)** - Creating and using custom Open Component Model components
 
 ## API Reference
