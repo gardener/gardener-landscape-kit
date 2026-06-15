@@ -9,10 +9,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("repoaccess", func() {
-	DescribeTable("#normalizeRepositoryURL",
+var _ = Describe("RepoAccess", func() {
+	DescribeTable("#trimURLScheme",
 		func(input, expected string) {
-			Expect(normalizeRepositoryURL(input)).To(Equal(expected))
+			Expect(trimURLScheme(input)).To(Equal(expected))
 		},
 		Entry("empty", "", ""),
 		Entry("no scheme no slash", "registry.example.com/path", "registry.example.com/path"),

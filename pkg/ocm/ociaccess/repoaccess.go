@@ -153,7 +153,7 @@ func FindComponentVersion(
 			return &FindComponentVersionResult{
 				Descriptor:    descriptor,
 				LocalBlobs:    repoLocalBlobs,
-				RepositoryURL: normalizeRepositoryURL(repo.RepositoryURL),
+				RepositoryURL: trimURLScheme(repo.RepositoryURL),
 			}, nil
 		}
 		errs = append(errs, fmt.Errorf("repository %s: %w", repo.RepositoryURL, err))
@@ -170,7 +170,7 @@ type NameVersionType struct {
 	Type    string
 }
 
-func normalizeRepositoryURL(repoURL string) string {
+func trimURLScheme(repoURL string) string {
 	repoURL = strings.TrimSuffix(repoURL, "/")
 	if idx := strings.Index(repoURL, "://"); idx > 0 {
 		repoURL = repoURL[idx+3:]
