@@ -55,19 +55,14 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 }
 
 func validate(opts *options.Options) error {
-	if opts.Config.Repositories == nil || opts.Config.Repositories.Landscape == nil {
+	if opts.Config.Repositories.Landscape == nil {
 		return fmt.Errorf("repositories.landscape config is required")
 	}
 	landscape := opts.Config.Repositories.Landscape
 
 	// opts.TargetDirPath is the on-disk landscape repository root.
-	// landscape.BaseLink locates the mounted base repository within it,
-	// and base.Target points within that mount at the generated base content.
-	baseTarget := ""
-	if opts.Config.Repositories.Base != nil {
-		baseTarget = opts.Config.Repositories.Base.Target
-	}
-	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink, baseTarget)
+	// landscape.BaseLink is the landscape-side path to the base content.
+	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink)
 
 	// Validate version compatibility
 	opts.Log.V(1).Info("Validating version compatibility", "pathToBase", pathToBase)

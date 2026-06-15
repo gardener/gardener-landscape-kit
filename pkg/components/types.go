@@ -33,7 +33,7 @@ type Options interface {
 	// GetRepoRoot returns the path on disk to the root of the repository being generated into
 	// (the value the user passed as TARGET_DIR).
 	GetRepoRoot() string
-	// GetTargetPath returns the directory the component should write its content into.
+	// GetTargetPath returns the path the component should write its content into.
 	// This is the repository root joined with the repository-relative target (base.target or landscape.target).
 	GetTargetPath() string
 	// GetFilesystem returns the filesystem to use.
@@ -53,7 +53,7 @@ type LandscapeOptions interface {
 	// GetLandscapeRef returns the git reference of the landscape repository.
 	GetLandscapeRef() configv1alpha1.GitRepositoryRef
 	// GetRelativeBasePath returns the path inside the landscape repository
-	// where the base repository's generated content lives, i.e., landscape.baseLink joined with base.target.
+	// where the base repository's generated content lives, i.e., landscape.baseLink.
 	GetRelativeBasePath() string
 	// GetRelativeLandscapePath returns landscape.target — i.e. the
 	// landscape directory within the landscape repository.
@@ -94,7 +94,7 @@ func (o *options) GetRepoRoot() string {
 	return o.repoRoot
 }
 
-// GetTargetPath returns the directory the component should write its content into.
+// GetTargetPath returns the path the component should write its content into.
 func (o *options) GetTargetPath() string {
 	return o.targetPath
 }
@@ -122,19 +122,15 @@ func (o *options) GetMergeMode() configv1alpha1.MergeMode {
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
 	repoRoot := path.Clean(opts.TargetDirPath)
 
-	baseTarget := ""
-	if opts.Config != nil && opts.Config.Repositories != nil && opts.Config.Repositories.Base != nil {
-		baseTarget = opts.Config.Repositories.Base.Target
-	}
+	baseTarget := opts.Config.Repositories.Base.Target
 	targetPath := path.Clean(path.Join(repoRoot, baseTarget))
 
 	var customComponentVectors [][]byte
-	if opts.Config != nil && opts.Config.Repositories != nil && opts.Config.Repositories.Landscape != nil {
+	if opts.Config.Repositories.Landscape != nil {
 		// Locate the base components.yaml inside the landscape repository.
-		// landscape.BaseLink is the path inside the landscape repo where the base repository's content is mounted.
-		// base.Target points within that mount at the directory containing components.yaml.
+		// landscape.BaseLink is the full landscape-side path to the base content (i.e. the directory containing components dir).
 		landscape := opts.Config.Repositories.Landscape
-		baseCompVectorFile := path.Join(repoRoot, landscape.BaseLink, baseTarget, utilscomponentvector.ComponentVectorFilename)
+		baseCompVectorFile := path.Join(repoRoot, landscape.BaseLink, utilscomponentvector.ComponentVectorFilename)
 		componentsBytes, err := readCustomComponentsFile(opts, fs, baseCompVectorFile)
 		if err != nil {
 			return nil, err
@@ -177,7 +173,6 @@ type landscapeOptions struct {
 	Options
 
 	landscape  *configv1alpha1.LandscapeRepositoryConfig
-	baseTarget string
 	targetPath string
 }
 
@@ -199,7 +194,7 @@ func (l *landscapeOptions) GetLandscapeRef() configv1alpha1.GitRepositoryRef {
 
 // GetRelativeBasePath returns the path inside the landscape repository where the base repository's generated content lives.
 func (l *landscapeOptions) GetRelativeBasePath() string {
-	return path.Join(l.landscape.BaseLink, l.baseTarget)
+	return l.landscape.BaseLink
 }
 
 // GetRelativeLandscapePath returns landscape.target
@@ -212,14 +207,15 @@ func (l *landscapeOptions) GetRelativeLandscapePath() string {
 // directory to the corresponding base component directory, suitable for kustomize "resources:" entries.
 // Both endpoints are relative to the landscape repository root:
 // the landscape side at landscape.target/components/<dir>,
-// the base side at landscape.baseLink/base.target/components/<dir>.
+// the base side at landscape.baseLink/components/<dir>.
 func (l *landscapeOptions) GetRelativeBaseComponentPath(componentDir string) string {
+	// The leading "/" provides a guaranteed common anchor to filepath.Rel, which makes both inputs absolute paths.
 	from := path.Join("/", l.landscape.Target, DirName, componentDir)
-	to := path.Join("/", l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
+	to := path.Join("/", l.landscape.BaseLink, DirName, componentDir)
 	rel, err := filepath.Rel(from, to)
 	if err != nil {
 		// from/to are both absolute and well-formed; this should never error.
-		return path.Join(l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
+		return path.Join(l.landscape.BaseLink, DirName, componentDir)
 	}
 	return rel
 }
@@ -232,15 +228,10 @@ func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (Landsca
 	}
 
 	landscape := opts.Config.Repositories.Landscape
-	baseTarget := ""
-	if opts.Config.Repositories.Base != nil {
-		baseTarget = opts.Config.Repositories.Base.Target
-	}
 
 	return &landscapeOptions{
 		Options:    base,
 		landscape:  landscape,
-		baseTarget: baseTarget,
 		targetPath: path.Clean(path.Join(base.GetRepoRoot(), landscape.Target)),
 	}, nil
 }

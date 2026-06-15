@@ -81,17 +81,23 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVarP(&o.ConfigFilePath, "config", "c", o.ConfigFilePath, "Path to configuration file.")
 }
 
-// WarnIfTargetNotRepoRoot logs a warning if TargetDirPath does not contain a `.git` directory.
+// WarnIfTargetNotRepoRoot logs a warning if TargetDirPath looks like an inner directory of a repository
+// rather than the repository root itself: the dir exists, has content, but no `.git` subdirectory.
+// Empty or missing target directories are skipped to support bootstrapping into a fresh location.
 // As of the `repositories:` config migration, generate commands expect the *repository root*, not the inner content directory.
 // This catches users still passing the old-style inner path.
 //
 // TODO(LucaBernstein): remove a few releases after the `repositories:` config rollout.
 func WarnIfTargetNotRepoRoot(targetDirPath string, fs afero.Afero, log logr.Logger) {
-	gitDir := filepath.Join(targetDirPath, ".git")
-	exists, err := fs.DirExists(gitDir)
-	if err != nil || exists {
+	entries, err := fs.ReadDir(targetDirPath)
+	if err != nil || len(entries) == 0 {
+		// Missing or empty target dir (likely bootstrap). Nothing to warn about.
 		return
 	}
+	if hasGit, err := fs.DirExists(filepath.Join(targetDirPath, ".git")); err != nil || hasGit {
+		return
+	}
+
 	log.Info(
 		"WARNING: target directory does not look like a git repository root (no .git directory found). "+
 			"As of the `repositories:` config migration, `generate base` and `generate landscape` expect the repository root, "+

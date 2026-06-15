@@ -248,13 +248,13 @@ var _ = Describe("Types", func() {
 		})
 
 		Describe("#GetRelativeBasePath", func() {
-			It("should return baseLink joined with base.target", func() {
+			It("should return baseLink", func() {
 				opts.Config.Repositories.Landscape.BaseLink = "./base"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("base/content"))
+				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("./base"))
 			})
 		})
 
@@ -272,7 +272,7 @@ var _ = Describe("Types", func() {
 		Describe("#GetRelativeBaseComponentPath", func() {
 			It("should return the relative path from a landscape component dir to the corresponding base component dir", func() {
 				opts.Config.Repositories.Landscape.Target = "landscapes/showroom"
-				opts.Config.Repositories.Landscape.BaseLink = "base"
+				opts.Config.Repositories.Landscape.BaseLink = "base/content"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
@@ -282,7 +282,7 @@ var _ = Describe("Types", func() {
 
 			It("should handle a single-segment landscape target", func() {
 				opts.Config.Repositories.Landscape.Target = "landscape"
-				opts.Config.Repositories.Landscape.BaseLink = "base"
+				opts.Config.Repositories.Landscape.BaseLink = "base/content"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
@@ -323,7 +323,7 @@ var _ = Describe("Types", func() {
 				Expect(result.GetFilesystem()).To(Equal(fs))
 				Expect(result.GetLandscapeURL()).To(Equal("https://github.com/example/repo.git"))
 				Expect(result.GetLandscapeRef()).To(Equal(opts.Config.Repositories.Landscape.Ref))
-				Expect(result.GetRelativeBasePath()).To(Equal("base/base"))
+				Expect(result.GetRelativeBasePath()).To(Equal("base"))
 				Expect(result.GetRelativeLandscapePath()).To(Equal("landscape"))
 			})
 		})

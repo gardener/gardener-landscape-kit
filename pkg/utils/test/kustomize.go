@@ -110,8 +110,8 @@ func KustomizeComponent(
 ) ([]byte, error) {
 	// Both repos share an on-disk root "/repo". The landscape repo's root is /repo (TargetDirPath for landscape gen),
 	// and its content lives at landscape.Target = "./landscapeDir".
-	// The base repo's root maps to /repo/baseDir on disk; landscape.BaseLink = "./baseDir" mirrors that
-	// inside the landscape repo so kustomize references resolve.
+	// The base repo's root maps to /repo/baseDir on disk (TargetDirPath for base gen with base.Target = "./").
+	// landscape.BaseLink = "./baseDir" points directly at the base content within the landscape repo so kustomize references resolve.
 	cfg := &v1alpha1.LandscapeKitConfiguration{
 		Repositories: &v1alpha1.RepositoriesConfig{
 			Base: &v1alpha1.BaseRepositoryConfig{Target: "./"},
