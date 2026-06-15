@@ -490,7 +490,7 @@ scheduler:
 	})
 
 	It("should resolve relativeOciReference resources against the repository URL", func() {
-		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", "my-image", "v0.0.1", "img/sub-path:v0.0.1@sha256:deadbeef")
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", ResourceTypeOCIImage, "my-image", "v0.0.1", "img/sub-path:v0.0.1@sha256:deadbeef")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
 			Descriptor:    desc,
 			RepositoryURL: "registry.example.com/path/to/repo",
@@ -509,7 +509,7 @@ scheduler:
 	})
 
 	It("should fail for malformed relativeOciReference resources", func() {
-		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", "my-image", "v0.0.1", "no-tag-no-digest")
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", ResourceTypeOCIImage, "my-image", "v0.0.1", "no-tag-no-digest")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
 			Descriptor:    desc,
 			RepositoryURL: "registry.example.com/path/to/repo",
@@ -517,11 +517,28 @@ scheduler:
 		Expect(err).To(MatchError(ContainSubstring("failed to convert resource my-image to image source")))
 		Expect(err).To(MatchError(ContainSubstring("invalid reference format")))
 	})
+
+	It("should resolve relativeOciReference helmChart resources against the repository URL", func() {
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-helm-ref", "v0.0.1", ResourceTypeHelmChart, "my-chart", "v0.0.1", "charts/my-chart:v0.0.1@sha256:deadbeef")
+		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:    desc,
+			RepositoryURL: "registry.example.com/path/to/repo",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		ref := ComponentReferenceFromNameAndVersion(desc.Component.Name, desc.Component.Version)
+		Expect(c.GetResources(ref)).To(ConsistOf(Resource{
+			Name:    "my-chart",
+			Version: "v0.0.1",
+			Type:    ResourceTypeHelmChart,
+			Value:   "registry.example.com/path/to/repo/charts/my-chart:v0.0.1@sha256:deadbeef",
+		}))
+	})
 })
 
-func buildRelativeOciDescriptor(componentName, componentVersion, resourceName, resourceVersion, relativeRef string) *descriptorruntime.Descriptor {
+func buildRelativeOciDescriptor(componentName, componentVersion, resourceType, resourceName, resourceVersion, relativeRef string) *descriptorruntime.Descriptor {
 	res := descriptorruntime.Resource{
-		Type: ResourceTypeOCIImage,
+		Type: resourceType,
 		Access: &ociaccess.RelativeOciReference{
 			Type:      ocmruntime.Type{Name: ociaccess.RelativeOciReferenceTypeName},
 			Reference: relativeRef,

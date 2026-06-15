@@ -201,15 +201,15 @@ func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindCompon
 				resources = append(resources, resource)
 			}
 		case ResourceTypeHelmChart:
-			var spec accessv1.OCIImage
-			if err := ociaccess.DefaultScheme.Convert(res.Access, &spec); err != nil {
+			imageReference, err := extractImageReference(res, result.RepositoryURL)
+			if err != nil {
 				return nil, err
 			}
 			resources = append(resources, Resource{
 				Name:    res.Name,
 				Version: res.Version,
 				Type:    res.Type,
-				Value:   spec.ImageReference,
+				Value:   imageReference,
 			})
 		case ResourceTypeHelmChartImageMap:
 			var localBlob descriptorv2.LocalBlob
@@ -733,30 +733,9 @@ func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocm
 		src.Name = res.Name
 		src.LookupOnly = true
 	}
-	var imageReference string
-	switch a := res.Access.(type) {
-	case *ociaccess.RelativeOciReference:
-		// Relative OCI references carry only a sub-path; prepend the component's repository URL to form a fully-qualified image reference.
-		imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(a.Reference, "/")
-	case *accessv1.OCIImage:
-		imageReference = a.ImageReference
-	default:
-		// Access not yet converted to a typed value (e.g., still a *runtime.Raw); convert via the scheme.
-		converted, err := ociaccess.DefaultScheme.NewObject(res.Access.GetType())
-		if err != nil {
-			return nil, fmt.Errorf("unsupported access type %q for resource %s: %w", res.Access.GetType().Name, res.Name, err)
-		}
-		if err := ociaccess.DefaultScheme.Convert(res.Access, converted); err != nil {
-			return nil, err
-		}
-		switch c := converted.(type) {
-		case *ociaccess.RelativeOciReference:
-			imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(c.Reference, "/")
-		case *accessv1.OCIImage:
-			imageReference = c.ImageReference
-		default:
-			return nil, fmt.Errorf("unsupported access type %T for resource %s", converted, res.Name)
-		}
+	imageReference, err := extractImageReference(res, repoURL)
+	if err != nil {
+		return nil, err
 	}
 	src.Ref = &imageReference
 	repo, tag, err := splitRef(imageReference)
@@ -770,6 +749,35 @@ func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocm
 	}
 	src.Local = res.Relation == descriptorruntime.LocalRelation
 	return &src, nil
+}
+
+func extractImageReference(res descriptorruntime.Resource, repoURL string) (string, error) {
+	var imageReference string
+	switch a := res.Access.(type) {
+	case *ociaccess.RelativeOciReference:
+		// Relative OCI references carry only a sub-path; prepend the component's repository URL to form a fully-qualified image reference.
+		imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(a.Reference, "/")
+	case *accessv1.OCIImage:
+		imageReference = a.ImageReference
+	default:
+		// Access not yet converted to a typed value (e.g., still a *runtime.Raw); convert via the scheme.
+		converted, err := ociaccess.DefaultScheme.NewObject(res.Access.GetType())
+		if err != nil {
+			return "", fmt.Errorf("unsupported access type %q for resource %s: %w", res.Access.GetType().Name, res.Name, err)
+		}
+		if err := ociaccess.DefaultScheme.Convert(res.Access, converted); err != nil {
+			return "", err
+		}
+		switch c := converted.(type) {
+		case *ociaccess.RelativeOciReference:
+			imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(c.Reference, "/")
+		case *accessv1.OCIImage:
+			imageReference = c.ImageReference
+		default:
+			return "", fmt.Errorf("unsupported access type %T for resource %s", converted, res.Name)
+		}
+	}
+	return imageReference, nil
 }
 
 func splitRef(ref string) (string, string, error) {
