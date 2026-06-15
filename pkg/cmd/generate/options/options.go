@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
@@ -82,19 +83,31 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 }
 
 // WarnIfTargetNotRepoRoot logs a warning if TargetDirPath looks like an inner directory of a repository
-// rather than the repository root itself: the dir exists, has content, but no `.git` subdirectory.
-// Empty or missing target directories are skipped to support bootstrapping into a fresh location.
+// rather than the repository root itself: it contains ordinary subdirectories (suggesting a populated tree)
+// but no `.git` subdirectory.
+// Empty or near-empty targets. Only files (e.g. a config file) or hidden entries (`.DS_Store`, etc.) are skipped
+// to support bootstrapping into a fresh location.
 // As of the `repositories:` config migration, generate commands expect the *repository root*, not the inner content directory.
 // This catches users still passing the old-style inner path.
 //
 // TODO(LucaBernstein): remove a few releases after the `repositories:` config rollout.
 func WarnIfTargetNotRepoRoot(targetDirPath string, fs afero.Afero, log logr.Logger) {
-	entries, err := fs.ReadDir(targetDirPath)
-	if err != nil || len(entries) == 0 {
-		// Missing or empty target dir (likely bootstrap). Nothing to warn about.
+	if hasGit, err := fs.DirExists(filepath.Join(targetDirPath, ".git")); err != nil || hasGit {
 		return
 	}
-	if hasGit, err := fs.DirExists(filepath.Join(targetDirPath, ".git")); err != nil || hasGit {
+	entries, err := fs.ReadDir(targetDirPath)
+	if err != nil {
+		return
+	}
+	hasOrdinarySubdir := false
+	for _, e := range entries {
+		if e.IsDir() && !strings.HasPrefix(e.Name(), ".") {
+			hasOrdinarySubdir = true
+			break
+		}
+	}
+	if !hasOrdinarySubdir {
+		// Empty, file-only, or only-hidden-entries target. Likely bootstrap; nothing to warn about.
 		return
 	}
 
