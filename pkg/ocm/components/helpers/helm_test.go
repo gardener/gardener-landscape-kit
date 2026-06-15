@@ -144,5 +144,15 @@ var _ = Describe("helm", func() {
 			Expect(repo).To(Equal("localhost:5000/myimage"))
 			Expect(tag).To(Equal("v1:2:3"))
 		})
+
+		It("should handle reference digest by using '@' as separator", func() {
+			ref := "myrepo/myimage@sha256:3e009262d73f"
+
+			repo, tag, err := SplitOCIImageReference(ref)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(repo).To(Equal("myrepo/myimage"))
+			Expect(tag).To(Equal("sha256:3e009262d73f"))
+		})
 	})
 })

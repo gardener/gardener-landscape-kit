@@ -48,9 +48,9 @@ func SplitOCIImageReference(ref string) (string, string, error) {
 	if lastIndex == -1 {
 		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
 	}
-	parts := strings.SplitN(ref[lastIndex:], ":", 2)
-	if len(parts) != 2 {
+	idx := strings.IndexAny(ref[lastIndex:], ":@")
+	if idx == -1 {
 		return "", "", fmt.Errorf("unexpected reference '%s'", ref)
 	}
-	return ref[:lastIndex] + parts[0], parts[1], nil
+	return ref[:lastIndex+idx], ref[lastIndex+idx+1:], nil
 }
