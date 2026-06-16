@@ -326,6 +326,41 @@ var _ = Describe("Types", func() {
 				Expect(result.GetRelativeBasePath()).To(Equal("base"))
 				Expect(result.GetRelativeLandscapePath()).To(Equal("landscape"))
 			})
+
+			It("should collect both the base and landscape components.yaml overrides with the landscape one taking precedence", func() {
+				opts.TargetDirPath = "/path/to/target"
+				opts.Config.Repositories.Landscape.BaseLink = "./baseDir"
+				opts.Config.Repositories.Landscape.Target = "./landscapeDir"
+
+				baseVectorYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.100.0
+- name: github.com/gardener/gardener-extension-networking-cilium
+  sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
+  version: v1.45.0
+`
+				landscapeVectorYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.200.0
+`
+				Expect(fs.WriteFile("/path/to/target/baseDir/components.yaml", []byte(baseVectorYAML), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/landscapeDir/components.yaml", []byte(landscapeVectorYAML), 0644)).To(Succeed())
+
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Landscape override wins for the shared component.
+				gardenerVersion, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				Expect(exists).To(BeTrue())
+				Expect(gardenerVersion).To(Equal("v1.200.0"))
+
+				// Base override is still applied for components not present in the landscape override.
+				ciliumVersion, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
+				Expect(exists).To(BeTrue())
+				Expect(ciliumVersion).To(Equal("v1.45.0"))
+			})
 		})
 	})
 })
