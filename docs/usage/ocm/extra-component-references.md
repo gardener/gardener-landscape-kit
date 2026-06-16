@@ -2,9 +2,11 @@
 
 ## Background
 
-GLK walks an OCM descriptor tree starting from a configured root component to discover all components that contribute to a landscape. The standard way to add a component to that tree is to declare it as a `componentReferences` entry in the parent descriptor. In some setups it is undesirable or impossible to modify the parent descriptor for that purpose — for example because the parent is published by an upstream pipeline that does not include the additional component.
+GLK walks an OCM descriptor tree starting from a configured root component to discover all components that contribute to a landscape. The standard way to add a component to that tree is to declare it as a `componentReferences` entry in the parent descriptor. Such standard references are replicated together with the parent: they are transported when the component is transported between OCM repositories and also show up in the bill of materials (BOM).
 
-To still pull such components into GLK's view of the tree, GLK supports a non-standard component label called **`ocm.software/ocm-gear/extra-component-references`**. Components listed in this label are added as dependencies of the labelled component, exactly as if they had been declared via `componentReferences`, but without requiring replication into the upstream descriptor.
+In some setups it is desirable to pull a component into GLK's view of the tree **without** replicating it — for example for experimental components.
+
+For this case GLK supports a non-standard component label called **`ocm.software/ocm-gear/extra-component-references`**. Components listed in this label are added to GLK's dependency graph just like ordinary `componentReferences`, but are **not replicated**: they do not appear in the BOM and are not transported with the parent.
 
 This label is **not part of the OCM specification**.
 
@@ -43,7 +45,3 @@ Extra references behave like plain dependencies — they do **not** carry an `im
 - The label name is declared as `LabelExtraComponentReferences` in [`pkg/ocm/components/const.go`](../../../pkg/ocm/components/const.go).
 - Parsing of the label happens in `extraReferences` in [`pkg/ocm/components/components.go`](../../../pkg/ocm/components/components.go).
 - The extra references are merged into the dependency map by `AddComponentDependencies` in [`pkg/ocm/components/components.go`](../../../pkg/ocm/components/components.go), right after the standard `componentReferences` are processed.
-
-## Compatibility note
-
-`extra-component-references` exists to support setups in which the root component descriptor is produced by tooling that cannot be extended with additional `componentReferences` entries. If you control the producer of the descriptor, prefer adding standard `componentReferences` — they are portable to any OCM-aware tool, while this label is interpreted only by GLK.

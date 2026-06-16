@@ -2,9 +2,11 @@
 
 ## Background
 
-Some Gardener components (for example `gardenlet`) are deployed alongside Kubernetes images such as `pause`, `etcd`, or the `hyperkube` family. The image vector overwrites attached to those components reference these images by *repository* and expect the deployer to supply the matching *tag* — the Kubernetes version — for every supported Kubernetes minor.
+Gardener usually specifies component and image versions in the image vector (see [imagevector/containers.yaml](https://github.com/gardener/gardener/blob/master/imagevector/containers.yaml)). Kubernetes images such as `kube-apiserver`, `kube-controller-manager`, or the `hyperkube` family are the exception: their versions are derived from the desired Kubernetes version of a shoot cluster, not pinned in the vector. The image vector attached to components that consume these images (for example `gardenlet`) therefore reference them by *repository* only and expect the deployer to supply the matching *tag* — the Kubernetes version — for every supported Kubernetes minor. This means the overwrites cannot simply be taken from the image vector and require special handling.
 
-The Kubernetes versions and digests are carried by a separate OCM component (the "Kubernetes component"). To wire the two together, GLK supports a non-standard component label called **`imagevector.gardener.cloud/application`**. A component labelled with the value `kubernetes` is treated as the authoritative source of Kubernetes image versions for the entire descriptor tree.
+To bridge this gap, GLK expects the Kubernetes image versions and digests to be carried by a dedicated OCM component, referred to here as the "Kubernetes component". This component is **not provided by Gardener out of the box**; it is a custom component that the landscape operator must build and maintain themselves, listing one resource per Kubernetes image (e.g. `kube-apiserver`, `kube-controller-manager`, `hyperkube`) for every supported Kubernetes minor version, with the Kubernetes version encoded in the resource's `version` field.
+
+To wire this component into the descriptor tree, GLK supports a non-standard component label called **`imagevector.gardener.cloud/application`**. A component labelled with the value `kubernetes` is treated as the authoritative source of Kubernetes image versions for the entire descriptor tree.
 
 This label is **not part of the OCM specification**.
 
@@ -19,6 +21,19 @@ component:
   labels:
     - name: imagevector.gardener.cloud/application
       value: kubernetes
+  resources:
+    - name: kube-apiserver
+      version: 1.35.3
+      labels:
+        - name: imagevector.gardener.cloud/name
+          value: registry.k8s.io/kube-apiserver
+      type: ociImage
+      relation: external
+      access:
+        imageReference: repo.example.com/registry_k8s_io/kube-apiserver:v1.35.3@sha256:8888888855555a3f57748c600c8cdec6279b996cccfbe35272c8e5b87b69f5cb
+        type: ociRegistry  
+    ... # more resources for kube-controller-manager, hyperkube, etc.
+
 ```
 
 Only the value `kubernetes` is recognized today; any other value is ignored.
