@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 NAME                 := gardener-landscape-kit
+VERSION              := $(shell cat VERSION)
 EFFECTIVE_VERSION    := $(VERSION)-$(shell git rev-parse HEAD)
 REPO_ROOT            := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 HACK_DIR             := $(REPO_ROOT)/hack
@@ -12,7 +13,7 @@ BUILD_DATE           ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 IMAGE_REGISTRY       ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
 TARGET_PLATFORMS     ?= linux/$(shell go env GOARCH)
 
-export VERSION               = $(shell cat VERSION)
+export VERSION
 export LD_FLAGS              = $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
 export SKAFFOLD_DEFAULT_REPO = glk-registry.local.gardener.cloud:6001
 export SKAFFOLD_PUSH         = true

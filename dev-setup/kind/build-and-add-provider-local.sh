@@ -92,7 +92,6 @@ EOF
     yq eval --inplace "(.. | select(. == \"$v$suffix\")) = \"$ref\"" ${tmpDir}/extension.yaml
   done
 
-  # patch extension.yaml for usage in kind cluster with different registry port
   yq eval --inplace '.spec.deployment.admission.values.image = (.spec.deployment.admission.runtimeCluster.helm.ociRepository.ref | sub("_charts_runtime","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.runtimeClusterValues.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.values.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml

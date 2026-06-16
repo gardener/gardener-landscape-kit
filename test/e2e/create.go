@@ -52,8 +52,6 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 
 		Expect(yaml.Unmarshal(configBytes, config)).To(Succeed())
 
-		println(string(configBytes))
-
 		Expect(config.Components).NotTo(BeNil())
 		// activate all components
 		config.Components.Include = nil
