@@ -20,9 +20,6 @@ kind: LandscapeKitConfiguration
 # components:
 #   exclude:
 #   - component-name
-#   # The github component is included by default. To disable it (e.g. if you
-#   # manage your own .github/actions/glk and .github/workflows/glk.yaml), add:
-#   # - github
 # versionConfig:
 #   defaultVersionsUpdateStrategy: ReleaseBranch
 #   checkMode: Strict # or Warning

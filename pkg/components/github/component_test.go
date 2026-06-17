@@ -21,7 +21,7 @@ import (
 	. "github.com/gardener/gardener-landscape-kit/pkg/components/github"
 )
 
-var _ = Describe("GitHubComponent", func() {
+var _ = Describe("Component Generation", func() {
 	var (
 		memFs        afero.Afero
 		generateOpts *generateoptions.Options
