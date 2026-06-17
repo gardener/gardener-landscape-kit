@@ -42,6 +42,7 @@ var DefaultScheme = ocmruntime.NewScheme()
 func init() {
 	ocmoci.MustAddToScheme(DefaultScheme)
 	descriptorv2.MustAddToScheme(DefaultScheme)
+	DefaultScheme.MustRegisterWithAlias(&RelativeOciReference{}, ocmruntime.Type{Name: RelativeOciReferenceTypeName})
 }
 
 // RepoAccess provides access to an OCI repository, allowing retrieval of component versions.
@@ -113,15 +114,32 @@ func (r *RepoAccess) GetLocalResource(ctx context.Context, component, version st
 	return buf.Bytes(), nil
 }
 
+// LocalBlobs represents a mapping from resource identifiers to their corresponding blob data.
+type LocalBlobs map[NameVersionType][]byte
+
+// FindComponentVersionResult encapsulates the result of searching for a component version across multiple repositories,
+// including the descriptor, any local blobs found, and the repository URL where it was found.
+type FindComponentVersionResult struct {
+	// Descriptor is the runtime descriptor of the resolved component version.
+	Descriptor *descriptorruntime.Descriptor
+	// LocalBlobs holds the bytes of any local-blob resources requested via localBlobResourceTypes,
+	// keyed by name/version/type. Nil if none were requested or found.
+	LocalBlobs LocalBlobs
+	// RepositoryURL is the normalized URL (no scheme, no trailing slash)
+	// of the repository where the component was found.
+	RepositoryURL string
+}
+
 // FindComponentVersion searches for a specific component version across multiple repositories.
-// It returns the descriptor and local blobs if any are found for the specified localBlobResourceTypes.
+// It returns a result containing the descriptor, any local blobs found for the specified
+// localBlobResourceTypes, and the (normalized) repository URL where the component was found.
 func FindComponentVersion(
 	ctx context.Context,
 	log logr.Logger,
 	repos []*RepoAccess,
 	component, version string,
 	localBlobResourceTypes ...string,
-) (*descriptorruntime.Descriptor, map[NameVersionType][]byte, error) {
+) (*FindComponentVersionResult, error) {
 	logOutputs := &bytes.Buffer{}
 	var errs []error
 	for _, repo := range repos {
@@ -130,15 +148,19 @@ func FindComponentVersion(
 			// Collect local blobs if requested.
 			repoLocalBlobs, err := loadLocalBlobs(ctx, repo, descriptor, localBlobResourceTypes...)
 			if err != nil {
-				return nil, nil, fmt.Errorf("failed to load local blobs for component version %s:%s from repository %s: %w", component, version, repo.RepositoryURL, err)
+				return nil, fmt.Errorf("failed to load local blobs for component version %s:%s from repository %s: %w", component, version, repo.RepositoryURL, err)
 			}
-			return descriptor, repoLocalBlobs, nil
+			return &FindComponentVersionResult{
+				Descriptor:    descriptor,
+				LocalBlobs:    repoLocalBlobs,
+				RepositoryURL: trimURLScheme(repo.RepositoryURL),
+			}, nil
 		}
 		errs = append(errs, fmt.Errorf("repository %s: %w", repo.RepositoryURL, err))
 		logOutputs.Write(repo.logOutput.Bytes())
 	}
 	log.Info("Failed to find component version in any repository", "component", component, "version", version, "details", logOutputs.String())
-	return nil, nil, fmt.Errorf("component version %s:%s not found in any repository: %s", component, version, errors.Join(errs...))
+	return nil, fmt.Errorf("component version %s:%s not found in any repository: %s", component, version, errors.Join(errs...))
 }
 
 // NameVersionType represents the identity of a resource with its name, version, and type.
@@ -146,6 +168,14 @@ type NameVersionType struct {
 	Name    string
 	Version string
 	Type    string
+}
+
+func trimURLScheme(repoURL string) string {
+	repoURL = strings.TrimSuffix(repoURL, "/")
+	if idx := strings.Index(repoURL, "://"); idx > 0 {
+		repoURL = repoURL[idx+3:]
+	}
+	return repoURL
 }
 
 func loadLocalBlobs(ctx context.Context, repo *RepoAccess, descriptor *descriptorruntime.Descriptor, localBlobResourceTypes ...string) (map[NameVersionType][]byte, error) {

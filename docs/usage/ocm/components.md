@@ -28,4 +28,4 @@ For each component, `components.yaml` contains these fields:
   ```
 - `componentImageVectorOverwrites` contains the image vector overwrite images deployed by subcomponents. This is not relevant for most components. Notable exception is the Gardener operator.
 
-For more details about the extracted data, see the `ComponentVector` struct in the package [`pkg/utils/componentvector`](../../pkg/utils/componentvector/types.go).
+For more details about the extracted data, see the `ComponentVector` struct in the package [`pkg/utils/componentvector`](../../../pkg/utils/componentvector/types.go).

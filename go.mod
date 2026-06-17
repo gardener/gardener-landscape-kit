@@ -1,6 +1,6 @@
 module github.com/gardener/gardener-landscape-kit
 
-go 1.26.0
+go 1.26.3
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
@@ -27,10 +27,10 @@ require (
 	k8s.io/code-generator v0.35.6
 	k8s.io/component-base v0.35.6
 	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2
-	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260107102143-2796cd3fe478
-	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.1-alpha8
-	ocm.software/open-component-model/bindings/go/oci v0.0.25
-	ocm.software/open-component-model/bindings/go/runtime v0.0.5
+	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260608134855-41ae44158792
+	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.3-alpha3
+	ocm.software/open-component-model/bindings/go/oci v0.0.45
+	ocm.software/open-component-model/bindings/go/runtime v0.0.8
 	oras.land/oras-go/v2 v2.6.0
 	sigs.k8s.io/controller-runtime v0.23.3
 	sigs.k8s.io/controller-tools v0.20.1
@@ -170,7 +170,7 @@ require (
 	github.com/valyala/gozstd v1.24.0 // indirect
 	github.com/valyala/histogram v1.2.0 // indirect
 	github.com/valyala/quicktemplate v1.8.0 // indirect
-	github.com/veqryn/slog-context v0.8.0 // indirect
+	github.com/veqryn/slog-context v0.9.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/zitadel/oidc/v3 v3.45.4 // indirect
@@ -232,8 +232,9 @@ require (
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // indirect
 	k8s.io/metrics v0.35.5 // indirect
 	k8s.io/streaming v0.36.2 // indirect
-	ocm.software/open-component-model/bindings/go/blob v0.0.10 // indirect
-	ocm.software/open-component-model/bindings/go/repository v0.0.4 // indirect
+	ocm.software/open-component-model/bindings/go/blob v0.0.13 // indirect
+	ocm.software/open-component-model/bindings/go/ctf v0.4.0 // indirect
+	ocm.software/open-component-model/bindings/go/repository v0.0.9 // indirect
 	sigs.k8s.io/gateway-api v1.5.0 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect

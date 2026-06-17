@@ -64,9 +64,6 @@ type Components struct {
 	kubernetesComponent *ComponentReference
 }
 
-// Blobs represents a mapping from resource identifiers to their corresponding blob data.
-type Blobs map[ociaccess.NameVersionType][]byte
-
 // Resource represents a resource associated with a component.
 type Resource struct {
 	// Name is the name of the resource.
@@ -100,12 +97,12 @@ func NewComponents() *Components {
 	}
 }
 
-func (c *Components) addComponent(descriptor *descriptorruntime.Descriptor, blobs Blobs) error {
+func (c *Components) addComponent(result *ociaccess.FindComponentVersionResult) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	cref := descriptorToComponentReference(descriptor)
-	imageVector, err := c.extractImageVectorFromResources(descriptor)
+	cref := descriptorToComponentReference(result.Descriptor)
+	imageVector, err := c.extractImageVectorFromResources(result)
 	if err != nil {
 		return fmt.Errorf("could not extract image vector from descriptor: %s", err)
 	}
@@ -115,13 +112,13 @@ func (c *Components) addComponent(descriptor *descriptorruntime.Descriptor, blob
 		ImageVector:        imageVector,
 	})
 
-	resources, err := c.extractResourcesFromDescriptor(descriptor, blobs)
+	resources, err := c.extractResourcesFromDescriptor(result)
 	if err != nil {
 		return fmt.Errorf("could not extract resources from descriptor: %s", err)
 	}
 	c.resources[cref] = resources
 
-	for _, label := range descriptor.Component.Labels {
+	for _, label := range result.Descriptor.Component.Labels {
 		switch label.Name {
 		case LabelImageVectorImages:
 			images, err := rawToImageSources(label.Value)
@@ -155,10 +152,10 @@ func (c *Components) addComponent(descriptor *descriptorruntime.Descriptor, blob
 	return nil
 }
 
-func (c *Components) extractImageVectorFromResources(descriptor *descriptorruntime.Descriptor) ([]ocmimagevector.ExtendedImageSource, error) {
+func (c *Components) extractImageVectorFromResources(result *ociaccess.FindComponentVersionResult) ([]ocmimagevector.ExtendedImageSource, error) {
 	var vector []ocmimagevector.ExtendedImageSource
-	for _, res := range descriptor.Component.Resources {
-		src, err := resourceToImageSource(res)
+	for _, res := range result.Descriptor.Component.Resources {
+		src, err := resourceToImageSource(res, result.RepositoryURL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 		}
@@ -169,12 +166,12 @@ func (c *Components) extractImageVectorFromResources(descriptor *descriptorrunti
 	return vector, nil
 }
 
-func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntime.Descriptor, blobs Blobs) ([]Resource, error) {
+func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindComponentVersionResult) ([]Resource, error) {
 	var resources []Resource
-	for _, res := range descriptor.Component.Resources {
+	for _, res := range result.Descriptor.Component.Resources {
 		switch res.Type {
 		case ResourceTypeOCIImage:
-			src, err := resourceToImageSource(res)
+			src, err := resourceToImageSource(res, result.RepositoryURL)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 			}
@@ -204,22 +201,22 @@ func (c *Components) extractResourcesFromDescriptor(descriptor *descriptorruntim
 				resources = append(resources, resource)
 			}
 		case ResourceTypeHelmChart:
-			var spec accessv1.OCIImage
-			if err := ociaccess.DefaultScheme.Convert(res.Access, &spec); err != nil {
+			imageReference, err := extractImageReference(res, result.RepositoryURL)
+			if err != nil {
 				return nil, err
 			}
 			resources = append(resources, Resource{
 				Name:    res.Name,
 				Version: res.Version,
 				Type:    res.Type,
-				Value:   spec.ImageReference,
+				Value:   imageReference,
 			})
 		case ResourceTypeHelmChartImageMap:
 			var localBlob descriptorv2.LocalBlob
 			if err := ociaccess.DefaultScheme.Convert(res.Access, &localBlob); err != nil {
 				return nil, err
 			}
-			blob := blobs[ociaccess.NameVersionType{
+			blob := result.LocalBlobs[ociaccess.NameVersionType{
 				Name:    res.Name,
 				Version: res.Version,
 				Type:    res.Type,
@@ -261,14 +258,14 @@ func (c *Components) AddComponentDependency(component ComponentReference, depend
 
 // AddComponentDependencies adds a component and its dependencies from the given descriptor.
 // It returns the newly added component references.
-func (c *Components) AddComponentDependencies(descriptor *descriptorruntime.Descriptor, blobs Blobs) ([]ComponentReference, error) {
-	if err := c.addComponent(descriptor, blobs); err != nil {
+func (c *Components) AddComponentDependencies(result *ociaccess.FindComponentVersionResult) ([]ComponentReference, error) {
+	if err := c.addComponent(result); err != nil {
 		return nil, err
 	}
 
-	component := descriptorToComponentReference(descriptor)
+	component := descriptorToComponentReference(result.Descriptor)
 	dependencies := make(map[ComponentReference]*Dependency)
-	for _, ref := range descriptor.Component.References {
+	for _, ref := range result.Descriptor.Component.References {
 		cref, imageSource, err := referenceToComponentReferenceWithImageSource(ref)
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve component reference %q: %w", ref, err)
@@ -285,7 +282,7 @@ func (c *Components) AddComponentDependencies(descriptor *descriptorruntime.Desc
 			dependency.ImageVector = append(dependency.ImageVector, *imageSource)
 		}
 	}
-	extraRefs, err := extraReferences(descriptor)
+	extraRefs, err := extraReferences(result.Descriptor)
 	if err != nil {
 		return nil, err
 	}
@@ -701,7 +698,7 @@ func rawToImageSources(value json.RawMessage) ([]*ocmimagevector.ExtendedImageSo
 	return obj.Images, nil
 }
 
-func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.ExtendedImageSource, error) {
+func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocmimagevector.ExtendedImageSource, error) {
 	if res.Type != ResourceTypeOCIImage {
 		return nil, nil
 	}
@@ -736,14 +733,14 @@ func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.Exte
 		src.Name = res.Name
 		src.LookupOnly = true
 	}
-	var spec accessv1.OCIImage
-	if err := ociaccess.DefaultScheme.Convert(res.Access, &spec); err != nil {
+	imageReference, err := extractImageReference(res, repoURL)
+	if err != nil {
 		return nil, err
 	}
-	src.Ref = &spec.ImageReference
-	repo, tag, err := splitRef(spec.ImageReference)
+	src.Ref = &imageReference
+	repo, tag, err := splitRef(imageReference)
 	if err != nil {
-		return nil, fmt.Errorf("failed to split ref %s: %w", spec.ImageReference, err)
+		return nil, fmt.Errorf("failed to split ref %s: %w", imageReference, err)
 	}
 	src.Repository = &repo
 	src.Tag = &tag
@@ -752,6 +749,35 @@ func resourceToImageSource(res descriptorruntime.Resource) (*ocmimagevector.Exte
 	}
 	src.Local = res.Relation == descriptorruntime.LocalRelation
 	return &src, nil
+}
+
+func extractImageReference(res descriptorruntime.Resource, repoURL string) (string, error) {
+	var imageReference string
+	switch a := res.Access.(type) {
+	case *ociaccess.RelativeOciReference:
+		// Relative OCI references carry only a sub-path; prepend the component's repository URL to form a fully-qualified image reference.
+		imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(a.Reference, "/")
+	case *accessv1.OCIImage:
+		imageReference = a.ImageReference
+	default:
+		// Access not yet converted to a typed value (e.g., still a *runtime.Raw); convert via the scheme.
+		converted, err := ociaccess.DefaultScheme.NewObject(res.Access.GetType())
+		if err != nil {
+			return "", fmt.Errorf("unsupported access type %q for resource %s: %w", res.Access.GetType().Name, res.Name, err)
+		}
+		if err := ociaccess.DefaultScheme.Convert(res.Access, converted); err != nil {
+			return "", err
+		}
+		switch c := converted.(type) {
+		case *ociaccess.RelativeOciReference:
+			imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(c.Reference, "/")
+		case *accessv1.OCIImage:
+			imageReference = c.ImageReference
+		default:
+			return "", fmt.Errorf("unsupported access type %T for resource %s", converted, res.Name)
+		}
+	}
+	return imageReference, nil
 }
 
 func splitRef(ref string) (string, string, error) {

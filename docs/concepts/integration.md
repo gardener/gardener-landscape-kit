@@ -94,7 +94,7 @@ GLK operations should be triggered based on specific events in the repository li
 - A new GLK version is rolled out
 - Additional components are added to the landscape
 
-**Why it matters**: The `resolve ocm` command reads OCM component descriptors and extracts critical information like versions and image overwrites. This data is then used by subsequent `generate` commands to render manifests with the correct versions and configurations. See [Components](components.md) for details on the extracted data structure.
+**Why it matters**: The `resolve ocm` command reads OCM component descriptors and extracts critical information like versions and image overwrites. This data is then used by subsequent `generate` commands to render manifests with the correct versions and configurations. See [Components](../usage/ocm/components.md) for details on the extracted data structure.
 
 #### Base Generation: `gardener-landscape-kit generate base`
 
