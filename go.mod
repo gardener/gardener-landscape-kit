@@ -6,8 +6,8 @@ require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/elastic/crd-ref-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
-	github.com/fluxcd/kustomize-controller/api v1.8.5
-	github.com/fluxcd/pkg/apis/meta v1.29.0
+	github.com/fluxcd/kustomize-controller/api v1.9.0
+	github.com/fluxcd/pkg/apis/meta v1.30.0
 	github.com/fluxcd/source-controller/api v1.8.5
 	github.com/gardener/gardener v1.144.1
 	github.com/gardener/gardener/pkg/apis v1.144.1
@@ -20,19 +20,19 @@ require (
 	github.com/spf13/pflag v1.0.10
 	go.yaml.in/yaml/v4 v4.0.0-rc.3
 	golang.org/x/tools v0.45.0
-	k8s.io/api v0.35.6
+	k8s.io/api v0.36.1
 	k8s.io/apimachinery v0.36.2
 	k8s.io/cli-runtime v0.35.6
-	k8s.io/client-go v0.35.6
-	k8s.io/code-generator v0.35.6
-	k8s.io/component-base v0.35.6
+	k8s.io/client-go v0.36.1
+	k8s.io/code-generator v0.36.1
+	k8s.io/component-base v0.36.1
 	k8s.io/utils v0.0.0-20260507154919-ff6756f316d2
 	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260608134855-41ae44158792
 	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.3-alpha3
 	ocm.software/open-component-model/bindings/go/oci v0.0.45
 	ocm.software/open-component-model/bindings/go/runtime v0.0.8
 	oras.land/oras-go/v2 v2.6.0
-	sigs.k8s.io/controller-runtime v0.23.3
+	sigs.k8s.io/controller-runtime v0.24.1
 	sigs.k8s.io/controller-tools v0.20.1
 	sigs.k8s.io/kustomize/api v0.21.1
 	sigs.k8s.io/kustomize/kyaml v0.21.1
@@ -83,7 +83,7 @@ require (
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fluent/fluent-operator/v3 v3.7.0 // indirect
 	github.com/fluxcd/pkg/apis/acl v0.9.0 // indirect
-	github.com/fluxcd/pkg/apis/kustomize v1.15.1 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/gardener/etcd-druid/api v0.36.4 // indirect
@@ -204,7 +204,7 @@ require (
 	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
 	golang.org/x/mod v0.36.0 // indirect
-	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
@@ -224,7 +224,7 @@ require (
 	helm.sh/helm/v4 v4.1.4 // indirect
 	istio.io/api v1.29.3 // indirect
 	istio.io/client-go v1.29.2 // indirect
-	k8s.io/apiextensions-apiserver v0.35.5 // indirect
+	k8s.io/apiextensions-apiserver v0.36.1 // indirect
 	k8s.io/autoscaler/vertical-pod-autoscaler v1.6.0 // indirect
 	k8s.io/gengo/v2 v2.0.0-20251215205346-5ee0d033ba5b // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
