@@ -16,8 +16,8 @@ import (
 )
 
 var _ = BeforeSuite(func() {
-	BasePath = os.Getenv("GLK_BASE_PATH")
-	LandscapePath = os.Getenv("GLK_LANDSCAPE_PATH")
+	BasePath = os.Getenv("GLK_BASE_REPO_PATH")
+	LandscapePath = os.Getenv("GLK_LANDSCAPE_REPO_PATH")
 	ConfigPath = os.Getenv("GLK_CONFIG_PATH")
 
 	GitServerURL = os.Getenv("GIT_SERVER_URL")

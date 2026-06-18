@@ -45,7 +45,7 @@ checkout_base_repo() {
 
 generate_base() {
   echo "🌱 Generating base"
-  glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_PATH}"
+  glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_REPO_PATH}"
 
   local glk_dev_image=$(cat $SCRIPT_DIR/../glk-dev-image)
   if [ -z "$glk_dev_image" ]; then
@@ -56,16 +56,16 @@ generate_base() {
   local glk_dev_image_base=${glk_dev_image%:*}
   local glk_dev_image_version=${glk_dev_image##*:}
 
-  local workflows_path="${GLK_BASE_PATH}/.github/workflows"
+  local workflows_path="${GLK_BASE_REPO_PATH}/.github/workflows"
   cp "$SCRIPT_DIR/workflow-pr-post-change.yaml" "$workflows_path"
   sed -i "s|<COMMAND>|base|g" "$workflows_path/workflow-pr-post-change.yaml"
   sed -i "s|<BASE-PATH>|./|g" "$workflows_path/workflow-pr-post-change.yaml"
   sed -i "s|<IMAGE-BASE>|$glk_dev_image_base|g" "$workflows_path/workflow-pr-post-change.yaml"
 
-  cp "$SCRIPT_DIR/components.yaml" "${GLK_BASE_PATH}/components.yaml"
-  sed -i "s|<DEV-VERSION>|$glk_dev_image_version|g" "${GLK_BASE_PATH}/components.yaml"
+  cp "$SCRIPT_DIR/components.yaml" "${GLK_BASE_REPO_PATH}/components.yaml"
+  sed -i "s|<DEV-VERSION>|$glk_dev_image_version|g" "${GLK_BASE_REPO_PATH}/components.yaml"
 
-  cd "${GLK_BASE_PATH}"
+  cd "${GLK_BASE_REPO_PATH}"
   git add .
   git commit -m "Generate base" || echo "No changes to commit"
   git push
@@ -78,7 +78,7 @@ checkout_landscape_repo() {
 
 generate_landscape() {
   echo "🌱 Generating test landscape"
-  glk generate landscape -c "${GLK_CONFIG_PATH}" "${GLK_LANDSCAPE_PATH}"
+  glk generate landscape -c "${GLK_CONFIG_PATH}" "${GLK_LANDSCAPE_REPO_PATH}"
 
   local glk_dev_image=$(cat $SCRIPT_DIR/../glk-dev-image)
   if [ -z "$glk_dev_image" ]; then
@@ -88,13 +88,13 @@ generate_landscape() {
 
   local glk_dev_image_base=${glk_dev_image%:*}
 
-  local workflows_path="${GLK_LANDSCAPE_PATH}/.github/workflows"
+  local workflows_path="${GLK_LANDSCAPE_REPO_PATH}/.github/workflows"
   cp "$SCRIPT_DIR/workflow-pr-post-change.yaml" "$workflows_path"
   sed -i "s|<COMMAND>|landscape|g" "$workflows_path/workflow-pr-post-change.yaml"
   sed -i "s|<BASE-PATH>|./base/|g" "$workflows_path/workflow-pr-post-change.yaml"
   sed -i "s|<IMAGE-BASE>|$glk_dev_image_base|g" "$workflows_path/workflow-pr-post-change.yaml"
 
-  cd "${GLK_LANDSCAPE_PATH}"
+  cd "${GLK_LANDSCAPE_REPO_PATH}"
   git add .
   git commit -m "Generate test landscape" || echo "No changes to commit"
   git push
@@ -102,7 +102,7 @@ generate_landscape() {
 
 ensure_base_as_submodule() {
   echo "🔗 Ensuring base is a submodule of test-landscape"
-  cd "${GLK_LANDSCAPE_PATH}"
+  cd "${GLK_LANDSCAPE_REPO_PATH}"
 
   if [ ! -f .gitmodules ] || ! grep -q "\[submodule \"base\"\]" .gitmodules; then
     git submodule add $GIT_SERVER_BASE_URL/gitops/base.git base

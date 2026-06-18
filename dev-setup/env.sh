@@ -8,10 +8,10 @@ export REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Git Repositories
 export GLK_BASE_REPO_NAME="base"
-export GLK_BASE_PATH="$REPO_ROOT/dev/e2e/$GLK_BASE_REPO_NAME"
+export GLK_BASE_REPO_PATH="$REPO_ROOT/dev/e2e/$GLK_BASE_REPO_NAME"
 export GLK_LANDSCAPE_REPO_NAME="test-landscape"
-export GLK_LANDSCAPE_PATH="$REPO_ROOT/dev/e2e/$GLK_LANDSCAPE_REPO_NAME"
-export GLK_CONFIG_PATH="${GLK_BASE_PATH}/landscapekitconfiguration.yaml"
+export GLK_LANDSCAPE_REPO_PATH="$REPO_ROOT/dev/e2e/$GLK_LANDSCAPE_REPO_NAME"
+export GLK_CONFIG_PATH="${GLK_BASE_REPO_PATH}/landscapekitconfiguration.yaml"
 
 # Git Server
 export GIT_USER_NAME="gitops"
