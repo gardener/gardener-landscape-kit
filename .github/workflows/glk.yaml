@@ -33,6 +33,11 @@ on:
         required: false
         type: boolean
         default: true
+      image-base:
+        description: Base image for GLK, default is the public registry.
+        required: false
+        type: string
+        default: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit
 
 jobs:
   glk:
@@ -61,6 +66,7 @@ jobs:
       with:
         components-file: ${{ inputs.components-file }}
         commands: ${{ inputs.glk-commands }}
+        image-base: ${{ inputs.image-base }}
 
     - name: Commit and push changes
       id: push

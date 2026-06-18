@@ -14,6 +14,7 @@ jobs:
         glk generate <COMMAND> -c $GITHUB_WORKSPACE/<BASE-PATH>landscapekitconfiguration.yaml $GITHUB_WORKSPACE
       components-file: '<BASE-PATH>components.yaml'
       commit-message: 'chore: run gardener-landscape-kit'
+      image-base: <IMAGE-BASE>
     permissions:
       contents: write
       pull-requests: write

@@ -16,6 +16,7 @@ repositories:
 components:
   include:
   - flux
+  - github
 # TODO(timuthy): Remove this config once dev versions are ignored.
 versionConfig:
   checkMode: Warning
