@@ -6,14 +6,10 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "$SCRIPT_DIR/../env.sh"
 
-REGISTRY_HOSTNAME="glk-registry.local.gardener.cloud"
-
-GIT_SERVER_HOSTNAME="git.local.gardener.cloud"
-GIT_SERVER_URL="http://$GIT_SERVER_HOSTNAME:6080"
-USER="gitops:testtest"
-REPO_NAMES="base test-landscape"
+USER="$GIT_USER_NAME:$GIT_USER_PASSWORD"
 
 check_local_dns_record() {
   local local_registry_ip_address=""
@@ -92,6 +88,6 @@ done
 
 echo "🚀 git-server is up and running at $GIT_SERVER_URL"
 
-for repo_name in ${REPO_NAMES:-}; do
+for repo_name in $GLK_BASE_REPO_NAME $GLK_LANDSCAPE_REPO_NAME; do
   create_repo $repo_name
 done

@@ -92,8 +92,6 @@ EOF
     yq eval --inplace "(.. | select(. == \"$v$suffix\")) = \"$ref\"" ${tmpDir}/extension.yaml
   done
 
-  # patch extension.yaml for usage in kind cluster with different registry port
-  sed -i "s/:6001/:5001/g" ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.admission.values.image = (.spec.deployment.admission.runtimeCluster.helm.ociRepository.ref | sub("_charts_runtime","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.runtimeClusterValues.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
   yq eval --inplace '.spec.deployment.extension.values.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
@@ -132,10 +130,10 @@ spec:
     namespace: garden
 EOF
 
-  glk generate landscape -c "${WORK_DIR}/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
+  glk generate landscape -c "${WORK_DIR}/base/landscapekitconfiguration.yaml" "${WORK_DIR}/test-landscape"
 
   cd "${WORK_DIR}/test-landscape"
-  git add components/provider-local components/kustomization.yaml
+  git add .glk components/provider-local components/kustomization.yaml
   git commit -m "Update provider-local" || echo "No changes to commit"
   git push
   echo "✅ Updated component provider-local"

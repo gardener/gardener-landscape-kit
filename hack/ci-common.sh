@@ -16,3 +16,7 @@ glk_ensure_local_gardener_cloud_hosts() {
     echo "> Content of '/etc/hosts' after adding local.gardener.cloud entries:\n$(cat /etc/hosts)"
   fi
 }
+
+export_forgejo_runner_logs() {
+  docker logs glk-forgejo-runner > "${ARTIFACTS}/forgejo-runner.log" || true
+}

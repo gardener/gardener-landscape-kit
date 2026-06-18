@@ -33,6 +33,11 @@ on:
         required: false
         type: boolean
         default: true
+      image-base:
+        description: Base image for GLK, default is the public registry.
+        required: false
+        type: string
+        default: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit
 
 jobs:
   glk:
@@ -46,6 +51,7 @@ jobs:
     - name: Checkout PR branch
       uses: actions/checkout@v6
       with:
+        submodules: 'true'
         token: ${{ secrets.GITHUB_TOKEN }}
         ref: ${{ github.event.pull_request.head.ref || github.ref }}
         repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
@@ -60,6 +66,7 @@ jobs:
       with:
         components-file: ${{ inputs.components-file }}
         commands: ${{ inputs.glk-commands }}
+        image-base: ${{ inputs.image-base }}
 
     - name: Commit and push changes
       id: push

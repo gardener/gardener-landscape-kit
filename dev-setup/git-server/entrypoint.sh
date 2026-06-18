@@ -20,8 +20,8 @@ create_user() {
 
   # Create default admin user
   su - git -c "/usr/local/bin/forgejo admin user create \
-    --username gitops \
-    --password testtest \
+    --username $GIT_USER_NAME \
+    --password $GIT_USER_PASSWORD \
     --email gitops@local.gardener.cloud \
     --admin"
 }

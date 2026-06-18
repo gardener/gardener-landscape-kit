@@ -1,0 +1,22 @@
+name: GLK Generate
+
+on:
+  pull_request:
+
+jobs:
+  glk-generate:
+    uses: ./.github/workflows/glk.yaml
+    with:
+      runs-on: docker
+      set-commit-status: false
+      status-runs-on: host
+      glk-commands: |
+        glk generate <COMMAND> -c $GITHUB_WORKSPACE/<BASE-PATH>landscapekitconfiguration.yaml $GITHUB_WORKSPACE
+      components-file: '<BASE-PATH>components.yaml'
+      commit-message: 'chore: run gardener-landscape-kit'
+      image-base: <IMAGE-BASE>
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: write
+      id-token: write

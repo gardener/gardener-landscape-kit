@@ -14,6 +14,10 @@ inputs:
         generate landscape -c landscape/glk.yaml .
     required: false
     default: ''
+  image-base:
+    description: Base image for GLK, default is the public registry.
+    required: false
+    default: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit
 
 runs:
   using: composite
@@ -30,7 +34,7 @@ runs:
     id: glk-binary
     shell: bash
     env:
-      GLK_IMAGE: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit:${{ steps.glk-version.outputs.version }}
+      GLK_IMAGE: ${{ inputs.image-base }}:${{ steps.glk-version.outputs.version }}
     run: |
       set -euo pipefail
       glk_bin="${RUNNER_TEMP}/gardener-landscape-kit"

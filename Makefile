@@ -10,9 +10,13 @@ HACK_DIR             := $(REPO_ROOT)/hack
 ENSURE_GARDENER_MOD  := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
 GARDENER_HACK_DIR    := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
 BUILD_DATE           ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-LD_FLAGS             := "-w $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))"
 IMAGE_REGISTRY       ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
 TARGET_PLATFORMS     ?= linux/$(shell go env GOARCH)
+
+export VERSION
+export LD_FLAGS              = $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
+export SKAFFOLD_DEFAULT_REPO = glk-registry.local.gardener.cloud:6001
+export SKAFFOLD_PUSH         = true
 
 #########################################
 # Tools                                 #
@@ -31,7 +35,7 @@ BUILD_PACKAGES    ?= ./cmd/...
 
 .PHONY: build
 build:
-	@LD_FLAGS=$(LD_FLAGS) EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) bash $(GARDENER_HACK_DIR)/build.sh -o $(BUILD_OUTPUT_FILE) $(BUILD_PACKAGES)
+	@LD_FLAGS="$(LD_FLAGS)" EFFECTIVE_VERSION=$(EFFECTIVE_VERSION) bash $(GARDENER_HACK_DIR)/build.sh -o $(BUILD_OUTPUT_FILE) $(BUILD_PACKAGES)
 
 .PHONY: install
 install:
@@ -56,6 +60,7 @@ tools-for-generate: $(CRD_REF_DOCS)
 
 .PHONY: generate
 generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh update
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(GARDENER_HACK_DIR)/generate-sequential.sh ./componentvector/... ./pkg/...
 	@REPO_ROOT=$(REPO_ROOT) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-codegen.sh
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-github-templates.sh
@@ -66,6 +71,7 @@ generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 .PHONY: check
 check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
 	@REPO_ROOT=$(REPO_ROOT) bash $(GARDENER_HACK_DIR)/check.sh --golangci-lint-config=./.golangci.yaml ./cmd/... ./pkg/...
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh check
 	@hack/check-component-yaml.sh
 
 .PHONY: check-generate
@@ -114,10 +120,6 @@ git-server-up:
 git-server-down:
 	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-down.sh
 
-.PHONY: git-server-cleanup # cleanup git server data
-git-server-cleanup: git-server-down $(YQ)
-	@rm -rf $(REPO_ROOT)/dev/git-server/data
-
 .PHONY: infra-up
 infra-up:
 	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml up -d
@@ -151,10 +153,15 @@ e2e-prepare: export BUILD_OUTPUT_FILE=$(TOOLS_BIN_DIR)
 
 .PHONY: e2e-prepare
 e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)
-	@$(REPO_ROOT)/dev-setup/kind/generate-repos.sh
+	@SKAFFOLD_FILENAME=$(REPO_ROOT)/dev-setup/skaffold.yaml skaffold build
+	@$(REPO_ROOT)/dev-setup/git-repos/generate-repos.sh
 	@$(REPO_ROOT)/dev-setup/kind/deploy-flux.sh
-	@$(REPO_ROOT)/dev-setup/kind/prepare-garden.sh
 	@$(REPO_ROOT)/dev-setup/kind/build-and-add-provider-local.sh
+
+.PHONY: e2e-cleanup
+e2e-cleanup: kind-down
+	@rm -rf $(REPO_ROOT)/dev/git-server
+	@rm -rf $(REPO_ROOT)/dev/e2e
 
 .PHONY: ci-e2e-kind
 ci-e2e-kind:
@@ -162,4 +169,4 @@ ci-e2e-kind:
 
 .PHONY: test-e2e-local
 test-e2e-local: $(GINKGO)
-	KUBECONFIG=$(KIND_LOCAL_KUBECONFIG) $(REPO_ROOT)/dev/gardener/hack/test-e2e-local.sh --procs=$(PARALLEL_E2E_TESTS) --label-filter="default" ./test/e2e/...
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(REPO_ROOT)/hack/test-e2e-local.sh --procs=$(PARALLEL_E2E_TESTS) --label-filter="default" ./test/e2e/...

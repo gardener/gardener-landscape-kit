@@ -1,0 +1,3 @@
+components:
+- name: github.com/gardener/gardener-landscape-kit
+  version: <DEV-VERSION>
