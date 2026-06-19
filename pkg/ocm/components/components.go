@@ -155,7 +155,7 @@ func (c *Components) addComponent(result *ociaccess.FindComponentVersionResult) 
 func (c *Components) extractImageVectorFromResources(result *ociaccess.FindComponentVersionResult) ([]ocmimagevector.ExtendedImageSource, error) {
 	var vector []ocmimagevector.ExtendedImageSource
 	for _, res := range result.Descriptor.Component.Resources {
-		src, err := resourceToImageSource(res, result.RepositoryURL)
+		src, err := resourceToImageSource(res, result.RepositoryHost)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 		}
@@ -171,7 +171,7 @@ func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindCompon
 	for _, res := range result.Descriptor.Component.Resources {
 		switch res.Type {
 		case ResourceTypeOCIImage:
-			src, err := resourceToImageSource(res, result.RepositoryURL)
+			src, err := resourceToImageSource(res, result.RepositoryHost)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 			}
@@ -201,7 +201,7 @@ func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindCompon
 				resources = append(resources, resource)
 			}
 		case ResourceTypeHelmChart:
-			imageReference, err := extractImageReference(res, result.RepositoryURL)
+			imageReference, err := extractImageReference(res, result.RepositoryHost)
 			if err != nil {
 				return nil, err
 			}
@@ -698,7 +698,7 @@ func rawToImageSources(value json.RawMessage) ([]*ocmimagevector.ExtendedImageSo
 	return obj.Images, nil
 }
 
-func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocmimagevector.ExtendedImageSource, error) {
+func resourceToImageSource(res descriptorruntime.Resource, repoHost string) (*ocmimagevector.ExtendedImageSource, error) {
 	if res.Type != ResourceTypeOCIImage {
 		return nil, nil
 	}
@@ -733,12 +733,12 @@ func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocm
 		src.Name = res.Name
 		src.LookupOnly = true
 	}
-	imageReference, err := extractImageReference(res, repoURL)
+	imageReference, err := extractImageReference(res, repoHost)
 	if err != nil {
 		return nil, err
 	}
 	src.Ref = &imageReference
-	repo, tag, err := splitRef(imageReference)
+	repo, tag, err := helpers.SplitOCIImageReference(imageReference)
 	if err != nil {
 		return nil, fmt.Errorf("failed to split ref %s: %w", imageReference, err)
 	}
@@ -751,12 +751,12 @@ func resourceToImageSource(res descriptorruntime.Resource, repoURL string) (*ocm
 	return &src, nil
 }
 
-func extractImageReference(res descriptorruntime.Resource, repoURL string) (string, error) {
+func extractImageReference(res descriptorruntime.Resource, repoHost string) (string, error) {
 	var imageReference string
 	switch a := res.Access.(type) {
 	case *ociaccess.RelativeOciReference:
-		// Relative OCI references carry only a sub-path; prepend the component's repository URL to form a fully-qualified image reference.
-		imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(a.Reference, "/")
+		// Relative OCI references carry only a sub-path; prepend the component's repository host to form a fully-qualified image reference.
+		imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(a.Reference, "/")
 	case *accessv1.OCIImage:
 		imageReference = a.ImageReference
 	default:
@@ -770,7 +770,7 @@ func extractImageReference(res descriptorruntime.Resource, repoURL string) (stri
 		}
 		switch c := converted.(type) {
 		case *ociaccess.RelativeOciReference:
-			imageReference = strings.TrimRight(repoURL, "/") + "/" + strings.TrimLeft(c.Reference, "/")
+			imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(c.Reference, "/")
 		case *accessv1.OCIImage:
 			imageReference = c.ImageReference
 		default:
@@ -778,22 +778,6 @@ func extractImageReference(res descriptorruntime.Resource, repoURL string) (stri
 		}
 	}
 	return imageReference, nil
-}
-
-func splitRef(ref string) (string, string, error) {
-	parts1 := strings.SplitN(ref, ":", 2)
-	parts2 := strings.SplitN(ref, "@", 2)
-	var parts []string
-	if len(parts1) == 2 {
-		parts = parts1
-	}
-	if len(parts2) == 2 && len(parts) == 2 && len(parts2[1]) > len(parts[1]) {
-		parts = parts2
-	}
-	if len(parts) != 2 {
-		return "", "", fmt.Errorf("invalid reference format")
-	}
-	return parts[0], parts[1], nil
 }
 
 func toString(value json.RawMessage) (string, error) {

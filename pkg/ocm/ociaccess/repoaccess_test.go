@@ -10,18 +10,24 @@ import (
 )
 
 var _ = Describe("RepoAccess", func() {
-	DescribeTable("#trimURLScheme",
-		func(input, expected string) {
-			Expect(trimURLScheme(input)).To(Equal(expected))
+	DescribeTable("#hostFromURL",
+		func(input, expectedHost string, expectErr bool) {
+			host, err := hostFromURL(input)
+			if expectErr {
+				Expect(err).To(HaveOccurred())
+				Expect(host).To(BeEmpty())
+				return
+			}
+			Expect(err).NotTo(HaveOccurred())
+			Expect(host).To(Equal(expectedHost))
 		},
-		Entry("empty", "", ""),
-		Entry("no scheme no slash", "registry.example.com/path", "registry.example.com/path"),
-		Entry("https scheme", "https://registry.example.com/path", "registry.example.com/path"),
-		Entry("http scheme", "http://registry.example.com/path", "registry.example.com/path"),
-		Entry("trailing slash", "registry.example.com/path/", "registry.example.com/path"),
-		Entry("scheme and trailing slash", "https://registry.example.com/path/", "registry.example.com/path"),
-		Entry("scheme only no path", "https://registry.example.com", "registry.example.com"),
-		Entry("with port", "https://registry.example.com:5000/path", "registry.example.com:5000/path"),
-		Entry("leading scheme delimiter", "://nothing", "://nothing"),
+		Entry("https scheme", "https://registry.example.com/path", "registry.example.com", false),
+		Entry("http scheme", "http://registry.example.com/path", "registry.example.com", false),
+		Entry("https with port", "https://registry.example.com:5000/path", "registry.example.com:5000", false),
+		Entry("https scheme only no path", "https://registry.example.com", "registry.example.com", false),
+		Entry("trailing slash", "https://registry.example.com/path/", "registry.example.com", false),
+		Entry("no scheme", "registry.example.com/path", "", true),
+		Entry("empty", "", "", true),
+		Entry("malformed", "://nothing", "", true),
 	)
 })
