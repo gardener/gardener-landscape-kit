@@ -567,7 +567,7 @@ var _ = Describe("#resourceToImageSource", func() {
 	}
 
 	DescribeTable("resolves the image reference",
-		func(accessType, accessRef, repoPrefix, expectedRef, expectedRepo, expectedTag string) {
+		func(accessType, accessRef, repoHost, expectedRef, expectedRepo, expectedTag string) {
 			for _, raw := range []bool{true, false} {
 				res := descriptorruntime.Resource{
 					Type:   ResourceTypeOCIImage,
@@ -576,7 +576,7 @@ var _ = Describe("#resourceToImageSource", func() {
 				res.Name = "my-image"
 				res.Version = "1.2.3"
 
-				src, err := resourceToImageSource(res, repoPrefix)
+				src, err := resourceToImageSource(res, repoHost)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(src).NotTo(BeNil())
 				Expect(*src.Ref).To(Equal(expectedRef))
@@ -591,14 +591,14 @@ var _ = Describe("#resourceToImageSource", func() {
 			"registry.example.com/my-image",
 			"1.2.3",
 		),
-		Entry("relative reference with tag, repoPrefix prepended",
+		Entry("relative reference with tag, repoHost prepended",
 			ociaccess.RelativeOciReferenceTypeName, "path/my-image:1.2.3",
 			"registry.example.com",
 			"registry.example.com/path/my-image:1.2.3",
 			"registry.example.com/path/my-image",
 			"1.2.3",
 		),
-		Entry("relative reference with digest, repoPrefix prepended",
+		Entry("relative reference with digest, repoHost prepended",
 			ociaccess.RelativeOciReferenceTypeName, "path/my-image@sha256:abc",
 			"registry.example.com",
 			"registry.example.com/path/my-image@sha256:abc",

@@ -698,7 +698,7 @@ func rawToImageSources(value json.RawMessage) ([]*ocmimagevector.ExtendedImageSo
 	return obj.Images, nil
 }
 
-func resourceToImageSource(res descriptorruntime.Resource, repoPrefix string) (*ocmimagevector.ExtendedImageSource, error) {
+func resourceToImageSource(res descriptorruntime.Resource, repoHost string) (*ocmimagevector.ExtendedImageSource, error) {
 	if res.Type != ResourceTypeOCIImage {
 		return nil, nil
 	}
@@ -733,7 +733,7 @@ func resourceToImageSource(res descriptorruntime.Resource, repoPrefix string) (*
 		src.Name = res.Name
 		src.LookupOnly = true
 	}
-	imageReference, err := extractImageReference(res, repoPrefix)
+	imageReference, err := extractImageReference(res, repoHost)
 	if err != nil {
 		return nil, err
 	}
@@ -751,12 +751,12 @@ func resourceToImageSource(res descriptorruntime.Resource, repoPrefix string) (*
 	return &src, nil
 }
 
-func extractImageReference(res descriptorruntime.Resource, repoPrefix string) (string, error) {
+func extractImageReference(res descriptorruntime.Resource, repoHost string) (string, error) {
 	var imageReference string
 	switch a := res.Access.(type) {
 	case *ociaccess.RelativeOciReference:
 		// Relative OCI references carry only a sub-path; prepend the component's repository host to form a fully-qualified image reference.
-		imageReference = strings.TrimRight(repoPrefix, "/") + "/" + strings.TrimLeft(a.Reference, "/")
+		imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(a.Reference, "/")
 	case *accessv1.OCIImage:
 		imageReference = a.ImageReference
 	default:
@@ -770,7 +770,7 @@ func extractImageReference(res descriptorruntime.Resource, repoPrefix string) (s
 		}
 		switch c := converted.(type) {
 		case *ociaccess.RelativeOciReference:
-			imageReference = strings.TrimRight(repoPrefix, "/") + "/" + strings.TrimLeft(c.Reference, "/")
+			imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(c.Reference, "/")
 		case *accessv1.OCIImage:
 			imageReference = c.ImageReference
 		default:
