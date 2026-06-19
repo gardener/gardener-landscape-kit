@@ -489,11 +489,11 @@ scheduler:
 		Expect(c.GetSortedComponents()).To(ContainElements(ComponentReference("github.com/gardener/diki:v0.25.0")))
 	})
 
-	It("should resolve relativeOciReference resources against the repository URL", func() {
+	It("should resolve relativeOciReference resources against the repository host", func() {
 		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", ResourceTypeOCIImage, "my-image", "v0.0.1", "img/sub-path:v0.0.1@sha256:deadbeef")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
-			Descriptor:    desc,
-			RepositoryURL: "registry.example.com/path/to/repo",
+			Descriptor:     desc,
+			RepositoryHost: "registry.example.com:443",
 		})
 		Expect(err).NotTo(HaveOccurred())
 
@@ -502,7 +502,7 @@ scheduler:
 		Expect(err).NotTo(HaveOccurred())
 		Expect(imageVector).To(ConsistOf(imagevector.ImageSource{
 			Name:       "my-image",
-			Repository: new("registry.example.com/path/to/repo/img/sub-path"),
+			Repository: new("registry.example.com:443/img/sub-path"),
 			Tag:        new("v0.0.1@sha256:deadbeef"),
 			Version:    new("v0.0.1"),
 		}))
@@ -511,18 +511,18 @@ scheduler:
 	It("should fail for malformed relativeOciReference resources", func() {
 		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", ResourceTypeOCIImage, "my-image", "v0.0.1", "no-tag-no-digest")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
-			Descriptor:    desc,
-			RepositoryURL: "registry.example.com/path/to/repo",
+			Descriptor:     desc,
+			RepositoryHost: "registry.example.com:443",
 		})
 		Expect(err).To(MatchError(ContainSubstring("failed to convert resource my-image to image source")))
-		Expect(err).To(MatchError(ContainSubstring("invalid reference format")))
+		Expect(err).To(MatchError(ContainSubstring("unexpected reference")))
 	})
 
-	It("should resolve relativeOciReference helmChart resources against the repository URL", func() {
+	It("should resolve relativeOciReference helmChart resources against the repository host", func() {
 		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-helm-ref", "v0.0.1", ResourceTypeHelmChart, "my-chart", "v0.0.1", "charts/my-chart:v0.0.1@sha256:deadbeef")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
-			Descriptor:    desc,
-			RepositoryURL: "registry.example.com/path/to/repo",
+			Descriptor:     desc,
+			RepositoryHost: "registry.example.com:443",
 		})
 		Expect(err).NotTo(HaveOccurred())
 
@@ -531,7 +531,7 @@ scheduler:
 			Name:    "my-chart",
 			Version: "v0.0.1",
 			Type:    ResourceTypeHelmChart,
-			Value:   "registry.example.com/path/to/repo/charts/my-chart:v0.0.1@sha256:deadbeef",
+			Value:   "registry.example.com:443/charts/my-chart:v0.0.1@sha256:deadbeef",
 		}))
 	})
 })
@@ -567,7 +567,7 @@ var _ = Describe("#resourceToImageSource", func() {
 	}
 
 	DescribeTable("resolves the image reference",
-		func(accessType, accessRef, repoURL, expectedRef, expectedRepo, expectedTag string) {
+		func(accessType, accessRef, repoPrefix, expectedRef, expectedRepo, expectedTag string) {
 			for _, raw := range []bool{true, false} {
 				res := descriptorruntime.Resource{
 					Type:   ResourceTypeOCIImage,
@@ -576,7 +576,7 @@ var _ = Describe("#resourceToImageSource", func() {
 				res.Name = "my-image"
 				res.Version = "1.2.3"
 
-				src, err := resourceToImageSource(res, repoURL)
+				src, err := resourceToImageSource(res, repoPrefix)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(src).NotTo(BeNil())
 				Expect(*src.Ref).To(Equal(expectedRef))
@@ -591,23 +591,23 @@ var _ = Describe("#resourceToImageSource", func() {
 			"registry.example.com/my-image",
 			"1.2.3",
 		),
-		Entry("relative reference with tag, repoURL prepended",
-			ociaccess.RelativeOciReferenceTypeName, "my-image:1.2.3",
-			"registry.example.com/path",
+		Entry("relative reference with tag, repoPrefix prepended",
+			ociaccess.RelativeOciReferenceTypeName, "path/my-image:1.2.3",
+			"registry.example.com",
 			"registry.example.com/path/my-image:1.2.3",
 			"registry.example.com/path/my-image",
 			"1.2.3",
 		),
-		Entry("relative reference with digest, repoURL prepended",
-			ociaccess.RelativeOciReferenceTypeName, "my-image@sha256:abc",
-			"registry.example.com/path",
+		Entry("relative reference with digest, repoPrefix prepended",
+			ociaccess.RelativeOciReferenceTypeName, "path/my-image@sha256:abc",
+			"registry.example.com",
 			"registry.example.com/path/my-image@sha256:abc",
 			"registry.example.com/path/my-image",
 			"sha256:abc",
 		),
-		Entry("relative reference with leading slash and repoURL with trailing slash, no double slash",
-			ociaccess.RelativeOciReferenceTypeName, "/my-image:1.2.3",
-			"registry.example.com/path/",
+		Entry("relative reference with leading slash, no double slash",
+			ociaccess.RelativeOciReferenceTypeName, "/path/my-image:1.2.3",
+			"registry.example.com",
 			"registry.example.com/path/my-image:1.2.3",
 			"registry.example.com/path/my-image",
 			"1.2.3",
@@ -654,9 +654,9 @@ func loadWithDepRecursive(c *Components, loadDescriptor func(cref ComponentRefer
 		desc := loadDescriptor(root)
 		blobs := addFakeLocalBlobs(desc)
 		deps, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
-			Descriptor:    desc,
-			LocalBlobs:    blobs,
-			RepositoryURL: "registry.example.com/path/to/repo",
+			Descriptor:     desc,
+			LocalBlobs:     blobs,
+			RepositoryHost: "registry.example.com:443",
 		})
 		Expect(err).NotTo(HaveOccurred())
 		if levels > 0 && len(deps) > 0 {

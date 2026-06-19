@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -125,9 +126,8 @@ type FindComponentVersionResult struct {
 	// LocalBlobs holds the bytes of any local-blob resources requested via localBlobResourceTypes,
 	// keyed by name/version/type. Nil if none were requested or found.
 	LocalBlobs LocalBlobs
-	// RepositoryURL is the normalized URL (no scheme, no trailing slash)
-	// of the repository where the component was found.
-	RepositoryURL string
+	// RepositoryHost is host of the repository where the component was found.
+	RepositoryHost string
 }
 
 // FindComponentVersion searches for a specific component version across multiple repositories.
@@ -150,10 +150,14 @@ func FindComponentVersion(
 			if err != nil {
 				return nil, fmt.Errorf("failed to load local blobs for component version %s:%s from repository %s: %w", component, version, repo.RepositoryURL, err)
 			}
+			host, err := hostFromURL(repo.RepositoryURL)
+			if err != nil {
+				return nil, err
+			}
 			return &FindComponentVersionResult{
-				Descriptor:    descriptor,
-				LocalBlobs:    repoLocalBlobs,
-				RepositoryURL: trimURLScheme(repo.RepositoryURL),
+				Descriptor:     descriptor,
+				LocalBlobs:     repoLocalBlobs,
+				RepositoryHost: host,
 			}, nil
 		}
 		errs = append(errs, fmt.Errorf("repository %s: %w", repo.RepositoryURL, err))
@@ -170,12 +174,15 @@ type NameVersionType struct {
 	Type    string
 }
 
-func trimURLScheme(repoURL string) string {
-	repoURL = strings.TrimSuffix(repoURL, "/")
-	if idx := strings.Index(repoURL, "://"); idx > 0 {
-		repoURL = repoURL[idx+3:]
+func hostFromURL(repoURL string) (string, error) {
+	u, err := url.ParseRequestURI(repoURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to extract hostname from repository URL %q: %w", repoURL, err)
 	}
-	return repoURL
+	if u.Host == "" {
+		return "", fmt.Errorf("repository URL %q has no host", repoURL)
+	}
+	return u.Host, nil
 }
 
 func loadLocalBlobs(ctx context.Context, repo *RepoAccess, descriptor *descriptorruntime.Descriptor, localBlobResourceTypes ...string) (map[NameVersionType][]byte, error) {

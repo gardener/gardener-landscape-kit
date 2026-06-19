@@ -28,20 +28,18 @@ The `reference` field must contain a path with a tag (`name:tag`), a digest (`na
 
 ## Resolution
 
-When GLK looks up a component version it remembers the URL of the repository the descriptor was found in. While extracting resources from the descriptor, every `relativeOciReference` access is resolved into a fully-qualified image reference using the rule:
+When GLK looks up a component version it remembers the host of the repository the descriptor was found in. While extracting resources from the descriptor, every `relativeOciReference` access is resolved into a fully-qualified image reference using the rule:
 
 ```
-<repository-url-without-scheme> + "/" + <reference>
+<repository-host> + "/" + <reference>
 ```
 
-The repository URL is normalized first:
-- the URL scheme (`https://`, `http://`) is stripped
-- a trailing `/` is removed
+The repository host is the hostname (with optional port) parsed from the repository URL — the scheme and any path are dropped.
 
 A leading `/` on the relative reference is also stripped to avoid producing a double slash. As a concrete example, given:
 
 - repository URL: `https://registry.example.com/path/to/repo/`
-- relative reference: `img/sub-path:v0.0.1@sha256:deadbeef`
+- relative reference: `path/to/repo/img/sub-path:v0.0.1@sha256:deadbeef`
 
 the resolved image reference becomes:
 
@@ -56,8 +54,8 @@ If the resource access is still in raw (unparsed) form when GLK encounters it, G
 ## Where this is wired up
 
 - The custom type is declared in [`pkg/ocm/ociaccess/relativeocireference.go`](../../../pkg/ocm/ociaccess/relativeocireference.go) and registered with the OCM runtime scheme in [`pkg/ocm/ociaccess/repoaccess.go`](../../../pkg/ocm/ociaccess/repoaccess.go).
-- The resolution against the repository URL is performed by `extractImageReference` in [`pkg/ocm/components/components.go`](../../../pkg/ocm/components/components.go), which is called from both the OCI image extraction path and the Helm chart extraction path.
-- The repository URL used as the base is captured by `FindComponentVersion` in [`pkg/ocm/ociaccess/repoaccess.go`](../../../pkg/ocm/ociaccess/repoaccess.go) and returned in `FindComponentVersionResult.RepositoryURL` (already normalized via `trimURLScheme`).
+- The resolution against the repository host is performed by `extractImageReference` in [`pkg/ocm/components/components.go`](../../../pkg/ocm/components/components.go), which is called from both the OCI image extraction path and the Helm chart extraction path.
+- The repository host used as the base is captured by `FindComponentVersion` in [`pkg/ocm/ociaccess/repoaccess.go`](../../../pkg/ocm/ociaccess/repoaccess.go) and returned in `FindComponentVersionResult.RepositoryHost` (extracted from the repository URL via `hostFromURL`).
 
 ## Compatibility note
 
