@@ -57,6 +57,11 @@ The following dependencies have been updated:\n\
       groupName: "open-component-model",
       matchPackageNames: ["ocm.software/open-component-model/"],
     },
+    {
+      matchDatasources: ['go'],
+      groupName: "fluxcd-controllers",
+      matchPackageNames: ['/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/'],
+    },
     // The following list of dependencies is updated by `make generate` and restricts updates to type `patch`.
     // DO NOT EDIT THIS SECTION MANUALLY.
     {
