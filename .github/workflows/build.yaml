@@ -84,6 +84,7 @@ jobs:
     permissions:
       contents: read
     needs:
+      - prepare
       - tests
       - build-date
     strategy:
