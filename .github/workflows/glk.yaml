@@ -18,10 +18,6 @@ on:
         description: 'Path to components.yaml file (used when version is not set)'
         required: false
         type: string
-      version:
-        description: 'GLK version to use. Takes precedence over components-file when set.'
-        required: false
-        type: string
       commit-message:
         description: 'Commit message for generated changes'
         required: false
@@ -42,6 +38,10 @@ on:
         required: false
         type: string
         default: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit
+      image-tag:
+        description: 'GLK version to use. Takes precedence over components-file when set.'
+        required: false
+        type: string
 
 jobs:
   glk:
@@ -69,7 +69,7 @@ jobs:
       uses: ./.github/actions/glk
       with:
         components-file: ${{ inputs.components-file }}
-        version: ${{ inputs.version }}
+        image-tag: ${{ inputs.image-tag }}
         commands: ${{ inputs.glk-commands }}
         image-base: ${{ inputs.image-base }}
 
