@@ -3,8 +3,11 @@ description: Run gardener-landscape-kit commands using the container image versi
 
 inputs:
   components-file:
-    description: Path to the GLK components.yaml
-    required: true
+    description: Path to the GLK components.yaml (used when version is not set)
+    required: false
+  version:
+    description: GLK version to use. Takes precedence over components-file when set.
+    required: false
   commands:
     description: |
       GLK commands to execute, one per line. If not provided, runs default commands.
@@ -22,13 +25,29 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Extract GLK version from components.yaml
+  - name: Resolve GLK version
     id: glk-version
     shell: bash
+    env:
+      GLK_VERSION_INPUT: ${{ inputs.version }}
+      GLK_COMPONENTS_FILE: ${{ inputs.components-file }}
     run: |
-      version=$(grep -A1 'name: github.com/gardener/gardener-landscape-kit' "${{ inputs.components-file }}" | grep 'version:' | awk '{print $2}')
+      set -euo pipefail
+      if [ -n "${GLK_VERSION_INPUT}" ]; then
+        version="${GLK_VERSION_INPUT}"
+        echo "Using GLK version from input: ${version}"
+      elif [ -n "${GLK_COMPONENTS_FILE}" ]; then
+        version=$(grep -A1 'name: github.com/gardener/gardener-landscape-kit' "${GLK_COMPONENTS_FILE}" | grep 'version:' | awk '{print $2}')
+        echo "Using GLK version from components-file (${GLK_COMPONENTS_FILE}): ${version}"
+      else
+        echo "Error: either 'version' or 'components-file' must be provided" >&2
+        exit 1
+      fi
+      if [ -z "${version}" ]; then
+        echo "Error: could not determine GLK version" >&2
+        exit 1
+      fi
       echo "version=${version}" >> "$GITHUB_OUTPUT"
-      echo "GLK version: ${version}"
 
   - name: Extract GLK binary from image
     id: glk-binary
@@ -49,7 +68,7 @@ runs:
       chmod +x "${glk_bin}"
       echo "bin=${glk_bin}" >> "$GITHUB_OUTPUT"
 
-  - name: Run GLK resolve and generate
+  - name: Run GLK commands
     shell: bash
     env:
       GLK_BIN: ${{ steps.glk-binary.outputs.bin }}
