@@ -9,9 +9,9 @@ require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/elastic/crd-ref-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
-	github.com/fluxcd/kustomize-controller/api v1.9.0
+	github.com/fluxcd/kustomize-controller/api v1.9.1
 	github.com/fluxcd/pkg/apis/meta v1.31.0
-	github.com/fluxcd/source-controller/api v1.9.0
+	github.com/fluxcd/source-controller/api v1.9.1
 	github.com/gardener/gardener v1.144.2
 	github.com/gardener/gardener/pkg/apis v1.144.2
 	github.com/go-logr/logr v1.4.3
@@ -88,7 +88,7 @@ require (
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fluent/fluent-operator/v3 v3.7.0 // indirect
 	github.com/fluxcd/pkg/apis/acl v0.10.0 // indirect
-	github.com/fluxcd/pkg/apis/kustomize v1.19.0 // indirect
+	github.com/fluxcd/pkg/apis/kustomize v1.19.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
 	github.com/gardener/etcd-druid/api v0.36.4 // indirect
@@ -235,7 +235,7 @@ require (
 	helm.sh/helm/v4 v4.1.4 // indirect
 	istio.io/api v1.29.3 // indirect
 	istio.io/client-go v1.29.2 // indirect
-	k8s.io/apiextensions-apiserver v0.36.1 // indirect
+	k8s.io/apiextensions-apiserver v0.36.2 // indirect
 	k8s.io/autoscaler/vertical-pod-autoscaler v1.6.0 // indirect
 	k8s.io/gengo/v2 v2.0.0-20251215205346-5ee0d033ba5b // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
