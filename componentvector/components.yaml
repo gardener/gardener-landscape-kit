@@ -20,7 +20,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/networking-calico
 - name: github.com/gardener/gardener-extension-networking-cilium
   sourceRepository: https://github.com/gardener/gardener-extension-networking-cilium
-  version: v1.48.1
+  version: v1.48.2
   resources:
     admissionCiliumRuntime:
       helmChart:
