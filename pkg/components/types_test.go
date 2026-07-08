@@ -248,13 +248,13 @@ var _ = Describe("Types", func() {
 		})
 
 		Describe("#GetRelativeBasePath", func() {
-			It("should return baseLink", func() {
+			It("should return baseLink joined with base.target", func() {
 				opts.Config.Repositories.Landscape.BaseLink = "./base"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("./base"))
+				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("base/content"))
 			})
 		})
 
@@ -272,7 +272,7 @@ var _ = Describe("Types", func() {
 		Describe("#GetRelativeBaseComponentPath", func() {
 			It("should return the relative path from a landscape component dir to the corresponding base component dir", func() {
 				opts.Config.Repositories.Landscape.Target = "landscapes/showroom"
-				opts.Config.Repositories.Landscape.BaseLink = "base/content"
+				opts.Config.Repositories.Landscape.BaseLink = "base"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
@@ -282,7 +282,7 @@ var _ = Describe("Types", func() {
 
 			It("should handle a single-segment landscape target", func() {
 				opts.Config.Repositories.Landscape.Target = "landscape"
-				opts.Config.Repositories.Landscape.BaseLink = "base/content"
+				opts.Config.Repositories.Landscape.BaseLink = "base"
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 
@@ -300,7 +300,7 @@ var _ = Describe("Types", func() {
 					TargetDirPath: "/path/to/target",
 					Config: &v1alpha1.LandscapeKitConfiguration{
 						Repositories: &v1alpha1.RepositoriesConfig{
-							Base: &v1alpha1.BaseRepositoryConfig{Target: "base"},
+							Base: &v1alpha1.BaseRepositoryConfig{Target: "./"},
 							Landscape: &v1alpha1.LandscapeRepositoryConfig{
 								URL: "https://github.com/example/repo.git",
 								Ref: v1alpha1.GitRepositoryRef{
@@ -329,6 +329,7 @@ var _ = Describe("Types", func() {
 
 			It("should collect both the base and landscape components.yaml overrides with the landscape one taking precedence", func() {
 				opts.TargetDirPath = "/path/to/target"
+				opts.Config.Repositories.Base.Target = "./"
 				opts.Config.Repositories.Landscape.BaseLink = "./baseDir"
 				opts.Config.Repositories.Landscape.Target = "./landscapeDir"
 

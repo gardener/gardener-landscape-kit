@@ -84,7 +84,8 @@ type LandscapeRepositoryConfig struct {
 	// Ref to check out (branch / tag / commit).
 	// +required
 	Ref GitRepositoryRef `json:"ref"`
-	// BaseLink is the path inside the landscape repository where the base repository's content is mounted (e.g. via a Git submodule).
+	// BaseLink is the path inside the landscape repository where the base repository's root is mounted (e.g. via a Git submodule).
+	// The base content is located at path.Join(baseLink, repositories.base.target).
 	// +required
 	BaseLink string `json:"baseLink"`
 	// Target is the landscape directory within the landscape repository.

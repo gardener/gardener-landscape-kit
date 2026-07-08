@@ -94,7 +94,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `url` _string_ | URL of the landscape Git repository (http/s or ssh). |  | Required: \{\} <br /> |
 | `ref` _[GitRepositoryRef](#gitrepositoryref)_ | Ref to check out (branch / tag / commit). |  | Required: \{\} <br /> |
-| `baseLink` _string_ | BaseLink is the path inside the landscape repository where the base repository's content is mounted (e.g. via a Git submodule). |  | Required: \{\} <br /> |
+| `baseLink` _string_ | BaseLink is the path inside the landscape repository where the base repository's root is mounted (e.g. via a Git submodule).<br />The base content is located at path.Join(baseLink, repositories.base.target). |  | Required: \{\} <br /> |
 | `target` _string_ | Target is the landscape directory within the landscape repository.<br />Defaults to "./" if not specified. |  | Optional: \{\} <br /> |
 
 
