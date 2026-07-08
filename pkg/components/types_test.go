@@ -181,6 +181,57 @@ var _ = Describe("Types", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
 			})
+
+			It("should apply configured base overrides on top of the in-repo components.yaml", func() {
+				baseYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.100.0
+`
+				overrideYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.999.0
+`
+				Expect(fs.WriteFile(componentVectorFile, []byte(baseYAML), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/extras/override.yaml", []byte(overrideYAML), 0644)).To(Succeed())
+				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"extras/override.yaml"}
+
+				componentOpts, err := NewOptions(opts, fs)
+				Expect(err).NotTo(HaveOccurred())
+				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				Expect(exists).To(BeTrue())
+				Expect(version).To(Equal("v1.999.0"))
+			})
+
+			It("should error when a configured override file is missing", func() {
+				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"extras/missing.yaml"}
+
+				_, err := NewOptions(opts, fs)
+				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/extras/missing.yaml" does not exist`)))
+			})
+
+			It("should apply multiple configured overrides in declared order", func() {
+				firstYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.500.0
+`
+				secondYAML := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.600.0
+`
+				Expect(fs.WriteFile("/path/to/target/first.yaml", []byte(firstYAML), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/second.yaml", []byte(secondYAML), 0644)).To(Succeed())
+				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"first.yaml", "second.yaml"}
+
+				componentOpts, err := NewOptions(opts, fs)
+				Expect(err).NotTo(HaveOccurred())
+				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				Expect(exists).To(BeTrue())
+				Expect(version).To(Equal("v1.600.0"))
+			})
 		})
 
 		Describe("#NewOptions", func() {
@@ -361,6 +412,55 @@ var _ = Describe("Types", func() {
 				ciliumVersion, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
 				Expect(exists).To(BeTrue())
 				Expect(ciliumVersion).To(Equal("v1.45.0"))
+			})
+
+			It("should layer configured base and landscape overrides on top of the in-repo files (landscape configured override wins)", func() {
+				opts.TargetDirPath = "/path/to/target"
+				opts.Config.Repositories.Landscape.BaseLink = "./baseDir"
+				opts.Config.Repositories.Landscape.Target = "./landscapeDir"
+
+				inRepoBase := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.100.0
+`
+				inRepoLandscape := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.200.0
+`
+				cfgBaseOverride := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.300.0
+`
+				cfgLandscapeOverride := `components:
+- name: github.com/gardener/gardener
+  sourceRepository: https://github.com/gardener/gardener
+  version: v1.400.0
+`
+				Expect(fs.WriteFile("/path/to/target/baseDir/components.yaml", []byte(inRepoBase), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/landscapeDir/components.yaml", []byte(inRepoLandscape), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/baseDir/overrides/base.yaml", []byte(cfgBaseOverride), 0644)).To(Succeed())
+				Expect(fs.WriteFile("/path/to/target/overrides/landscape.yaml", []byte(cfgLandscapeOverride), 0644)).To(Succeed())
+
+				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"overrides/base.yaml"}
+				opts.Config.Repositories.Landscape.ComponentsYamlOverrides = []string{"overrides/landscape.yaml"}
+
+				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				Expect(exists).To(BeTrue())
+				Expect(version).To(Equal("v1.400.0"))
+			})
+
+			It("should error when a configured landscape override is missing", func() {
+				opts.TargetDirPath = "/path/to/target"
+				opts.Config.Repositories.Landscape.ComponentsYamlOverrides = []string{"overrides/missing.yaml"}
+
+				_, err := NewLandscapeOptions(opts, fs)
+				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/overrides/missing.yaml" does not exist`)))
 			})
 		})
 	})

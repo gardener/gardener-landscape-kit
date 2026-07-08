@@ -122,7 +122,11 @@ func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) 
 	repoRoot := path.Clean(opts.TargetDirPath)
 	targetPath := path.Join(repoRoot, opts.Config.Repositories.Base.Target)
 
-	componentVector, err := loadComponentVector(opts, fs, path.Join(targetPath, utilscomponentvector.ComponentVectorFilename))
+	var sources []overrideSource
+	sources = append(sources, overrideSource{path: path.Join(targetPath, utilscomponentvector.ComponentVectorFilename)})
+	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsYamlOverrides, repoRoot)...)
+
+	componentVector, err := loadComponentVector(opts, fs, sources...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,15 +144,37 @@ func newOptions(opts *generateoptions.Options, fs afero.Afero, repoRoot, targetP
 	}
 }
 
-// loadComponentVector reads zero or more components.yaml override files (later paths override earlier ones) on top of the default component vector embedded in the binary.
-func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, overridePaths ...string) (utilscomponentvector.Interface, error) {
+// overrideSource is one components.yaml override input for loadComponentVector.
+type overrideSource struct {
+	// path is the on-disk location of the override file.
+	path string
+	// requireExists makes loadComponentVector return an error if the file is missing.
+	// Implicit in-repo lookups leave this false; explicitly configured overrides set it true.
+	requireExists bool
+}
+
+// configuredOverrides resolves configured override paths against repoRoot.
+// Returns sources marked as required-to-exist.
+func configuredOverrides(paths []string, repoRoot string) []overrideSource {
+	sources := make([]overrideSource, 0, len(paths))
+	for _, p := range paths {
+		sources = append(sources, overrideSource{path: path.Join(repoRoot, p), requireExists: true})
+	}
+	return sources
+}
+
+// loadComponentVector reads zero or more components.yaml override files (later sources override earlier ones) on top of the default component vector embedded in the binary.
+// Sources marked requireExists return an error when missing; others are silently skipped.
+func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, sources ...overrideSource) (utilscomponentvector.Interface, error) {
 	var customComponentVectors [][]byte
-	for _, p := range overridePaths {
-		componentsBytes, err := readCustomComponentsFile(opts, fs, p)
+	for _, s := range sources {
+		componentsBytes, err := readCustomComponentsFile(opts, fs, s)
 		if err != nil {
 			return nil, err
 		}
-		customComponentVectors = append(customComponentVectors, componentsBytes)
+		if componentsBytes != nil {
+			customComponentVectors = append(customComponentVectors, componentsBytes)
+		}
 	}
 	componentVector, err := utilscomponentvector.NewWithOverride(componentvector.DefaultComponentsYAML, customComponentVectors...)
 	if err != nil {
@@ -157,14 +183,19 @@ func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, override
 	return componentVector, nil
 }
 
-func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, filePath string) ([]byte, error) {
-	customBytes, err := fs.ReadFile(filePath)
+func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, src overrideSource) ([]byte, error) {
+	customBytes, err := fs.ReadFile(src.path)
 	if err == nil {
-		opts.Log.Info("Found custom component vector override file", "file", filePath)
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return nil, fmt.Errorf("failed to read component vector override file: %w", err)
+		opts.Log.Info("Found custom component vector override file", "file", src.path)
+		return customBytes, nil
 	}
-	return customBytes, nil
+	if errors.Is(err, os.ErrNotExist) {
+		if src.requireExists {
+			return nil, fmt.Errorf("configured component vector override file %q does not exist", src.path)
+		}
+		return nil, nil
+	}
+	return nil, fmt.Errorf("failed to read component vector override file: %w", err)
 }
 
 type landscapeOptions struct {
@@ -230,12 +261,15 @@ func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (Landsca
 	landscape := opts.Config.Repositories.Landscape
 	base := opts.Config.Repositories.Base
 
-	componentVector, err := loadComponentVector(opts, fs,
-		// Base components.yaml override, located at baseLink+base.target inside the landscape repo.
-		path.Join(repoRoot, landscape.BaseLink, base.Target, utilscomponentvector.ComponentVectorFilename),
-		// Landscape-specific components.yaml override.
-		path.Join(repoRoot, landscape.Target, utilscomponentvector.ComponentVectorFilename),
-	)
+	var sources []overrideSource
+	// Base components.yaml override, located at baseLink+base.target inside the landscape repo.
+	sources = append(sources, overrideSource{path: path.Join(repoRoot, landscape.BaseLink, base.Target, utilscomponentvector.ComponentVectorFilename)})
+	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsYamlOverrides, path.Join(repoRoot, landscape.BaseLink))...)
+	// Landscape-specific components.yaml override.
+	sources = append(sources, overrideSource{path: path.Join(repoRoot, landscape.Target, utilscomponentvector.ComponentVectorFilename)})
+	sources = append(sources, configuredOverrides(landscape.ComponentsYamlOverrides, repoRoot)...)
+
+	componentVector, err := loadComponentVector(opts, fs, sources...)
 	if err != nil {
 		return nil, err
 	}
