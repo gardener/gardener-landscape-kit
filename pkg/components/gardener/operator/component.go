@@ -96,13 +96,9 @@ func getTemplateValues(opts components.Options) (map[string]any, error) {
 		}, nil
 	}
 
-	ref, err := getOCIImageReferenceFromComponentVector("operator", cv)
+	repository, tag, err := getHelmChartRepoTagFromComponentVector("operator", cv)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get operator OCI image reference from component vector: %w", err)
-	}
-	repository, tag, err := helpers.SplitOCIImageReference(ref)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get operator Helm chart repository/tag from component vector: %w", err)
 	}
 
 	values, err := cv.TemplateValues()
@@ -134,18 +130,24 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
 }
 
-func getOCIImageReferenceFromComponentVector(name string, cv *utilscomponentvector.ComponentVector) (string, error) {
+func getHelmChartRepoTagFromComponentVector(name string, cv *utilscomponentvector.ComponentVector) (string, string, error) {
 	if cv == nil || len(cv.Resources) == 0 {
-		return "", fmt.Errorf("component vector or component resources are nil")
+		return "", "", fmt.Errorf("component vector or component resources are nil")
 	}
 
 	data, found := cv.Resources[name]
 	if !found {
-		return "", fmt.Errorf("no resources found for component %s", name)
+		return "", "", fmt.Errorf("no resources found for component %s", name)
 	}
-	ociImage := data.OCIImage
-	if ociImage == nil || ptr.Deref(ociImage.Ref, "") == "" {
-		return "", fmt.Errorf("OCI image reference not found for component %s", name)
+	if data.HelmChart == nil {
+		return "", "", fmt.Errorf("HelmChart not found for component %s", name)
 	}
-	return ptr.Deref(ociImage.Ref, ""), nil
+	if data.HelmChart.Repository != nil && data.HelmChart.Tag != nil {
+		return *data.HelmChart.Repository, *data.HelmChart.Tag, nil
+	}
+	ref := data.HelmChart.Ref
+	if ptr.Deref(ref, "") == "" {
+		return "", "", fmt.Errorf("HelmChart reference not found for component %s", name)
+	}
+	return helpers.SplitOCIImageReference(*ref)
 }

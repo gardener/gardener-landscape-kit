@@ -10,7 +10,7 @@ spec:
     operation: copy
   ref:
     tag: v1.2.3
-  url: oci://test.repo/path/gardener/operator
+  url: oci://test.repo/path/charts/gardener/operator
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
