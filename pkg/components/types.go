@@ -52,8 +52,7 @@ type LandscapeOptions interface {
 	GetLandscapeURL() string
 	// GetLandscapeRef returns the git reference of the landscape repository.
 	GetLandscapeRef() configv1alpha1.GitRepositoryRef
-	// GetRelativeBasePath returns the path inside the landscape repository
-	// where the base repository's generated content lives, i.e., landscape.baseLink.
+	// GetRelativeBasePath returns the landscape-side path to the base content, i.e. baseLink joined with base.target.
 	GetRelativeBasePath() string
 	// GetRelativeLandscapePath returns landscape.target — i.e. the
 	// landscape directory within the landscape repository.
@@ -172,6 +171,7 @@ type landscapeOptions struct {
 	Options
 
 	landscape  *configv1alpha1.LandscapeRepositoryConfig
+	baseTarget string
 	targetPath string
 }
 
@@ -191,9 +191,9 @@ func (l *landscapeOptions) GetLandscapeRef() configv1alpha1.GitRepositoryRef {
 	return l.landscape.Ref
 }
 
-// GetRelativeBasePath returns the path inside the landscape repository where the base repository's generated content lives.
+// GetRelativeBasePath returns the landscape-side path to the base content, i.e. landscape.baseLink joined with base.target.
 func (l *landscapeOptions) GetRelativeBasePath() string {
-	return l.landscape.BaseLink
+	return path.Join(l.landscape.BaseLink, l.baseTarget)
 }
 
 // GetRelativeLandscapePath returns landscape.target
@@ -206,15 +206,15 @@ func (l *landscapeOptions) GetRelativeLandscapePath() string {
 // directory to the corresponding base component directory, suitable for kustomize "resources:" entries.
 // Both endpoints are relative to the landscape repository root:
 // the landscape side at landscape.target/components/<dir>,
-// the base side at landscape.baseLink/components/<dir>.
+// the base side at path.Join(landscape.baseLink, base.target)/components/<dir>.
 func (l *landscapeOptions) GetRelativeBaseComponentPath(componentDir string) string {
 	// The leading "/" provides a guaranteed common anchor to filepath.Rel, which makes both inputs absolute paths.
 	from := path.Join("/", l.landscape.Target, DirName, componentDir)
-	to := path.Join("/", l.landscape.BaseLink, DirName, componentDir)
+	to := path.Join("/", l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
 	rel, err := filepath.Rel(from, to)
 	if err != nil {
 		// from/to are both absolute and well-formed; this should never error.
-		return path.Join(l.landscape.BaseLink, DirName, componentDir)
+		return path.Join(l.landscape.BaseLink, l.baseTarget, DirName, componentDir)
 	}
 	return rel
 }
@@ -223,15 +223,16 @@ func (l *landscapeOptions) GetRelativeBaseComponentPath(componentDir string) str
 //
 // opts.TargetDirPath is the on-disk root of the landscape repository.
 // Both the base and the landscape components.yaml override files are read from inside this repository:
-// the former at landscape.baseLink (where the base content is mounted), the latter at landscape.target.
+// the former at path.Join(landscape.baseLink, base.target) (where the base content is mounted), the latter at landscape.target.
 // The landscape override is applied last so it takes precedence.
 func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (LandscapeOptions, error) {
 	repoRoot := path.Clean(opts.TargetDirPath)
 	landscape := opts.Config.Repositories.Landscape
+	base := opts.Config.Repositories.Base
 
 	componentVector, err := loadComponentVector(opts, fs,
-		// Base components.yaml override, mounted inside the landscape repo at landscape.baseLink.
-		path.Join(repoRoot, landscape.BaseLink, utilscomponentvector.ComponentVectorFilename),
+		// Base components.yaml override, located at baseLink+base.target inside the landscape repo.
+		path.Join(repoRoot, landscape.BaseLink, base.Target, utilscomponentvector.ComponentVectorFilename),
 		// Landscape-specific components.yaml override.
 		path.Join(repoRoot, landscape.Target, utilscomponentvector.ComponentVectorFilename),
 	)
@@ -239,10 +240,11 @@ func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (Landsca
 		return nil, err
 	}
 
-	basePath := path.Join(repoRoot, landscape.BaseLink)
+	basePath := path.Join(repoRoot, landscape.BaseLink, base.Target)
 	return &landscapeOptions{
 		Options:    newOptions(opts, fs, repoRoot, basePath, componentVector),
 		landscape:  landscape,
-		targetPath: path.Clean(path.Join(repoRoot, landscape.Target)),
+		baseTarget: base.Target,
+		targetPath: path.Join(repoRoot, landscape.Target),
 	}, nil
 }

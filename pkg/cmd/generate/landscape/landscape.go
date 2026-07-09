@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -58,11 +59,19 @@ func validate(opts *options.Options) error {
 	if opts.Config.Repositories.Landscape == nil {
 		return fmt.Errorf("repositories.landscape config is required")
 	}
+	if opts.Config.Repositories.Base == nil {
+		return fmt.Errorf("repositories.base config is required for landscape generation")
+	}
+	if strings.TrimSpace(opts.Config.Repositories.Base.Target) == "" {
+		return fmt.Errorf("repositories.base.target must be set for landscape generation")
+	}
+
 	landscape := opts.Config.Repositories.Landscape
 
 	// opts.TargetDirPath is the on-disk landscape repository root.
-	// landscape.BaseLink is the landscape-side path to the base content.
-	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink)
+	// landscape.BaseLink is the mount point of the base repository root inside the landscape repo;
+	// base.target is joined to reach the actual base content.
+	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink, opts.Config.Repositories.Base.Target)
 
 	// Validate version compatibility
 	opts.Log.V(1).Info("Validating version compatibility", "pathToBase", pathToBase)
