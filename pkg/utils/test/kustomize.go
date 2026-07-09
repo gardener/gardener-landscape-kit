@@ -113,7 +113,6 @@ func KustomizeComponent(
 	// The base repo's root maps to /repo/baseDir on disk (TargetDirPath for base gen with base.Target = "./").
 	// landscape.BaseLink = "./baseDir" is the base repository root mount point inside the landscape repo.
 	// base.Target = "./" means the base content is at the repo root, so baseLink + base.target = "./baseDir".
-	// The join is a no-op and the on-disk mapping is unchanged compared to the legacy single-path convention.
 	cfg := &v1alpha1.LandscapeKitConfiguration{
 		Repositories: &v1alpha1.RepositoriesConfig{
 			Base: &v1alpha1.BaseRepositoryConfig{Target: "./"},
