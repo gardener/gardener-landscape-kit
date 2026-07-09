@@ -8,7 +8,7 @@ services:
     - GIT_USER_NAME
     - GIT_USER_PASSWORD
     container_name: glk-forgejo
-    image: codeberg.org/forgejo/forgejo:15.0.3
+    image: codeberg.org/forgejo/forgejo:15.0.4
     entrypoint: [ "/bin/sh", "/entrypoint.sh" ]
     healthcheck:
       test: [ "CMD-SHELL", "test -f /runner/config.yaml" ]
