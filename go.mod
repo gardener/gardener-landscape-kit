@@ -9,9 +9,9 @@ require (
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/elastic/crd-ref-docs v0.3.0
 	github.com/elliotchance/orderedmap/v3 v3.1.1
-	github.com/fluxcd/kustomize-controller/api v1.9.2
+	github.com/fluxcd/kustomize-controller/api v1.9.3
 	github.com/fluxcd/pkg/apis/meta v1.31.0
-	github.com/fluxcd/source-controller/api v1.9.2
+	github.com/fluxcd/source-controller/api v1.9.3
 	github.com/gardener/gardener v1.145.3
 	github.com/gardener/gardener/pkg/apis v1.145.3
 	github.com/go-logr/logr v1.4.3
