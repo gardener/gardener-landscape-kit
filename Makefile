@@ -50,7 +50,6 @@ docker-images:
 .PHONY: tidy
 tidy:
 	@GO111MODULE=on go mod tidy
-	@cd $(HACK_DIR)/tools/mod && go mod tidy
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
