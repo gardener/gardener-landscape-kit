@@ -62,6 +62,12 @@ The following dependencies have been updated:\n\
       groupName: "fluxcd-controllers",
       matchPackageNames: ['/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/'],
     },
+    {
+      // Flux controller OCI images are managed by hack/flux-gotk-generate.sh.
+      matchDatasources: ['docker'],
+      matchPackageNames: ['/^ghcr\\.io\\/fluxcd\\//'],
+      enabled: false,
+    },
     // The following list of dependencies is updated by `make generate` and restricts updates to type `patch`.
     // DO NOT EDIT THIS SECTION MANUALLY.
     {
