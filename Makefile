@@ -87,11 +87,11 @@ clean:
 	@bash $(GARDENER_HACK_DIR)/clean.sh ./pkg/...
 
 .PHONY: sast
-sast:
+sast: $(GOSEC)
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
-sast-report:
+sast-report: $(GOSEC)
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test

@@ -8,6 +8,4 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-source $HACK_DIR/tools/mod/aliases.sh;
-
 bash $GARDENER_HACK_DIR/sast.sh $@
