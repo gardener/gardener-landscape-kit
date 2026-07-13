@@ -20,7 +20,7 @@ ensure_gardener_dir() {
     existingVersion=$(cat gardener/local/VERSION || echo "")
   fi
 
-  if [[ "$existingVersion" == "$gardenerVersion" && -d gardener/pkg/apis ]]; then
+  if [[ "$existingVersion" == "$gardenerVersion" && -d gardener/pkg/apis && -f gardener/hack/tools/go.mod ]]; then
     echo "✅ Gardener repository already at version: ${gardenerVersion}, skipping copying."
   else
     rm -rf gardener
@@ -30,6 +30,9 @@ ensure_gardener_dir() {
     cp -r  $(go list -m -f "{{.Dir}}" github.com/gardener/gardener/pkg/apis) apis
     chmod -R u+w apis
     mv apis gardener/pkg/apis
+    cp -r $(go list -m -f "{{.Dir}}" github.com/gardener/gardener/hack/tools) hack-tools
+    chmod -R u+w hack-tools
+    mv hack-tools gardener/hack/tools
     chmod u+x gardener/hack/*.sh
     chmod u+x gardener/dev-setup/*.sh
     mkdir gardener/local

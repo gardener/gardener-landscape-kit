@@ -74,6 +74,10 @@ check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh check
 	@hack/check-component-yaml.sh
 
+.PHONY: update-skaffold-deps
+update-skaffold-deps:
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh update
+
 .PHONY: check-generate
 check-generate:
 	@bash $(GARDENER_HACK_DIR)/check-generate.sh $(REPO_ROOT)
