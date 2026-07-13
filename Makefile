@@ -2,16 +2,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-NAME                 := gardener-landscape-kit
-VERSION              := $(shell cat VERSION)
-EFFECTIVE_VERSION    := $(VERSION)-$(shell git rev-parse HEAD)
-REPO_ROOT            := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-HACK_DIR             := $(REPO_ROOT)/hack
-ENSURE_GARDENER_MOD  := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
-GARDENER_HACK_DIR    := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
-BUILD_DATE           ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-IMAGE_REGISTRY       ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
-TARGET_PLATFORMS     ?= linux/$(shell go env GOARCH)
+NAME                     := gardener-landscape-kit
+VERSION                  := $(shell cat VERSION)
+EFFECTIVE_VERSION        := $(VERSION)-$(shell git rev-parse HEAD)
+REPO_ROOT                := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+HACK_DIR                 := $(REPO_ROOT)/hack
+ENSURE_GARDENER_MOD      := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
+ENSURE_GARDENER_HACK_MOD := $(shell go get github.com/gardener/gardener/hack/tools@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener/hack/tools))
+GARDENER_HACK_DIR        := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
+BUILD_DATE               ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+IMAGE_REGISTRY           ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
+TARGET_PLATFORMS         ?= linux/$(shell go env GOARCH)
 
 export VERSION
 export LD_FLAGS              = $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
