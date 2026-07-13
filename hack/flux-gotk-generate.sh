@@ -72,6 +72,24 @@ update_resource "kustomizeController" "$KUSTOMIZE_IMAGE"
 update_resource "helmController" "$HELM_IMAGE"
 update_resource "notificationController" "$NOTIFICATION_IMAGE"
 
+## Update Flux controller images in .ocm/base-component.yaml
+echo "> Updating Flux controller images in .ocm/base-component.yaml"
+
+BASE_COMPONENT=$REPO_ROOT/.ocm/base-component.yaml
+
+update_ocm_resource() {
+  local name=$1
+  local image=$2
+  local tag="${image##*:}"
+  yq -i "(.resources[] | select(.name == \"${name}\") | .version) = \"${tag}\"" "$BASE_COMPONENT"
+  yq -i "(.resources[] | select(.name == \"${name}\") | .access.imageReference) = \"${image}\"" "$BASE_COMPONENT"
+}
+
+update_ocm_resource "source-controller" "$SOURCE_IMAGE"
+update_ocm_resource "kustomize-controller" "$KUSTOMIZE_IMAGE"
+update_ocm_resource "helm-controller" "$HELM_IMAGE"
+update_ocm_resource "notification-controller" "$NOTIFICATION_IMAGE"
+
 ## Replace actual images in gotk-components.yaml with template placeholders
 echo "> Replacing images in gotk-components.yaml with template placeholders"
 
