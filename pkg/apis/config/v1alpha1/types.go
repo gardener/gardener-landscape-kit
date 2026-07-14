@@ -105,6 +105,12 @@ type OCMConfig struct {
 	// IgnoreMissingComponents indicates whether to ignore missing components during resolution.
 	// +optional
 	IgnoreMissingComponents *bool `json:"ignoreMissingComponents,omitempty"`
+	// CustomRepositoryBase allows to override the OCI repository base for `relativeOciReferences`.
+	// The value must be a bare host (optionally with port and/or path) without a scheme prefix,
+	// e.g. "registry.example.com", "registry.example.com:5000", or "registry.example.com/myproject".
+	// If not specified, it defaults to the repository host the component descriptor was read from.
+	// +optional
+	CustomRepositoryBase *string `json:"customRepositoryBase,omitempty"`
 }
 
 // OCMComponent specifies a OCM component.

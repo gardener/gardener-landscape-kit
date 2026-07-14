@@ -19,6 +19,7 @@ import (
 	ocmruntime "ocm.software/open-component-model/bindings/go/runtime"
 	"sigs.k8s.io/yaml"
 
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
 )
 
@@ -54,7 +55,7 @@ var _ = Describe("Components", func() {
 		}
 	)
 	BeforeEach(func() {
-		c = NewComponents()
+		c = NewComponents(nil)
 	})
 
 	It("should produce correct image vector for extension-shoot-cert-service", func() {
@@ -508,6 +509,27 @@ scheduler:
 		}))
 	})
 
+	It("should resolve relativeOciReference resources against the repository host with custom repository base", func() {
+		customRepoBase := "myrepo.example.com:1234/custom/path"
+		c = NewComponents(&configv1alpha1.OCMConfig{CustomRepositoryBase: new(customRepoBase)})
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.2", ResourceTypeOCIImage, "my-image", "v0.0.2", "img/sub-path:v0.0.2@sha256:deadbeef")
+		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:     desc,
+			RepositoryHost: "registry.example.com:443",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		ref := ComponentReferenceFromNameAndVersion(desc.Component.Name, desc.Component.Version)
+		imageVector, err := c.GetImageVector(ref, false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(imageVector).To(ConsistOf(imagevector.ImageSource{
+			Name:       "my-image",
+			Repository: new(customRepoBase + "/img/sub-path"),
+			Tag:        new("v0.0.2@sha256:deadbeef"),
+			Version:    new("v0.0.2"),
+		}))
+	})
+
 	It("should fail for malformed relativeOciReference resources", func() {
 		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-ref", "v0.0.1", ResourceTypeOCIImage, "my-image", "v0.0.1", "no-tag-no-digest")
 		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
@@ -532,6 +554,25 @@ scheduler:
 			Version: "v0.0.1",
 			Type:    ResourceTypeHelmChart,
 			Value:   "registry.example.com:443/charts/my-chart:v0.0.1@sha256:deadbeef",
+		}))
+	})
+
+	It("should resolve relativeOciReference helmChart resources against the repository host with custom repository base", func() {
+		customRepoBase := "myrepo.example.com:1234/custom/path"
+		c = NewComponents(&configv1alpha1.OCMConfig{CustomRepositoryBase: new(customRepoBase)})
+		desc := buildRelativeOciDescriptor("example.com/comp-with-relative-helm-ref", "v0.0.1", ResourceTypeHelmChart, "my-chart", "v0.0.1", "charts/my-chart:v0.0.1@sha256:deadbeef")
+		_, err := c.AddComponentDependencies(&ociaccess.FindComponentVersionResult{
+			Descriptor:     desc,
+			RepositoryHost: "registry.example.com:443",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		ref := ComponentReferenceFromNameAndVersion(desc.Component.Name, desc.Component.Version)
+		Expect(c.GetResources(ref)).To(ConsistOf(Resource{
+			Name:    "my-chart",
+			Version: "v0.0.1",
+			Type:    ResourceTypeHelmChart,
+			Value:   customRepoBase + "/charts/my-chart:v0.0.1@sha256:deadbeef",
 		}))
 	})
 })
@@ -576,7 +617,8 @@ var _ = Describe("#resourceToImageSource", func() {
 				res.Name = "my-image"
 				res.Version = "1.2.3"
 
-				src, err := resourceToImageSource(res, repoHost)
+				c := NewComponents(nil)
+				src, err := c.resourceToImageSource(res, repoHost)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(src).NotTo(BeNil())
 				Expect(*src.Ref).To(Equal(expectedRef))

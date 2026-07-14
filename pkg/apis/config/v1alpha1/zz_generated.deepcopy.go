@@ -183,6 +183,11 @@ func (in *OCMConfig) DeepCopyInto(out *OCMConfig) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.CustomRepositoryBase != nil {
+		in, out := &in.CustomRepositoryBase, &out.CustomRepositoryBase
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 

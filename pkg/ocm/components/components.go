@@ -20,6 +20,7 @@ import (
 	accessv1 "ocm.software/open-component-model/bindings/go/oci/spec/access/v1"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
+	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
 	ocmimagevector "github.com/gardener/gardener-landscape-kit/pkg/ocm/imagevector"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm/ociaccess"
@@ -55,11 +56,12 @@ type Dependency struct {
 
 // Components manages a collection of components, their dependencies, and associated image vectors.
 type Components struct {
-	lock         sync.Mutex
-	dependents   map[ComponentReference]sets.Set[ComponentReference]
-	dependencies map[ComponentReference][]Dependency
-	mappedImages map[ComponentReference][]*ocmimagevector.ExtendedImageSource
-	resources    map[ComponentReference][]Resource
+	lock                 sync.Mutex
+	dependents           map[ComponentReference]sets.Set[ComponentReference]
+	dependencies         map[ComponentReference][]Dependency
+	mappedImages         map[ComponentReference][]*ocmimagevector.ExtendedImageSource
+	resources            map[ComponentReference][]Resource
+	customRepositoryBase *string
 
 	kubernetesComponent *ComponentReference
 }
@@ -88,12 +90,17 @@ type ResourcesOutput struct {
 }
 
 // NewComponents creates a new instance of Components.
-func NewComponents() *Components {
+func NewComponents(cfg *configv1alpha1.OCMConfig) *Components {
+	var customRepositoryBase *string
+	if cfg != nil {
+		customRepositoryBase = cfg.CustomRepositoryBase
+	}
 	return &Components{
-		dependents:   make(map[ComponentReference]sets.Set[ComponentReference]),
-		dependencies: make(map[ComponentReference][]Dependency),
-		mappedImages: make(map[ComponentReference][]*ocmimagevector.ExtendedImageSource),
-		resources:    make(map[ComponentReference][]Resource),
+		dependents:           make(map[ComponentReference]sets.Set[ComponentReference]),
+		dependencies:         make(map[ComponentReference][]Dependency),
+		mappedImages:         make(map[ComponentReference][]*ocmimagevector.ExtendedImageSource),
+		resources:            make(map[ComponentReference][]Resource),
+		customRepositoryBase: customRepositoryBase,
 	}
 }
 
@@ -155,7 +162,7 @@ func (c *Components) addComponent(result *ociaccess.FindComponentVersionResult) 
 func (c *Components) extractImageVectorFromResources(result *ociaccess.FindComponentVersionResult) ([]ocmimagevector.ExtendedImageSource, error) {
 	var vector []ocmimagevector.ExtendedImageSource
 	for _, res := range result.Descriptor.Component.Resources {
-		src, err := resourceToImageSource(res, result.RepositoryHost)
+		src, err := c.resourceToImageSource(res, result.RepositoryHost)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 		}
@@ -171,7 +178,7 @@ func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindCompon
 	for _, res := range result.Descriptor.Component.Resources {
 		switch res.Type {
 		case ResourceTypeOCIImage:
-			src, err := resourceToImageSource(res, result.RepositoryHost)
+			src, err := c.resourceToImageSource(res, result.RepositoryHost)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert resource %s to image source: %w", res.Name, err)
 			}
@@ -201,7 +208,7 @@ func (c *Components) extractResourcesFromDescriptor(result *ociaccess.FindCompon
 				resources = append(resources, resource)
 			}
 		case ResourceTypeHelmChart:
-			imageReference, err := extractImageReference(res, result.RepositoryHost)
+			imageReference, err := c.extractImageReference(res, result.RepositoryHost)
 			if err != nil {
 				return nil, err
 			}
@@ -648,6 +655,67 @@ func (c *Components) ComponentsCount() int {
 	return len(c.dependents)
 }
 
+func (c *Components) extractImageReference(res descriptorruntime.Resource, repositoryHost string) (string, error) {
+	repoBase := repositoryHost
+	if v := ptr.Deref(c.customRepositoryBase, ""); v != "" {
+		repoBase = v
+	}
+	return extractImageReference(res, repoBase)
+}
+
+func (c *Components) resourceToImageSource(res descriptorruntime.Resource, repoHost string) (*ocmimagevector.ExtendedImageSource, error) {
+	if res.Type != ResourceTypeOCIImage {
+		return nil, nil
+	}
+
+	var (
+		src ocmimagevector.ExtendedImageSource
+		err error
+	)
+	for _, value := range res.Labels {
+		switch value.Name {
+		case LabelNameImageVectorName:
+			src.Name, err = toString(value.Value)
+			src.ResourceName = res.Name
+		case labelNameImageVectorRepository:
+			src.Repository, err = toStringPtr(value.Value)
+		case labelNameImageVectorSourceRepository:
+			// ignore
+		case labelNameImageVectorTargetVersion:
+			src.TargetVersion, err = toStringPtr(value.Value)
+		case labelNameCveCategorisation:
+			src.Labels = append(src.Labels, value)
+		case LabelNameOriginalRef:
+			src.OriginalRef, err = toStringPtr(value.Value)
+		default:
+			// ignore
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert label %s to string: %w", value.Name, err)
+		}
+	}
+	if src.Name == "" {
+		src.Name = res.Name
+		src.LookupOnly = true
+	}
+	imageReference, err := c.extractImageReference(res, repoHost)
+	if err != nil {
+		return nil, err
+	}
+	src.Ref = &imageReference
+	repo, tag, err := helpers.SplitOCIImageReference(imageReference)
+	if err != nil {
+		return nil, fmt.Errorf("failed to split ref %s: %w", imageReference, err)
+	}
+	src.Repository = &repo
+	src.Tag = &tag
+	if res.Version != "" {
+		src.Version = &res.Version
+	}
+	src.Local = res.Relation == descriptorruntime.LocalRelation
+	return &src, nil
+}
+
 func referenceToComponentReferenceWithImageSource(ref descriptorruntime.Reference) (cref ComponentReference, img *ocmimagevector.ExtendedImageSource, err error) {
 	cref = ComponentReference(fmt.Sprintf("%s:%s", ref.Component, ref.Version))
 	for _, label := range ref.Labels {
@@ -698,65 +766,12 @@ func rawToImageSources(value json.RawMessage) ([]*ocmimagevector.ExtendedImageSo
 	return obj.Images, nil
 }
 
-func resourceToImageSource(res descriptorruntime.Resource, repoHost string) (*ocmimagevector.ExtendedImageSource, error) {
-	if res.Type != ResourceTypeOCIImage {
-		return nil, nil
-	}
-
-	var (
-		src ocmimagevector.ExtendedImageSource
-		err error
-	)
-	for _, value := range res.Labels {
-		switch value.Name {
-		case LabelNameImageVectorName:
-			src.Name, err = toString(value.Value)
-			src.ResourceName = res.Name
-		case labelNameImageVectorRepository:
-			src.Repository, err = toStringPtr(value.Value)
-		case labelNameImageVectorSourceRepository:
-			// ignore
-		case labelNameImageVectorTargetVersion:
-			src.TargetVersion, err = toStringPtr(value.Value)
-		case labelNameCveCategorisation:
-			src.Labels = append(src.Labels, value)
-		case LabelNameOriginalRef:
-			src.OriginalRef, err = toStringPtr(value.Value)
-		default:
-			// ignore
-		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert label %s to string: %w", value.Name, err)
-		}
-	}
-	if src.Name == "" {
-		src.Name = res.Name
-		src.LookupOnly = true
-	}
-	imageReference, err := extractImageReference(res, repoHost)
-	if err != nil {
-		return nil, err
-	}
-	src.Ref = &imageReference
-	repo, tag, err := helpers.SplitOCIImageReference(imageReference)
-	if err != nil {
-		return nil, fmt.Errorf("failed to split ref %s: %w", imageReference, err)
-	}
-	src.Repository = &repo
-	src.Tag = &tag
-	if res.Version != "" {
-		src.Version = &res.Version
-	}
-	src.Local = res.Relation == descriptorruntime.LocalRelation
-	return &src, nil
-}
-
-func extractImageReference(res descriptorruntime.Resource, repoHost string) (string, error) {
+func extractImageReference(res descriptorruntime.Resource, repoBase string) (string, error) {
 	var imageReference string
 	switch a := res.Access.(type) {
 	case *ociaccess.RelativeOciReference:
-		// Relative OCI references carry only a sub-path; prepend the component's repository host to form a fully-qualified image reference.
-		imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(a.Reference, "/")
+		// Relative OCI references carry only a sub-path; prepend the component's repository base to form a fully-qualified image reference.
+		imageReference = strings.TrimRight(repoBase, "/") + "/" + strings.TrimLeft(a.Reference, "/")
 	case *accessv1.OCIImage:
 		imageReference = a.ImageReference
 	default:
@@ -770,7 +785,7 @@ func extractImageReference(res descriptorruntime.Resource, repoHost string) (str
 		}
 		switch c := converted.(type) {
 		case *ociaccess.RelativeOciReference:
-			imageReference = strings.TrimRight(repoHost, "/") + "/" + strings.TrimLeft(c.Reference, "/")
+			imageReference = strings.TrimRight(repoBase, "/") + "/" + strings.TrimLeft(c.Reference, "/")
 		case *accessv1.OCIImage:
 			imageReference = c.ImageReference
 		default:

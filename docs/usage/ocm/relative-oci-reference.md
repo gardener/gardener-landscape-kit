@@ -31,10 +31,15 @@ The `reference` field must contain a path with a tag (`name:tag`), a digest (`na
 When GLK looks up a component version it remembers the host of the repository the descriptor was found in. While extracting resources from the descriptor, every `relativeOciReference` access is resolved into a fully-qualified image reference using the rule:
 
 ```
-<repository-host> + "/" + <reference>
+<repository-base> + "/" + <reference>
 ```
 
-The repository host is the hostname (with optional port) parsed from the repository URL — the scheme and any path are dropped.
+By default, the repository base is the hostname (with optional port) parsed from the repository URL — the scheme and any path are dropped. This can be overridden by setting `ocm.customRepositoryBase` in the GLK configuration, which replaces the auto-detected host for all `relativeOciReference` resolutions. This is useful when the component descriptor was mirrored to a registry whose URL differs from the original producer's host.
+
+The value must be a bare host without a scheme prefix, and may optionally include a port and/or a path prefix, for example:
+- `registry.example.com`
+- `registry.example.com:5000`
+- `registry.example.com/myproject`
 
 A leading `/` on the relative reference is also stripped to avoid producing a double slash. As a concrete example, given:
 

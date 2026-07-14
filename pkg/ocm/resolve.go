@@ -58,7 +58,7 @@ func ResolveOCMComponents(log logr.Logger, cfg *configv1alpha1.LandscapeKitConfi
 		outputDir:    outputDir,
 		debug:        debug,
 		workers:      workers,
-		components:   components.NewComponents(),
+		components:   components.NewComponents(cfg.OCM),
 		repos:        repos,
 	}
 

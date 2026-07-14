@@ -149,6 +149,7 @@ _Appears in:_
 | `rootComponent` _[OCMComponent](#ocmcomponent)_ | RootComponent is the configuration of the root component. |  |  |
 | `originalRefs` _boolean_ | OriginalRefs is a flag to output original image references in the image vectors. |  |  |
 | `ignoreMissingComponents` _boolean_ | IgnoreMissingComponents indicates whether to ignore missing components during resolution. |  | Optional: \{\} <br /> |
+| `customRepositoryBase` _string_ | CustomRepositoryBase allows to override the OCI repository base for `relativeOciReferences`.<br />The value must be a bare host (optionally with port and/or path) without a scheme prefix,<br />e.g. "registry.example.com", "registry.example.com:5000", or "registry.example.com/myproject".<br />If not specified, it defaults to the repository host the component descriptor was read from. |  | Optional: \{\} <br /> |
 
 
 #### RepositoriesConfig
