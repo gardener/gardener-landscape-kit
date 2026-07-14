@@ -144,6 +144,29 @@ func ValidateOCMConfig(conf *configv1alpha1.OCMConfig, fldPath *field.Path) fiel
 		}
 	}
 
+	if conf.CustomRepositoryBase != nil {
+		base := *conf.CustomRepositoryBase
+		basePath := fldPath.Child("customRepositoryBase")
+		switch {
+		case strings.TrimSpace(base) == "":
+			allErrs = append(allErrs, field.Invalid(basePath, base, "must not be empty"))
+		case strings.Contains(base, "://"):
+			allErrs = append(allErrs, field.Invalid(basePath, base, "must not contain a scheme prefix (e.g. 'registry.example.com', not 'https://registry.example.com')"))
+		default:
+			u, err := url.Parse("https://" + base)
+			switch {
+			case err != nil:
+				allErrs = append(allErrs, field.Invalid(basePath, base, "invalid url: "+err.Error()))
+			case u.Host == "":
+				allErrs = append(allErrs, field.Invalid(basePath, base, "must specify a host (e.g. 'registry.example.com')"))
+			case u.User != nil:
+				allErrs = append(allErrs, field.Invalid(basePath, base, "must not contain user info"))
+			case u.RawQuery != "" || u.Fragment != "":
+				allErrs = append(allErrs, field.Invalid(basePath, base, "must not contain a query or fragment"))
+			}
+		}
+	}
+
 	return allErrs
 }
 

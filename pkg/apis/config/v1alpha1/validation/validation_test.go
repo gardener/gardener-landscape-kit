@@ -515,4 +515,39 @@ func setupOCMConfigTests(test func(conf *v1alpha1.OCMConfig) field.ErrorList, ba
 			})),
 		))
 	})
+
+	DescribeTable("customRepositoryBase",
+		func(base string, valid bool) {
+			conf := &v1alpha1.OCMConfig{
+				Repositories: []string{"https://example.com/repo"},
+				RootComponent: v1alpha1.OCMComponent{
+					Name:    "example.com/org/component",
+					Version: "1.0.0",
+				},
+				CustomRepositoryBase: &base,
+			}
+
+			errList := test(conf)
+			if valid {
+				Expect(errList).To(BeEmpty())
+				return
+			}
+			Expect(errList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
+				"Type":     Equal(field.ErrorTypeInvalid),
+				"Field":    Equal(baseFldPath.Child("customRepositoryBase").String()),
+				"BadValue": Equal(base),
+			}))))
+		},
+		Entry("valid host", "registry.example.com", true),
+		Entry("valid host with port and path", "registry.example.com:1234/sub/path", true),
+		Entry("scheme prefix", "https://registry.example.com", false),
+		Entry("empty string", "", false),
+		Entry("whitespace only", "   ", false),
+		Entry("invalid url with control character", "host\x00name", false),
+		Entry("invalid port", "registry.example.com:notaport", false),
+		Entry("missing host", "/only/path", false),
+		Entry("contains user info", "user@registry.example.com", false),
+		Entry("contains query", "registry.example.com/path?q=1", false),
+		Entry("contains fragment", "registry.example.com#frag", false),
+	)
 }

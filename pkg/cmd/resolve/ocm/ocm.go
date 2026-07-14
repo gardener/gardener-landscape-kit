@@ -18,6 +18,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
+	configv1alpha1validation "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1/validation"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/ocm"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
@@ -100,6 +101,10 @@ func (o *Options) complete() error {
 func (o *Options) validate() error {
 	if o.Config == nil || o.Config.OCM == nil {
 		return fmt.Errorf("OCM configuration is required")
+	}
+
+	if errs := configv1alpha1validation.ValidateLandscapeKitConfiguration(o.Config); len(errs) > 0 {
+		return fmt.Errorf("invalid configuration: %v", errs.ToAggregate())
 	}
 
 	return nil
