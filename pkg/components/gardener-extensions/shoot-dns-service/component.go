@@ -6,12 +6,16 @@ package dnsservice
 
 import (
 	"embed"
+	"fmt"
 	"path"
 
 	"github.com/gardener/gardener/pkg/utils"
+	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/ocm/components/helpers"
+	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -88,9 +92,14 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	if err != nil {
 		return err
 	}
+	dnsControllerManagerImageValue, err := addDNSControllerManagerImageValue(renderValue)
+	if err != nil {
+		return err
+	}
 	values := utils.MergeMaps(renderValue, map[string]any{
-		"relativePathToBaseComponent": opts.GetRelativeBaseComponentPath(ComponentDirectory),
+		"dnsControllerManagerImage":   dnsControllerManagerImageValue,
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
+		"relativePathToBaseComponent": opts.GetRelativeBaseComponentPath(ComponentDirectory),
 	})
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
@@ -98,4 +107,32 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	}
 
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
+}
+
+func addDNSControllerManagerImageValue(renderValue map[string]any) (map[string]any, error) {
+	imageVectorOverwrite, ok := renderValue["imageVectorOverwrite"]
+	if !ok {
+		return nil, nil
+	}
+	data, ok := imageVectorOverwrite.(string)
+	if !ok {
+		return nil, fmt.Errorf("imageVectorOverwrite is not a string")
+	}
+	var obj utilscomponentvector.ImageVectorOverwrite
+	if err := yaml.Unmarshal([]byte(data), &obj); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal imageVectorOverwrite: %w", err)
+	}
+	for _, img := range obj.Images {
+		if img.Name == "dns-controller-manager" {
+			repository, tag, err := helpers.RepoTagFromRefOrParts(img.Repository, img.Tag, img.Ref)
+			if err != nil {
+				return nil, fmt.Errorf("invalid image %q: %w", img.Name, err)
+			}
+			return map[string]any{
+				"repository": repository,
+				"tag":        tag,
+			}, nil
+		}
+	}
+	return nil, nil
 }

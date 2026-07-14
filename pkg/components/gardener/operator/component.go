@@ -10,7 +10,6 @@ import (
 	"path"
 
 	"github.com/gardener/gardener/pkg/utils"
-	"k8s.io/utils/ptr"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
@@ -142,12 +141,9 @@ func getHelmChartRepoTagFromComponentVector(name string, cv *utilscomponentvecto
 	if data.HelmChart == nil {
 		return "", "", fmt.Errorf("HelmChart not found for component %s", name)
 	}
-	if data.HelmChart.Repository != nil && data.HelmChart.Tag != nil {
-		return *data.HelmChart.Repository, *data.HelmChart.Tag, nil
+	repository, tag, err := helpers.RepoTagFromRefOrParts(data.HelmChart.Repository, data.HelmChart.Tag, data.HelmChart.Ref)
+	if err != nil {
+		return "", "", fmt.Errorf("HelmChart reference not found for component %s: %w", name, err)
 	}
-	ref := data.HelmChart.Ref
-	if ptr.Deref(ref, "") == "" {
-		return "", "", fmt.Errorf("HelmChart reference not found for component %s", name)
-	}
-	return helpers.SplitOCIImageReference(*ref)
+	return repository, tag, nil
 }

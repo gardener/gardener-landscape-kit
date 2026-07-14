@@ -22,19 +22,15 @@ spec:
         ociRepository:
           ref: {{ .resources.shootDnsService.helmChart.ref }}
       {{- if (or .resources.shootDnsService.helmChart.imageMap .imageVectorOverwrite) }}
-      runtimeClusterValues:
-        {{- if .resources.shootDnsService.helmChart.imageMap }}
-{{ toIndentYAML 2 .resources.shootDnsService.helmChart.imageMap.gardenerExtensionShootDnsService | indent 8 }}
-        {{- end }}
-        {{- if .imageVectorOverwrite }}
-        imageVectorOverwrite: |
-{{ indent 10 .imageVectorOverwrite }}
-        {{- end }}
-      {{- end }}
-      {{- if (or .resources.shootDnsService.helmChart.imageMap .imageVectorOverwrite) }}
       values:
         {{- if .resources.shootDnsService.helmChart.imageMap }}
 {{ toIndentYAML 2 .resources.shootDnsService.helmChart.imageMap.gardenerExtensionShootDnsService | indent 8 }}
+        {{- end }}
+        {{- if .dnsControllerManagerImage }}
+        dnsControllerManager:
+          image:
+            repository: {{ .dnsControllerManagerImage.repository }}
+            tag: {{ .dnsControllerManagerImage.tag }}
         {{- end }}
         {{- if .imageVectorOverwrite }}
         imageVectorOverwrite: |
