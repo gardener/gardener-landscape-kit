@@ -11,7 +11,8 @@ kind: LandscapeKitConfiguration
 # repositories:
 #   base:
 #     target: ./
-#     componentsYamlOverrides:
+#     componentsFiles:
+#     - components.yaml
 #     - overrides/base-extras.yaml
 #   landscape:
 #     url: https://github.com/<org>/<repo>
@@ -19,7 +20,8 @@ kind: LandscapeKitConfiguration
 #       branch: <branch-name>
 #     baseLink: ./base
 #     target: ./
-#     componentsYamlOverrides:
+#     componentsFiles:
+#     - components.yaml
 #     - overrides/landscape-extras.yaml
 # components:
 #   exclude:

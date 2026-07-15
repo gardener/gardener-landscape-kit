@@ -116,15 +116,14 @@ func (o *options) GetMergeMode() configv1alpha1.MergeMode {
 // NewOptions returns a new Options instance for `glk generate base`.
 //
 // opts.TargetDirPath is treated as the on-disk root of the base repository being generated into.
-// The component target directory is repoRoot/<base.target>, which is also where the base components.yaml override is read from.
+// The component target directory is repoRoot/<base.target>.
 // For landscape generation, NewLandscapeOptions overrides this with landscape-specific paths.
 func NewOptions(opts *generateoptions.Options, fs afero.Afero) (Options, error) {
 	repoRoot := path.Clean(opts.TargetDirPath)
 	targetPath := path.Join(repoRoot, opts.Config.Repositories.Base.Target)
 
 	var sources []overrideSource
-	sources = append(sources, overrideSource{path: path.Join(targetPath, utilscomponentvector.ComponentVectorFilename)})
-	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsYamlOverrides, repoRoot)...)
+	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsFiles, repoRoot)...)
 
 	componentVector, err := loadComponentVector(opts, fs, sources...)
 	if err != nil {
@@ -253,7 +252,7 @@ func (l *landscapeOptions) GetRelativeBaseComponentPath(componentDir string) str
 // NewLandscapeOptions returns a new LandscapeOptions instance.
 //
 // opts.TargetDirPath is the on-disk root of the landscape repository.
-// Both the base and the landscape components.yaml override files are read from inside this repository:
+// Both the base and the landscape components files are read from inside this repository, as specified in the configuration:
 // the former at path.Join(landscape.baseLink, base.target) (where the base content is mounted), the latter at landscape.target.
 // The landscape override is applied last so it takes precedence.
 func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (LandscapeOptions, error) {
@@ -262,12 +261,8 @@ func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (Landsca
 	base := opts.Config.Repositories.Base
 
 	var sources []overrideSource
-	// Base components.yaml override, located at baseLink+base.target inside the landscape repo.
-	sources = append(sources, overrideSource{path: path.Join(repoRoot, landscape.BaseLink, base.Target, utilscomponentvector.ComponentVectorFilename)})
-	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsYamlOverrides, path.Join(repoRoot, landscape.BaseLink))...)
-	// Landscape-specific components.yaml override.
-	sources = append(sources, overrideSource{path: path.Join(repoRoot, landscape.Target, utilscomponentvector.ComponentVectorFilename)})
-	sources = append(sources, configuredOverrides(landscape.ComponentsYamlOverrides, repoRoot)...)
+	sources = append(sources, configuredOverrides(opts.Config.Repositories.Base.ComponentsFiles, path.Join(repoRoot, landscape.BaseLink))...)
+	sources = append(sources, configuredOverrides(landscape.ComponentsFiles, repoRoot)...)
 
 	componentVector, err := loadComponentVector(opts, fs, sources...)
 	if err != nil {

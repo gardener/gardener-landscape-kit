@@ -132,6 +132,8 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(componentVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
+
 				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
@@ -150,6 +152,8 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte("invalid: yaml: content: [[["), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
+
 				_, err = NewOptions(opts, fs)
 
 				Expect(err).To(MatchError("failed to create component vector: failed to parse override component vector: error converting YAML to JSON: yaml: mapping values are not allowed in this context"))
@@ -164,6 +168,8 @@ var _ = Describe("Types", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(partialVectorYAML), 0644)
 				Expect(err).NotTo(HaveOccurred())
 
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
+
 				componentOpts, err := NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
@@ -175,6 +181,8 @@ var _ = Describe("Types", func() {
 			It("should return the default component vector when an empty file is provided", func() {
 				err := fs.WriteFile(componentVectorFile, []byte(""), 0644)
 				Expect(err).NotTo(HaveOccurred())
+
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
 				componentOpts, err := NewOptions(opts, fs)
 
@@ -195,7 +203,7 @@ var _ = Describe("Types", func() {
 `
 				Expect(fs.WriteFile(componentVectorFile, []byte(baseYAML), 0644)).To(Succeed())
 				Expect(fs.WriteFile("/path/to/target/extras/override.yaml", []byte(overrideYAML), 0644)).To(Succeed())
-				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"extras/override.yaml"}
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml", "extras/override.yaml"}
 
 				componentOpts, err := NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
@@ -205,13 +213,13 @@ var _ = Describe("Types", func() {
 			})
 
 			It("should error when a configured override file is missing", func() {
-				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"extras/missing.yaml"}
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"extras/missing.yaml"}
 
 				_, err := NewOptions(opts, fs)
 				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/extras/missing.yaml" does not exist`)))
 			})
 
-			It("should apply multiple configured overrides in declared order", func() {
+			It("should apply multiple configured components files in declared order", func() {
 				firstYAML := `components:
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
@@ -224,7 +232,7 @@ var _ = Describe("Types", func() {
 `
 				Expect(fs.WriteFile("/path/to/target/first.yaml", []byte(firstYAML), 0644)).To(Succeed())
 				Expect(fs.WriteFile("/path/to/target/second.yaml", []byte(secondYAML), 0644)).To(Succeed())
-				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"first.yaml", "second.yaml"}
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"first.yaml", "second.yaml"}
 
 				componentOpts, err := NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
@@ -378,10 +386,10 @@ var _ = Describe("Types", func() {
 				Expect(result.GetRelativeLandscapePath()).To(Equal("landscape"))
 			})
 
-			It("should collect both the base and landscape components.yaml overrides with the landscape one taking precedence", func() {
+			It("should collect both the base and landscape components.yaml files with the landscape one taking precedence", func() {
 				opts.TargetDirPath = "/path/to/target"
-				opts.Config.Repositories.Base.Target = "./"
-				opts.Config.Repositories.Landscape.BaseLink = "./baseDir"
+				opts.Config.Repositories.Base.Target = "./baseDir"
+				opts.Config.Repositories.Landscape.BaseLink = "./"
 				opts.Config.Repositories.Landscape.Target = "./landscapeDir"
 
 				baseVectorYAML := `components:
@@ -400,6 +408,9 @@ var _ = Describe("Types", func() {
 				Expect(fs.WriteFile("/path/to/target/baseDir/components.yaml", []byte(baseVectorYAML), 0644)).To(Succeed())
 				Expect(fs.WriteFile("/path/to/target/landscapeDir/components.yaml", []byte(landscapeVectorYAML), 0644)).To(Succeed())
 
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"baseDir/components.yaml"}
+				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"landscapeDir/components.yaml"}
+
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 
@@ -416,7 +427,8 @@ var _ = Describe("Types", func() {
 
 			It("should layer configured base and landscape overrides on top of the in-repo files (landscape configured override wins)", func() {
 				opts.TargetDirPath = "/path/to/target"
-				opts.Config.Repositories.Landscape.BaseLink = "./baseDir"
+				opts.Config.Repositories.Base.Target = "./baseDir"
+				opts.Config.Repositories.Landscape.BaseLink = "./"
 				opts.Config.Repositories.Landscape.Target = "./landscapeDir"
 
 				inRepoBase := `components:
@@ -444,8 +456,8 @@ var _ = Describe("Types", func() {
 				Expect(fs.WriteFile("/path/to/target/baseDir/overrides/base.yaml", []byte(cfgBaseOverride), 0644)).To(Succeed())
 				Expect(fs.WriteFile("/path/to/target/overrides/landscape.yaml", []byte(cfgLandscapeOverride), 0644)).To(Succeed())
 
-				opts.Config.Repositories.Base.ComponentsYamlOverrides = []string{"overrides/base.yaml"}
-				opts.Config.Repositories.Landscape.ComponentsYamlOverrides = []string{"overrides/landscape.yaml"}
+				opts.Config.Repositories.Base.ComponentsFiles = []string{"baseDir/components.yaml", "baseDir/overrides/base.yaml"}
+				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"landscapeDir/components.yaml", "overrides/landscape.yaml"}
 
 				landscapeOpts, err := NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
@@ -457,7 +469,7 @@ var _ = Describe("Types", func() {
 
 			It("should error when a configured landscape override is missing", func() {
 				opts.TargetDirPath = "/path/to/target"
-				opts.Config.Repositories.Landscape.ComponentsYamlOverrides = []string{"overrides/missing.yaml"}
+				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"overrides/missing.yaml"}
 
 				_, err := NewLandscapeOptions(opts, fs)
 				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/overrides/missing.yaml" does not exist`)))

@@ -8,6 +8,9 @@ kind: LandscapeKitConfiguration
 #     version: <component-version>
 #   originalRefs: true
 repositories:
+  base:
+    componentsFiles:
+    - components.yaml
   landscape:
     url: http://gitops:testtest@git.local.gardener.cloud:6080/gitops/test-landscape.git
     ref:

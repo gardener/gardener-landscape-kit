@@ -77,7 +77,7 @@ func validateRepositories(repos *configv1alpha1.RepositoriesConfig, fldPath *fie
 		if path.IsAbs(repos.Base.Target) {
 			allErrs = append(allErrs, field.Invalid(basePath.Child("target"), repos.Base.Target, "target must be a relative path within the base repository"))
 		}
-		allErrs = append(allErrs, validateComponentsYamlOverrides(repos.Base.ComponentsYamlOverrides, basePath.Child("componentsYamlOverrides"))...)
+		allErrs = append(allErrs, validateComponentsFiles(repos.Base.ComponentsFiles, basePath.Child("componentsFiles"))...)
 	}
 
 	if repos.Landscape != nil {
@@ -106,13 +106,13 @@ func validateRepositories(repos *configv1alpha1.RepositoriesConfig, fldPath *fie
 			allErrs = append(allErrs, field.Invalid(lsPath.Child("target"), repos.Landscape.Target, "target must be a relative path within the landscape repository"))
 		}
 
-		allErrs = append(allErrs, validateComponentsYamlOverrides(repos.Landscape.ComponentsYamlOverrides, lsPath.Child("componentsYamlOverrides"))...)
+		allErrs = append(allErrs, validateComponentsFiles(repos.Landscape.ComponentsFiles, lsPath.Child("componentsFiles"))...)
 	}
 
 	return allErrs
 }
 
-func validateComponentsYamlOverrides(paths []string, fldPath *field.Path) field.ErrorList {
+func validateComponentsFiles(paths []string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	for i, p := range paths {
 		switch {

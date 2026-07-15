@@ -45,7 +45,6 @@ checkout_base_repo() {
 
 generate_base() {
   echo "🌱 Generating base"
-  glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_REPO_PATH}"
 
   local glk_dev_image=$(cat $SCRIPT_DIR/../glk-dev-image)
   if [ -z "$glk_dev_image" ]; then
@@ -57,6 +56,7 @@ generate_base() {
   local glk_dev_image_version=${glk_dev_image##*:}
 
   local workflows_path="${GLK_BASE_REPO_PATH}/.github/workflows"
+  mkdir -p "$workflows_path"
   cp "$SCRIPT_DIR/workflow-pr-post-change.yaml" "$workflows_path"
   sed -i "s|<COMMAND>|base|g" "$workflows_path/workflow-pr-post-change.yaml"
   sed -i "s|<BASE-PATH>|./|g" "$workflows_path/workflow-pr-post-change.yaml"
@@ -64,6 +64,8 @@ generate_base() {
 
   cp "$SCRIPT_DIR/components.yaml" "${GLK_BASE_REPO_PATH}/components.yaml"
   sed -i "s|<DEV-VERSION>|$glk_dev_image_version|g" "${GLK_BASE_REPO_PATH}/components.yaml"
+
+  glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_REPO_PATH}"
 
   cd "${GLK_BASE_REPO_PATH}"
   git add .

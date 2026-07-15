@@ -12,6 +12,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
+	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
@@ -19,23 +20,27 @@ import (
 type BuildComponentVectorFn func() (utilscomponentvector.ComponentVector, error)
 
 // CreateComponentsVectorFile creates a components vector YAML file in the given filesystem.
-func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) error {
+func CreateComponentsVectorFile(fs afero.Afero, build BuildComponentVectorFn) (func(*v1alpha1.LandscapeKitConfiguration), error) {
 	cv, err := build()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	components := &utilscomponentvector.Components{
 		Components: []*utilscomponentvector.ComponentVector{&cv},
 	}
 	content, err := yaml.Marshal(components)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	filePath := "/repo/baseDir/components.yaml"
 	if err := fs.WriteFile(filePath, content, 0o644); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return setBaseComponentsFile, nil
+}
+
+func setBaseComponentsFile(cfg *v1alpha1.LandscapeKitConfiguration) {
+	cfg.Repositories.Base.ComponentsFiles = append(cfg.Repositories.Base.ComponentsFiles, "components.yaml")
 }
 
 // ComponentVectorFactoryBuilder helps to build BuildComponentVectorFn instances.

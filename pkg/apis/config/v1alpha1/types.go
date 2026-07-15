@@ -74,10 +74,10 @@ type BaseRepositoryConfig struct {
 	// Defaults to "./" if not specified.
 	// +optional
 	Target string `json:"target,omitempty"`
-	// ComponentsYamlOverrides lists additional components.yaml files layered on top of the in-repo base components.yaml.
+	// ComponentsFiles lists additional components.yaml files layered on top of the in-repo base components.yaml.
 	// Applied in declared order; later entries win.
 	// +optional
-	ComponentsYamlOverrides []string `json:"componentsYamlOverrides,omitempty"`
+	ComponentsFiles []string `json:"componentsFiles,omitempty"`
 }
 
 // LandscapeRepositoryConfig configures the landscape repository.
@@ -96,10 +96,10 @@ type LandscapeRepositoryConfig struct {
 	// Defaults to "./" if not specified.
 	// +optional
 	Target string `json:"target,omitempty"`
-	// ComponentsYamlOverrides lists additional components.yaml files layered on top of the in-repo landscape components.yaml during `generate landscape`.
+	// ComponentsFiles lists additional components.yaml files layered on top of the in-repo landscape components.yaml during `generate landscape`.
 	// Applied in declared order; later entries win.
 	// +optional
-	ComponentsYamlOverrides []string `json:"componentsYamlOverrides,omitempty"`
+	ComponentsFiles []string `json:"componentsFiles,omitempty"`
 }
 
 // OCMConfig contains information about root component.
