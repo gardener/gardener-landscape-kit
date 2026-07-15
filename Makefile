@@ -2,16 +2,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-NAME                 := gardener-landscape-kit
-VERSION              := $(shell cat VERSION)
-EFFECTIVE_VERSION    := $(VERSION)-$(shell git rev-parse HEAD)
-REPO_ROOT            := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-HACK_DIR             := $(REPO_ROOT)/hack
-ENSURE_GARDENER_MOD  := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
-GARDENER_HACK_DIR    := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
-BUILD_DATE           ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-IMAGE_REGISTRY       ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
-TARGET_PLATFORMS     ?= linux/$(shell go env GOARCH)
+NAME                     := gardener-landscape-kit
+VERSION                  := $(shell cat VERSION)
+EFFECTIVE_VERSION        := $(VERSION)-$(shell git rev-parse HEAD)
+REPO_ROOT                := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+HACK_DIR                 := $(REPO_ROOT)/hack
+ENSURE_GARDENER_MOD      := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
+ENSURE_GARDENER_HACK_MOD := $(shell go get github.com/gardener/gardener/hack/tools@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener/hack/tools))
+GARDENER_HACK_DIR        := $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
+BUILD_DATE               ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+IMAGE_REGISTRY           ?= europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit
+TARGET_PLATFORMS         ?= linux/$(shell go env GOARCH)
 
 export VERSION
 export LD_FLAGS              = $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
@@ -49,7 +50,6 @@ docker-images:
 .PHONY: tidy
 tidy:
 	@GO111MODULE=on go mod tidy
-	@cd $(HACK_DIR)/tools/mod && go mod tidy
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
@@ -74,6 +74,10 @@ check: $(GOIMPORTS) $(GOLANGCI_LINT) $(YQ)
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh check
 	@hack/check-component-yaml.sh
 
+.PHONY: update-skaffold-deps
+update-skaffold-deps:
+	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) hack/skaffold-deps.sh update
+
 .PHONY: check-generate
 check-generate:
 	@bash $(GARDENER_HACK_DIR)/check-generate.sh $(REPO_ROOT)
@@ -83,11 +87,11 @@ clean:
 	@bash $(GARDENER_HACK_DIR)/clean.sh ./pkg/...
 
 .PHONY: sast
-sast:
+sast: $(GOSEC)
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev
 
 .PHONY: sast-report
-sast-report:
+sast-report: $(GOSEC)
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
