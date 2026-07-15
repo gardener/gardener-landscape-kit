@@ -23,22 +23,18 @@ spec:
       helm:
         ociRepository:
           ref: test-repo/path/charts/gardener/extensions/shoot-dns-service:v1.2.3
-      runtimeClusterValues:
-        image:
-          repository: test-repo/path/gardener/extensions/shoot-dns-service
-          tag: v1.2.3
-        imageVectorOverwrite: |
-          images:
-          - name: component1
-            ref: test.repo/path/component1:v1.2.3
       values:
+        dnsControllerManager:
+          image:
+            repository: test.repo/path/dns-controller-manager
+            tag: v4.5.6
         image:
           repository: test-repo/path/gardener/extensions/shoot-dns-service
           tag: v1.2.3
         imageVectorOverwrite: |
           images:
-          - name: component1
-            ref: test.repo/path/component1:v1.2.3
+          - name: dns-controller-manager
+            ref: test.repo/path/dns-controller-manager:v4.5.6
   resources:
   - autoEnable:
     - shoot

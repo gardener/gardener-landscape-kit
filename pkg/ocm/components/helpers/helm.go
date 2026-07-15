@@ -54,3 +54,16 @@ func SplitOCIImageReference(ref string) (string, string, error) {
 	}
 	return ref[:lastIndex+idx], ref[lastIndex+idx+1:], nil
 }
+
+// RepoTagFromRefOrParts resolves repository and tag from either explicit
+// repository+tag fields or by splitting a ref string. It mirrors the field
+// layout of imagevector.ImageSource and componentvector.HelmChart / OCIImage.
+func RepoTagFromRefOrParts(repository, tag, ref *string) (string, string, error) {
+	if repository != nil && tag != nil {
+		return *repository, *tag, nil
+	}
+	if ref != nil {
+		return SplitOCIImageReference(*ref)
+	}
+	return "", "", fmt.Errorf("neither repository+tag nor ref is set")
+}

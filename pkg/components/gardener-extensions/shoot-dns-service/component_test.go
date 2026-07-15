@@ -116,8 +116,8 @@ var _ = Describe("Component Generation", func() {
 					WithImageVectorOverwrite(componentvector.ImageVectorOverwrite{
 						Images: []imagevector.ImageSource{
 							{
-								Name: "component1",
-								Ref:  new("test.repo/path/component1:v1.2.3"),
+								Name: "dns-controller-manager",
+								Ref:  new("test.repo/path/dns-controller-manager:v4.5.6"),
 							},
 						},
 					}).
