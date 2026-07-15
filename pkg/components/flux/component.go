@@ -9,6 +9,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/gardener/gardener/pkg/utils"
+
+	"github.com/gardener/gardener-landscape-kit/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
@@ -81,12 +84,19 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	fluxPath := path.Join(opts.GetRelativeLandscapePath(), DirName)
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
-	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
+	cvValues, err := components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerLandscapeKit)
+	if err != nil {
+		return err
+	}
+
+	values := utils.MergeMaps(cvValues, map[string]any{
 		"repo_url":        opts.GetLandscapeURL(),
 		"repo_ref":        repoRef,
 		"flux_path":       fluxPath,
 		"components_path": path.Join(opts.GetRelativeLandscapePath(), components.DirName),
 	})
+
+	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, values)
 	if err != nil {
 		return err
 	}

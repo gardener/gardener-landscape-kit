@@ -2,6 +2,27 @@ components:
 - name: github.com/gardener/gardener-landscape-kit
   sourceRepository: https://github.com/gardener/gardener-landscape-kit
   version: v0.3.0-dev
+  resources:
+    fluxCLI:
+      ociImage:
+        repository: ghcr.io/fluxcd/flux-cli
+        tag: v2.8.8
+    helmController:
+      ociImage:
+        repository: ghcr.io/fluxcd/helm-controller
+        tag: v1.5.5
+    kustomizeController:
+      ociImage:
+        repository: ghcr.io/fluxcd/kustomize-controller
+        tag: v1.8.5
+    notificationController:
+      ociImage:
+        repository: ghcr.io/fluxcd/notification-controller
+        tag: v1.8.4
+    sourceController:
+      ociImage:
+        repository: ghcr.io/fluxcd/source-controller
+        tag: v1.8.5
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.146.3

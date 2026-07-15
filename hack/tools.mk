@@ -4,17 +4,16 @@
 
 GLK_PRETTIFY        := $(TOOLS_BIN_DIR)/prettify
 
-# renovate: datasource=github-releases depName=fluxcd/flux2
-FLUX_CLI_VERSION ?= v2.8.8
+FLUX_CLI_VERSION ?= $(shell grep -A3 'fluxCLI:' $(REPO_ROOT)/componentvector/components.yaml | sed -n 's/.*tag: //p')
 GLK_PRETTIFY_VERSION = $(shell git rev-parse HEAD)
 
 FLUX_CLI ?= $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH)/flux
 .PHONY: flux-cli
 flux-cli: $(FLUX_CLI)
 $(FLUX_CLI): $(TOOLS_DIR) $(call tool_version_file,$(FLUX_CLI),$(FLUX_CLI_VERSION))
-	curl -Lo $(FLUX_CLI).tar.gz https://github.com/fluxcd/flux2/releases/download/$(FLUX_CLI_VERSION)/flux_$(FLUX_CLI_VERSION:v%=%)_$(SYSTEM_NAME)_$(SYSTEM_ARCH).tar.gz
-	tar -zxvf $(FLUX_CLI).tar.gz -C $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH) flux
-	touch $(FLUX_CLI) && chmod +x $(FLUX_CLI) && rm $(FLUX_CLI).tar.gz
+	@mkdir -p $(dir $(FLUX_CLI))
+	@printf '#!/usr/bin/env bash\nset -e\ndocker run --rm -v "$(REPO_ROOT):$(REPO_ROOT)" ghcr.io/fluxcd/flux-cli:$(FLUX_CLI_VERSION) "$$@"\n' > $(FLUX_CLI)
+	@chmod +x $(FLUX_CLI)
 
 $(GLK_PRETTIFY): $(call tool_version_file,$(GLK_PRETTIFY),$(GLK_PRETTIFY_VERSION))
 	GOBIN=$(abspath $(TOOLS_BIN_DIR)) go install ./hack/tools/prettify

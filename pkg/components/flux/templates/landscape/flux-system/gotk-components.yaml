@@ -2560,7 +2560,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: ghcr.io/fluxcd/source-controller:v1.8.5
+        image: {{ .resources.sourceController.ociImage.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -3387,7 +3387,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: ghcr.io/fluxcd/kustomize-controller:v1.8.5
+        image: {{ .resources.kustomizeController.ociImage.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -4943,7 +4943,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: ghcr.io/fluxcd/helm-controller:v1.5.5
+        image: {{ .resources.helmController.ociImage.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -6383,7 +6383,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: ghcr.io/fluxcd/notification-controller:v1.8.4
+        image: {{ .resources.notificationController.ociImage.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
