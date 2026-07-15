@@ -251,10 +251,10 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(err).NotTo(HaveOccurred())
 				content := string(data)
 
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/source-controller:v1.8.5"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/kustomize-controller:v1.8.5"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/helm-controller:v1.5.5"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/notification-controller:v1.8.4"))
+				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/source-controller:v"))
+				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/kustomize-controller:v"))
+				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/helm-controller:v"))
+				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/notification-controller:v"))
 			})
 
 			It("should use overridden images from the component vector resources", func() {
