@@ -49,7 +49,7 @@ docker-images:
 
 .PHONY: tidy
 tidy:
-	@GO111MODULE=on go mod tidy
+	@go mod tidy
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
