@@ -12,8 +12,16 @@ FLUX_CLI ?= $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH)/flux
 flux-cli: $(FLUX_CLI)
 $(FLUX_CLI): $(TOOLS_DIR) $(call tool_version_file,$(FLUX_CLI),$(FLUX_CLI_VERSION))
 	@mkdir -p $(dir $(FLUX_CLI))
-	@printf '#!/usr/bin/env bash\nset -e\ndocker run --rm -v "$(REPO_ROOT):$(REPO_ROOT)" ghcr.io/fluxcd/flux-cli:$(FLUX_CLI_VERSION) "$$@"\n' > $(FLUX_CLI)
-	@chmod +x $(FLUX_CLI)
+	@# Prefer a lightweight docker wrapper, but fall back to downloading the flux CLI binary when docker is unavailable
+	@# (e.g. on the Renovate runner which has no docker daemon).
+	@if command -v docker >/dev/null 2>&1; then \
+		printf '#!/usr/bin/env bash\nset -e\ndocker run --rm -v "$(REPO_ROOT):$(REPO_ROOT)" ghcr.io/fluxcd/flux-cli:$(FLUX_CLI_VERSION) "$$@"\n' > $(FLUX_CLI); \
+		chmod +x $(FLUX_CLI); \
+	else \
+		curl -Lo $(FLUX_CLI).tar.gz https://github.com/fluxcd/flux2/releases/download/$(FLUX_CLI_VERSION)/flux_$(FLUX_CLI_VERSION:v%=%)_$(SYSTEM_NAME)_$(SYSTEM_ARCH).tar.gz; \
+		tar -zxvf $(FLUX_CLI).tar.gz -C $(dir $(FLUX_CLI)) flux; \
+		touch $(FLUX_CLI) && chmod +x $(FLUX_CLI) && rm $(FLUX_CLI).tar.gz; \
+	fi
 
 $(GLK_PRETTIFY): $(call tool_version_file,$(GLK_PRETTIFY),$(GLK_PRETTIFY_VERSION))
 	GOBIN=$(abspath $(TOOLS_BIN_DIR)) go install ./hack/tools/prettify
