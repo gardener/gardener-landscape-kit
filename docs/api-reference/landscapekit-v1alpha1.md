@@ -23,6 +23,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `target` _string_ | Target is the directory of the base content within the base repository.<br />Defaults to "./" if not specified. |  | Optional: \{\} <br /> |
+| `componentsFiles` _string array_ | ComponentsFiles lists additional components.yaml files layered on top of the in-repo base components.yaml.<br />Applied in declared order; later entries win. |  | Optional: \{\} <br /> |
 
 
 #### ComponentsConfiguration
@@ -96,6 +97,7 @@ _Appears in:_
 | `ref` _[GitRepositoryRef](#gitrepositoryref)_ | Ref to check out (branch / tag / commit). |  | Required: \{\} <br /> |
 | `baseLink` _string_ | BaseLink is the path inside the landscape repository where the base repository's root is mounted (e.g. via a Git submodule).<br />The base content is located at path.Join(baseLink, repositories.base.target). |  | Required: \{\} <br /> |
 | `target` _string_ | Target is the landscape directory within the landscape repository.<br />Defaults to "./" if not specified. |  | Optional: \{\} <br /> |
+| `componentsFiles` _string array_ | ComponentsFiles lists additional components.yaml files layered on top of the in-repo landscape components.yaml during `generate landscape`.<br />Applied in declared order; later entries win. |  | Optional: \{\} <br /> |
 
 
 #### MergeMode

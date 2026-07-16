@@ -11,12 +11,18 @@ kind: LandscapeKitConfiguration
 # repositories:
 #   base:
 #     target: ./
+#     componentsFiles:
+#     - components.yaml
+#     - custom-components.yaml
 #   landscape:
 #     url: https://github.com/<org>/<repo>
 #     ref:
 #       branch: <branch-name>
 #     baseLink: ./base
 #     target: ./
+#     componentsFiles:
+#     - components.yaml
+#     - custom-components.yaml
 # components:
 #   exclude:
 #   - component-name

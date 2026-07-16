@@ -101,8 +101,9 @@ var _ = Describe("Component Generation", func() {
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
 				component := NewComponent()
-				Expect(test.CreateComponentsVectorFile(fs, build)).To(Succeed())
-				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/os-gardenlinux")
+				optsFn, err := test.CreateComponentsVectorFile(fs, build)
+				Expect(err).ToNot(HaveOccurred())
+				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/os-gardenlinux", optsFn)
 				Expect(err).ToNot(HaveOccurred())
 				expected, err := os.ReadFile(expectedFile)
 				Expect(err).ToNot(HaveOccurred())

@@ -107,6 +107,7 @@ func KustomizeComponent(
 	fs afero.Afero,
 	component components.Interface,
 	relativeComponentPath string,
+	cfgFn ...func(*v1alpha1.LandscapeKitConfiguration),
 ) ([]byte, error) {
 	// Both repos share an on-disk root "/repo". The landscape repo's root is /repo (TargetDirPath for landscape gen),
 	// and its content lives at landscape.Target = "./landscapeDir".
@@ -115,12 +116,17 @@ func KustomizeComponent(
 	// base.Target = "./" means the base content is at the repo root, so baseLink + base.target = "./baseDir".
 	cfg := &v1alpha1.LandscapeKitConfiguration{
 		Repositories: &v1alpha1.RepositoriesConfig{
-			Base: &v1alpha1.BaseRepositoryConfig{Target: "./"},
+			Base: &v1alpha1.BaseRepositoryConfig{
+				Target: "./",
+			},
 			Landscape: &v1alpha1.LandscapeRepositoryConfig{
 				BaseLink: "./baseDir",
 				Target:   "./landscapeDir",
 			},
 		},
+	}
+	for _, fn := range cfgFn {
+		fn(cfg)
 	}
 	v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(cfg)
 
