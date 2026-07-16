@@ -52,7 +52,10 @@ var _ = Describe("Flux Component Generation", func() {
 		opts   components.LandscapeOptions
 	)
 
-	buildOpts := func() components.LandscapeOptions {
+	buildOpts := func(optsFn ...func(*v1alpha1.LandscapeKitConfiguration)) components.LandscapeOptions {
+		for _, fn := range optsFn {
+			fn(config)
+		}
 		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(config)
 		o, err := components.NewLandscapeOptions(
 			&generateoptions.Options{
@@ -272,7 +275,9 @@ notificationController:
   ociImage:
     ref: my.registry.io/fluxcd/notification-controller:v9.9.9
 `)
-				opts = buildOpts()
+				opts = buildOpts(func(conf *v1alpha1.LandscapeKitConfiguration) {
+					conf.Repositories.Landscape.ComponentsFiles = []string{"components.yaml"}
+				})
 
 				component := NewComponent()
 				Expect(component.GenerateLandscape(opts)).To(Succeed())

@@ -216,7 +216,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"extras/missing.yaml"}
 
 				_, err := NewOptions(opts, fs)
-				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/extras/missing.yaml" does not exist`)))
+				Expect(err).To(MatchError(ContainSubstring(`failed to read component vector override file: open /path/to/target/extras/missing.yaml: file does not exist`)))
 			})
 
 			It("should apply multiple configured components files in declared order", func() {
@@ -472,7 +472,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"overrides/missing.yaml"}
 
 				_, err := NewLandscapeOptions(opts, fs)
-				Expect(err).To(MatchError(ContainSubstring(`configured component vector override file "/path/to/target/overrides/missing.yaml" does not exist`)))
+				Expect(err).To(MatchError(ContainSubstring(`failed to read component vector override file: open /path/to/target/overrides/missing.yaml: file does not exist`)))
 			})
 		})
 	})

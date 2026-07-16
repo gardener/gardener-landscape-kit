@@ -6,9 +6,7 @@ package components
 
 import (
 	_ "embed"
-	"errors"
 	"fmt"
-	"os"
 	"path"
 	"path/filepath"
 
@@ -147,9 +145,6 @@ func newOptions(opts *generateoptions.Options, fs afero.Afero, repoRoot, targetP
 type overrideSource struct {
 	// path is the on-disk location of the override file.
 	path string
-	// requireExists makes loadComponentVector return an error if the file is missing.
-	// Implicit in-repo lookups leave this false; explicitly configured overrides set it true.
-	requireExists bool
 }
 
 // configuredOverrides resolves configured override paths against repoRoot.
@@ -157,7 +152,7 @@ type overrideSource struct {
 func configuredOverrides(paths []string, repoRoot string) []overrideSource {
 	sources := make([]overrideSource, 0, len(paths))
 	for _, p := range paths {
-		sources = append(sources, overrideSource{path: path.Join(repoRoot, p), requireExists: true})
+		sources = append(sources, overrideSource{path: path.Join(repoRoot, p)})
 	}
 	return sources
 }
@@ -167,7 +162,7 @@ func configuredOverrides(paths []string, repoRoot string) []overrideSource {
 func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, sources ...overrideSource) (utilscomponentvector.Interface, error) {
 	var customComponentVectors [][]byte
 	for _, s := range sources {
-		componentsBytes, err := readCustomComponentsFile(opts, fs, s)
+		componentsBytes, err := readComponentsFile(opts, fs, s)
 		if err != nil {
 			return nil, err
 		}
@@ -182,17 +177,11 @@ func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, sources 
 	return componentVector, nil
 }
 
-func readCustomComponentsFile(opts *generateoptions.Options, fs afero.Afero, src overrideSource) ([]byte, error) {
+func readComponentsFile(opts *generateoptions.Options, fs afero.Afero, src overrideSource) ([]byte, error) {
 	customBytes, err := fs.ReadFile(src.path)
 	if err == nil {
 		opts.Log.Info("Found custom component vector override file", "file", src.path)
 		return customBytes, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		if src.requireExists {
-			return nil, fmt.Errorf("configured component vector override file %q does not exist", src.path)
-		}
-		return nil, nil
 	}
 	return nil, fmt.Errorf("failed to read component vector override file: %w", err)
 }

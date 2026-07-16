@@ -13,7 +13,7 @@ kind: LandscapeKitConfiguration
 #     target: ./
 #     componentsFiles:
 #     - components.yaml
-#     - overrides/base-extras.yaml
+#     - custom-components.yaml
 #   landscape:
 #     url: https://github.com/<org>/<repo>
 #     ref:
@@ -22,7 +22,7 @@ kind: LandscapeKitConfiguration
 #     target: ./
 #     componentsFiles:
 #     - components.yaml
-#     - overrides/landscape-extras.yaml
+#     - custom-components.yaml
 # components:
 #   exclude:
 #   - component-name

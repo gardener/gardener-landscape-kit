@@ -40,6 +40,7 @@ versionConfig:
 ### Custom Component Vector
 
 You can pin or override component versions by placing a `components.yaml` file in your base or landscape directory and specifying its location in the config (`componentsFiles`).
+The components files are merged in the order they are specified, with later files overriding earlier ones. Landscape files override base files.
 This file can also be created (or updated) automatically by running the `resolve plain` command, pointing `--target-dir` at the respective directory:
 
 ```bash
