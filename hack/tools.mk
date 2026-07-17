@@ -12,9 +12,10 @@ FLUX_CLI ?= $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH)/flux
 flux-cli: $(FLUX_CLI)
 $(FLUX_CLI): $(TOOLS_DIR) $(call tool_version_file,$(FLUX_CLI),$(FLUX_CLI_VERSION))
 	@mkdir -p $(dir $(FLUX_CLI))
-	@# Prefer a lightweight docker wrapper, but fall back to downloading the flux CLI binary when docker is unavailable
-	@# (e.g. on the Renovate runner which has no docker daemon).
-	@if command -v docker >/dev/null 2>&1; then \
+	@# Prefer a lightweight docker wrapper, but fall back to downloading the flux CLI binary when docker is unavailable.
+	@# Note: the Renovate runner ships the docker binary but has no running daemon, so we probe for a reachable daemon
+	@# (docker info) instead of merely checking for the binary (command -v docker).
+	@if docker info >/dev/null 2>&1; then \
 		printf '#!/usr/bin/env bash\nset -e\ndocker run --rm -v "$(REPO_ROOT):$(REPO_ROOT)" ghcr.io/fluxcd/flux-cli:$(FLUX_CLI_VERSION) "$$@"\n' > $(FLUX_CLI); \
 		chmod +x $(FLUX_CLI); \
 	else \
