@@ -117,7 +117,7 @@ generate-ocm-testdata:
 	@go run $(HACK_DIR)/tools/ocm-testdata-generator -config $(REPO_ROOT)/pkg/ocm/components/testdata/config.yaml
 
 .PHONY: git-server-up
-git-server-up:
+git-server-up: $(YQ)
 	@bash $(REPO_ROOT)/dev-setup/git-server/git-server-up.sh
 
 .PHONY: git-server-down
