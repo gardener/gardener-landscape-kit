@@ -6,23 +6,23 @@ components:
     fluxCLI:
       ociImage:
         repository: ghcr.io/fluxcd/flux-cli
-        tag: v2.8.8
+        tag: v2.9.2
     helmController:
       ociImage:
         repository: ghcr.io/fluxcd/helm-controller
-        tag: v1.5.5
+        tag: v1.6.2
     kustomizeController:
       ociImage:
         repository: ghcr.io/fluxcd/kustomize-controller
-        tag: v1.8.5
+        tag: v1.9.3
     notificationController:
       ociImage:
         repository: ghcr.io/fluxcd/notification-controller
-        tag: v1.8.4
+        tag: v1.9.2
     sourceController:
       ociImage:
         repository: ghcr.io/fluxcd/source-controller
-        tag: v1.8.5
+        tag: v1.9.3
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.146.3
