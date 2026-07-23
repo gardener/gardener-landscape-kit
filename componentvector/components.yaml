@@ -6,7 +6,7 @@ components:
     fluxCLI:
       ociImage:
         repository: ghcr.io/fluxcd/flux-cli
-        tag: v2.9.2
+        tag: v2.9.3
     helmController:
       ociImage:
         repository: ghcr.io/fluxcd/helm-controller
