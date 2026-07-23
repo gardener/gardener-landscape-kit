@@ -8,7 +8,7 @@ require (
 	codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3 v3.0.0
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/elliotchance/orderedmap/v3 v3.1.1
-	github.com/fluxcd/kustomize-controller/api v1.9.3
+	github.com/fluxcd/kustomize-controller/api v1.9.4
 	github.com/fluxcd/pkg/apis/meta v1.31.0
 	github.com/fluxcd/source-controller/api v1.9.3
 	github.com/gardener/gardener v1.147.1
