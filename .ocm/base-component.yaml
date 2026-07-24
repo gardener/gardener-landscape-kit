@@ -8,26 +8,26 @@ main-source:
           we use gosec for sast scanning. See attached log.
 resources:
   - name: flux-cli
-    version: v2.9.2
+    version: v2.9.3
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.2
+      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.3
   - name: helm-controller
-    version: v1.6.2
+    version: v1.6.3
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.2
+      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.3
   - name: kustomize-controller
-    version: v1.9.3
+    version: v1.9.4
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.3
+      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.4
   - name: notification-controller
     version: v1.9.2
     type: ociImage

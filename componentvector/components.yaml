@@ -6,15 +6,15 @@ components:
     fluxCLI:
       ociImage:
         repository: ghcr.io/fluxcd/flux-cli
-        tag: v2.9.2
+        tag: v2.9.3
     helmController:
       ociImage:
         repository: ghcr.io/fluxcd/helm-controller
-        tag: v1.6.2
+        tag: v1.6.3
     kustomizeController:
       ociImage:
         repository: ghcr.io/fluxcd/kustomize-controller
-        tag: v1.9.3
+        tag: v1.9.4
     notificationController:
       ociImage:
         repository: ghcr.io/fluxcd/notification-controller
