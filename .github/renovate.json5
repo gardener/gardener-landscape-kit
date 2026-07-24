@@ -7,7 +7,7 @@
   labels: ['kind/enhancement'],
   postUpgradeTasks: {
     commands: ['make generate MODE=sequential'],
-    fileFilters: ['.github/**', 'pkg/**', 'docs/**'],
+    fileFilters: ['.github/**', 'pkg/**', 'docs/**', 'componentvector/components.yaml', '.ocm/base-components.yaml'],
   },
   baseBranchPatterns: [
     'main',
