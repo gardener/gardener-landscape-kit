@@ -52,6 +52,14 @@ on:
         required: false
         type: string
         default: ''
+      fork-mode:
+        description: >
+          When true, the workflow runs in read-only fork mode: it generates but does not push.
+          If the generation produces a diff, the job fails with a descriptive message and posts
+          a failure status to the PR. If there is no diff, it posts a success status.
+        required: false
+        type: boolean
+        default: false
       oci-auth-username:
         description: 'OCI registry username for authentication (optional)'
         required: false
@@ -76,7 +84,7 @@ jobs:
       with:
         submodules: 'true'
         token: ${{ secrets.GITHUB_TOKEN }}
-        ref: ${{ github.event.pull_request.head.ref || github.ref }}
+        ref: ${{ github.event.pull_request.head.sha || github.ref }}
         repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
     - name: Set up Git
@@ -104,6 +112,7 @@ jobs:
       run: ${{ inputs.post-generate-commands }}
 
     - name: Commit and push changes
+      if: ${{ !inputs.fork-mode }}
       id: push
       run: |
         git add .
@@ -117,10 +126,49 @@ jobs:
         fi
 
     - name: Set status on pushed commit
-      if: ${{ inputs.set-commit-status && steps.push.outputs.pushed == 'true' }}
+      if: ${{ !inputs.fork-mode && inputs.set-commit-status && steps.push.outputs.pushed == 'true' }}
       run: |
-        curl -sfS -X POST \
+        curl -sS -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
           "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ steps.push.outputs.sha }}" \
-          -d "{\"state\":\"success\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"GLK generation completed\"}"
+          -d "{\"state\":\"success\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"GLK generation completed\"}" || true
+
+    - name: Check for diff (fork mode)
+      if: ${{ inputs.fork-mode }}
+      id: fork-diff
+      run: |
+        git add .
+        if git diff --cached --quiet; then
+          echo "has-diff=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "has-diff=true" >> "$GITHUB_OUTPUT"
+          echo "### GLK generation produced uncommitted changes" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          git diff --cached --stat >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: Post fork-mode status to PR
+      if: ${{ inputs.fork-mode && inputs.set-commit-status }}
+      run: |
+        if [[ "${{ steps.fork-diff.outputs.has-diff }}" == "true" ]]; then
+          state="failure"
+          description="GLK generation produced a diff. Open PR from the upstream repo (not a fork) or run 'glk generate base -c base/glk-config.yaml ./' manually."
+        else
+          state="success"
+          description="GLK generation produced no diff."
+        fi
+        curl -sS -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }}" \
+          -d "{\"state\":\"${state}\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"${description}\"}" || true
+
+    - name: Fail if fork diff detected
+      if: ${{ inputs.fork-mode && steps.fork-diff.outputs.has-diff == 'true' }}
+      run: |
+        echo "GLK generation produced a diff that cannot be pushed to a fork."
+        echo "Please either open this PR from a branch in the upstream repository,"
+        echo "or run 'glk generate' locally and commit the results before opening the PR."
+        exit 1
