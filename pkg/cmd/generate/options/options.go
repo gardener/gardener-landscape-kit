@@ -64,6 +64,10 @@ func (o *Options) Complete(args []string) error {
 	}
 	o.TargetDirPath = args[0]
 
+	if o.ConfigFilePath == "" {
+		return fmt.Errorf("config option is required, use -c/--config to specify the path to the configuration file")
+	}
+
 	data, err := os.ReadFile(o.ConfigFilePath) // #nosec G304 -- Trusted file from CLI argument.
 	if err != nil {
 		return fmt.Errorf("error reading config file: %w", err)
