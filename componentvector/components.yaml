@@ -68,7 +68,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/public/charts/gardener/extensions/os-gardenlinux
 - name: github.com/gardener/gardener-extension-provider-aws
   sourceRepository: https://github.com/gardener/gardener-extension-provider-aws
-  version: v1.72.1
+  version: v1.73.0
   resources:
     admissionAwsRuntime:
       helmChart:
