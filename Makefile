@@ -154,6 +154,8 @@ ifndef ARTIFACTS
 endif
 
 e2e-prepare: export BUILD_OUTPUT_FILE=$(TOOLS_BIN_DIR)
+e2e-prepare: export SOURCE_DIGEST=$(shell find $(shell yq '.build.artifacts[0].ko.dependencies.paths[]' $(REPO_ROOT)/dev-setup/skaffold.yaml | tr '\n' ' ') -type f | sort | xargs sha256sum | sha256sum | cut -c1-8)
+e2e-prepare: export LD_FLAGS=$(shell EFFECTIVE_VERSION=$(VERSION)-$(SOURCE_DIGEST) bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
 
 .PHONY: e2e-prepare
 e2e-prepare: build $(SKAFFOLD) $(HELM) $(KUBECTL) $(YQ) $(GLK_PRETTIFY)

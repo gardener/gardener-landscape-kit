@@ -70,13 +70,11 @@ build:
               - "echo $SKAFFOLD_IMAGE > dev-setup/glk-dev-image"
   tagPolicy:
     customTemplate:
-      template: '{{.version}}-{{.sha}}-{{.digest}}'
+      template: '{{.version}}-{{.digest}}'
       components:
         - name: version
           envTemplate:
             template: '{{.VERSION}}'
-        - name: sha
-          gitCommit:
-            variant: AbbrevCommitSha
         - name: digest
-          inputDigest: {}
+          envTemplate:
+            template: '{{.SOURCE_DIGEST}}'
