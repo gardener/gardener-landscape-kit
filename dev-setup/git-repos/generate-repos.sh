@@ -67,6 +67,9 @@ generate_base() {
 
   glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_REPO_PATH}"
 
+  # Secrets configuration in the reusable workflow is not supported by Forgejo, see https://codeberg.org/forgejo/forgejo/issues/6069.
+  yq -i 'del(.on.workflow_call.secrets)' "${GLK_BASE_REPO_PATH}/.github/workflows/glk.yaml"
+
   cd "${GLK_BASE_REPO_PATH}"
   git add .
   git commit -m "Generate base" || echo "No changes to commit"
@@ -97,6 +100,10 @@ generate_landscape() {
   sed -i "s|<IMAGE-BASE>|$glk_dev_image_base|g" "$workflows_path/workflow-pr-post-change.yaml"
 
   cd "${GLK_LANDSCAPE_REPO_PATH}"
+
+  # Secrets configuration in the reusable workflow is not supported by Forgejo, see https://codeberg.org/forgejo/forgejo/issues/6069.
+  yq -i 'del(.on.workflow_call.secrets)' "${GLK_BASE_REPO_PATH}/.github/workflows/glk.yaml"
+
   git add .
   git commit -m "Generate test landscape" || echo "No changes to commit"
   git push
