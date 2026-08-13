@@ -21,6 +21,12 @@ import (
 	. "github.com/gardener/gardener-landscape-kit/pkg/components/github"
 )
 
+func mustNewComponent() components.Interface {
+	c, err := NewComponent()
+	Expect(err).NotTo(HaveOccurred())
+	return c
+}
+
 var _ = Describe("Component Generation", func() {
 	var (
 		memFs        afero.Afero
@@ -38,7 +44,7 @@ var _ = Describe("Component Generation", func() {
 
 	Describe("#Name", func() {
 		It("returns 'github'", func() {
-			Expect(NewComponent().Name()).To(Equal("github"))
+			Expect(mustNewComponent().Name()).To(Equal("github"))
 		})
 	})
 
@@ -59,7 +65,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("writes both .github files at the repository root", func() {
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				for _, p := range []string{
 					"/repo/.github/actions/glk/action.yaml",
@@ -72,7 +78,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("writes only the expected subdirectories under .github/", func() {
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				dirEntries, err := afero.ReadDir(memFs, "/repo/.github")
 				Expect(err).NotTo(HaveOccurred())
@@ -85,7 +91,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("does not create a .glk shadow tree under the target directory", func() {
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				exists, err := memFs.DirExists("/repo/base/.glk")
 				Expect(err).NotTo(HaveOccurred())
@@ -93,7 +99,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("prepends the disclaimer header and preserves the embedded bytes verbatim", func() {
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				for _, tc := range []struct {
 					writtenPath   string
@@ -123,7 +129,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("preserves GitHub Actions ${{ ... }} expressions verbatim", func() {
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				for _, tc := range []struct {
 					writtenPath   string
@@ -150,7 +156,7 @@ var _ = Describe("Component Generation", func() {
 				Expect(memFs.MkdirAll("/repo/.github/actions/glk", 0700)).To(Succeed())
 				Expect(memFs.WriteFile("/repo/.github/actions/glk/action.yaml", []byte(userContent), 0600)).To(Succeed())
 
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				written, err := memFs.ReadFile("/repo/.github/actions/glk/action.yaml")
 				Expect(err).NotTo(HaveOccurred())
@@ -170,7 +176,7 @@ var _ = Describe("Component Generation", func() {
 				opts, err := components.NewOptions(generateOpts, memFs)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(NewComponent().GenerateBase(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateBase(opts)).To(Succeed())
 
 				for _, p := range []string{
 					"/repo/.github/actions/glk/action.yaml",
@@ -204,7 +210,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("writes both .github files two levels up at the repository root", func() {
-				Expect(NewComponent().GenerateLandscape(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateLandscape(opts)).To(Succeed())
 
 				for _, p := range []string{
 					"/repo/.github/actions/glk/action.yaml",
@@ -217,7 +223,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("writes only the expected subdirectories under .github/", func() {
-				Expect(NewComponent().GenerateLandscape(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateLandscape(opts)).To(Succeed())
 
 				dirEntries, err := afero.ReadDir(memFs, "/repo/.github")
 				Expect(err).NotTo(HaveOccurred())
@@ -230,7 +236,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("does not create a .glk shadow tree under the landscape directory", func() {
-				Expect(NewComponent().GenerateLandscape(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateLandscape(opts)).To(Succeed())
 
 				exists, err := memFs.DirExists("/repo/landscapes/test/.glk")
 				Expect(err).NotTo(HaveOccurred())
@@ -238,7 +244,7 @@ var _ = Describe("Component Generation", func() {
 			})
 
 			It("prepends the disclaimer header and preserves the embedded bytes verbatim", func() {
-				Expect(NewComponent().GenerateLandscape(opts)).To(Succeed())
+				Expect(mustNewComponent().GenerateLandscape(opts)).To(Succeed())
 
 				for _, tc := range []struct {
 					writtenPath   string

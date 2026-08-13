@@ -36,13 +36,22 @@ var (
 	landscapeTemplateDir = "templates/landscape"
 	//go:embed templates/landscape
 	landscapeTemplates embed.FS
+
+	//go:embed meta.yaml
+	metadataYAML []byte
 )
 
-type component struct{}
+type component struct {
+	*components.Metadata
+}
 
 // NewComponent creates a new gardener-operator component.
-func NewComponent() components.Interface {
-	return &component{}
+func NewComponent() (components.Interface, error) {
+	metadata, err := components.NewMetadata(metadataYAML)
+	if err != nil {
+		return nil, err
+	}
+	return &component{Metadata: metadata}, nil
 }
 
 // Name returns the component name.

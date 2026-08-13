@@ -320,7 +320,7 @@ var _ = Describe("Registry", func() {
 		var (
 			mockComp1, mockComp2, mockComp3 *mockComponent
 
-			mockComponents []func() components.Interface
+			mockComponents []func() (components.Interface, error)
 		)
 
 		BeforeEach(func() {
@@ -345,15 +345,15 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			mockComponents = []func() components.Interface{
-				func() components.Interface {
-					return mockComp1
+			mockComponents = []func() (components.Interface, error){
+				func() (components.Interface, error) {
+					return mockComp1, nil
 				},
-				func() components.Interface {
-					return mockComp2
+				func() (components.Interface, error) {
+					return mockComp2, nil
 				},
-				func() components.Interface {
-					return mockComp3
+				func() (components.Interface, error) {
+					return mockComp3, nil
 				},
 			}
 
@@ -425,6 +425,10 @@ type mockComponent struct {
 	generateLandscapeFunc   func(components.LandscapeOptions) error
 	generateBaseCalled      bool
 	generateLandscapeCalled bool
+}
+
+func (m *mockComponent) GetComponentMetadata() *components.Metadata {
+	return &components.Metadata{Name: m.name}
 }
 
 func (m *mockComponent) Name() string {

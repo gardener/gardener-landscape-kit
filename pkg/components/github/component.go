@@ -5,6 +5,7 @@
 package github
 
 import (
+	_ "embed"
 	"fmt"
 	"io/fs"
 	"path"
@@ -31,11 +32,22 @@ const DisclaimerHeader = `# This file is managed by gardener-landscape-kit (gith
 #
 `
 
-type component struct{}
+var (
+	//go:embed meta.yaml
+	metadataYAML []byte
+)
+
+type component struct {
+	*components.Metadata
+}
 
 // NewComponent creates a new github component.
-func NewComponent() components.Interface {
-	return &component{}
+func NewComponent() (components.Interface, error) {
+	metadata, err := components.NewMetadata(metadataYAML)
+	if err != nil {
+		return nil, err
+	}
+	return &component{Metadata: metadata}, nil
 }
 
 // Name returns the component name.

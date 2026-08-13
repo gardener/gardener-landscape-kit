@@ -93,12 +93,14 @@ var _ = Describe("Flux Component Generation", func() {
 
 	Describe("#GenerateLandscape", func() {
 		It("should correctly generate the flux landscape directory", func() {
-			component := NewComponent()
+			component, err := NewComponent()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 		})
 
 		It("should not recreate a deleted gitignore file", func() {
-			component := NewComponent()
+			component, err := NewComponent()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 			Expect(fs.Exists("/landscapeDir/flux/flux-system/.gitignore")).To(BeTrue())
 
@@ -110,7 +112,8 @@ var _ = Describe("Flux Component Generation", func() {
 		})
 
 		It("should not reformat previously generated manifests (idempotency)", func() {
-			component := NewComponent()
+			component, err := NewComponent()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 			initialContents, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-sync.yaml")
@@ -126,7 +129,8 @@ var _ = Describe("Flux Component Generation", func() {
 
 		Context("GOTK Sync Manifest", func() {
 			test := func(opts components.LandscapeOptions, expectedKind string, refMatcher types.GomegaMatcher) {
-				component := NewComponent()
+				component, err := NewComponent()
+				Expect(err).NotTo(HaveOccurred())
 				Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 				gotkData, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-sync.yaml")
@@ -263,7 +267,8 @@ var _ = Describe("Flux Component Generation", func() {
 			}
 
 			It("should use default images when no component vector resources are set", func() {
-				component := NewComponent()
+				component, err := NewComponent()
+				Expect(err).NotTo(HaveOccurred())
 				Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 				data, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-components.yaml")
@@ -295,7 +300,8 @@ notificationController:
 					conf.Repositories.Landscape.ComponentsFiles = []string{"components.yaml"}
 				})
 
-				component := NewComponent()
+				component, err := NewComponent()
+				Expect(err).NotTo(HaveOccurred())
 				Expect(component.GenerateLandscape(opts)).To(Succeed())
 
 				data, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-components.yaml")

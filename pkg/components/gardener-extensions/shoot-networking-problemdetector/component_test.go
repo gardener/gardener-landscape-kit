@@ -50,7 +50,8 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate the component base", func() {
-			component := NewComponent()
+			component, err := NewComponent()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(component.GenerateBase(opts)).To(Succeed())
 
 			content, err := fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-networking-problemdetector/extension.yaml")
@@ -80,7 +81,8 @@ var _ = Describe("Component Generation", func() {
 		})
 
 		It("should generate only the flux kustomization into the landscape dir", func() {
-			component := NewComponent()
+			component, err := NewComponent()
+			Expect(err).NotTo(HaveOccurred())
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
 			Expect(err).ToNot(HaveOccurred())
@@ -100,7 +102,8 @@ var _ = Describe("Component Generation", func() {
 
 		DescribeTable("should generate correct kustomized build output",
 			func(build test.BuildComponentVectorFn, expectedFile string) {
-				component := NewComponent()
+				component, err := NewComponent()
+				Expect(err).NotTo(HaveOccurred())
 				optsFn, err := test.CreateComponentsVectorFile(fs, build)
 				Expect(err).ToNot(HaveOccurred())
 				result, err := test.KustomizeComponent(fs, component, "components/gardener-extensions/shoot-networking-problemdetector", optsFn)

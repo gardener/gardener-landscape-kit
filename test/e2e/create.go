@@ -291,7 +291,8 @@ data: {}
 
 		// Iterate over all components and identify extensions
 		for _, newComponent := range registry.ComponentList {
-			component := newComponent()
+			component, err := newComponent()
+			Expect(err).NotTo(HaveOccurred())
 			pkgPath := reflect.TypeOf(component).Elem().PkgPath()
 
 			// Consider the component as an extension if the package path contains "gardener-extensions"
