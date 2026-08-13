@@ -17,12 +17,6 @@ import (
 )
 
 const (
-	// DirName is the directory name where the cluster instances are stored.
-	DirName = "flux"
-
-	// FluxComponentsDirName is the directory name where the Flux cli generates the flux-system components into.
-	FluxComponentsDirName = DirName + "/flux-system"
-
 	// gitignoreTemplateFile is the name of the .gitignore template file.
 	gitignoreTemplateFile = "flux-system/gitignore"
 	// gitignoreFileName is the name of the .gitignore file.
@@ -40,6 +34,8 @@ var (
 
 type component struct {
 	*components.Metadata
+
+	fluxComponentsDirName string
 }
 
 // NewComponent creates a new gardener-operator component.
@@ -50,13 +46,14 @@ func NewComponent() (components.Interface, error) {
 	}
 
 	return &component{
-		Metadata: metadata,
+		Metadata:              metadata,
+		fluxComponentsDirName: metadata.Directory + "/flux-system",
 	}, nil
 }
 
 // Name returns the component name.
-func (*component) Name() string {
-	return "flux"
+func (c *component) Name() string {
+	return c.GetComponentMetadata().Name
 }
 
 // GenerateBase generates the component base directory.
@@ -67,9 +64,9 @@ func (c *component) GenerateBase(_ components.Options) error {
 // GenerateLandscape generates the component landscape directory.
 func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
-		writeLandscapeTemplateFiles,
-		writeGitignoreFile,
-		generateFirstStepsMessageIfRequired(options),
+		c.writeLandscapeTemplateFiles,
+		c.writeGitignoreFile,
+		c.generateFirstStepsMessageIfRequired(options),
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -78,7 +75,7 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
+func (c *component) writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	ref := opts.GetLandscapeRef()
 	var repoRef string
 	switch {
@@ -92,7 +89,7 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 		repoRef = "branch: main"
 	}
 
-	fluxPath := path.Join(opts.GetRelativeLandscapePath(), DirName)
+	fluxPath := path.Join(opts.GetRelativeLandscapePath(), c.Directory)
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
 	cvValues, err := components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerLandscapeKit)
@@ -117,19 +114,19 @@ func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	delete(objects, "flux-system/gitignore")
 	delete(objects, "flux-system/doc.go")
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), DirName, opts.GetFilesystem(), opts.GetMergeMode())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), c.Directory, opts.GetFilesystem(), opts.GetMergeMode())
 }
 
-func writeGitignoreFile(options components.LandscapeOptions) error {
+func (c *component) writeGitignoreFile(options components.LandscapeOptions) error {
 	gitignore, err := landscapeTemplates.ReadFile(path.Join(landscapeTemplateDir, gitignoreTemplateFile))
 	if err != nil {
 		return err
 	}
-	gitignoreDefaultPath := path.Join(options.GetTargetPath(), files.GLKSystemDirName, files.DefaultDirName, FluxComponentsDirName, gitignoreFileName)
+	gitignoreDefaultPath := path.Join(options.GetTargetPath(), files.GLKSystemDirName, files.DefaultDirName, c.fluxComponentsDirName, gitignoreFileName)
 
 	fileDefaultExists, err := options.GetFilesystem().Exists(gitignoreDefaultPath)
 	if err == nil && !fileDefaultExists {
-		if err := files.WriteFileToFilesystem(gitignore, path.Join(options.GetTargetPath(), FluxComponentsDirName, gitignoreFileName), false, options.GetFilesystem()); err != nil {
+		if err := files.WriteFileToFilesystem(gitignore, path.Join(options.GetTargetPath(), c.fluxComponentsDirName, gitignoreFileName), false, options.GetFilesystem()); err != nil {
 			return err
 		}
 	}
@@ -137,14 +134,14 @@ func writeGitignoreFile(options components.LandscapeOptions) error {
 	return files.WriteFileToFilesystem(gitignore, gitignoreDefaultPath, true, options.GetFilesystem())
 }
 
-func generateFirstStepsMessageIfRequired(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
+func (c *component) generateFirstStepsMessageIfRequired(options components.LandscapeOptions) func(options components.LandscapeOptions) error {
 	landscapeDir := options.GetTargetPath()
-	instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, FluxComponentsDirName))
+	instanceFileExisted, err := options.GetFilesystem().DirExists(path.Join(landscapeDir, c.fluxComponentsDirName))
 	return func(options components.LandscapeOptions) error {
 		if err != nil || instanceFileExisted {
 			return err
 		}
-		fluxDir := path.Join(landscapeDir, DirName)
+		fluxDir := path.Join(landscapeDir, c.Directory)
 		options.GetLogger().Info(`Initialized the landscape for an expected Flux cluster at: ` + fluxDir + `
 
 Next steps:
@@ -158,17 +155,17 @@ Next steps:
 
 3. Install the Flux CRDs initially:
 
-   $  kubectl create -f ` + path.Join(landscapeDir, FluxComponentsDirName, "gotk-components.yaml") + `
+   $  kubectl create -f ` + path.Join(landscapeDir, c.fluxComponentsDirName, "gotk-components.yaml") + `
 
 4. You might want to consider creating the Git sync credentials manually and store them separately instead of checking them into Git:
 
-   $  kubectl create -f ` + path.Join(landscapeDir, FluxComponentsDirName, "git-sync-secret.yaml") + `
+   $  kubectl create -f ` + path.Join(landscapeDir, c.fluxComponentsDirName, "git-sync-secret.yaml") + `
 
 5. Commit and push the changes to your landscape git repository.
 
 6. Deploy Flux on the cluster:
 
-  $  kubectl apply -k ` + path.Join(landscapeDir, FluxComponentsDirName) + `
+  $  kubectl apply -k ` + path.Join(landscapeDir, c.fluxComponentsDirName) + `
 `)
 		return nil
 	}

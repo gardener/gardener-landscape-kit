@@ -12,13 +12,6 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
-const (
-	// ComponentName is the name of the garden-config component.
-	ComponentName = "garden-config"
-	// ComponentDirectory is the directory of the garden-config component within the base components directory.
-	ComponentDirectory = "virtual-garden/garden-config"
-)
-
 var (
 	// baseTemplateDir is the directory where the base templates are stored.
 	baseTemplateDir = "templates/base"
@@ -49,13 +42,13 @@ func NewComponent() (components.Interface, error) {
 
 // Name returns the component name.
 func (c *component) Name() string {
-	return ComponentName
+	return c.GetComponentMetadata().Name
 }
 
 // GenerateBase generates the component base directory.
 func (c *component) GenerateBase(options components.Options) error {
 	for _, op := range []func(components.Options) error{
-		writeBaseTemplateFiles,
+		c.writeBaseTemplateFiles,
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -67,7 +60,7 @@ func (c *component) GenerateBase(options components.Options) error {
 // GenerateLandscape generates the component landscape directory.
 func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
-		writeLandscapeTemplateFiles,
+		c.writeLandscapeTemplateFiles,
 	} {
 		if err := op(options); err != nil {
 			return err
@@ -76,26 +69,26 @@ func (c *component) GenerateLandscape(options components.LandscapeOptions) error
 	return nil
 }
 
-func writeBaseTemplateFiles(opts components.Options) error {
+func (c *component) writeBaseTemplateFiles(opts components.Options) error {
 	objects, err := files.RenderTemplateFiles(baseTemplates, baseTemplateDir, nil)
 	if err != nil {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, c.Directory), opts.GetFilesystem(), opts.GetMergeMode())
 }
 
-func writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
-	relativeComponentPath := path.Join(components.DirName, ComponentDirectory)
+func (c *component) writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
+	relativeComponentPath := path.Join(components.DirName, c.Directory)
 
 	objects, err := files.RenderTemplateFiles(landscapeTemplates, landscapeTemplateDir, map[string]any{
 		"sourceKind":                  opts.GetSourceKind(),
-		"relativePathToBaseComponent": opts.GetRelativeBaseComponentPath(ComponentDirectory),
+		"relativePathToBaseComponent": opts.GetRelativeBaseComponentPath(c.Directory),
 		"landscapeComponentPath":      path.Join(opts.GetRelativeLandscapePath(), relativeComponentPath),
 	})
 	if err != nil {
 		return err
 	}
 
-	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, ComponentDirectory), opts.GetFilesystem(), opts.GetMergeMode())
+	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, c.Directory), opts.GetFilesystem(), opts.GetMergeMode())
 }

@@ -15,12 +15,6 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
-// ComponentName is the name of the github component.
-const ComponentName = "github"
-
-// dotGitHubDir is the destination directory at the repository root.
-const dotGitHubDir = ".github"
-
 // DisclaimerHeader is prepended to every file written by this component.
 const DisclaimerHeader = `# This file is managed by gardener-landscape-kit (github component) and will be
 # overwritten on every 'glk generate' invocation. To stop glk from managing
@@ -51,23 +45,23 @@ func NewComponent() (components.Interface, error) {
 }
 
 // Name returns the component name.
-func (*component) Name() string {
-	return ComponentName
+func (c *component) Name() string {
+	return c.GetComponentMetadata().Name
 }
 
 // GenerateBase materializes the embedded .github/ assets into the repository root during base generation.
-func (*component) GenerateBase(opts components.Options) error {
-	return writeDotGitHub(opts)
+func (c *component) GenerateBase(opts components.Options) error {
+	return c.writeDotGitHub(opts)
 }
 
 // GenerateLandscape materializes the embedded .github/ assets into the repository root during landscape generation.
-func (*component) GenerateLandscape(opts components.LandscapeOptions) error {
-	return writeDotGitHub(opts)
+func (c *component) GenerateLandscape(opts components.LandscapeOptions) error {
+	return c.writeDotGitHub(opts)
 }
 
 // writeDotGitHub walks the embedded sources and writes each file directly to the repository root with the disclaimer header prepended, overwriting any existing content.
-func writeDotGitHub(opts components.Options) error {
-	dotGitHubRoot := path.Join(opts.GetRepoRoot(), dotGitHubDir)
+func (c *component) writeDotGitHub(opts components.Options) error {
+	dotGitHubRoot := path.Join(opts.GetRepoRoot(), c.Directory)
 	for _, src := range []struct {
 		fs   fs.FS
 		root string
