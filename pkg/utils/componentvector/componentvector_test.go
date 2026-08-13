@@ -5,8 +5,11 @@
 package componentvector_test
 
 import (
+	"path/filepath"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/afero"
 
 	. "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
@@ -678,4 +681,65 @@ components:
 		})
 	})
 
+	Describe("#WriteComponentVectorMetadata", func() {
+		var (
+			cv         Interface
+			targetPath string
+			fs         afero.Afero
+		)
+
+		BeforeEach(func() {
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener
+    sourceRepository: https://github.com/gardener/gardener
+    version: v1.148.0
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: v0.2.0
+`)
+			targetPath = "/tmp/target"
+			fs = afero.Afero{Fs: afero.NewMemMapFs()}
+
+			var err error
+			cv, err = NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should create the file at the correct path", func() {
+			err := WriteComponentVectorMetadata(cv, targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedPath := filepath.Join(targetPath, ".glk", "meta", "components.yaml")
+			exists, err := fs.Exists(expectedPath)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(exists).To(BeTrue())
+		})
+
+		It("should write valid YAML containing all component names and versions", func() {
+			err := WriteComponentVectorMetadata(cv, targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+
+			filePath := filepath.Join(targetPath, ".glk", "meta", "components.yaml")
+			content, err := fs.ReadFile(filePath)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(content).NotTo(BeEmpty())
+
+			contentStr := string(content)
+			Expect(contentStr).To(ContainSubstring("github.com/gardener/gardener"))
+			Expect(contentStr).To(ContainSubstring("v1.148.0"))
+			Expect(contentStr).To(ContainSubstring("github.com/gardener/gardener-landscape-kit"))
+			Expect(contentStr).To(ContainSubstring("v0.2.0"))
+		})
+
+		It("should include sourceRepository in the output", func() {
+			err := WriteComponentVectorMetadata(cv, targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+
+			filePath := filepath.Join(targetPath, ".glk", "meta", "components.yaml")
+			content, err := fs.ReadFile(filePath)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(content)).To(ContainSubstring("https://github.com/gardener/gardener"))
+		})
+	})
 })

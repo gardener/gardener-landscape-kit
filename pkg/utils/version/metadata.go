@@ -18,9 +18,7 @@ import (
 	apimachineryversion "k8s.io/apimachinery/pkg/version"
 	componentbaseversion "k8s.io/component-base/version"
 
-	"github.com/gardener/gardener-landscape-kit/componentvector"
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
-	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -149,14 +147,12 @@ func ValidateLandscapeVersionCompatibility(targetPath string, fs afero.Afero) er
 // The behavior depends on the checkMode in the configuration:
 // - If checkMode is "Strict", returns an error on mismatch.
 // - If checkMode is "Warning", logs a warning on mismatch and returns nil.
-func CheckGLKComponentVersion(cv utilscomponentvector.Interface, config *configv1alpha1.LandscapeKitConfiguration, log logr.Logger) error {
-	toolVersion := version.GitVersion
-	componentVersion, found := cv.FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
-
-	if !found {
-		return fmt.Errorf("gardener-landscape-kit component not found in component vector - this should not happen as it's part of the default component vector")
+func CheckGLKComponentVersion(componentVersion string, config *configv1alpha1.LandscapeKitConfiguration, log logr.Logger) error {
+	if componentVersion == "" {
+		return fmt.Errorf("gardener-landscape-kit component not found - this should not happen as it's part of the default component vector")
 	}
 
+	toolVersion := version.GitVersion
 	if toolVersion != componentVersion {
 		checkMode := *config.VersionConfig.CheckMode
 

@@ -7,12 +7,17 @@ package componentvector
 import (
 	"fmt"
 	"maps"
+	"path/filepath"
 	"reflect"
 	"slices"
 
+	"github.com/spf13/afero"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
+
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
 const (
@@ -227,4 +232,32 @@ func NameVersionBytes(cv Interface) ([]byte, error) {
 		return nil, fmt.Errorf("failed to marshal component versions: %w", err)
 	}
 	return data, nil
+}
+
+// VectorFileName is the name of the component vector metadata file
+const VectorFileName = "components.yaml"
+
+// WriteComponentVectorMetadata writes the full component vector to .glk/meta/components.yaml
+func WriteComponentVectorMetadata(cv Interface, targetPath string, fs afero.Afero) error {
+	components := &Components{}
+	for _, name := range cv.ComponentNames() {
+		components.Components = append(components.Components, cv.FindComponentVector(name))
+	}
+
+	data, err := yaml.Marshal(components)
+	if err != nil {
+		return fmt.Errorf("failed to marshal component vector: %w", err)
+	}
+
+	metaDir := filepath.Join(targetPath, files.GLKSystemDirName, version.MetaDirName)
+	if err := fs.MkdirAll(metaDir, 0744); err != nil {
+		return fmt.Errorf("failed to create metadata directory: %w", err)
+	}
+
+	componentVectorFilePath := filepath.Join(metaDir, VectorFileName)
+	if err := fs.WriteFile(componentVectorFilePath, data, 0644); err != nil {
+		return fmt.Errorf("failed to write component vector metadata: %w", err)
+	}
+
+	return nil
 }

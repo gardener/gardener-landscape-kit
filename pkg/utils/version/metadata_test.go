@@ -15,7 +15,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	. "github.com/gardener/gardener-landscape-kit/pkg/utils/version"
 )
 
@@ -252,22 +251,13 @@ var _ = Describe("Version Metadata", func() {
 
 		DescribeTable("version checking behavior",
 			func(tc testCase) {
-				baseYAML := []byte(`
-components:
-  - name: github.com/gardener/gardener-landscape-kit
-    sourceRepository: https://github.com/gardener/gardener-landscape-kit
-    version: ` + tc.componentVersion + `
-`)
-				cv, err := componentvector.NewWithOverride(baseYAML)
-				Expect(err).NotTo(HaveOccurred())
-
 				config := &configv1alpha1.LandscapeKitConfiguration{
 					VersionConfig: &configv1alpha1.VersionConfiguration{
 						CheckMode: &tc.checkMode,
 					},
 				}
 
-				err = CheckGLKComponentVersion(cv, config, log)
+				err := CheckGLKComponentVersion(tc.componentVersion, config, log)
 
 				if tc.expectError {
 					Expect(err).To(HaveOccurred())
@@ -336,16 +326,7 @@ components:
 				}()),
 		)
 
-		It("should fail when GLK component is not found in both modes", func() {
-			baseYAML := []byte(`
-components:
-  - name: github.com/gardener/other-component
-    sourceRepository: https://github.com/gardener/other-component
-    version: v1.0.0
-`)
-			cv, err := componentvector.NewWithOverride(baseYAML)
-			Expect(err).NotTo(HaveOccurred())
-
+		It("should fail when GLK component version is empty", func() {
 			// Test strict mode
 			strictMode := configv1alpha1.VersionCheckModeStrict
 			strictConfig := &configv1alpha1.LandscapeKitConfiguration{
@@ -354,7 +335,7 @@ components:
 				},
 			}
 
-			err = CheckGLKComponentVersion(cv, strictConfig, log)
+			err := CheckGLKComponentVersion("", strictConfig, log)
 			Expect(err).To(MatchError(ContainSubstring("gardener-landscape-kit component not found")))
 
 			// Test warning mode
@@ -365,7 +346,7 @@ components:
 				},
 			}
 
-			err = CheckGLKComponentVersion(cv, warningConfig, log)
+			err = CheckGLKComponentVersion("", warningConfig, log)
 			Expect(err).To(MatchError(ContainSubstring("gardener-landscape-kit component not found")))
 		})
 	})
