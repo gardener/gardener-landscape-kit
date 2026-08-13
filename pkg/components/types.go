@@ -6,6 +6,8 @@ package components
 
 import (
 	_ "embed"
+
+	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -15,10 +17,38 @@ const (
 
 // Interface is the components interface that each component must implement.
 type Interface interface {
+	MetadataInterface
 	// Name returns the component name.
+	// Deprecated: Use GetComponentMetadata().Name instead.
 	Name() string
 	// GenerateBase generates the component base dir.
 	GenerateBase(Options) error
 	// GenerateLandscape generates the component landscape dir.
 	GenerateLandscape(LandscapeOptions) error
+}
+
+// MetadataInterface
+type MetadataInterface interface {
+	// GetComponentMetadata returns the component metadata.
+	GetComponentMetadata() *Metadata
+}
+
+// Metadata contains metadata information for a component.
+type Metadata struct {
+	// Name is the component name.
+	Name string `json:"name"`
+	// Directory is the directory, where the components store their generated files. It is relative to the base or landscape target directory.
+	Directory string `json:"directory"`
+}
+
+// GetComponentMetadata returns the component metadata.
+func (m *Metadata) GetComponentMetadata() *Metadata { return m }
+
+// NewMetadata creates a new Metadata instance from the given YAML bytes.
+func NewMetadata(yamlBytes []byte) (*Metadata, error) {
+	metadata := &Metadata{}
+	if err := yaml.Unmarshal(yamlBytes, metadata); err != nil {
+		return nil, err
+	}
+	return metadata, nil
 }

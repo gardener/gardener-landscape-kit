@@ -38,7 +38,7 @@ import (
 )
 
 // ComponentList contains all available components.
-var ComponentList = []func() components.Interface{
+var ComponentList = []func() (components.Interface, error){
 	flux.NewComponent,
 	githubcomponent.NewComponent,
 	operator.NewComponent,
@@ -66,7 +66,10 @@ var ComponentList = []func() components.Interface{
 func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConfiguration) error {
 	orderedComponents := orderedmap.NewOrderedMap[string, components.Interface]()
 	for _, newComponent := range ComponentList {
-		component := newComponent()
+		component, err := newComponent()
+		if err != nil {
+			return fmt.Errorf("failed to create component: %w", err)
+		}
 		orderedComponents.Set(component.Name(), component)
 	}
 
