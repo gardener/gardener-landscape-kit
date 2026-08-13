@@ -51,10 +51,6 @@ func NewComponent() (components.Interface, error) {
 	}, nil
 }
 
-// Name returns the component name.
-func (c *component) Name() string {
-	return c.GetComponentMetadata().Name
-}
 
 // GenerateBase generates the component base directory.
 func (c *component) GenerateBase(_ components.Options) error {

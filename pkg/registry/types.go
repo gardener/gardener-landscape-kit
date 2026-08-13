@@ -26,7 +26,7 @@ const (
 // Interface is the interface for a component registry.
 type Interface interface {
 	// RegisterComponent registers a component in the registry.
-	RegisterComponent(name string, component components.Interface)
+	RegisterComponent(component components.Interface)
 	// GenerateBase generates the base component.
 	GenerateBase(opts components.Options) error
 	// GenerateLandscape generates the landscape component.
@@ -38,8 +38,8 @@ type registry struct {
 }
 
 // RegisterComponent registers a component in the registry.
-func (r *registry) RegisterComponent(name string, component components.Interface) {
-	r.components.Set(name, component)
+func (r *registry) RegisterComponent(component components.Interface) {
+	r.components.Set(component.GetComponentMetadata().Name, component)
 }
 
 // GenerateBase generates the base component.

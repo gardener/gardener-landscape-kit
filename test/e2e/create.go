@@ -297,7 +297,7 @@ data: {}
 
 			// Consider the component as an extension if the package path contains "gardener-extensions"
 			if strings.Contains(pkgPath, "gardener-extensions") {
-				extensionNames = append(extensionNames, component.Name())
+				extensionNames = append(extensionNames, component.GetComponentMetadata().Name)
 			}
 		}
 

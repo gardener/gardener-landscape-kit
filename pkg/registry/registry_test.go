@@ -74,8 +74,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -104,8 +104,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -123,7 +123,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.Name(), mockComp)
+			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -139,7 +139,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.Name(), mockComp)
+			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
 
 			err := reg.GenerateBase(options)
 			Expect(err).To(HaveOccurred())
@@ -161,8 +161,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
 
 			err := reg.GenerateBase(options)
 			Expect(err).To(Equal(expectedErr))
@@ -191,8 +191,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).NotTo(HaveOccurred())
@@ -210,7 +210,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.Name(), mockComp)
+			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).NotTo(HaveOccurred())
@@ -226,7 +226,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.Name(), mockComp)
+			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).To(HaveOccurred())
@@ -248,8 +248,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).To(Equal(expectedErr))
@@ -270,7 +270,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.Name(), mockComp)
+			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -306,9 +306,9 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.Name(), mockComp1)
-			reg.RegisterComponent(mockComp2.Name(), mockComp2)
-			reg.RegisterComponent(mockComp3.Name(), mockComp3)
+			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
+			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			reg.RegisterComponent(mockComp3.GetComponentMetadata().Name, mockComp3)
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -429,10 +429,6 @@ type mockComponent struct {
 
 func (m *mockComponent) GetComponentMetadata() *components.Metadata {
 	return &components.Metadata{Name: m.name}
-}
-
-func (m *mockComponent) Name() string {
-	return m.name
 }
 
 func (m *mockComponent) GenerateBase(opts components.Options) error {

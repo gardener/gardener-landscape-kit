@@ -18,9 +18,6 @@ const (
 // Interface is the components interface that each component must implement.
 type Interface interface {
 	MetadataInterface
-	// Name returns the component name.
-	// Deprecated: Use GetComponentMetadata().Name instead.
-	Name() string
 	// GenerateBase generates the component base dir.
 	GenerateBase(Options) error
 	// GenerateLandscape generates the component landscape dir.
@@ -39,6 +36,8 @@ type Metadata struct {
 	Name string `json:"name"`
 	// Directory is the directory, where the components store their generated files. It is relative to the base or landscape target directory.
 	Directory string `json:"directory"`
+	// ComponentRef is the component reference to a component in the component vector.
+	ComponentRef *string `json:"componentRef,omitempty"`
 }
 
 // GetComponentMetadata returns the component metadata.

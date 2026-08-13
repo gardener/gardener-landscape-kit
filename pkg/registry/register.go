@@ -70,7 +70,7 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 		if err != nil {
 			return fmt.Errorf("failed to create component: %w", err)
 		}
-		orderedComponents.Set(component.Name(), component)
+		orderedComponents.Set(component.GetComponentMetadata().Name, component)
 	}
 
 	if err := excludeComponents(config, orderedComponents); err != nil {
@@ -82,7 +82,7 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 	}
 
 	for _, component := range orderedComponents.AllFromFront() {
-		registry.RegisterComponent(component.Name(), component)
+		registry.RegisterComponent(component)
 	}
 
 	return nil

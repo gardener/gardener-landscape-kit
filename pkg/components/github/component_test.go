@@ -42,9 +42,9 @@ var _ = Describe("Component Generation", func() {
 		v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(generateOpts.Config)
 	})
 
-	Describe("#Name", func() {
-		It("returns 'github'", func() {
-			Expect(mustNewComponent().Name()).To(Equal("github"))
+	Describe("#GetComponentMetadata", func() {
+		It("returns 'github' as name", func() {
+			Expect(mustNewComponent().GetComponentMetadata().Name).To(Equal("github"))
 		})
 	})
 

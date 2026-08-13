@@ -44,10 +44,6 @@ func NewComponent() (components.Interface, error) {
 	return &component{Metadata: metadata}, nil
 }
 
-// Name returns the component name.
-func (c *component) Name() string {
-	return c.GetComponentMetadata().Name
-}
 
 // GenerateBase materializes the embedded .github/ assets into the repository root during base generation.
 func (c *component) GenerateBase(opts components.Options) error {
