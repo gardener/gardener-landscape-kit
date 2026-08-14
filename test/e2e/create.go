@@ -55,6 +55,8 @@ var _ = Describe("Create Gardener Landscape", Label("Garden", "default"), Ordere
 		Expect(config.Components).NotTo(BeNil())
 		// activate all components
 		config.Components.Include = nil
+		// deactivate the github component to retain changes
+		config.Components.Exclude = []string{"github"}
 
 		configBytes, err = yaml.Marshal(config)
 		Expect(err).NotTo(HaveOccurred())
