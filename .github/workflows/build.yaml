@@ -43,7 +43,7 @@ jobs:
   tests:
     permissions:
       contents: read
-    runs-on: ${{ github.repository_owner == 'gardener' && 'ubuntu-latest-large' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: gardener/cc-utils/.github/actions/trusted-checkout@v1
       - uses: gardener/cc-utils/.github/actions/setup-git-identity@v1
