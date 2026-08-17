@@ -91,25 +91,27 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to create component options: %w", err)
 	}
 
+	fs := afero.Afero{Fs: afero.NewOsFs()}
+	currentComponentVector, err := utilscomponentvector.ReadComponentVectorMetadata(opts.TargetDirPath, fs)
+	if err != nil {
+		return fmt.Errorf("failed to read current component vector metadata: %w", err)
+	}
+
+	reg := registry.New(currentComponentVector, componentOpts.GetComponentVector())
+	if err := registry.RegisterAllComponents(opts.Log, reg, opts.Config); err != nil {
+		return fmt.Errorf("failed to register components: %w", err)
+	}
+
 	componentVersion, _ := componentOpts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
 	if err := version.CheckGLKComponentVersion(componentVersion, opts.Config, opts.Log); err != nil {
 		return fmt.Errorf("version validation failed: %w", err)
-	}
-
-	reg := registry.New()
-	if err := registry.RegisterAllComponents(reg, opts.Config); err != nil {
-		return fmt.Errorf("failed to register components: %w", err)
 	}
 
 	if err := reg.GenerateLandscape(componentOpts); err != nil {
 		return fmt.Errorf("failed to generate landscape components: %w", err)
 	}
 
-	if err := utilscomponentvector.WriteComponentVectorMetadata(
-		componentOpts.GetComponentVector(),
-		componentOpts.GetTargetPath(),
-		afero.Afero{Fs: afero.NewOsFs()},
-	); err != nil {
+	if err := utilscomponentvector.WriteComponentVectorMetadata(componentOpts.GetComponentVector(), componentOpts.GetTargetPath(), fs); err != nil {
 		return fmt.Errorf("failed to write component vector metadata: %w", err)
 	}
 

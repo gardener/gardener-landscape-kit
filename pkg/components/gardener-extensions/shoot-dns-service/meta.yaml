@@ -1,2 +1,3 @@
 name: shoot-dns-service
 directory: gardener-extensions/shoot-dns-service
+componentRef: github.com/gardener/gardener-extension-shoot-dns-service

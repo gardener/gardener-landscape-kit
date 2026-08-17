@@ -261,3 +261,23 @@ func WriteComponentVectorMetadata(cv Interface, targetPath string, fs afero.Afer
 
 	return nil
 }
+
+// ReadComponentVectorMetadata reads the component vector metadata from .glk/meta/components.yaml and returns it as an Interface.
+func ReadComponentVectorMetadata(targetPath string, fs afero.Afero) (Interface, error) {
+	componentVectorFilePath := filepath.Join(targetPath, files.GLKSystemDirName, version.MetaDirName, VectorFileName)
+	exists, err := fs.Exists(componentVectorFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check existence of component vector metadata file: %w", err)
+	}
+	// TODO(timuthy): This should be an error in a later version. Instead it should be checked if GLK is generating the first time.
+	if !exists {
+		return nil, nil
+	}
+
+	data, err := fs.ReadFile(componentVectorFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read component vector metadata: %w", err)
+	}
+
+	return NewWithOverride(data)
+}

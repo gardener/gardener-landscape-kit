@@ -54,7 +54,7 @@ var _ = Describe("Component Generation", func() {
 		It("should generate the component base", func() {
 			component, err := NewComponent()
 			Expect(err).NotTo(HaveOccurred())
-			Expect(component.GenerateBase(opts)).To(Succeed())
+			Expect(component.GenerateBase(components.NewContext(), opts)).To(Succeed())
 
 			for _, file := range []string{
 				"/repo/baseDir/.glk/defaults/components/gardener/operator/oci-repository.yaml",
@@ -103,7 +103,7 @@ var _ = Describe("Component Generation", func() {
 			Expect(err).NotTo(HaveOccurred())
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
+			Expect(component.GenerateLandscape(components.NewContext(), landscapeOpts)).To(Succeed())
 
 			exists, err := fs.DirExists("/repo/baseDir")
 			Expect(err).ToNot(HaveOccurred())

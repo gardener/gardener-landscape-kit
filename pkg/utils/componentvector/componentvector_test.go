@@ -681,6 +681,74 @@ components:
 		})
 	})
 
+	Describe("#ReadComponentVectorMetadata", func() {
+		var (
+			targetPath string
+			fs         afero.Afero
+		)
+
+		BeforeEach(func() {
+			targetPath = "/tmp/target"
+			fs = afero.Afero{Fs: afero.NewMemMapFs()}
+		})
+
+		It("should return nil when the metadata file does not exist", func() {
+			cv, err := ReadComponentVectorMetadata(targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(cv).To(BeNil())
+		})
+
+		It("should read back what WriteComponentVectorMetadata wrote", func() {
+			baseYAML := []byte(`
+components:
+  - name: github.com/gardener/gardener
+    sourceRepository: https://github.com/gardener/gardener
+    version: v1.148.0
+  - name: github.com/gardener/gardener-landscape-kit
+    sourceRepository: https://github.com/gardener/gardener-landscape-kit
+    version: v0.2.0
+`)
+			cv, err := NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(WriteComponentVectorMetadata(cv, targetPath, fs)).To(Succeed())
+
+			got, err := ReadComponentVectorMetadata(targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+
+			version, exists := got.FindComponentVersion("github.com/gardener/gardener")
+			Expect(exists).To(BeTrue())
+			Expect(version).To(Equal("v1.148.0"))
+
+			version, exists = got.FindComponentVersion("github.com/gardener/gardener-landscape-kit")
+			Expect(exists).To(BeTrue())
+			Expect(version).To(Equal("v0.2.0"))
+		})
+
+		It("should return all component names that were written", func() {
+			baseYAML := []byte(`
+components:
+  - name: component-a
+    sourceRepository: https://github.com/org/a
+    version: v1.0.0
+  - name: component-b
+    sourceRepository: https://github.com/org/b
+    version: v2.0.0
+  - name: component-c
+    sourceRepository: https://github.com/org/c
+    version: v3.0.0
+`)
+			cv, err := NewWithOverride(baseYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(WriteComponentVectorMetadata(cv, targetPath, fs)).To(Succeed())
+
+			got, err := ReadComponentVectorMetadata(targetPath, fs)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(got.ComponentNames()).To(ConsistOf("component-a", "component-b", "component-c"))
+		})
+	})
+
 	Describe("#WriteComponentVectorMetadata", func() {
 		var (
 			cv         Interface

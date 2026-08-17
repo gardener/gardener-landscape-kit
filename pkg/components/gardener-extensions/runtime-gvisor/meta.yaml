@@ -1,2 +1,3 @@
 name: runtime-gvisor
 directory: gardener-extensions/runtime-gvisor
+componentRef: github.com/gardener/gardener-extension-runtime-gvisor

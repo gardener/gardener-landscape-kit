@@ -19,12 +19,12 @@ const (
 type Interface interface {
 	MetadataInterface
 	// GenerateBase generates the component base dir.
-	GenerateBase(Options) error
+	GenerateBase(Context, Options) error
 	// GenerateLandscape generates the component landscape dir.
-	GenerateLandscape(LandscapeOptions) error
+	GenerateLandscape(Context, LandscapeOptions) error
 }
 
-// MetadataInterface
+// MetadataInterface is the interface that each component must implement to provide metadata information.
 type MetadataInterface interface {
 	// GetComponentMetadata returns the component metadata.
 	GetComponentMetadata() *Metadata

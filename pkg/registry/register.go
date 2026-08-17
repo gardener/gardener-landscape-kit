@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/elliotchance/orderedmap/v3"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -63,7 +64,7 @@ var ComponentList = []func() (components.Interface, error){
 }
 
 // RegisterAllComponents registers all available components.
-func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConfiguration) error {
+func RegisterAllComponents(log logr.Logger, registry Interface, config *v1alpha1.LandscapeKitConfiguration) error {
 	orderedComponents := orderedmap.NewOrderedMap[string, components.Interface]()
 	for _, newComponent := range ComponentList {
 		component, err := newComponent()
@@ -82,7 +83,9 @@ func RegisterAllComponents(registry Interface, config *v1alpha1.LandscapeKitConf
 	}
 
 	for _, component := range orderedComponents.AllFromFront() {
-		registry.RegisterComponent(component)
+		if err := registry.RegisterComponent(log, component); err != nil {
+			return fmt.Errorf("failed to register component: %w", err)
+		}
 	}
 
 	return nil

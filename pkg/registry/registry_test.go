@@ -23,6 +23,7 @@ import (
 var _ = Describe("Registry", func() {
 	var (
 		reg Interface
+		log logr.Logger
 
 		config           *v1alpha1.LandscapeKitConfiguration
 		options          components.Options
@@ -30,7 +31,8 @@ var _ = Describe("Registry", func() {
 	)
 
 	BeforeEach(func() {
-		reg = New()
+		reg = New(nil, nil)
+		log = logr.Discard()
 
 		config = &v1alpha1.LandscapeKitConfiguration{
 			Repositories: &v1alpha1.RepositoriesConfig{
@@ -42,7 +44,7 @@ var _ = Describe("Registry", func() {
 		var err error
 		options, err = components.NewOptions(
 			&generateoptions.Options{
-				Options: &cmd.Options{Log: logr.Discard()},
+				Options: &cmd.Options{Log: log},
 				Config:  config,
 			},
 			afero.Afero{Fs: afero.NewMemMapFs()},
@@ -51,7 +53,7 @@ var _ = Describe("Registry", func() {
 
 		landscapeOptions, err = components.NewLandscapeOptions(
 			&generateoptions.Options{
-				Options: &cmd.Options{Log: logr.Discard()},
+				Options: &cmd.Options{Log: log},
 				Config:  config,
 			},
 			afero.Afero{Fs: afero.NewMemMapFs()},
@@ -74,8 +76,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			Expect(reg.RegisterComponent(log, mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(log, mockComp2)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -104,8 +106,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			Expect(reg.RegisterComponent(log, mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(log, mockComp2)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -123,7 +125,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
+			Expect(reg.RegisterComponent(log, mockComp)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -139,7 +141,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
+			Expect(reg.RegisterComponent(log, mockComp)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).To(HaveOccurred())
@@ -161,8 +163,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			Expect(reg.RegisterComponent(log, mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(log, mockComp2)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).To(Equal(expectedErr))
@@ -191,8 +193,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			Expect(reg.RegisterComponent(log, mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(log, mockComp2)).To(Succeed())
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).NotTo(HaveOccurred())
@@ -210,7 +212,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
+			Expect(reg.RegisterComponent(log, mockComp)).To(Succeed())
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).NotTo(HaveOccurred())
@@ -226,7 +228,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
+			Expect(reg.RegisterComponent(log, mockComp)).To(Succeed())
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).To(HaveOccurred())
@@ -248,8 +250,8 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp2)).To(Succeed())
 
 			err := reg.GenerateLandscape(landscapeOptions)
 			Expect(err).To(Equal(expectedErr))
@@ -270,7 +272,7 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp.GetComponentMetadata().Name, mockComp)
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -306,9 +308,9 @@ var _ = Describe("Registry", func() {
 				},
 			}
 
-			reg.RegisterComponent(mockComp1.GetComponentMetadata().Name, mockComp1)
-			reg.RegisterComponent(mockComp2.GetComponentMetadata().Name, mockComp2)
-			reg.RegisterComponent(mockComp3.GetComponentMetadata().Name, mockComp3)
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp1)).To(Succeed())
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp2)).To(Succeed())
+			Expect(reg.RegisterComponent(logr.Discard(), mockComp3)).To(Succeed())
 
 			err := reg.GenerateBase(options)
 			Expect(err).NotTo(HaveOccurred())
@@ -365,7 +367,7 @@ var _ = Describe("Registry", func() {
 				Exclude: []string{"mockComp2"},
 			}
 
-			Expect(RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(RegisterAllComponents(logr.Discard(), reg, config)).To(Succeed())
 			Expect(reg.GenerateBase(options)).To(Succeed())
 
 			Expect(mockComp1.generateBaseCalled).To(BeTrue())
@@ -378,7 +380,7 @@ var _ = Describe("Registry", func() {
 				Exclude: []string{"unknown", "mockComp2", "unknown2"},
 			}
 
-			Expect(RegisterAllComponents(reg, config)).To(MatchError(And(
+			Expect(RegisterAllComponents(logr.Discard(), reg, config)).To(MatchError(And(
 				ContainSubstring(`configuration contains invalid component excludes`),
 				ContainSubstring(`unknown`),
 				ContainSubstring(`unknown2`),
@@ -391,7 +393,7 @@ var _ = Describe("Registry", func() {
 				Include: []string{"mockComp2", "mockComp3"},
 			}
 
-			Expect(RegisterAllComponents(reg, config)).To(Succeed())
+			Expect(RegisterAllComponents(logr.Discard(), reg, config)).To(Succeed())
 			Expect(reg.GenerateBase(options)).To(Succeed())
 
 			Expect(mockComp1.generateBaseCalled).To(BeFalse())
@@ -404,7 +406,7 @@ var _ = Describe("Registry", func() {
 				Include: []string{"unknown", "mockComp1", "unknown2"},
 			}
 
-			Expect(RegisterAllComponents(reg, config)).To(MatchError(And(
+			Expect(RegisterAllComponents(logr.Discard(), reg, config)).To(MatchError(And(
 				ContainSubstring(`configuration contains invalid component includes`),
 				ContainSubstring(`unknown`),
 				ContainSubstring(`unknown2`),
@@ -413,7 +415,7 @@ var _ = Describe("Registry", func() {
 		})
 
 		It("should succeed when config is nil", func() {
-			Expect(RegisterAllComponents(reg, nil)).To((Succeed()))
+			Expect(RegisterAllComponents(logr.Discard(), reg, nil)).To((Succeed()))
 		})
 	})
 })
@@ -431,7 +433,7 @@ func (m *mockComponent) GetComponentMetadata() *components.Metadata {
 	return &components.Metadata{Name: m.name}
 }
 
-func (m *mockComponent) GenerateBase(opts components.Options) error {
+func (m *mockComponent) GenerateBase(_ components.Context, opts components.Options) error {
 	m.generateBaseCalled = true
 	if m.generateBaseFunc != nil {
 		return m.generateBaseFunc(opts)
@@ -439,7 +441,7 @@ func (m *mockComponent) GenerateBase(opts components.Options) error {
 	return nil
 }
 
-func (m *mockComponent) GenerateLandscape(opts components.LandscapeOptions) error {
+func (m *mockComponent) GenerateLandscape(_ components.Context, opts components.LandscapeOptions) error {
 	m.generateLandscapeCalled = true
 	if m.generateLandscapeFunc != nil {
 		return m.generateLandscapeFunc(opts)

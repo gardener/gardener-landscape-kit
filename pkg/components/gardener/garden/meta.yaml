@@ -1,2 +1,3 @@
 name: garden
 directory: gardener/garden
+componentRef: github.com/gardener/gardener

@@ -47,9 +47,8 @@ func NewComponent() (components.Interface, error) {
 	return &component{Metadata: metadata}, nil
 }
 
-
 // GenerateBase generates the component base directory.
-func (c *component) GenerateBase(options components.Options) error {
+func (c *component) GenerateBase(_ components.Context, options components.Options) error {
 	for _, op := range []func(components.Options) error{
 		c.writeBaseTemplateFiles,
 	} {
@@ -61,7 +60,7 @@ func (c *component) GenerateBase(options components.Options) error {
 }
 
 // GenerateLandscape generates the component landscape directory.
-func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
+func (c *component) GenerateLandscape(_ components.Context, options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
 		c.writeLandscapeTemplateFiles,
 	} {

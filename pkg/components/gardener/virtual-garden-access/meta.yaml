@@ -1,2 +1,3 @@
 name: virtual-garden-access
 directory: gardener/virtual-garden-access
+componentRef: github.com/gardener/gardener

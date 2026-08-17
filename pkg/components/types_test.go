@@ -13,7 +13,7 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd"
 	"github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
-	. "github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/components"
 )
 
 var _ = Describe("Types", func() {
@@ -43,7 +43,7 @@ var _ = Describe("Types", func() {
 			It("should return the target path", func() {
 				opts.TargetDirPath = "/path/to/target"
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/target"))
@@ -52,7 +52,7 @@ var _ = Describe("Types", func() {
 			It("should return empty path when not set", func() {
 				opts.TargetDirPath = ""
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("."))
@@ -61,7 +61,7 @@ var _ = Describe("Types", func() {
 			It("should return a cleaned path", func() {
 				opts.TargetDirPath = "/path/to/target/../landscape"
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetTargetPath()).To(Equal("/path/to/landscape"))
@@ -70,7 +70,7 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetFilesystem", func() {
 			It("should return the filesystem", func() {
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetFilesystem()).To(Equal(fs))
@@ -83,7 +83,7 @@ var _ = Describe("Types", func() {
 					Log: logger,
 				}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetLogger()).To(Equal(logger))
@@ -98,7 +98,7 @@ var _ = Describe("Types", func() {
 			})
 
 			It("should return an empty component vector when no component vector file is provided", func() {
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -111,7 +111,7 @@ var _ = Describe("Types", func() {
 				opts.Config = &v1alpha1.LandscapeKitConfiguration{}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -134,7 +134,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -154,7 +154,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
-				_, err = NewOptions(opts, fs)
+				_, err = components.NewOptions(opts, fs)
 
 				Expect(err).To(MatchError("failed to create component vector: failed to parse override component vector: error converting YAML to JSON: yaml: mapping values are not allowed in this context"))
 			})
@@ -170,7 +170,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
@@ -184,7 +184,7 @@ var _ = Describe("Types", func() {
 
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
@@ -205,7 +205,7 @@ var _ = Describe("Types", func() {
 				Expect(fs.WriteFile("/path/to/target/extras/override.yaml", []byte(overrideYAML), 0644)).To(Succeed())
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml", "extras/override.yaml"}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
@@ -215,7 +215,7 @@ var _ = Describe("Types", func() {
 			It("should error when a configured override file is missing", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"extras/missing.yaml"}
 
-				_, err := NewOptions(opts, fs)
+				_, err := components.NewOptions(opts, fs)
 				Expect(err).To(MatchError(ContainSubstring(`failed to read component vector override file: open /path/to/target/extras/missing.yaml: file does not exist`)))
 			})
 
@@ -234,7 +234,7 @@ var _ = Describe("Types", func() {
 				Expect(fs.WriteFile("/path/to/target/second.yaml", []byte(secondYAML), 0644)).To(Succeed())
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"first.yaml", "second.yaml"}
 
-				componentOpts, err := NewOptions(opts, fs)
+				componentOpts, err := components.NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
@@ -253,7 +253,7 @@ var _ = Describe("Types", func() {
 				}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				result, err := NewOptions(opts, fs)
+				result, err := components.NewOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
@@ -290,7 +290,7 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetLandscapeURL", func() {
 			It("should return the landscape repository URL", func() {
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetLandscapeURL()).To(Equal("https://github.com/example/repo.git"))
@@ -299,7 +299,7 @@ var _ = Describe("Types", func() {
 
 		Describe("#GetLandscapeRef", func() {
 			It("should return the landscape repository ref", func() {
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetLandscapeRef()).To(Equal(opts.Config.Repositories.Landscape.Ref))
@@ -310,7 +310,7 @@ var _ = Describe("Types", func() {
 			It("should return baseLink joined with base.target", func() {
 				opts.Config.Repositories.Landscape.BaseLink = "./base"
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeBasePath()).To(Equal("base/content"))
@@ -321,7 +321,7 @@ var _ = Describe("Types", func() {
 			It("should return the landscape path", func() {
 				opts.Config.Repositories.Landscape.Target = "./landscape"
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeLandscapePath()).To(Equal("./landscape"))
@@ -333,7 +333,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Landscape.Target = "landscapes/showroom"
 				opts.Config.Repositories.Landscape.BaseLink = "base"
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeBaseComponentPath("gardener/garden")).To(Equal("../../../../../base/content/components/gardener/garden"))
@@ -343,7 +343,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Landscape.Target = "landscape"
 				opts.Config.Repositories.Landscape.BaseLink = "base"
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(landscapeOpts.GetRelativeBaseComponentPath("gardener/garden")).To(Equal("../../../../base/content/components/gardener/garden"))
@@ -373,7 +373,7 @@ var _ = Describe("Types", func() {
 				}
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
-				result, err := NewLandscapeOptions(opts, fs)
+				result, err := components.NewLandscapeOptions(opts, fs)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(result).NotTo(BeNil())
@@ -411,7 +411,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"baseDir/components.yaml"}
 				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"landscapeDir/components.yaml"}
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 
 				// Landscape override wins for the shared component.
@@ -459,7 +459,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"baseDir/components.yaml", "baseDir/overrides/base.yaml"}
 				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"landscapeDir/components.yaml", "overrides/landscape.yaml"}
 
-				landscapeOpts, err := NewLandscapeOptions(opts, fs)
+				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 
 				version, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
@@ -471,7 +471,7 @@ var _ = Describe("Types", func() {
 				opts.TargetDirPath = "/path/to/target"
 				opts.Config.Repositories.Landscape.ComponentsFiles = []string{"overrides/missing.yaml"}
 
-				_, err := NewLandscapeOptions(opts, fs)
+				_, err := components.NewLandscapeOptions(opts, fs)
 				Expect(err).To(MatchError(ContainSubstring(`failed to read component vector override file: open /path/to/target/overrides/missing.yaml: file does not exist`)))
 			})
 		})

@@ -1,2 +1,3 @@
 name: shoot-traefik
 directory: gardener-extensions/shoot-traefik
+componentRef: github.com/gardener/gardener-extension-shoot-traefik

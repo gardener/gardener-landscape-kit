@@ -51,14 +51,13 @@ func NewComponent() (components.Interface, error) {
 	}, nil
 }
 
-
 // GenerateBase generates the component base directory.
-func (c *component) GenerateBase(_ components.Options) error {
+func (c *component) GenerateBase(_ components.Context, _ components.Options) error {
 	return nil
 }
 
 // GenerateLandscape generates the component landscape directory.
-func (c *component) GenerateLandscape(options components.LandscapeOptions) error {
+func (c *component) GenerateLandscape(_ components.Context, options components.LandscapeOptions) error {
 	for _, op := range []func(components.LandscapeOptions) error{
 		c.writeLandscapeTemplateFiles,
 		c.writeGitignoreFile,

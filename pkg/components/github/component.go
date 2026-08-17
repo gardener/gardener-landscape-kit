@@ -44,14 +44,13 @@ func NewComponent() (components.Interface, error) {
 	return &component{Metadata: metadata}, nil
 }
 
-
 // GenerateBase materializes the embedded .github/ assets into the repository root during base generation.
-func (c *component) GenerateBase(opts components.Options) error {
+func (c *component) GenerateBase(_ components.Context, opts components.Options) error {
 	return c.writeDotGitHub(opts)
 }
 
 // GenerateLandscape materializes the embedded .github/ assets into the repository root during landscape generation.
-func (c *component) GenerateLandscape(opts components.LandscapeOptions) error {
+func (c *component) GenerateLandscape(_ components.Context, opts components.LandscapeOptions) error {
 	return c.writeDotGitHub(opts)
 }
 

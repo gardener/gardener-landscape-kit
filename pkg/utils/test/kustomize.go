@@ -140,7 +140,7 @@ func KustomizeComponent(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create base options: %w", err)
 	}
-	if err := component.GenerateBase(baseOpts); err != nil {
+	if err := component.GenerateBase(components.NewContext(), baseOpts); err != nil {
 		return nil, fmt.Errorf("failed to generate component base: %w", err)
 	}
 
@@ -153,7 +153,7 @@ func KustomizeComponent(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create landscape options: %w", err)
 	}
-	if err := component.GenerateLandscape(landscapeOpts); err != nil {
+	if err := component.GenerateLandscape(components.NewContext(), landscapeOpts); err != nil {
 		return nil, fmt.Errorf("failed to generate component landscape: %w", err)
 	}
 

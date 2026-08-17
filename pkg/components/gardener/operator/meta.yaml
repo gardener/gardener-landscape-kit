@@ -1,2 +1,3 @@
 name: gardener-operator
 directory: gardener/operator
+componentRef: github.com/gardener/gardener

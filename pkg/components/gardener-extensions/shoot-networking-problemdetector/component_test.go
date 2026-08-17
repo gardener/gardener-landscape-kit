@@ -52,7 +52,7 @@ var _ = Describe("Component Generation", func() {
 		It("should generate the component base", func() {
 			component, err := NewComponent()
 			Expect(err).NotTo(HaveOccurred())
-			Expect(component.GenerateBase(opts)).To(Succeed())
+			Expect(component.GenerateBase(components.NewContext(), opts)).To(Succeed())
 
 			content, err := fs.ReadFile("/repo/baseDir/components/gardener-extensions/shoot-networking-problemdetector/extension.yaml")
 			Expect(err).ToNot(HaveOccurred())
@@ -84,7 +84,7 @@ var _ = Describe("Component Generation", func() {
 			component, err := NewComponent()
 			Expect(err).NotTo(HaveOccurred())
 			landscapeOpts, err := components.NewLandscapeOptions(generateOpts, fs)
-			Expect(component.GenerateLandscape(landscapeOpts)).To(Succeed())
+			Expect(component.GenerateLandscape(components.NewContext(), landscapeOpts)).To(Succeed())
 			Expect(err).ToNot(HaveOccurred())
 
 			exists, err := fs.DirExists("/repo/baseDir")

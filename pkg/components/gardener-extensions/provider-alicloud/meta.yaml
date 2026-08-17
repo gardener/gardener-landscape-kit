@@ -1,2 +1,3 @@
 name: provider-alicloud
 directory: gardener-extensions/provider-alicloud
+componentRef: github.com/gardener/gardener-extension-provider-alicloud

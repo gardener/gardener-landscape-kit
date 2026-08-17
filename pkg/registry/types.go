@@ -11,8 +11,10 @@ import (
 	"strings"
 
 	"github.com/elliotchance/orderedmap/v3"
+	"github.com/go-logr/logr"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 	"github.com/gardener/gardener-landscape-kit/pkg/utils/files"
 )
 
@@ -26,26 +28,30 @@ const (
 // Interface is the interface for a component registry.
 type Interface interface {
 	// RegisterComponent registers a component in the registry.
-	RegisterComponent(component components.Interface)
+	RegisterComponent(logr.Logger, components.Interface) error
 	// GenerateBase generates the base component.
-	GenerateBase(opts components.Options) error
+	GenerateBase(components.Options) error
 	// GenerateLandscape generates the landscape component.
-	GenerateLandscape(opts components.LandscapeOptions) error
+	GenerateLandscape(components.LandscapeOptions) error
 }
 
 type registry struct {
-	components *orderedmap.OrderedMap[string, components.Interface]
+	context                *components.ComponentsContext
+	currentComponentVector componentvector.Interface
+	nextComponentVector    componentvector.Interface
+	components             *orderedmap.OrderedMap[string, components.Interface]
 }
 
 // RegisterComponent registers a component in the registry.
-func (r *registry) RegisterComponent(component components.Interface) {
+func (r *registry) RegisterComponent(log logr.Logger, component components.Interface) error {
 	r.components.Set(component.GetComponentMetadata().Name, component)
+	return r.context.AddComponentContext(log, component.GetComponentMetadata(), r.currentComponentVector, r.nextComponentVector)
 }
 
 // GenerateBase generates the base component.
 func (r *registry) GenerateBase(opts components.Options) error {
 	for _, component := range r.components.AllFromFront() {
-		if err := component.GenerateBase(opts); err != nil {
+		if err := component.GenerateBase(r.context, opts); err != nil {
 			return err
 		}
 	}
@@ -56,7 +62,7 @@ func (r *registry) GenerateBase(opts components.Options) error {
 // GenerateLandscape generates the landscape component.
 func (r *registry) GenerateLandscape(opts components.LandscapeOptions) error {
 	for _, component := range r.components.AllFromFront() {
-		if err := component.GenerateLandscape(opts); err != nil {
+		if err := component.GenerateLandscape(r.context, opts); err != nil {
 			return err
 		}
 	}
@@ -119,8 +125,11 @@ func (r *registry) renderCustomComponents(ocmComponentName, componentDir string,
 }
 
 // New creates a new component registry.
-func New() Interface {
+func New(current, next componentvector.Interface) Interface {
 	return &registry{
-		components: orderedmap.NewOrderedMap[string, components.Interface](),
+		context:                components.NewContext(),
+		currentComponentVector: current,
+		nextComponentVector:    next,
+		components:             orderedmap.NewOrderedMap[string, components.Interface](),
 	}
 }
