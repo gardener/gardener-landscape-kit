@@ -138,18 +138,17 @@ jobs:
       if: ${{ inputs.fork-mode }}
       id: fork-diff
       run: |
-        git add .
-        if git diff --cached --quiet; then
-          echo "has-diff=false" >> "$GITHUB_OUTPUT"
-        else
+        if git status --porcelain --untracked-files=normal | grep -q .; then
           echo "has-diff=true" >> "$GITHUB_OUTPUT"
           echo "### GLK generation produced uncommitted changes" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          git diff --cached --stat >> "$GITHUB_STEP_SUMMARY"
+          git status --short >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "has-diff=false" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Post fork-mode status to PR
+    - name: Post status to PR (fork-mode)
       if: ${{ inputs.fork-mode && inputs.set-commit-status }}
       run: |
         if [[ "${{ steps.fork-diff.outputs.has-diff }}" == "true" ]]; then
@@ -165,7 +164,7 @@ jobs:
           "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }}" \
           -d "{\"state\":\"${state}\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"${description}\"}" || true
 
-    - name: Fail if fork diff detected
+    - name: Fail if diff detected (fork mode)
       if: ${{ inputs.fork-mode && steps.fork-diff.outputs.has-diff == 'true' }}
       run: |
         echo "GLK generation produced a diff that cannot be pushed to a fork."
