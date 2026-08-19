@@ -18,6 +18,7 @@ import (
 	generateoptions "github.com/gardener/gardener-landscape-kit/pkg/cmd/generate/options"
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	. "github.com/gardener/gardener-landscape-kit/pkg/registry"
+	"github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
 
 var _ = Describe("Registry", func() {
@@ -83,6 +84,43 @@ var _ = Describe("Registry", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(mockComp1.generateBaseCalled).To(BeTrue())
 			Expect(mockComp2.generateBaseCalled).To(BeTrue())
+		})
+
+		It("should create the correct component context from the provided vectors", func() {
+			const testComponentRef = "github.com/gardener/test-extension"
+
+			currentYAML := []byte(`components:
+- name: github.com/gardener/test-extension
+  sourceRepository: https://github.com/gardener/test-extension
+  version: v1.0.0
+`)
+			nextYAML := []byte(`components:
+- name: github.com/gardener/test-extension
+  sourceRepository: https://github.com/gardener/test-extension
+  version: v2.0.0
+`)
+			currentCV, err := componentvector.NewWithOverride(currentYAML)
+			Expect(err).NotTo(HaveOccurred())
+			nextCV, err := componentvector.NewWithOverride(nextYAML)
+			Expect(err).NotTo(HaveOccurred())
+
+			regWithVectors := New(currentCV, nextCV)
+
+			var receivedCtx components.Context
+			comp := &mockComponent{
+				name:         "test-extension",
+				componentRef: testComponentRef,
+				captureCtx:   func(ctx components.Context) { receivedCtx = ctx },
+			}
+
+			Expect(regWithVectors.RegisterComponent(log, comp)).To(Succeed())
+			Expect(regWithVectors.GenerateBase(options)).To(Succeed())
+
+			Expect(receivedCtx).NotTo(BeNil())
+			compCtx, err := receivedCtx.Own(comp)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(compCtx.GetUpgradePath().CurrentVersion).To(Equal("v1.0.0"))
+			Expect(compCtx.GetUpgradePath().NextVersion).To(Equal("v2.0.0"))
 		})
 	})
 
@@ -423,26 +461,39 @@ var _ = Describe("Registry", func() {
 // mockComponent is a test helper that implements components.Interface
 type mockComponent struct {
 	name                    string
-	generateBaseFunc        func(components.Options) error
-	generateLandscapeFunc   func(components.LandscapeOptions) error
+	componentRef            string
+	captureCtx              func(components.Context)
 	generateBaseCalled      bool
 	generateLandscapeCalled bool
+
+	generateBaseFunc      func(components.Options) error
+	generateLandscapeFunc func(components.LandscapeOptions) error
 }
 
 func (m *mockComponent) GetComponentMetadata() *components.Metadata {
-	return &components.Metadata{Name: m.name}
+	meta := &components.Metadata{Name: m.name}
+	if m.componentRef != "" {
+		meta.ComponentRef = &m.componentRef
+	}
+	return meta
 }
 
-func (m *mockComponent) GenerateBase(_ components.Context, opts components.Options) error {
+func (m *mockComponent) GenerateBase(ctx components.Context, opts components.Options) error {
 	m.generateBaseCalled = true
+	if m.captureCtx != nil {
+		m.captureCtx(ctx)
+	}
 	if m.generateBaseFunc != nil {
 		return m.generateBaseFunc(opts)
 	}
 	return nil
 }
 
-func (m *mockComponent) GenerateLandscape(_ components.Context, opts components.LandscapeOptions) error {
+func (m *mockComponent) GenerateLandscape(ctx components.Context, opts components.LandscapeOptions) error {
 	m.generateLandscapeCalled = true
+	if m.captureCtx != nil {
+		m.captureCtx(ctx)
+	}
 	if m.generateLandscapeFunc != nil {
 		return m.generateLandscapeFunc(opts)
 	}
