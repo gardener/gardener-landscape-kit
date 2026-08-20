@@ -50,12 +50,12 @@ func NewCommand(globalOpts *cmd.Options) *cobra.Command {
 }
 
 func run(_ context.Context, opts *options.Options) error {
-	componentOpts, err := components.NewOptions(opts, afero.Afero{Fs: afero.NewOsFs()})
+	fs := afero.Afero{Fs: afero.NewOsFs()}
+	componentOpts, err := components.NewOptions(opts, fs)
 	if err != nil {
 		return fmt.Errorf("failed to create component options: %w", err)
 	}
 
-	fs := afero.Afero{Fs: afero.NewOsFs()}
 	currentComponentVector, err := utilscomponentvector.ReadComponentVectorMetadata(opts.TargetDirPath, fs)
 	if err != nil {
 		return fmt.Errorf("failed to read current component vector metadata: %w", err)
