@@ -95,9 +95,11 @@ EOF
     yq eval --inplace "(.. | select(. == \"$v$suffix\")) = \"$ref\"" ${tmpDir}/extension.yaml
   done
 
-  yq eval --inplace '.spec.deployment.admission.values.image = (.spec.deployment.admission.runtimeCluster.helm.ociRepository.ref | sub("_charts_runtime","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
-  yq eval --inplace '.spec.deployment.extension.runtimeClusterValues.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
-  yq eval --inplace '.spec.deployment.extension.values.image = (.spec.deployment.extension.helm.ociRepository.ref | sub("_charts_extension","") | sub("@.+","")) ' ${tmpDir}/extension.yaml
+  admissionRef=$(yq -r '.builds[] | select(.imageName == "local-skaffold/gardener-extension-admission-local") | .tag | sub("@.+"; "")' "${devDir}/gardener/local/build-output.json")
+  yq eval --inplace ".spec.deployment.admission.values.image = \"$admissionRef\"" ${tmpDir}/extension.yaml
+  extRef=$(yq -r '.builds[] | select(.imageName == "local-skaffold/gardener-extension-provider-local") | .tag | sub("@.+"; "")' "${devDir}/gardener/local/build-output.json")
+  yq eval --inplace ".spec.deployment.extension.runtimeClusterValues.image = \"$extRef\"" ${tmpDir}/extension.yaml
+  yq eval --inplace ".spec.deployment.extension.values.image = \"$extRef\"" ${tmpDir}/extension.yaml
 
   echo "✅ Generated extension.yaml for provider-local"
 }
