@@ -2,8 +2,6 @@ module github.com/gardener/gardener-landscape-kit
 
 go 1.26.5
 
-replace k8s.io/apiserver => k8s.io/apiserver v0.35.5 // TODO(LucaBernstein): Remove once g/g updated its dependency to v0.36+
-
 require (
 	codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3 v3.0.0
 	github.com/Masterminds/semver/v3 v3.5.0
