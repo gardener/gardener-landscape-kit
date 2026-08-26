@@ -1,4 +1,4 @@
-FROM kindest/node:v1.34.8@sha256:02722c2dedddcfc00febf5d27fbeb9b7b2c14294c82109ff4a85d89ac9ba3256
+FROM kindest/node:v1.34.11@sha256:44e222ee2132dab25ff87301682f89eb82c7880ea3a1bf543bfe9708fd08d67d
 
 # copy containerd hosts configurations for local registry mirrors
 COPY containerd /etc/containerd/certs.d/
