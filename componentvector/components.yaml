@@ -1,7 +1,7 @@
 components:
 - name: github.com/gardener/gardener-landscape-kit
   sourceRepository: https://github.com/gardener/gardener-landscape-kit
-  version: v0.4.0
+  version: v0.4.1-dev
   resources:
     fluxCLI:
       ociImage:
