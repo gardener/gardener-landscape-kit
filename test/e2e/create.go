@@ -15,6 +15,7 @@ import (
 
 	fluxv1 "github.com/fluxcd/kustomize-controller/api/v1"
 	fluxmeta "github.com/fluxcd/pkg/apis/meta"
+	sourcev1 "github.com/fluxcd/source-controller/api/v1"
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	operatorv1alpha1 "github.com/gardener/gardener/pkg/apis/operator/v1alpha1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
@@ -255,6 +256,7 @@ data: {}
 	It("Create Kubernetes client", func() {
 		runtimeScheme := runtime.NewScheme()
 		Expect(fluxv1.AddToScheme(runtimeScheme)).To(Succeed())
+		Expect(sourcev1.AddToScheme(runtimeScheme)).To(Succeed())
 		Expect(operatorclient.AddRuntimeSchemeToScheme(runtimeScheme)).To(Succeed())
 
 		var err error
@@ -270,6 +272,47 @@ data: {}
 		s = &GardenContext{}
 		s.WithVirtualClusterClientSet(runtimeClusterClient)
 	})
+
+	It("Reconcile Source", func(ctx SpecContext) {
+		config := &v1alpha1.LandscapeKitConfiguration{}
+		configBytes, err := os.ReadFile(ConfigPath) // #nosec G304 -- controlled by test.
+		Expect(err).NotTo(HaveOccurred())
+		Expect(yaml.Unmarshal(configBytes, config)).To(Succeed())
+
+		sourceKey := client.ObjectKey{Name: "flux-system", Namespace: "flux-system"}
+		requestedAt := time.Now().Format(time.RFC3339Nano)
+
+		sourceKind := v1alpha1.KindGitRepository
+		if config.Repositories != nil && config.Repositories.Landscape != nil && config.Repositories.Landscape.Kind != "" {
+			sourceKind = config.Repositories.Landscape.Kind
+		}
+
+		By("Annotating source to trigger reconciliation")
+		switch sourceKind {
+		case v1alpha1.KindOCIRepository:
+			src := &sourcev1.OCIRepository{}
+			Expect(runtimeClusterClient.Client().Get(ctx, sourceKey, src)).To(Succeed())
+			metav1.SetMetaDataAnnotation(&src.ObjectMeta, fluxmeta.ReconcileRequestAnnotation, requestedAt)
+			Expect(runtimeClusterClient.Client().Update(ctx, src)).To(Succeed())
+
+			By("Waiting for OCIRepository to acknowledge reconciliation")
+			Eventually(ctx, func(g Gomega) {
+				g.Expect(runtimeClusterClient.Client().Get(ctx, sourceKey, src)).To(Succeed())
+				g.Expect(src.Status.GetLastHandledReconcileRequest()).To(Equal(requestedAt))
+			}).Should(Succeed())
+		default:
+			src := &sourcev1.GitRepository{}
+			Expect(runtimeClusterClient.Client().Get(ctx, sourceKey, src)).To(Succeed())
+			metav1.SetMetaDataAnnotation(&src.ObjectMeta, fluxmeta.ReconcileRequestAnnotation, requestedAt)
+			Expect(runtimeClusterClient.Client().Update(ctx, src)).To(Succeed())
+
+			By("Waiting for GitRepository to acknowledge reconciliation")
+			Eventually(ctx, func(g Gomega) {
+				g.Expect(runtimeClusterClient.Client().Get(ctx, sourceKey, src)).To(Succeed())
+				g.Expect(src.Status.GetLastHandledReconcileRequest()).To(Equal(requestedAt))
+			}).Should(Succeed())
+		}
+	}, SpecTimeout(5*time.Minute))
 
 	It("Reconcile Garden", func(ctx SpecContext) {
 		garden := &operatorv1alpha1.Garden{ObjectMeta: metav1.ObjectMeta{Name: "garden"}}
