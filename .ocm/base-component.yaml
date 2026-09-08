@@ -14,6 +14,11 @@ resources:
     access:
       type: ociRegistry
       imageReference: ghcr.io/fluxcd/flux-cli:v2.9.4
+    labels:
+      - name: imagevector.gardener.cloud/name
+        value: flux-cli
+      - name: imagevector.gardener.cloud/repository
+        value: ghcr.io/fluxcd/flux-cli
   - name: helm-controller
     version: v1.6.3
     type: ociImage
@@ -21,6 +26,11 @@ resources:
     access:
       type: ociRegistry
       imageReference: ghcr.io/fluxcd/helm-controller:v1.6.3
+    labels:
+      - name: imagevector.gardener.cloud/name
+        value: helm-controller
+      - name: imagevector.gardener.cloud/repository
+        value: ghcr.io/fluxcd/helm-controller
   - name: kustomize-controller
     version: v1.9.4
     type: ociImage
@@ -28,6 +38,11 @@ resources:
     access:
       type: ociRegistry
       imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.4
+    labels:
+      - name: imagevector.gardener.cloud/name
+        value: kustomize-controller
+      - name: imagevector.gardener.cloud/repository
+        value: ghcr.io/fluxcd/kustomize-controller
   - name: notification-controller
     version: v1.9.3
     type: ociImage
@@ -35,6 +50,11 @@ resources:
     access:
       type: ociRegistry
       imageReference: ghcr.io/fluxcd/notification-controller:v1.9.3
+    labels:
+      - name: imagevector.gardener.cloud/name
+        value: notification-controller
+      - name: imagevector.gardener.cloud/repository
+        value: ghcr.io/fluxcd/notification-controller
   - name: source-controller
     version: v1.9.4
     type: ociImage
@@ -42,3 +62,8 @@ resources:
     access:
       type: ociRegistry
       imageReference: ghcr.io/fluxcd/source-controller:v1.9.4
+    labels:
+      - name: imagevector.gardener.cloud/name
+        value: source-controller
+      - name: imagevector.gardener.cloud/repository
+        value: ghcr.io/fluxcd/source-controller
