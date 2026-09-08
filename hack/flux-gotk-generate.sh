@@ -97,8 +97,8 @@ done < <(grep -oP "(?<=image: )ghcr\.io/fluxcd/[^\s]+" "$GOTK" | sort -u)
 while IFS=$'\t' read -r key repo tag; do
   name=$(to_kebab_case "$key")
   image="${repo}:${tag}"
-  name=$name tag=$tag image=$image \
-    yq -i '. += [{"name": env(name), "version": env(tag), "type": "ociImage", "relation": "external", "access": {"type": "ociRegistry", "imageReference": env(image)}}]' \
+  name=$name tag=$tag image=$image repo=$repo \
+    yq -i '. += [{"name": env(name), "version": env(tag), "type": "ociImage", "relation": "external", "access": {"type": "ociRegistry", "imageReference": env(image)}, "labels": [{"name": "imagevector.gardener.cloud/name", "value": env(name)}, {"name": "imagevector.gardener.cloud/repository", "value": env(repo)}]}]' \
     "$ocm_resources_file"
 done < <(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].resources | to_entries | .[] | .key + "\t" + .value.ociImage.repository + "\t" + .value.ociImage.tag' "$COMPONENTS")
 
