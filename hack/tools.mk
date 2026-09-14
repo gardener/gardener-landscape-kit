@@ -4,7 +4,7 @@
 
 GLK_PRETTIFY        := $(TOOLS_BIN_DIR)/prettify
 
-FLUX_CLI_VERSION ?= $(shell grep -A3 'fluxCLI:' $(REPO_ROOT)/componentvector/components.yaml | sed -n 's/.*tag: //p')
+FLUX_CLI_VERSION ?= $(shell grep -A2 'name: flux-cli' $(REPO_ROOT)/componentvector/components.yaml | sed -n 's/.*tag: //p')
 GLK_PRETTIFY_VERSION = $(shell git rev-parse HEAD)
 
 FLUX_CLI ?= $(TOOLS_DIR)/bin/$(SYSTEM_NAME)-$(SYSTEM_ARCH)/flux

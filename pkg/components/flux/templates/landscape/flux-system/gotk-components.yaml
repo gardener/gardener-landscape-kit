@@ -2611,7 +2611,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: {{ .resources.sourceController.ociImage.ref }}
+        image: {{ .images.sourceController.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -3537,7 +3537,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: {{ .resources.kustomizeController.ociImage.ref }}
+        image: {{ .images.kustomizeController.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -5133,7 +5133,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: {{ .resources.helmController.ociImage.ref }}
+        image: {{ .images.helmController.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -6038,7 +6038,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: {{ .resources.notificationController.ociImage.ref }}
+        image: {{ .images.notificationController.ref }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

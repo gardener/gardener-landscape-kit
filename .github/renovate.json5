@@ -41,7 +41,7 @@ The following dependencies have been updated:\n\
       // (and running `make generate` via postUpgradeTasks) propagates the controller versions downstream.
       managerFilePatterns: ['/^componentvector/components\\.yaml$/'],
       matchStrings: [
-        'fluxCLI:\\s*\\n\\s*ociImage:\\s*\\n\\s*repository: (?<depName>[^\\s]+)\\s*\\n\\s*tag: (?<currentValue>v?[^\\s]+)',
+        '- name: flux-cli\\s*\\n\\s*repository: (?<depName>[^\\s]+)\\s*\\n\\s*tag: (?<currentValue>v?[^\\s]+)',
       ],
       datasourceTemplate: 'docker',
     },

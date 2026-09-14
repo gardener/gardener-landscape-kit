@@ -9,6 +9,7 @@ import (
 
 	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1"
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,7 +29,6 @@ import (
 	"github.com/gardener/gardener-landscape-kit/pkg/components"
 	. "github.com/gardener/gardener-landscape-kit/pkg/components/flux"
 	utilscomponentvector "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
-	"github.com/gardener/gardener-landscape-kit/pkg/utils/test"
 )
 
 var (
@@ -250,13 +250,13 @@ var _ = Describe("Flux Component Generation", func() {
 		})
 
 		Context("GOTK Components Manifest", func() {
-			writeComponentsVectorFile := func(resourcesYAML string) {
-				resources, err := test.UnmarshalToResources(resourcesYAML)
-				Expect(err).NotTo(HaveOccurred())
+			writeComponentsVectorFile := func(imagesYAML string) {
+				var images []imagevector.ImageSource
+				Expect(yaml.Unmarshal([]byte(imagesYAML), &images)).To(Succeed())
 				cv := &utilscomponentvector.ComponentVector{
-					Name:      componentvector.NameGardenerGardenerLandscapeKit,
-					Version:   "v0.3.0-dev",
-					Resources: resources,
+					Name:                 componentvector.NameGardenerGardenerLandscapeKit,
+					Version:              "v0.3.0-dev",
+					ImageVectorOverwrite: &utilscomponentvector.ImageVectorOverwrite{Images: images},
 				}
 				cvs := &utilscomponentvector.Components{Components: []*utilscomponentvector.ComponentVector{cv}}
 				content, err := yaml.Marshal(cvs)
@@ -266,7 +266,7 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(fs.WriteFile("/components.yaml", content, 0o644)).To(Succeed())
 			}
 
-			It("should use default images when no component vector resources are set", func() {
+			It("should contain the pinned Flux controller image refs", func() {
 				component, err := NewComponent()
 				Expect(err).NotTo(HaveOccurred())
 				Expect(component.GenerateLandscape(components.NewContext(), opts)).To(Succeed())
@@ -281,20 +281,16 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/notification-controller:v"))
 			})
 
-			It("should use overridden images from the component vector resources", func() {
+			It("should use overridden images from the component vector imageVectorOverwrite", func() {
 				writeComponentsVectorFile(`
-sourceController:
-  ociImage:
-    ref: my.registry.io/fluxcd/source-controller:v9.9.9
-kustomizeController:
-  ociImage:
-    ref: my.registry.io/fluxcd/kustomize-controller:v9.9.9
-helmController:
-  ociImage:
-    ref: my.registry.io/fluxcd/helm-controller:v9.9.9
-notificationController:
-  ociImage:
-    ref: my.registry.io/fluxcd/notification-controller:v9.9.9
+- name: source-controller
+  ref: my.registry.io/fluxcd/source-controller:v9.9.9
+- name: kustomize-controller
+  ref: my.registry.io/fluxcd/kustomize-controller:v9.9.9
+- name: helm-controller
+  ref: my.registry.io/fluxcd/helm-controller:v9.9.9
+- name: notification-controller
+  ref: my.registry.io/fluxcd/notification-controller:v9.9.9
 `)
 				opts = buildOpts(func(conf *v1alpha1.LandscapeKitConfiguration) {
 					conf.Repositories.Landscape.ComponentsFiles = []string{"components.yaml"}

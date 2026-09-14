@@ -55,23 +55,18 @@ GOTK=$REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-compone
 COMPONENTS=$REPO_ROOT/componentvector/components.yaml
 OCM_BASE_COMPONENT=$REPO_ROOT/.ocm/base-component.yaml
 
+GLK_INDEX=$(yq '.components | to_entries | .[] | select(.value.name == "github.com/gardener/gardener-landscape-kit") | .key' "$COMPONENTS")
+
 # Convert a hyphenated controller name to camelCase key, e.g. "source-controller" -> "sourceController"
 to_camel_case() {
   echo "$1" | sed -E 's/-([a-z])/\U\1/g'
 }
 
-# Convert a camelCase key to kebab-case, e.g. "fluxCLI" -> "flux-cli", "sourceController" -> "source-controller"
-to_kebab_case() {
-  echo "$1" | sed 's/\([a-z]\)\([A-Z]\)/\1-\2/g; s/\([A-Z]\+\)\([A-Z][a-z]\)/\1-\2/g' | tr '[:upper:]' '[:lower:]'
-}
-
-GLK_INDEX=$(yq '.components | to_entries | .[] | select(.value.name == "github.com/gardener/gardener-landscape-kit") | .key' "$COMPONENTS")
-
 ## Extract all Flux controller images from gotk-components.yaml and update downstream files
 echo "> Updating Flux controller images in componentvector/components.yaml and .ocm/base-component.yaml"
 
-# Clear existing Flux controller resources so stale entries don't accumulate, preserving non-controller entries (e.g. fluxCLI).
-GLK_INDEX=$GLK_INDEX yq -i '.components[env(GLK_INDEX)].resources = (.components[env(GLK_INDEX)].resources | with_entries(select(.key == "fluxCLI")))' "$COMPONENTS"
+# Clear existing Flux controller images so stale entries don't accumulate, preserving non-controller entries (e.g. flux-cli).
+GLK_INDEX=$GLK_INDEX yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images = (.components[env(GLK_INDEX)].imageVectorOverwrite.images | map(select(.name == "flux-cli")))' "$COMPONENTS"
 
 ocm_resources_file=$(mktemp)
 trap "rm -f $ocm_resources_file" EXIT
@@ -86,25 +81,23 @@ while IFS= read -r image; do
   repo="${image%:*}"                       # "ghcr.io/fluxcd/source-controller"
   resource_key=$(to_camel_case "$controller")
 
-  GLK_INDEX=$GLK_INDEX resource_key=$resource_key repo=$repo tag=$tag \
-    yq -i '.components[env(GLK_INDEX)].resources[env(resource_key)].ociImage.repository = env(repo) |
-           .components[env(GLK_INDEX)].resources[env(resource_key)].ociImage.tag = env(tag)' "$COMPONENTS"
+  GLK_INDEX=$GLK_INDEX controller=$controller repo=$repo tag=$tag \
+    yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images += [{"name": env(controller), "repository": env(repo), "tag": env(tag)}]' "$COMPONENTS"
 
-  sed -i "s|image: ${image}|image: {{ .resources.${resource_key}.ociImage.ref }}|g" "$GOTK"
+  sed -i "s|image: ${repo}:${tag}|image: {{ .images.${resource_key}.ref }}|g" "$GOTK"
 done < <(grep -oP "(?<=image: )ghcr\.io/fluxcd/[^\s]+" "$GOTK" | sort -u)
 
 # Add all gardener-landscape-kit resources from componentvector/components.yaml to .ocm/base-component.yaml.
-while IFS=$'\t' read -r key repo tag; do
-  name=$(to_kebab_case "$key")
+while IFS=$'\t' read -r name repo tag; do
   image="${repo}:${tag}"
   name=$name tag=$tag image=$image repo=$repo \
     yq -i '. += [{"name": env(name), "version": env(tag), "type": "ociImage", "relation": "external", "access": {"type": "ociRegistry", "imageReference": env(image)}, "labels": [{"name": "imagevector.gardener.cloud/name", "value": env(name)}, {"name": "imagevector.gardener.cloud/repository", "value": env(repo)}]}]' \
     "$ocm_resources_file"
-done < <(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].resources | to_entries | .[] | .key + "\t" + .value.ociImage.repository + "\t" + .value.ociImage.tag' "$COMPONENTS")
+done < <(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].imageVectorOverwrite.images[] | .name + "\t" + .repository + "\t" + .tag' "$COMPONENTS")
 
 resources_file=$ocm_resources_file yq -i '.resources = load(env(resources_file))' "$OCM_BASE_COMPONENT"
 
 # Sync flux-cli version to GitHub Action definition in dev-setup, replacing whatever version is currently pinned there.
-FLUX_CLI_VERSION=$(yq -e '.components[0].resources.fluxCLI.ociImage.tag' $COMPONENTS)
+FLUX_CLI_VERSION=$(yq -e '.components[0].imageVectorOverwrite.images[] | select(.name == "flux-cli") | .tag' $COMPONENTS)
 WORKFLOW_FILE="$REPO_ROOT/dev-setup/git-repos/workflow-push-oci.yaml"
 sed -i -E "s|(fluxcd/flux2/action@).+|\1$FLUX_CLI_VERSION|g" "$WORKFLOW_FILE"

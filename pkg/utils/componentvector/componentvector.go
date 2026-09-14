@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"slices"
+	"strings"
+	"unicode"
 
 	"github.com/spf13/afero"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -158,6 +160,20 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 			return nil, fmt.Errorf("failed to marshal image vector overwrite: %w", err)
 		}
 		m[imageVectorOverwriteKey] = string(data)
+
+		// Also expose images as a navigable map keyed by camelCase name, so templates can reference
+		// individual image refs via e.g. {{ .images.sourceController.ref }}.
+		imagesMap := make(map[string]any, len(cv.ImageVectorOverwrite.Images))
+		for _, img := range cv.ImageVectorOverwrite.Images {
+			ref := ""
+			if img.Ref != nil {
+				ref = *img.Ref
+			} else if img.Repository != nil && img.Tag != nil {
+				ref = *img.Repository + ":" + *img.Tag
+			}
+			imagesMap[kebabToCamelCase(img.Name)] = map[string]any{"ref": ref}
+		}
+		m["images"] = imagesMap
 	}
 	if cv.ComponentImageVectorOverwrites != nil {
 		// Marshal the ComponentImageVectorOverwrites as it is expected to be as string.
@@ -280,4 +296,17 @@ func ReadComponentVectorMetadata(targetPath string, fs afero.Afero) (Interface, 
 	}
 
 	return NewWithOverride(data)
+}
+
+// kebabToCamelCase converts a kebab-case string to camelCase, e.g. "source-controller" → "sourceController".
+func kebabToCamelCase(s string) string {
+	parts := strings.Split(s, "-")
+	for i := 1; i < len(parts); i++ {
+		if len(parts[i]) > 0 {
+			runes := []rune(parts[i])
+			runes[0] = unicode.ToUpper(runes[0])
+			parts[i] = string(runes)
+		}
+	}
+	return strings.Join(parts, "")
 }
