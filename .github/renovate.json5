@@ -54,7 +54,7 @@ The following dependencies have been updated:\n\
         '/^Makefile$/',
       ],
       matchStrings: [
-        '# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\s+export GOTOOLCHAIN\\s*\\??=\\s*go(?<currentValue>[^\\s]+)',
+        '# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\s+export GOTOOLCHAIN\\s*:?\\??=\\s*go(?<currentValue>[^\\s]+)',
       ],
     },
   ],
