@@ -99,6 +99,7 @@ sast: $(GOSEC)
 
 .PHONY: sast-report
 sast-report: $(GOSEC)
+	@[ "$$(go version $(GOSEC) | awk '{print $$2}')" = "$(GOTOOLCHAIN)" ] || { rm -f $(GOSEC); $(MAKE) $(GOSEC); } # TODO(LucaBernstein): Remove this force-rebuild of gosec once g/g includes the Go version a tool was built with in the version file.
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test
