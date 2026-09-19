@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# Use a specific Go toolchain version to ensure consistent builds across different environments.
+# renovate: datasource=golang-version depName=go
+export GOTOOLCHAIN = go1.27.1
+# $(GOTOOLCHAIN) is exported, but exported make variables are not propagated into the environment of $(shell ...) sub-shells.
+# By exporting it explicitly in the SHELL command, it becomes available also in sub-shells.
+SHELL=/usr/bin/env GOTOOLCHAIN=$(GOTOOLCHAIN) bash -o pipefail
+
 NAME                     := gardener-landscape-kit
 VERSION                  := $(shell cat VERSION)
 EFFECTIVE_VERSION        := $(VERSION)-$(shell git rev-parse HEAD)
@@ -18,10 +25,6 @@ export VERSION
 export LD_FLAGS              = $(shell bash $(GARDENER_HACK_DIR)/get-build-ld-flags.sh k8s.io/component-base $(REPO_ROOT)/VERSION $(NAME) $(BUILD_DATE))
 export SKAFFOLD_DEFAULT_REPO = glk-registry.local.gardener.cloud:6001
 export SKAFFOLD_PUSH         = true
-
-# Use a specific Go toolchain version to ensure consistent builds across different environments.
-# renovate: datasource=golang-version depName=go
-export GOTOOLCHAIN := go1.26.7
 
 #########################################
 # Tools                                 #
@@ -96,6 +99,7 @@ sast: $(GOSEC)
 
 .PHONY: sast-report
 sast-report: $(GOSEC)
+	@[ "$$(go version $(GOSEC) | awk '{print $$2}')" = "$(GOTOOLCHAIN)" ] || { rm -f $(GOSEC); $(MAKE) $(GOSEC); } # TODO(LucaBernstein): Remove this force-rebuild of gosec once g/g includes the Go version a tool was built with in the version file.
 	@HACK_DIR=$(HACK_DIR) GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) bash $(HACK_DIR)/sast.sh --exclude-dirs hack,dev --gosec-report true
 
 .PHONY: test

@@ -13,7 +13,7 @@ import (
 
 // LandscapeKitConfiguration contains configuration for the Gardener Landscape Kit.
 type LandscapeKitConfiguration struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta `json:""`
 
 	// OCM is the configuration for the OCM version processing.
 	// +optional
