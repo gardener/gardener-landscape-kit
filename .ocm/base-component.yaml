@@ -8,60 +8,60 @@ main-source:
           we use gosec for sast scanning. See attached log.
 resources:
   - name: flux-cli
-    version: v2.9.4
+    version: v2.9.5
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.4
+      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.5
     labels:
       - name: imagevector.gardener.cloud/name
         value: flux-cli
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/flux-cli
   - name: helm-controller
-    version: v1.6.3
+    version: v1.6.4
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.3
+      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.4
     labels:
       - name: imagevector.gardener.cloud/name
         value: helm-controller
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/helm-controller
   - name: kustomize-controller
-    version: v1.9.4
+    version: v1.9.5
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.4
+      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.5
     labels:
       - name: imagevector.gardener.cloud/name
         value: kustomize-controller
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/kustomize-controller
   - name: notification-controller
-    version: v1.9.3
+    version: v1.9.4
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/notification-controller:v1.9.3
+      imageReference: ghcr.io/fluxcd/notification-controller:v1.9.4
     labels:
       - name: imagevector.gardener.cloud/name
         value: notification-controller
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/notification-controller
   - name: source-controller
-    version: v1.9.4
+    version: v1.9.5
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/source-controller:v1.9.4
+      imageReference: ghcr.io/fluxcd/source-controller:v1.9.5
     labels:
       - name: imagevector.gardener.cloud/name
         value: source-controller

@@ -6,19 +6,19 @@ components:
     images:
     - name: flux-cli
       repository: ghcr.io/fluxcd/flux-cli
-      tag: v2.9.4
+      tag: v2.9.5
     - name: helm-controller
       repository: ghcr.io/fluxcd/helm-controller
-      tag: v1.6.3
+      tag: v1.6.4
     - name: kustomize-controller
       repository: ghcr.io/fluxcd/kustomize-controller
-      tag: v1.9.4
+      tag: v1.9.5
     - name: notification-controller
       repository: ghcr.io/fluxcd/notification-controller
-      tag: v1.9.3
+      tag: v1.9.4
     - name: source-controller
       repository: ghcr.io/fluxcd/source-controller
-      tag: v1.9.4
+      tag: v1.9.5
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.149.4
