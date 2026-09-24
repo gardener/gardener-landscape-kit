@@ -20,11 +20,11 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
-	k8s.io/api v0.37.0
-	k8s.io/apimachinery v0.37.0
-	k8s.io/cli-runtime v0.37.0
-	k8s.io/client-go v0.37.0
-	k8s.io/component-base v0.37.0
+	k8s.io/api v0.37.1
+	k8s.io/apimachinery v0.37.1
+	k8s.io/cli-runtime v0.37.1
+	k8s.io/client-go v0.37.1
+	k8s.io/component-base v0.37.1
 	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	ocm.software/open-component-model/bindings/go/descriptor/runtime v0.0.0-20260608134855-41ae44158792
 	ocm.software/open-component-model/bindings/go/descriptor/v2 v2.0.3-alpha3
@@ -246,7 +246,7 @@ require (
 	k8s.io/kube-aggregator v0.36.4 // indirect
 	k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad // indirect
 	k8s.io/metrics v0.36.4 // indirect
-	k8s.io/streaming v0.37.0 // indirect
+	k8s.io/streaming v0.37.1 // indirect
 	ocm.software/open-component-model/bindings/go/blob v0.0.13 // indirect
 	ocm.software/open-component-model/bindings/go/ctf v0.4.0 // indirect
 	ocm.software/open-component-model/bindings/go/repository v0.0.9 // indirect
