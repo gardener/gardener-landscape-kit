@@ -78,17 +78,6 @@ The following dependencies have been updated:\n\
     },
     {
       matchDatasources: ['go'],
-      groupName: "open-component-model-bindings-go-descriptor-runtime",
-      matchPackageNames: ["ocm.software/open-component-model/bindings/go/descriptor/runtime"],
-      enabled: false,
-    },
-    {
-      matchDatasources: ['go'],
-      groupName: "open-component-model",
-      matchPackageNames: ["ocm.software/open-component-model/"],
-    },
-    {
-      matchDatasources: ['go'],
       groupName: "fluxcd-controllers",
       matchPackageNames: ['/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/'],
     },
