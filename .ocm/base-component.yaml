@@ -8,36 +8,36 @@ main-source:
           we use gosec for sast scanning. See attached log.
 resources:
   - name: flux-cli
-    version: v2.9.5
+    version: v2.9.6
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.5
+      imageReference: ghcr.io/fluxcd/flux-cli:v2.9.6
     labels:
       - name: imagevector.gardener.cloud/name
         value: flux-cli
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/flux-cli
   - name: helm-controller
-    version: v1.6.4
+    version: v1.6.5
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.4
+      imageReference: ghcr.io/fluxcd/helm-controller:v1.6.5
     labels:
       - name: imagevector.gardener.cloud/name
         value: helm-controller
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/helm-controller
   - name: kustomize-controller
-    version: v1.9.5
+    version: v1.9.6
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.5
+      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.9.6
     labels:
       - name: imagevector.gardener.cloud/name
         value: kustomize-controller
@@ -56,12 +56,12 @@ resources:
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/notification-controller
   - name: source-controller
-    version: v1.9.5
+    version: v1.9.6
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/source-controller:v1.9.5
+      imageReference: ghcr.io/fluxcd/source-controller:v1.9.6
     labels:
       - name: imagevector.gardener.cloud/name
         value: source-controller
