@@ -4,7 +4,7 @@
 
 # Use a specific Go toolchain version to ensure consistent builds across different environments.
 # renovate: datasource=golang-version depName=go
-export GOTOOLCHAIN = go1.27.1
+export GOTOOLCHAIN = go1.27.2
 # $(GOTOOLCHAIN) is exported, but exported make variables are not propagated into the environment of $(shell ...) sub-shells.
 # By exporting it explicitly in the SHELL command, it becomes available also in sub-shells.
 SHELL=/usr/bin/env GOTOOLCHAIN=$(GOTOOLCHAIN) bash -o pipefail
