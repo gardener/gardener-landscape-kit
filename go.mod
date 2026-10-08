@@ -9,9 +9,9 @@ require (
 	github.com/fluxcd/kustomize-controller/api v1.9.6
 	github.com/fluxcd/pkg/apis/meta v1.32.0
 	github.com/fluxcd/source-controller/api v1.9.6
-	github.com/gardener/gardener v1.152.0
-	github.com/gardener/gardener/hack/tools v1.152.0
-	github.com/gardener/gardener/pkg/apis v1.152.0
+	github.com/gardener/gardener v1.152.1
+	github.com/gardener/gardener/hack/tools v1.152.1
+	github.com/gardener/gardener/pkg/apis v1.152.1
 	github.com/go-logr/logr v1.4.4
 	github.com/go-sprout/sprout v1.1.1
 	github.com/onsi/ginkgo/v2 v2.33.0
