@@ -11,13 +11,13 @@ set -o pipefail
 # install.sh — downloads and installs a gardener-landscape-kit release.
 #
 # Usage:
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)"
 #   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- --version v0.6.0
 #   /bin/bash -c "$(curl -fsSL ...)" -- --components-file path/to/component-descriptor.yaml --install-dir ~/.local/bin
 #
 # Options:
-#   --version VERSION        GLK release to install (for example, v0.6.0)
+#   --version VERSION        GLK release to install (default: latest release)
 #   --components-file PATH   Path to a release's component-descriptor.yaml
-#                            (default: ./components.yaml)
 #   --install-dir DIR        Directory to install the binary into (default: ~/.glk/bin)
 #   --no-symlink             Do not create/update a 'glk' symlink in install-dir
 #   --help                   Print this help
@@ -88,7 +88,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# ── download the component descriptor for the requested release ──────────────
+# ── download a component descriptor unless one was provided ──────────────────
 
 if [[ -n "$RELEASE_VERSION" ]]; then
   [[ -z "$COMPONENTS_FILE" ]] \
@@ -96,15 +96,23 @@ if [[ -n "$RELEASE_VERSION" ]]; then
   [[ "$RELEASE_VERSION" =~ ^v[0-9][0-9A-Za-z.+-]*$ ]] \
     || die "Invalid version '${RELEASE_VERSION}'. Expected a release tag such as v0.6.0."
 
-  COMPONENTS_TMP="$(mktemp)"
-
-  log "Downloading component descriptor for ${RELEASE_VERSION} ..."
-  download "https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_VERSION}/component-descriptor.yaml" "$COMPONENTS_TMP" \
-    || die "Could not download component-descriptor.yaml for release '${RELEASE_VERSION}'."
-  COMPONENTS_FILE="$COMPONENTS_TMP"
 fi
 
-COMPONENTS_FILE="${COMPONENTS_FILE:-./components.yaml}"
+if [[ -z "$COMPONENTS_FILE" ]]; then
+  COMPONENTS_TMP="$(mktemp)"
+  if [[ -n "$RELEASE_VERSION" ]]; then
+    DESCRIPTOR_URL="https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_VERSION}/component-descriptor.yaml"
+    RELEASE_DESCRIPTION="release ${RELEASE_VERSION}"
+  else
+    DESCRIPTOR_URL="https://github.com/${GITHUB_REPO}/releases/latest/download/component-descriptor.yaml"
+    RELEASE_DESCRIPTION="the latest release"
+  fi
+
+  log "Downloading component descriptor for ${RELEASE_DESCRIPTION} ..."
+  download "$DESCRIPTOR_URL" "$COMPONENTS_TMP" \
+    || die "Could not download component-descriptor.yaml for ${RELEASE_DESCRIPTION}."
+  COMPONENTS_FILE="$COMPONENTS_TMP"
+fi
 
 # ── detect version from the component descriptor ──────────────────────────────
 

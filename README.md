@@ -7,7 +7,13 @@
 
 ## Getting Started
 
-Choose the GLK release you want to install and pass its version to the installer:
+Run the installer without arguments to install the latest GLK release:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)"
+```
+
+To install a specific release, pass its version to the installer:
 
 ```bash
 GLK_VERSION=v0.6.0
@@ -15,15 +21,14 @@ GLK_VERSION=v0.6.0
   --version "${GLK_VERSION}"
 ```
 
-The latest installer downloads the specified release's `component-descriptor.yaml`,
-determines the matching `glk` binary version, installs it to `~/.glk/bin/`, and prints
-next steps. Using the latest installer also ensures that descriptors from older releases
-are handled correctly.
+The installer downloads the latest release's `component-descriptor.yaml` by default, or
+the specified release's descriptor when `--version` is set. It determines the matching
+`glk` binary version, installs it to `~/.glk/bin/`, and prints next steps. Using the latest
+installer also ensures that descriptors from older releases are handled correctly.
 
 To use a descriptor downloaded manually, get the asset named
 `component-descriptor.yaml` from the desired [GitHub release](https://github.com/gardener/gardener-landscape-kit/releases)
-and pass it to the installer. This is the file previously referred to as `components.yaml`
-in the installation instructions:
+and pass it to the installer:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
