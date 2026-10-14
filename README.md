@@ -7,15 +7,33 @@
 
 ## Getting Started
 
-1. Obtain the `components.yaml` for the desired GLK release.
-2. Run the install script, pointing it at that file:
+Run the installer without arguments to install the latest GLK release:
 
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
-     --components-file path/to/components.yaml
-   ```
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)"
+```
 
-   This downloads the matching `glk` binary to `~/.glk/bin/` and prints next steps.
+To install a specific release, pass its version to the installer:
+
+```bash
+GLK_VERSION=v0.6.0
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
+  --version "${GLK_VERSION}"
+```
+
+The installer downloads the latest release's `component-descriptor.yaml` by default, or
+the specified release's descriptor when `--version` is set. It determines the matching
+`glk` binary version, installs it to `~/.glk/bin/`, and prints next steps. Using the latest
+installer also ensures that descriptors from older releases are handled correctly.
+
+To use a descriptor downloaded manually, get the asset named
+`component-descriptor.yaml` from the desired [GitHub release](https://github.com/gardener/gardener-landscape-kit/releases)
+and pass it to the installer:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
+  --components-file path/to/component-descriptor.yaml
+```
 
 `gardener-landscape-kit`, short GLK, is a toolkit for generating manifests to facilitate GitOps-based management of Gardener landscapes.
 
