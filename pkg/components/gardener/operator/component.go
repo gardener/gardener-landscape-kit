@@ -108,13 +108,19 @@ func getTemplateValues(opts components.Options) (map[string]any, error) {
 }
 
 func versionRefTemplateValue(version string) map[string]any {
-	refKind := "tag"
+	if tag, digest, found := strings.Cut(version, "@"); found {
+		return map[string]any{
+			"tag":    tag,
+			"digest": digest,
+		}
+	}
 	if strings.HasPrefix(version, "sha256:") {
-		refKind = "digest"
+		return map[string]any{
+			"digest": version,
+		}
 	}
 	return map[string]any{
-		"kind":  refKind,
-		"value": version,
+		"tag": version,
 	}
 }
 
