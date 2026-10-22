@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"maps"
 	"path/filepath"
-	"reflect"
 	"slices"
 	"strings"
 	"unicode"
 
+	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"github.com/spf13/afero"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/utils/ptr"
@@ -93,11 +93,7 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 	return result, nil
 }
 
-// mergeComponents merges override components on top of base components.
-// For each component in override: if its name exists in base, the base entry is merged with the override (override values take precedence);
-// otherwise it is appended. Returns a new Components struct with the merged result.
 func mergeComponents(base, override *Components) *Components {
-	// Build an ordered list starting from base, replacing entries found in override.
 	nameToOverride := make(map[string]*ComponentVector, len(override.Components))
 	for _, ov := range override.Components {
 		nameToOverride[ov.Name] = ov
@@ -107,7 +103,7 @@ func mergeComponents(base, override *Components) *Components {
 	seen := make(map[string]struct{}, len(base.Components))
 	for _, bc := range base.Components {
 		oc := nameToOverride[bc.Name]
-		merged = append(merged, mergeComponentVector(oc, bc))
+		merged = append(merged, mergeComponentVector(bc, oc))
 		seen[bc.Name] = struct{}{}
 	}
 	// Append components from override that were not present in base.
@@ -119,23 +115,79 @@ func mergeComponents(base, override *Components) *Components {
 	return &Components{Components: merged}
 }
 
-// mergeComponentVector fills zero-value fields in ov from the corresponding fields in bc.
-// The Name field is skipped as it is the identity key.
-func mergeComponentVector(ov, bc *ComponentVector) *ComponentVector {
+func mergeImageVectorOverwrite(base, override *ImageVectorOverwrite) *ImageVectorOverwrite {
+	if override == nil {
+		return base
+	}
+
+	nameToImage := make(map[string]imagevector.ImageSource)
+	if base != nil {
+		for _, img := range base.Images {
+			nameToImage[img.Name] = img
+		}
+	}
+	for _, img := range override.Images {
+		nameToImage[img.Name] = img
+	}
+	return &ImageVectorOverwrite{Images: slices.SortedFunc(
+		maps.Values(nameToImage),
+		func(a, b imagevector.ImageSource) int {
+			return strings.Compare(a.Name, b.Name)
+		},
+	)}
+}
+
+func mergeComponentVector(bc, ov *ComponentVector) *ComponentVector {
 	if ov == nil {
 		return bc
 	}
-	ovVal := reflect.ValueOf(ov).Elem()
-	bcVal := reflect.ValueOf(bc).Elem()
-	for i := range ovVal.NumField() {
-		if ovVal.Type().Field(i).Name == "Name" {
-			continue
-		}
-		if ovVal.Field(i).IsZero() {
-			ovVal.Field(i).Set(bcVal.Field(i))
+	if ov.Version == "" {
+		ov.Version = bc.Version
+	}
+	if ov.SourceRepository == nil {
+		ov.SourceRepository = bc.SourceRepository
+	}
+	ov.Resources = mergeResources(bc.Resources, ov.Resources)
+	ov.ImageVectorOverwrite = mergeImageVectorOverwrite(bc.ImageVectorOverwrite, ov.ImageVectorOverwrite)
+	ov.ComponentImageVectorOverwrites = mergeComponentImageVectorOverwrites(bc.ComponentImageVectorOverwrites, ov.ComponentImageVectorOverwrites)
+	return ov
+}
+
+func mergeResources(base, override map[string]ResourceData) map[string]ResourceData {
+	if len(override) == 0 {
+		return base
+	}
+	result := make(map[string]ResourceData, len(base))
+	maps.Copy(result, base)
+	maps.Copy(result, override)
+	return result
+}
+
+func mergeComponentImageVectorOverwrites(base, override *ComponentImageVectorOverwrites) *ComponentImageVectorOverwrites {
+	if override == nil {
+		return base
+	}
+	nameToOverride := make(map[string]ComponentImageVectorOverwrite, len(override.Components))
+	for _, oc := range override.Components {
+		nameToOverride[oc.Name] = oc
+	}
+	if base != nil {
+		for _, bc := range base.Components {
+			if oc, exists := nameToOverride[bc.Name]; exists {
+				mergedOverwrite := mergeImageVectorOverwrite(&bc.ImageVectorOverwrite, &oc.ImageVectorOverwrite)
+				nameToOverride[bc.Name] = ComponentImageVectorOverwrite{Name: bc.Name, ImageVectorOverwrite: *mergedOverwrite}
+			} else {
+				nameToOverride[bc.Name] = bc
+			}
 		}
 	}
-	return ov
+
+	return &ComponentImageVectorOverwrites{Components: slices.SortedFunc(
+		maps.Values(nameToOverride),
+		func(a, b ComponentImageVectorOverwrite) int {
+			return strings.Compare(a.Name, b.Name)
+		},
+	)}
 }
 
 // TemplateValues returns the template values for the component vector.

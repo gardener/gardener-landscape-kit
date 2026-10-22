@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
+	"k8s.io/utils/ptr"
 
 	. "github.com/gardener/gardener-landscape-kit/pkg/utils/componentvector"
 )
@@ -808,6 +809,215 @@ components:
 			content, err := fs.ReadFile(filePath)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(content)).To(ContainSubstring("https://github.com/gardener/gardener"))
+		})
+	})
+
+	Describe("#NewWithOverride deep merge within a component", func() {
+		const baseYAML = `
+components:
+  - name: comp1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.0.0
+    resources:
+      resource-a:
+        ociImage:
+          repository: registry.example.com/image-a
+          tag: v1.0.0
+      resource-b:
+        ociImage:
+          repository: registry.example.com/image-b
+          tag: v1.0.0
+    imageVectorOverwrite:
+      images:
+        - name: img-a
+          repository: registry.example.com/img-a
+          tag: v1.0.0
+        - name: img-b
+          repository: registry.example.com/img-b
+          tag: v1.0.0
+    componentImageVectorOverwrites:
+      components:
+        - name: sub-a
+          imageVectorOverwrite:
+            images:
+              - name: img-x
+                repository: registry.example.com/img-x
+                tag: v1.0.0
+              - name: img-y
+                repository: registry.example.com/img-y
+                tag: v1.0.0
+`
+
+		It("should deep-merge Resources: base-only keys are kept, override wins on conflict", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    resources:
+      resource-a:
+        ociImage:
+          repository: registry.example.com/image-a
+          tag: v2.0.0
+      resource-c:
+        ociImage:
+          repository: registry.example.com/image-c
+          tag: v1.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.Resources).To(HaveLen(3))
+			Expect(vec.Resources["resource-a"].OCIImage.Tag).To(Equal(ptr.To("v2.0.0")), "override wins")
+			Expect(vec.Resources["resource-b"].OCIImage.Tag).To(Equal(ptr.To("v1.0.0")), "base-only key kept")
+			Expect(vec.Resources["resource-c"].OCIImage.Tag).To(Equal(ptr.To("v1.0.0")), "new key from override appended")
+		})
+
+		It("should deep-merge ImageVectorOverwrite: override wins on name conflict, new entries appended", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    imageVectorOverwrite:
+      images:
+        - name: img-b
+          repository: registry.example.com/img-b
+          tag: v2.0.0
+        - name: img-c
+          repository: registry.example.com/img-c
+          tag: v1.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.ImageVectorOverwrite).NotTo(BeNil())
+			images := vec.ImageVectorOverwrite.Images
+			Expect(images).To(HaveLen(3))
+			Expect(images[0].Name).To(Equal("img-a"), "base order: img-a first")
+			Expect(images[0].Tag).To(Equal(ptr.To("v1.0.0")), "img-a unchanged")
+			Expect(images[1].Name).To(Equal("img-b"), "base order: img-b second")
+			Expect(images[1].Tag).To(Equal(ptr.To("v2.0.0")), "img-b updated by override")
+			Expect(images[2].Name).To(Equal("img-c"), "img-c appended from override")
+		})
+
+		It("should deep-merge ComponentImageVectorOverwrites: matched subcomponents have their images merged, new subcomponents appended", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    componentImageVectorOverwrites:
+      components:
+        - name: sub-a
+          imageVectorOverwrite:
+            images:
+              - name: img-x
+                repository: registry.example.com/img-x
+                tag: v2.0.0
+              - name: img-z
+                repository: registry.example.com/img-z
+                tag: v1.0.0
+        - name: sub-b
+          imageVectorOverwrite:
+            images:
+              - name: img-new
+                repository: registry.example.com/img-new
+                tag: v1.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.ComponentImageVectorOverwrites).NotTo(BeNil())
+			comps := vec.ComponentImageVectorOverwrites.Components
+			Expect(comps).To(HaveLen(2))
+
+			// sub-a: images merged
+			Expect(comps[0].Name).To(Equal("sub-a"))
+			subAImages := comps[0].ImageVectorOverwrite.Images
+			Expect(subAImages).To(HaveLen(3))
+			Expect(subAImages[0].Name).To(Equal("img-x"))
+			Expect(subAImages[0].Tag).To(Equal(ptr.To("v2.0.0")), "img-x updated by override")
+			Expect(subAImages[1].Name).To(Equal("img-y"))
+			Expect(subAImages[1].Tag).To(Equal(ptr.To("v1.0.0")), "img-y kept from base")
+			Expect(subAImages[2].Name).To(Equal("img-z"), "img-z appended from override")
+
+			// sub-b: new subcomponent appended
+			Expect(comps[1].Name).To(Equal("sub-b"))
+			Expect(comps[1].ImageVectorOverwrite.Images).To(HaveLen(1))
+			Expect(comps[1].ImageVectorOverwrite.Images[0].Name).To(Equal("img-new"))
+		})
+
+		It("should use override ImageVectorOverwrite as-is when base has none", func() {
+			baseNoIVO := `
+components:
+  - name: comp1
+    sourceRepository: https://github.com/org/repo1
+    version: 1.0.0
+`
+			overrideYAML := `
+components:
+  - name: comp1
+    imageVectorOverwrite:
+      images:
+        - name: img-only
+          repository: registry.example.com/img-only
+          tag: v1.0.0
+`
+			cv, err := NewWithOverride([]byte(baseNoIVO), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.ImageVectorOverwrite).NotTo(BeNil())
+			Expect(vec.ImageVectorOverwrite.Images).To(HaveLen(1))
+			Expect(vec.ImageVectorOverwrite.Images[0].Name).To(Equal("img-only"))
+		})
+
+		It("should keep base Resources when override specifies none", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    version: 2.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.Resources).To(HaveLen(2), "base resources preserved when override has none")
+			Expect(vec.Version).To(Equal("2.0.0"), "version overridden")
+		})
+
+		It("should keep base ImageVectorOverwrite when override specifies none", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    version: 2.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.ImageVectorOverwrite).NotTo(BeNil())
+			Expect(vec.ImageVectorOverwrite.Images).To(HaveLen(2), "base image vector overwrite preserved")
+		})
+
+		It("should keep base ComponentImageVectorOverwrites when override specifies none", func() {
+			overrideYAML := `
+components:
+  - name: comp1
+    version: 2.0.0
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(overrideYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vec := cv.FindComponentVector("comp1")
+			Expect(vec).NotTo(BeNil())
+			Expect(vec.ComponentImageVectorOverwrites).NotTo(BeNil())
+			Expect(vec.ComponentImageVectorOverwrites.Components).To(HaveLen(1), "base CIVO preserved")
+			Expect(vec.ComponentImageVectorOverwrites.Components[0].Name).To(Equal("sub-a"))
 		})
 	})
 })
