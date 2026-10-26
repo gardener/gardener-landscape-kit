@@ -78,11 +78,15 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 		return nil, fmt.Errorf("invalid base component vector: %w", errList.ToAggregate())
 	}
 
-	return mergeAndValidateComponents(&baseObj, overrides...)
+	return MergeAndValidateComponents(newComponents(&baseObj), overrides...)
 }
 
-func mergeAndValidateComponents(base *Components, overrides ...[]byte) (*components, error) {
-	result := newComponents(base)
+// MergeAndValidateComponents merges the base component vector with the overrides and validates the result.
+func MergeAndValidateComponents(base Interface, overrides ...[]byte) (Interface, error) {
+	result, ok := base.(*components)
+	if !ok {
+		return nil, fmt.Errorf("base component vector is not of type *components")
+	}
 	for _, override := range overrides {
 		overrideObj := Components{}
 		if err := yaml.Unmarshal(override, &overrideObj); err != nil {
