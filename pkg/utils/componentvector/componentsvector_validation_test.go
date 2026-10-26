@@ -527,4 +527,123 @@ var _ = Describe("ComponentVector Validation", func() {
 			})
 		})
 	})
+
+	Describe("#ValidateLocalComponents", func() {
+		var fldPath *field.Path
+
+		BeforeEach(func() {
+			fldPath = field.NewPath("test")
+		})
+
+		It("should pass with only the allowed fields set", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{
+						Name: "component1",
+						Resources: map[string]ResourceData{
+							"chart": {OCIImage: &OCIImage{Repository: new("registry.example.com/image")}},
+						},
+						ImageVectorOverwrite: &ImageVectorOverwrite{},
+					},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(BeEmpty())
+		})
+
+		It("should pass with nil components", func() {
+			Expect(ValidateLocalComponents(nil, fldPath)).To(BeEmpty())
+		})
+
+		It("should pass with an empty components list", func() {
+			Expect(ValidateLocalComponents(&Components{}, fldPath)).To(BeEmpty())
+		})
+
+		It("should fail when the component name is missing", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{Name: ""},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(ConsistOf(
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeRequired),
+					"Field": Equal("test.components[0].name"),
+				})),
+			))
+		})
+
+		It("should fail when version is set", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{Name: "component1", Version: "1.0.0"},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(ConsistOf(
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeForbidden),
+					"Field": Equal("test.components[0].version"),
+				})),
+			))
+		})
+
+		It("should fail when sourceRepository is set", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{Name: "component1", SourceRepository: new("https://github.com/org/repo")},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(ConsistOf(
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeForbidden),
+					"Field": Equal("test.components[0].sourceRepository"),
+				})),
+			))
+		})
+
+		It("should fail with duplicate component names", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{Name: "duplicate"},
+					{Name: "duplicate"},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(ConsistOf(
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":     Equal(field.ErrorTypeDuplicate),
+					"Field":    Equal("test.components[1].name"),
+					"BadValue": Equal("duplicate"),
+				})),
+			))
+		})
+
+		It("should report multiple violations on a single entry", func() {
+			components := &Components{
+				Components: []*ComponentVector{
+					{Name: "component1", Version: "1.0.0", SourceRepository: new("https://github.com/org/repo")},
+				},
+			}
+
+			errList := ValidateLocalComponents(components, fldPath)
+			Expect(errList).To(ConsistOf(
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeForbidden),
+					"Field": Equal("test.components[0].version"),
+				})),
+				PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeForbidden),
+					"Field": Equal("test.components[0].sourceRepository"),
+				})),
+			))
+		})
+	})
 })

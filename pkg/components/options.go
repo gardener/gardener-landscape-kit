@@ -13,6 +13,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+	"sigs.k8s.io/yaml"
 
 	"github.com/gardener/gardener-landscape-kit/componentvector"
 	configv1alpha1 "github.com/gardener/gardener-landscape-kit/pkg/apis/config/v1alpha1"
@@ -75,11 +77,11 @@ const SkipDir = "__SKIP__"
 // GetComponentsVector returns the component vector based on the given component dir.
 func (o *options) GetComponentsVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
 	if relativeComponentDir != SkipDir {
-		localComponentsBytes, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.targetPath, DirName, relativeComponentDir))
+		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.targetPath, DirName, relativeComponentDir))
 		if err != nil {
 			return nil, err
 		}
-		return utilscomponentvector.MergeAndValidateComponents(o.componentVector, localComponentsBytes)
+		return utilscomponentvector.MergeAndValidateComponents(o.componentVector, localComponents)
 	}
 
 	return o.componentVector, nil
@@ -176,14 +178,26 @@ func loadComponentVector(opts *generateoptions.Options, fs afero.Afero, sources 
 	return componentVector, nil
 }
 
-func readLocalComponentsFile(fs afero.Afero, log logr.Logger, filePath string) ([]byte, error) {
+func readLocalComponentsFile(fs afero.Afero, log logr.Logger, filePath string) (*utilscomponentvector.Components, error) {
 	localComponentsFilePath := path.Join(filePath, utilscomponentvector.ComponentVectorFilename)
 	customBytes, err := fs.ReadFile(localComponentsFilePath)
 	if err != nil && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to read local components.yaml file: %w", err)
 	}
+	if len(customBytes) == 0 {
+		return nil, nil
+	}
+
+	obj := &utilscomponentvector.Components{}
+	if err := yaml.Unmarshal(customBytes, obj); err != nil {
+		return nil, fmt.Errorf("failed to parse local components.yaml file: %w", err)
+	}
+	if errList := utilscomponentvector.ValidateLocalComponents(obj, field.NewPath("")); len(errList) > 0 {
+		return nil, fmt.Errorf("invalid local components.yaml file %q: %w", localComponentsFilePath, errList.ToAggregate())
+	}
+
 	log.Info("Found local component vector override file", "file", localComponentsFilePath)
-	return customBytes, nil
+	return obj, nil
 }
 
 func readComponentsFile(opts *generateoptions.Options, fs afero.Afero, src overrideSource) ([]byte, error) {

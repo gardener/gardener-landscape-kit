@@ -78,22 +78,29 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 		return nil, fmt.Errorf("invalid base component vector: %w", errList.ToAggregate())
 	}
 
-	return MergeAndValidateComponents(newComponents(&baseObj), overrides...)
+	overridesObj := make([]*Components, 0, len(overrides))
+	for _, raw := range overrides {
+		overrideObj := &Components{}
+		if err := yaml.Unmarshal(raw, &overrideObj); err != nil {
+			return nil, fmt.Errorf("failed to parse override component vector: %w", err)
+		}
+		overridesObj = append(overridesObj, overrideObj)
+	}
+
+	return MergeAndValidateComponents(newComponents(&baseObj), overridesObj...)
 }
 
 // MergeAndValidateComponents merges the base component vector with the overrides and validates the result.
-func MergeAndValidateComponents(base Interface, overrides ...[]byte) (Interface, error) {
+func MergeAndValidateComponents(base Interface, overrides ...*Components) (Interface, error) {
 	result, ok := base.(*components)
 	if !ok {
 		return nil, fmt.Errorf("base component vector is not of type *components")
 	}
 	for _, override := range overrides {
-		overrideObj := Components{}
-		if err := yaml.Unmarshal(override, &overrideObj); err != nil {
-			return nil, fmt.Errorf("failed to parse override component vector: %w", err)
+		if override == nil || len(override.Components) == 0 {
+			continue
 		}
-
-		overrideComponents := newComponents(&overrideObj)
+		overrideComponents := newComponents(override)
 		result = mergeComponents(result, overrideComponents)
 	}
 

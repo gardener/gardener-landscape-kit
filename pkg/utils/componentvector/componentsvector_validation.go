@@ -47,6 +47,43 @@ func ValidateComponents(components *Components, fldPath *field.Path) field.Error
 	return allErrs
 }
 
+// ValidateLocalComponents validates a local components.yaml override file.
+// Certain fields are not allowed to be set in a local override, such as version and sourceRepository.
+func ValidateLocalComponents(components *Components, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if components == nil || len(components.Components) == 0 {
+		return allErrs
+	}
+
+	componentNames := sets.New[string]()
+	for i, component := range components.Components {
+		componentPath := fldPath.Child("components").Index(i)
+
+		if component == nil {
+			allErrs = append(allErrs, field.Required(componentPath, "component must not be empty"))
+			continue
+		}
+
+		if strings.TrimSpace(component.Name) == "" {
+			allErrs = append(allErrs, field.Required(componentPath.Child("name"), "component name must not be empty"))
+		} else if componentNames.Has(component.Name) {
+			allErrs = append(allErrs, field.Duplicate(componentPath.Child("name"), component.Name))
+		} else {
+			componentNames.Insert(component.Name)
+		}
+
+		if component.Version != "" {
+			allErrs = append(allErrs, field.Forbidden(componentPath.Child("version"), "version must not be set in a local components.yaml file"))
+		}
+		if component.SourceRepository != nil && *component.SourceRepository != "" {
+			allErrs = append(allErrs, field.Forbidden(componentPath.Child("sourceRepository"), "sourceRepository must not be set in a local components.yaml file"))
+		}
+	}
+
+	return allErrs
+}
+
 // validateComponentVector validates a single ComponentVector.
 func validateComponentVector(component *ComponentVector, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
