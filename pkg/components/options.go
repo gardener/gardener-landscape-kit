@@ -77,7 +77,7 @@ const SkipDir = "__SKIP__"
 // GetComponentsVector returns the component vector based on the given component dir.
 func (o *options) GetComponentsVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
 	if relativeComponentDir != SkipDir {
-		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.targetPath, DirName, relativeComponentDir))
+		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.GetTargetPath(), DirName, relativeComponentDir))
 		if err != nil {
 			return nil, err
 		}
@@ -214,13 +214,6 @@ type landscapeOptions struct {
 
 	landscape  *configv1alpha1.LandscapeRepositoryConfig
 	baseTarget string
-	targetPath string
-}
-
-// GetTargetPath overrides Options.GetTargetPath: for landscape generation the
-// content directory is the landscape repository root joined with landscape.target.
-func (l *landscapeOptions) GetTargetPath() string {
-	return l.targetPath
 }
 
 // GetLandscapeURL returns the URL of the landscape git repository.
@@ -289,11 +282,9 @@ func NewLandscapeOptions(opts *generateoptions.Options, fs afero.Afero) (Landsca
 		return nil, err
 	}
 
-	basePath := path.Join(repoRoot, landscape.BaseLink, base.Target)
 	return &landscapeOptions{
-		Options:    newOptions(opts, fs, repoRoot, basePath, componentVector),
+		Options:    newOptions(opts, fs, repoRoot, path.Join(repoRoot, landscape.Target), componentVector),
 		landscape:  landscape,
 		baseTarget: base.Target,
-		targetPath: path.Join(repoRoot, landscape.Target),
 	}, nil
 }
