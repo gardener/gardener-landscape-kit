@@ -97,12 +97,17 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to read current component vector metadata: %w", err)
 	}
 
-	reg := registry.New(currentComponentVector, componentOpts.GetComponentVector())
+	componentsVector, err := componentOpts.GetComponentsVector(components.SkipDir)
+	if err != nil {
+		return err
+	}
+
+	reg := registry.New(currentComponentVector, componentsVector)
 	if err := registry.RegisterAllComponents(opts.Log, reg, opts.Config); err != nil {
 		return fmt.Errorf("failed to register components: %w", err)
 	}
 
-	componentVersion, _ := componentOpts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
+	componentVersion, _ := componentsVector.FindComponentVersion(componentvector.NameGardenerGardenerLandscapeKit)
 	if err := version.CheckGLKComponentVersion(componentVersion, opts.Config, opts.Log); err != nil {
 		return fmt.Errorf("version validation failed: %w", err)
 	}
@@ -111,7 +116,7 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to generate landscape components: %w", err)
 	}
 
-	if err := utilscomponentvector.WriteComponentVectorMetadata(componentOpts.GetComponentVector(), componentOpts.GetTargetPath(), fs); err != nil {
+	if err := utilscomponentvector.WriteComponentVectorMetadata(componentsVector, componentOpts.GetTargetPath(), fs); err != nil {
 		return fmt.Errorf("failed to write component vector metadata: %w", err)
 	}
 

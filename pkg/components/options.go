@@ -22,8 +22,8 @@ import (
 
 // Options is an interface for options passed to components for generating.
 type Options interface {
-	// GetComponentVector returns the component vector based on the given component dir.
-	GetComponentVector(string) (utilscomponentvector.Interface, error)
+	// GetComponentsVector returns the component vector based on the given component dir.
+	GetComponentsVector(string) (utilscomponentvector.Interface, error)
 	// GetRepoRoot returns the path on disk to the root of the repository being generated into
 	// (the value the user passed as TARGET_DIR).
 	GetRepoRoot() string
@@ -69,14 +69,20 @@ type options struct {
 	mergeMode       configv1alpha1.MergeMode
 }
 
-// GetComponentVector returns the component vector based on the given component dir.
-func (o *options) GetComponentVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
-	localComponentsBytes, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.targetPath, DirName, relativeComponentDir))
-	if err != nil {
-		return nil, err
+// SkipDir is a special argument value to pass for dummy component directories.
+const SkipDir = "__SKIP__"
+
+// GetComponentsVector returns the component vector based on the given component dir.
+func (o *options) GetComponentsVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
+	if relativeComponentDir != SkipDir {
+		localComponentsBytes, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.targetPath, DirName, relativeComponentDir))
+		if err != nil {
+			return nil, err
+		}
+		return utilscomponentvector.MergeAndValidateComponents(o.componentVector, localComponentsBytes)
 	}
 
-	return utilscomponentvector.MergeAndValidateComponents(o.componentVector, localComponentsBytes)
+	return o.componentVector, nil
 }
 
 // GetRepoRoot returns the on-disk path to the root of the repository being generated into.

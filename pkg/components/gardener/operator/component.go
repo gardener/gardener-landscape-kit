@@ -80,10 +80,14 @@ func (c *component) writeBaseTemplateFiles(opts components.Options) error {
 	return files.WriteObjectsToFilesystem(objects, opts.GetTargetPath(), path.Join(components.DirName, c.Directory), opts.GetFilesystem(), opts.GetMergeMode())
 }
 
-func getTemplateValues(opts components.Options) (map[string]any, error) {
-	cv := opts.GetComponentVector().FindComponentVector(componentvector.NameGardenerGardener)
+func (c *component) getTemplateValues(opts components.Options) (map[string]any, error) {
+	componentsVector, err := opts.GetComponentsVector(c.Directory)
+	if err != nil {
+		return nil, err
+	}
+	cv := componentsVector.FindComponentVector(componentvector.NameGardenerGardener)
 	if cv == nil || len(cv.Resources) == 0 {
-		gardenerVersion, exists := opts.GetComponentVector().FindComponentVersion(componentvector.NameGardenerGardener)
+		gardenerVersion, exists := componentsVector.FindComponentVersion(componentvector.NameGardenerGardener)
 		if !exists {
 			opts.GetLogger().Info("Component version not found in component vector, falling back to empty version", "component", componentvector.NameGardenerGardener)
 		}
@@ -127,7 +131,7 @@ func versionRefTemplateValue(version string) map[string]any {
 func (c *component) writeLandscapeTemplateFiles(opts components.LandscapeOptions) error {
 	relativeComponentPath := path.Join(components.DirName, c.Directory)
 
-	values, err := getTemplateValues(opts)
+	values, err := c.getTemplateValues(opts)
 	if err != nil {
 		return err
 	}

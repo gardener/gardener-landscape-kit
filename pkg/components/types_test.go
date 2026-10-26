@@ -28,7 +28,10 @@ var _ = Describe("Types", func() {
 	})
 
 	Describe("Options", func() {
-		var opts *options.Options
+		var (
+			opts         *options.Options
+			componentDir string
+		)
 
 		BeforeEach(func() {
 			opts = &options.Options{
@@ -36,6 +39,7 @@ var _ = Describe("Types", func() {
 				TargetDirPath: "",
 				Config:        &v1alpha1.LandscapeKitConfiguration{},
 			}
+			componentDir = components.SkipDir
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
@@ -99,11 +103,12 @@ var _ = Describe("Types", func() {
 
 			It("should return an empty component vector when no component vector file is provided", func() {
 				componentOpts, err := components.NewOptions(opts, fs)
-
 				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
 
-				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, exists := componentsVector.FindComponentVersion("test-component")
 				Expect(exists).To(BeFalse())
 			})
 
@@ -112,11 +117,12 @@ var _ = Describe("Types", func() {
 				v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 
 				componentOpts, err := components.NewOptions(opts, fs)
-
 				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
 
-				_, exists := componentOpts.GetComponentVector().FindComponentVersion("test-component")
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				_, exists := componentsVector.FindComponentVersion("test-component")
 				Expect(exists).To(BeFalse())
 			})
 
@@ -135,15 +141,16 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
 				componentOpts, err := components.NewOptions(opts, fs)
-
 				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
 
-				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v1.134.0"))
 
-				version, exists = componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
+				version, exists = componentsVector.FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v1.45.0"))
 			})
@@ -171,9 +178,12 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
 				componentOpts, err := components.NewOptions(opts, fs)
-
 				Expect(err).NotTo(HaveOccurred())
-				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v9.9.9"))
 			})
@@ -185,9 +195,11 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
 				componentOpts, err := components.NewOptions(opts, fs)
-
 				Expect(err).NotTo(HaveOccurred())
-				Expect(componentOpts.GetComponentVector()).NotTo(BeNil())
+
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(componentsVector).NotTo(BeNil())
 			})
 
 			It("should apply configured base overrides on top of the in-repo components.yaml", func() {
@@ -207,7 +219,11 @@ var _ = Describe("Types", func() {
 
 				componentOpts, err := components.NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
-				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v1.999.0"))
 			})
@@ -236,7 +252,11 @@ var _ = Describe("Types", func() {
 
 				componentOpts, err := components.NewOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
-				version, exists := componentOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+
+				componentsVector, err := componentOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v1.600.0"))
 			})
@@ -265,7 +285,10 @@ var _ = Describe("Types", func() {
 	})
 
 	Describe("LandscapeOptions", func() {
-		var opts *options.Options
+		var (
+			opts         *options.Options
+			componentDir string
+		)
 
 		BeforeEach(func() {
 			opts = &options.Options{
@@ -285,6 +308,7 @@ var _ = Describe("Types", func() {
 				},
 				TargetDirPath: "",
 			}
+			componentDir = components.SkipDir
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
@@ -414,13 +438,16 @@ var _ = Describe("Types", func() {
 				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 
+				componentsVector, err := landscapeOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
 				// Landscape override wins for the shared component.
-				gardenerVersion, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				gardenerVersion, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(gardenerVersion).To(Equal("v1.200.0"))
 
 				// Base override is still applied for components not present in the landscape override.
-				ciliumVersion, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
+				ciliumVersion, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener-extension-networking-cilium")
 				Expect(exists).To(BeTrue())
 				Expect(ciliumVersion).To(Equal("v1.45.0"))
 			})
@@ -462,7 +489,10 @@ var _ = Describe("Types", func() {
 				landscapeOpts, err := components.NewLandscapeOptions(opts, fs)
 				Expect(err).NotTo(HaveOccurred())
 
-				version, exists := landscapeOpts.GetComponentVector().FindComponentVersion("github.com/gardener/gardener")
+				componentsVector, err := landscapeOpts.GetComponentsVector(componentDir)
+				Expect(err).NotTo(HaveOccurred())
+
+				version, exists := componentsVector.FindComponentVersion("github.com/gardener/gardener")
 				Expect(exists).To(BeTrue())
 				Expect(version).To(Equal("v1.400.0"))
 			})

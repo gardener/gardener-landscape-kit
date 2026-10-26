@@ -68,7 +68,7 @@ func (c *component) GenerateLandscape(_ components.Context, options components.L
 }
 
 func (c *component) getTemplateValues(opts components.Options) (map[string]any, error) {
-	return components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerExtensionShootTraefik)
+	return components.GetComponentVectorTemplateValues(opts, c.Directory, componentvector.NameGardenerGardenerExtensionShootTraefik)
 }
 
 func (c *component) writeBaseTemplateFiles(opts components.Options) error {

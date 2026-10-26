@@ -87,7 +87,7 @@ func (c *component) writeLandscapeTemplateFiles(opts components.LandscapeOptions
 	fluxPath := path.Join(opts.GetRelativeLandscapePath(), c.Directory)
 	fluxPath = strings.TrimPrefix(fluxPath, "./")
 
-	cvValues, err := components.GetComponentVectorTemplateValues(opts, componentvector.NameGardenerGardenerLandscapeKit)
+	cvValues, err := components.GetComponentVectorTemplateValues(opts, c.Directory, componentvector.NameGardenerGardenerLandscapeKit)
 	if err != nil {
 		return err
 	}
