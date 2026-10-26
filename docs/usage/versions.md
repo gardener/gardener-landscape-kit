@@ -64,6 +64,31 @@ components:
 > [!IMPORTANT]
 > The landscape-level `components.yaml` (if present) overrides the base-level file, which in turn overrides the built-in defaults.
 
+### Local Component File
+
+Each generated component directory (`components/<component-dir>/`) can contain its own `components.yaml` file.
+When present, GLK reads it during `generate` and merges the entries it contains on top of the global component vector — but only for that component's render pass.
+
+This is useful for overriding resource-level data (OCI image repositories, Helm chart tags, etc.) for a single component without touching the global file.
+
+> [!IMPORTANT]
+> A local `components.yaml` must not set `version` or `sourceRepository`. Setting either field causes a validation error during `generate`.
+
+Example — patching only the chart OCI image of a component:
+
+```yaml
+# components/gardener/garden/components.yaml
+components:
+- name: github.com/gardener/gardener
+  resources:
+    chart:
+      ociImage:
+        repository: my-registry.example.com/charts/gardener
+        tag: v1.134.1
+```
+
+The `version` and `image` resource values are inherited from the global component vector; only the `chart` resource is overridden here.
+
 ### Prefer components.yaml Over Editing Generated Manifests
 
 The `components.yaml` file is the recommended way to control component versions for your landscape.
