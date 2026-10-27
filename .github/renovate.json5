@@ -73,13 +73,11 @@ The following dependencies have been updated:\n\
       enabled: true,
     },
     {
-      matchDatasources: ['go'],
       groupName: "fluxcd-controllers",
-      matchPackageNames: ['/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/'],
-    },
-    {
-      matchDatasources: ['docker'],
-      matchPackageNames: ['ghcr.io/fluxcd/flux-cli'],
+      matchPackageNames: [
+        '/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/',
+        'ghcr.io/fluxcd/flux-cli',
+      ],
       separateMultipleMinor: true,
     },
     {
