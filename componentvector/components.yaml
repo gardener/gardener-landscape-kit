@@ -9,16 +9,16 @@ components:
       tag: v2.9.6
     - name: helm-controller
       repository: ghcr.io/fluxcd/helm-controller
-      tag: v1.6.5
+      tag: v1.6.5-27add72a
     - name: kustomize-controller
       repository: ghcr.io/fluxcd/kustomize-controller
-      tag: v1.9.6
+      tag: v1.9.6-3974b6d7
     - name: notification-controller
       repository: ghcr.io/fluxcd/notification-controller
-      tag: v1.9.4
+      tag: v1.9.4-a1dff359
     - name: source-controller
       repository: ghcr.io/fluxcd/source-controller
-      tag: v1.9.6
+      tag: v1.9.6-456fa323
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.152.1
