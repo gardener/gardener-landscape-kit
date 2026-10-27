@@ -65,14 +65,6 @@ to_camel_case() {
 ## Extract all Flux controller images from gotk-components.yaml and update downstream files
 echo "> Updating Flux controller images in componentvector/components.yaml and .ocm/base-component.yaml"
 
-# TODO(LucaBernstein): Remove this pinning guard (and the associative array below) once security-pinned image builds
-# (e.g. v1.6.5-27add72a) are no longer needed.
-# Snapshot existing pinned tags before the clear step wipes them.
-declare -A pinned_tags
-while IFS=$'\t' read -r name tag; do
-  pinned_tags["$name"]="$tag"
-done < <(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].imageVectorOverwrite.images[] | select(.name != "flux-cli") | .name + "\t" + .tag' "$COMPONENTS")
-
 # Clear existing Flux controller images so stale entries don't accumulate, preserving non-controller entries (e.g. flux-cli).
 GLK_INDEX=$GLK_INDEX yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images = (.components[env(GLK_INDEX)].imageVectorOverwrite.images | map(select(.name == "flux-cli")))' "$COMPONENTS"
 
@@ -89,26 +81,10 @@ while IFS= read -r image; do
   repo="${image%:*}"                       # "ghcr.io/fluxcd/source-controller"
   resource_key=$(to_camel_case "$controller")
 
-  # Always keep the existing pinned tag; warn if the upstream base version changed so a human
-  # can manually update the pinned tag in components.yaml and re-run.
-  upstream_tag="$tag"
-  existing_tag="${pinned_tags[$controller]}"
-  if [[ -n "$existing_tag" ]]; then
-    existing_base="${existing_tag%%-*}"
-    new_base="${tag%%-*}"
-    if [[ "$existing_base" != "$new_base" ]]; then
-      echo "  ERROR: upstream base version for ${controller} changed (${existing_base} -> ${new_base})." \
-           "Update the pinned tag in components.yaml manually, then re-run."
-      exit 1
-    fi
-    tag="$existing_tag"
-  fi
-
   GLK_INDEX=$GLK_INDEX controller=$controller repo=$repo tag=$tag \
     yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images += [{"name": env(controller), "repository": env(repo), "tag": env(tag)}]' "$COMPONENTS"
 
-  # Match the plain upstream tag in gotk-components.yaml; replace with the (potentially pinned) tag.
-  sed -i "s|image: ${repo}:${upstream_tag}|image: {{ .images.${resource_key}.ref }}|g" "$GOTK"
+  sed -i "s|image: ${repo}:${tag}|image: {{ .images.${resource_key}.ref }}|g" "$GOTK"
 done < <(grep -oP "(?<=image: )ghcr\.io/fluxcd/[^\s]+" "$GOTK" | sort -u)
 
 # Add all gardener-landscape-kit resources from componentvector/components.yaml to .ocm/base-component.yaml.
