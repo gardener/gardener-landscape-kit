@@ -6,7 +6,7 @@ components:
     images:
     - name: flux-cli
       repository: ghcr.io/fluxcd/flux-cli
-      tag: v2.9.6
+      tag: v2.10.0
     - name: helm-controller
       repository: ghcr.io/fluxcd/helm-controller
       tag: v1.6.5-27add72a
