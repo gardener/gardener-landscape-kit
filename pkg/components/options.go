@@ -71,12 +71,9 @@ type options struct {
 	mergeMode       configv1alpha1.MergeMode
 }
 
-// SkipDir is a special argument value to pass for dummy component directories.
-const SkipDir = "__SKIP__"
-
 // GetComponentsVector returns the component vector based on the given component dir.
 func (o *options) GetComponentsVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
-	if relativeComponentDir != SkipDir {
+	if relativeComponentDir != "" {
 		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.GetTargetPath(), DirName, relativeComponentDir))
 		if err != nil {
 			return nil, err
@@ -192,7 +189,7 @@ func readLocalComponentsFile(fs afero.Afero, log logr.Logger, filePath string) (
 	if err := yaml.Unmarshal(customBytes, obj); err != nil {
 		return nil, fmt.Errorf("failed to parse local components.yaml file: %w", err)
 	}
-	if errList := utilscomponentvector.ValidateLocalComponents(obj, field.NewPath("")); len(errList) > 0 {
+	if errList := utilscomponentvector.ValidateComponents(obj, false, field.NewPath("")); len(errList) > 0 {
 		return nil, fmt.Errorf("invalid local components.yaml file %q: %w", localComponentsFilePath, errList.ToAggregate())
 	}
 

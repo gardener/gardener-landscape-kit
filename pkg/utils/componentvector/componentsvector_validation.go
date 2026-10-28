@@ -13,7 +13,7 @@ import (
 )
 
 // ValidateComponents validates the given Components.
-func ValidateComponents(components *Components, fldPath *field.Path) field.ErrorList {
+func ValidateComponents(components *Components, advancedFields bool, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
 	if components == nil {
@@ -32,7 +32,7 @@ func ValidateComponents(components *Components, fldPath *field.Path) field.Error
 		componentPath := fldPath.Child("components").Index(i)
 
 		// Validate individual component
-		allErrs = append(allErrs, validateComponentVector(component, componentPath)...)
+		allErrs = append(allErrs, validateComponentVector(component, advancedFields, componentPath)...)
 
 		// Check for duplicate names
 		if component != nil && component.Name != "" {
@@ -47,45 +47,8 @@ func ValidateComponents(components *Components, fldPath *field.Path) field.Error
 	return allErrs
 }
 
-// ValidateLocalComponents validates a local components.yaml override file.
-// Certain fields are not allowed to be set in a local override, such as version and sourceRepository.
-func ValidateLocalComponents(components *Components, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-
-	if components == nil || len(components.Components) == 0 {
-		return allErrs
-	}
-
-	componentNames := sets.New[string]()
-	for i, component := range components.Components {
-		componentPath := fldPath.Child("components").Index(i)
-
-		if component == nil {
-			allErrs = append(allErrs, field.Required(componentPath, "component must not be empty"))
-			continue
-		}
-
-		if strings.TrimSpace(component.Name) == "" {
-			allErrs = append(allErrs, field.Required(componentPath.Child("name"), "component name must not be empty"))
-		} else if componentNames.Has(component.Name) {
-			allErrs = append(allErrs, field.Duplicate(componentPath.Child("name"), component.Name))
-		} else {
-			componentNames.Insert(component.Name)
-		}
-
-		if component.Version != "" {
-			allErrs = append(allErrs, field.Forbidden(componentPath.Child("version"), "version must not be set in a local components.yaml file"))
-		}
-		if component.SourceRepository != nil && *component.SourceRepository != "" {
-			allErrs = append(allErrs, field.Forbidden(componentPath.Child("sourceRepository"), "sourceRepository must not be set in a local components.yaml file"))
-		}
-	}
-
-	return allErrs
-}
-
-// validateComponentVector validates a single ComponentVector.
-func validateComponentVector(component *ComponentVector, fldPath *field.Path) field.ErrorList {
+// validateBasicComponentVector validates basic fields of the given ComponentVector.
+func validateBasicComponentVector(component *ComponentVector, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
 	if component == nil {
@@ -98,8 +61,21 @@ func validateComponentVector(component *ComponentVector, fldPath *field.Path) fi
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "component name must not be empty"))
 	}
 
+	return allErrs
+}
+
+// validateAdvancedComponentVector validates advanced fields of the given ComponentVector.
+func validateAdvancedComponentVector(component *ComponentVector, advancedFields bool, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if component == nil {
+		return allErrs
+	}
+
 	// Validate SourceRepository
-	if component.SourceRepository != nil {
+	if !advancedFields && component.SourceRepository != nil {
+		allErrs = append(allErrs, field.Forbidden(fldPath.Child("sourceRepository"), "source repository is not allowed"))
+	} else if advancedFields && component.SourceRepository != nil {
 		sourceRepo := *component.SourceRepository
 		if strings.TrimSpace(sourceRepo) == "" {
 			allErrs = append(allErrs, field.Required(fldPath.Child("sourceRepository"), "source repository must not be empty"))
@@ -117,9 +93,20 @@ func validateComponentVector(component *ComponentVector, fldPath *field.Path) fi
 	}
 
 	// Validate Version
-	if strings.TrimSpace(component.Version) == "" {
+	if !advancedFields && component.Version != "" {
+		allErrs = append(allErrs, field.Forbidden(fldPath.Child("version"), "version is not allowed"))
+	} else if advancedFields && strings.TrimSpace(component.Version) == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("version"), "component version must not be empty"))
 	}
+
+	return allErrs
+}
+
+func validateComponentVector(component *ComponentVector, advancedFields bool, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	allErrs = append(allErrs, validateBasicComponentVector(component, fldPath)...)
+	allErrs = append(allErrs, validateAdvancedComponentVector(component, advancedFields, fldPath)...)
 
 	return allErrs
 }

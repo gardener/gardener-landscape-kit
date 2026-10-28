@@ -40,7 +40,7 @@ var _ = Describe("Types", func() {
 				TargetDirPath: "",
 				Config:        &v1alpha1.LandscapeKitConfiguration{},
 			}
-			componentDir = components.SkipDir
+			componentDir = ""
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 
@@ -343,7 +343,7 @@ var _ = Describe("Types", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				_, err = componentOpts.GetComponentsVector(relativeCompDir)
-				Expect(err).To(MatchError(ContainSubstring("version must not be set in a local components.yaml file")))
+				Expect(err).To(MatchError(ContainSubstring("version is not allowed")))
 			})
 
 			It("should return an error when the local override sets a sourceRepository", func() {
@@ -357,7 +357,7 @@ var _ = Describe("Types", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				_, err = componentOpts.GetComponentsVector(relativeCompDir)
-				Expect(err).To(MatchError(ContainSubstring("sourceRepository must not be set in a local components.yaml file")))
+				Expect(err).To(MatchError(ContainSubstring("source repository is not allowed")))
 			})
 
 			It("should succeed when no local override file exists", func() {
@@ -419,7 +419,7 @@ var _ = Describe("Types", func() {
 				},
 				TargetDirPath: "",
 			}
-			componentDir = components.SkipDir
+			componentDir = ""
 			v1alpha1.SetObjectDefaults_LandscapeKitConfiguration(opts.Config)
 		})
 

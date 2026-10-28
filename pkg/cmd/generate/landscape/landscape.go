@@ -97,7 +97,7 @@ func run(_ context.Context, opts *options.Options) error {
 		return fmt.Errorf("failed to read current component vector metadata: %w", err)
 	}
 
-	componentsVector, err := componentOpts.GetComponentsVector(components.SkipDir)
+	componentsVector, err := componentOpts.GetComponentsVector("")
 	if err != nil {
 		return err
 	}

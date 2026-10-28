@@ -74,7 +74,7 @@ func NewWithOverride(base []byte, overrides ...[]byte) (Interface, error) {
 	if err := yaml.Unmarshal(base, &baseObj); err != nil {
 		return nil, fmt.Errorf("failed to parse base component vector: %w", err)
 	}
-	if errList := ValidateComponents(&baseObj, field.NewPath("")); len(errList) > 0 {
+	if errList := ValidateComponents(&baseObj, true, field.NewPath("")); len(errList) > 0 {
 		return nil, fmt.Errorf("invalid base component vector: %w", errList.ToAggregate())
 	}
 
@@ -106,7 +106,7 @@ func MergeAndValidateComponents(base Interface, overrides ...*Components) (Inter
 
 	// Validate merged entries (name + version required per entry)
 	for cv := range maps.Values(result.nameToComponentVector) {
-		if errList := validateComponentVector(cv, field.NewPath("")); len(errList) > 0 {
+		if errList := validateComponentVector(cv, true, field.NewPath("")); len(errList) > 0 {
 			return nil, fmt.Errorf("invalid merged component vector: %w", errList.ToAggregate())
 		}
 	}
