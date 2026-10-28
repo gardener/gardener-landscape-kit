@@ -24,7 +24,7 @@ components:
   version: v1.152.2
 - name: github.com/gardener/gardener-extension-networking-calico
   sourceRepository: https://github.com/gardener/gardener-extension-networking-calico
-  version: v1.60.2
+  version: v1.60.3
   resources:
     admissionCalicoRuntime:
       helmChart:
