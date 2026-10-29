@@ -14,10 +14,13 @@ set -o pipefail
 #   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)"
 #   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- --version v0.6.0
 #   /bin/bash -c "$(curl -fsSL ...)" -- --components-file path/to/component-descriptor.yaml --install-dir ~/.local/bin
+#   /bin/bash -c "$(curl -fsSL ...)" -- --components-file-dir ~/.cache/glk
 #
 # Options:
 #   --version VERSION        GLK release to install (default: latest release)
 #   --components-file PATH   Path to a release's component-descriptor.yaml
+#   --components-file-dir DIR
+#                            Directory to save a downloaded component-descriptor.yaml
 #   --install-dir DIR        Directory to install the binary into (default: ~/.glk/bin)
 #   --no-symlink             Do not create/update a 'glk' symlink in install-dir
 #   --help                   Print this help
@@ -30,6 +33,7 @@ BINARY_NAME="gardener-landscape-kit"
 # Defaults
 RELEASE_VERSION=""
 COMPONENTS_FILE="${COMPONENTS_FILE:-}"
+COMPONENTS_FILE_DIR="${COMPONENTS_FILE_DIR:-}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.glk/bin}"
 CREATE_SYMLINK=true
 COMPONENTS_TMP=""
@@ -77,6 +81,11 @@ while [[ $# -gt 0 ]]; do
       COMPONENTS_FILE="$2"
       shift 2
       ;;
+    --components-file-dir)
+      [[ $# -ge 2 && -n "$2" ]] || die "--components-file-dir requires a directory path."
+      COMPONENTS_FILE_DIR="$2"
+      shift 2
+      ;;
     --install-dir)
       [[ $# -ge 2 ]] || die "--install-dir requires a path."
       INSTALL_DIR="$2"
@@ -90,16 +99,17 @@ done
 
 # ── download a component descriptor unless one was provided ──────────────────
 
+[[ -z "$COMPONENTS_FILE" || -z "$COMPONENTS_FILE_DIR" ]] \
+  || die "--components-file and --components-file-dir cannot be used together."
+
 if [[ -n "$RELEASE_VERSION" ]]; then
   [[ -z "$COMPONENTS_FILE" ]] \
     || die "--version and --components-file cannot be used together."
   [[ "$RELEASE_VERSION" =~ ^v[0-9][0-9A-Za-z.+-]*$ ]] \
     || die "Invalid version '${RELEASE_VERSION}'. Expected a release tag such as v0.6.0."
-
 fi
 
 if [[ -z "$COMPONENTS_FILE" ]]; then
-  COMPONENTS_TMP="$(mktemp)"
   if [[ -n "$RELEASE_VERSION" ]]; then
     DESCRIPTOR_URL="https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_VERSION}/component-descriptor.yaml"
     RELEASE_DESCRIPTION="release ${RELEASE_VERSION}"
@@ -108,10 +118,28 @@ if [[ -z "$COMPONENTS_FILE" ]]; then
     RELEASE_DESCRIPTION="the latest release"
   fi
 
+  if [[ -n "$COMPONENTS_FILE_DIR" ]]; then
+    [[ -d "$COMPONENTS_FILE_DIR" ]] \
+      || die "component descriptor directory '$COMPONENTS_FILE_DIR' does not exist."
+    COMPONENTS_FILE="${COMPONENTS_FILE_DIR%/}/component-descriptor.yaml"
+    [[ ! -d "$COMPONENTS_FILE" ]] \
+      || die "component descriptor destination '$COMPONENTS_FILE' is a directory."
+    COMPONENTS_TMP="$(mktemp "${COMPONENTS_FILE_DIR%/}/.component-descriptor.yaml.XXXXXX")"
+  else
+    COMPONENTS_TMP="$(mktemp)"
+    COMPONENTS_FILE="$COMPONENTS_TMP"
+  fi
+
   log "Downloading component descriptor for ${RELEASE_DESCRIPTION} ..."
   download "$DESCRIPTOR_URL" "$COMPONENTS_TMP" \
     || die "Could not download component-descriptor.yaml for ${RELEASE_DESCRIPTION}."
-  COMPONENTS_FILE="$COMPONENTS_TMP"
+
+  if [[ -n "$COMPONENTS_FILE_DIR" ]]; then
+    mv -f "$COMPONENTS_TMP" "$COMPONENTS_FILE" \
+      || die "Could not save component-descriptor.yaml to '$COMPONENTS_FILE'."
+    COMPONENTS_TMP=""
+    log "Saved component descriptor to '${COMPONENTS_FILE}'."
+  fi
 fi
 
 # ── detect version from the component descriptor ──────────────────────────────

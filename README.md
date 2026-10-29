@@ -25,6 +25,10 @@ The installer downloads the latest release's `component-descriptor.yaml` by defa
 the specified release's descriptor when `--version` is set. It determines the matching
 `glk` binary version, installs it to `~/.glk/bin/`, and prints next steps. Using the latest
 installer also ensures that descriptors from older releases are handled correctly.
+By default, the downloaded descriptor is kept in a temporary file and removed when the
+installer exits. Pass `--components-file-dir DIR` to keep it at
+`DIR/component-descriptor.yaml`; the directory must already exist and an existing
+descriptor at that path is replaced.
 
 To use a descriptor downloaded manually, get the asset named
 `component-descriptor.yaml` from the desired [GitHub release](https://github.com/gardener/gardener-landscape-kit/releases)
@@ -33,6 +37,13 @@ and pass it to the installer:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
   --components-file path/to/component-descriptor.yaml
+```
+
+To keep the descriptor downloaded by the installer, pass a directory instead:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- \
+  --components-file-dir path/to/components
 ```
 
 `gardener-landscape-kit`, short GLK, is a toolkit for generating manifests to facilitate GitOps-based management of Gardener landscapes.
