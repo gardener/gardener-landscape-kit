@@ -103,7 +103,7 @@ components:
         repository: europe-docker.pkg.dev/gardener-project/releases/charts/gardener/extensions/provider-gcp
 - name: github.com/gardener/gardener-extension-provider-openstack
   sourceRepository: https://github.com/gardener/gardener-extension-provider-openstack
-  version: v1.59.0
+  version: v1.59.1
   resources:
     admissionOpenstackRuntime:
       helmChart:
