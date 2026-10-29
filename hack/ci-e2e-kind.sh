@@ -16,7 +16,11 @@ clamp_mss_to_pmtu
 glk_ensure_local_gardener_cloud_hosts
 
 # test setup
-make kind-up e2e-prepare
+make kind-up
+
+glk_ensure_registry_ca_trusted
+
+make e2e-prepare
 
 # export all container logs and events after test execution
 trap "

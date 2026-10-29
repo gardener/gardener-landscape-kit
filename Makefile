@@ -134,11 +134,11 @@ git-server-down:
 
 .PHONY: infra-up
 infra-up:
-	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml up -d
+	@$(REPO_ROOT)/dev-setup/infra.sh up
 
 .PHONY: infra-down
 infra-down:
-	@docker compose -f $(REPO_ROOT)/dev-setup/infra/docker-compose.yaml down
+	@$(REPO_ROOT)/dev-setup/infra.sh down
 
 .PHONY: kind-up ## create single kind cluster for hosting glk and runtime
 kind-up: $(KIND) $(KUBECTL) $(HELM)
@@ -149,6 +149,10 @@ kind-up: $(KIND) $(KUBECTL) $(HELM)
 .PHONY: kind-down
 kind-down: git-server-down infra-down $(KIND) $(KUBECTL)
 	@$(REPO_ROOT)/dev-setup/kind/kind-delete-cluster.sh single
+
+.PHONY: cleanup-local-registry-ca ## remove the GLK registry CA from the OS trust store
+cleanup-local-registry-ca:
+	@$(REPO_ROOT)/dev-setup/infra.sh cleanup-registry-ca
 
 #########################################
 # E2E Tests                             #

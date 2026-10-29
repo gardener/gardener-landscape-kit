@@ -17,6 +17,15 @@ glk_ensure_local_gardener_cloud_hosts() {
   fi
 }
 
+# In CI, ensure the GLK registry CA is trusted by the system so that skaffold and helm can push to the
+# HTTPS registry. The kind-create-cluster.sh normally handles this for local dev; in CI we run as root
+# so the trust store update needs no sudo.
+glk_ensure_registry_ca_trusted() {
+  if [ -n "${CI:-}" -a -n "${ARTIFACTS:-}" ]; then
+    "$(dirname "$0")/../dev-setup/infra.sh" ensure-registry-tls
+  fi
+}
+
 export_forgejo_runner_logs() {
   docker logs glk-forgejo-runner > "${ARTIFACTS}/forgejo-runner.log" || true
 }

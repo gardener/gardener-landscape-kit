@@ -25,20 +25,11 @@ if [[ "$(id -u)" != "0" ]]; then
 fi
 
 # The local registry needs to be available from the host for pushing and from the containers for pulling.
-# On the host, we bind the registry to localhost (see infra/docker-compose.yaml), because 127.0.0.1 and ::1
-# are configured as HTTP-only (insecure-registries) by default in Docker, which allows `docker push` without
-# changing the Docker daemon config.
+# On the host, we bind the registry to localhost (see infra/docker-compose.yaml). The registry is served
+# over HTTPS, so the self-signed CA (see dev-setup/infra.sh ensure-registry-tls) must be trusted on the
+# host and in the kind node containers.
 # From within the containers (e.g., the kind nodes), the registry domain is resolved via Docker's built-in
 # DNS server to the IP of the registry container because of the host alias configured in docker compose.
-#
-# We could also bind the registry to an 172.18.255.* address similar to bind9 to make the registry reachable
-# from the host and containers via the same IP. This would be cleaner, because we wouldn't need to add entries
-# to /etc/hosts for the registry domain and would resolve the domain from the host via bind9 just as all other
-# domains.
-# However, this would require changing the Docker daemon config to set registry.local.gardener.cloud as an
-# insecure registry to allow pushing to it from the host. The insecureRegistries settings in the skaffold config
-# doesn't apply here, because skaffold uses the Docker daemon/CLI under the hood for pushing images, which only
-# considers the Docker daemon's registry configuration.
 ensure_local_registry_hosts() {
   local host="glk-registry.local.gardener.cloud"
 
@@ -199,6 +190,7 @@ create_kind_cluster() {
 
 setup_kind_network
 build_kind_node_image
+"$(dirname "$0")/../infra.sh" ensure-registry-tls
 ensure_local_registry_hosts
 setup_local_dns_resolver
 create_kind_cluster

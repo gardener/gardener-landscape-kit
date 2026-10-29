@@ -33,7 +33,6 @@ services:
   docker-in-docker:
     container_name: glk-forgejo-dind
     image: data.forgejo.org/oci/docker:dind
-    command: ['--insecure-registry=glk-registry.local.gardener.cloud:6001']
     hostname: docker  # Must set hostname as TLS certificates are only valid for docker or localhost
     privileged: true
     environment:
@@ -41,6 +40,10 @@ services:
       DOCKER_HOST: docker-in-docker
     volumes:
     - ../../dev/git-server/docker_certs:/certs
+    - type: bind
+      source: ../infra/registry/tls/ca.crt
+      target: /etc/docker/certs.d/glk-registry.local.gardener.cloud:6001/ca.crt
+      read_only: true
     restart: unless-stopped
 
   runner:

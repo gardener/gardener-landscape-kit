@@ -1,6 +1,8 @@
-# Enable containerd to reach registry at glk-registry.local.gardener.cloud:6001 via HTTP.
+# Enable containerd to reach registry at glk-registry.local.gardener.cloud:6001 via HTTPS.
+# The registry's self-signed CA is installed into the node's OS trust store at kind-up time (by infra.sh),
+# so containerd trusts the TLS certificate without an explicit 'ca' field here.
 # Beware: Port `:5000` cannot be used, as it conflicts with the default port allocation for the `AirPlay Receiver` on MacOS.
-server = "http://glk-registry.local.gardener.cloud:6001"
+server = "https://glk-registry.local.gardener.cloud:6001"
 
-[host."http://glk-registry.local.gardener.cloud:6001"]
+[host."https://glk-registry.local.gardener.cloud:6001"]
   capabilities = ["pull", "resolve"]
