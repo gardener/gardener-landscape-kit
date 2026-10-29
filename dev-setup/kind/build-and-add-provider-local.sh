@@ -68,6 +68,9 @@ generate_extension_yaml() {
   tmpDir="${devDir}/gardener/local/provider-local"
   rm -rf "${tmpDir}"
   mkdir -p "${tmpDir}"
+  # The upstream kustomization may reference secret-registry-ca.yaml (added in g/g v1.153.0).
+  # Generate it before copying so it is present when kustomize resolves the component.
+  "$(dirname "$0")/../infra.sh" write-registry-ca-secrets
   cp -r "${devDir}/gardener/dev-setup/extensions/provider-local/components/extension/" "${tmpDir}"
   patch_file="${tmpDir}/extension/patch-extension-prow.yaml"
   cat <<EOF > "$patch_file"

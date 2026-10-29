@@ -7,7 +7,7 @@ set -o errexit
 set -o pipefail
 
 COMMAND="${1:-up}"
-VALID_COMMANDS=("up" "down" "cleanup-registry-ca" "ensure-registry-tls")
+VALID_COMMANDS=("up" "down" "cleanup-registry-ca" "ensure-registry-tls" "write-registry-ca-secrets")
 
 INFRA_COMPOSE_FILE="$(dirname "$0")/infra/docker-compose.yaml"
 DIR_REGISTRY_TLS="$(dirname "$0")/infra/registry/tls"
@@ -150,6 +150,38 @@ EOF
   done
 }
 
+# Write the registry CA as a Kubernetes Secret manifest to the gardener dev-setup directories that reference it.
+# The upstream kustomization.yaml for provider-local/extension lists secret-registry-ca.yaml as a resource;
+# without this file kustomize fails during e2e-prepare.
+write_registry_ca_secrets() {
+  local ca_crt="$DIR_REGISTRY_TLS/ca.crt"
+  [[ -f "$ca_crt" ]] || return 0
+
+  local gardener_dev_dir
+  gardener_dev_dir="$(dirname "$0")/../dev/gardener/dev-setup"
+  [[ -d "$gardener_dev_dir" ]] || return 0
+
+  local dest
+  for dest in \
+    "$gardener_dev_dir/extensions/provider-local/components/extension/secret-registry-ca.yaml" \
+    "$gardener_dev_dir/gardenlet/base/secret-registry-ca.yaml"; do
+    [[ -d "$(dirname "$dest")" ]] || continue
+    cat > "$dest" <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gardener-local-registry-ca
+  namespace: garden
+  labels:
+    gardener.cloud/role: oci-ca-bundle
+type: Opaque
+stringData:
+  bundle.crt: |
+$(sed 's/^/    /' "$ca_crt")
+EOF
+  done
+}
+
 case "$COMMAND" in
   up)
     ensure_registry_tls
@@ -163,6 +195,9 @@ case "$COMMAND" in
     ;;
   ensure-registry-tls)
     ensure_registry_tls
+    ;;
+  write-registry-ca-secrets)
+    write_registry_ca_secrets
     ;;
   *)
     echo "Unknown command: $COMMAND. Valid commands: ${VALID_COMMANDS[*]}" >&2
