@@ -8,15 +8,19 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# install.sh — downloads the gardener-landscape-kit binary matching the version
-# specified in a components.yaml file.
+# install.sh — downloads and installs a gardener-landscape-kit release.
 #
 # Usage:
 #   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)"
-#   /bin/bash -c "$(curl -fsSL ...)" -- --components-file path/to/components.yaml --install-dir ~/.local/bin
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/gardener/gardener-landscape-kit/HEAD/install.sh)" -- --version v0.6.0
+#   /bin/bash -c "$(curl -fsSL ...)" -- --components-file path/to/component-descriptor.yaml --install-dir ~/.local/bin
+#   /bin/bash -c "$(curl -fsSL ...)" -- --components-file-dir ~/.cache/glk
 #
 # Options:
-#   --components-file PATH   Path to components.yaml (default: ./components.yaml)
+#   --version VERSION        GLK release to install (default: latest release)
+#   --components-file PATH   Path to a release's component-descriptor.yaml
+#   --components-file-dir DIR
+#                            Directory to save a downloaded component-descriptor.yaml
 #   --install-dir DIR        Directory to install the binary into (default: ~/.glk/bin)
 #   --no-symlink             Do not create/update a 'glk' symlink in install-dir
 #   --help                   Print this help
@@ -27,9 +31,13 @@ GITHUB_REPO="gardener/gardener-landscape-kit"
 BINARY_NAME="gardener-landscape-kit"
 
 # Defaults
-COMPONENTS_FILE="${COMPONENTS_FILE:-./components.yaml}"
+RELEASE_VERSION=""
+COMPONENTS_FILE="${COMPONENTS_FILE:-}"
+COMPONENTS_FILE_DIR="${COMPONENTS_FILE_DIR:-}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.glk/bin}"
 CREATE_SYMLINK=true
+COMPONENTS_TMP=""
+ARCHIVE_TMP=""
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -41,17 +49,98 @@ usage() {
   exit 0
 }
 
+cleanup() {
+  [[ -z "$COMPONENTS_TMP" ]] || rm -f "$COMPONENTS_TMP"
+  [[ -z "$ARCHIVE_TMP" ]] || rm -f "$ARCHIVE_TMP"
+}
+
+trap cleanup EXIT
+
+download() {
+  local url="$1" dest="$2"
+  if command -v curl &>/dev/null; then
+    curl -fSL --progress-bar -o "$dest" "$url"
+  elif command -v wget &>/dev/null; then
+    wget -q --show-progress -O "$dest" "$url"
+  else
+    die "Neither curl nor wget found. Install one and retry."
+  fi
+}
+
 # ── argument parsing ──────────────────────────────────────────────────────────
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --components-file) COMPONENTS_FILE="$2"; shift 2 ;;
-    --install-dir)     INSTALL_DIR="$2";     shift 2 ;;
+    --version)
+      [[ $# -ge 2 ]] || die "--version requires a value."
+      RELEASE_VERSION="$2"
+      shift 2
+      ;;
+    --components-file)
+      [[ $# -ge 2 ]] || die "--components-file requires a path."
+      COMPONENTS_FILE="$2"
+      shift 2
+      ;;
+    --components-file-dir)
+      [[ $# -ge 2 && -n "$2" ]] || die "--components-file-dir requires a directory path."
+      COMPONENTS_FILE_DIR="$2"
+      shift 2
+      ;;
+    --install-dir)
+      [[ $# -ge 2 ]] || die "--install-dir requires a path."
+      INSTALL_DIR="$2"
+      shift 2
+      ;;
     --no-symlink)      CREATE_SYMLINK=false; shift   ;;
     --help|-h)         usage ;;
     *) die "Unknown argument: $1. Run with --help for usage." ;;
   esac
 done
+
+# ── download a component descriptor unless one was provided ──────────────────
+
+[[ -z "$COMPONENTS_FILE" || -z "$COMPONENTS_FILE_DIR" ]] \
+  || die "--components-file and --components-file-dir cannot be used together."
+
+if [[ -n "$RELEASE_VERSION" ]]; then
+  [[ -z "$COMPONENTS_FILE" ]] \
+    || die "--version and --components-file cannot be used together."
+  [[ "$RELEASE_VERSION" =~ ^v[0-9][0-9A-Za-z.+-]*$ ]] \
+    || die "Invalid version '${RELEASE_VERSION}'. Expected a release tag such as v0.6.0."
+fi
+
+if [[ -z "$COMPONENTS_FILE" ]]; then
+  if [[ -n "$RELEASE_VERSION" ]]; then
+    DESCRIPTOR_URL="https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_VERSION}/component-descriptor.yaml"
+    RELEASE_DESCRIPTION="release ${RELEASE_VERSION}"
+  else
+    DESCRIPTOR_URL="https://github.com/${GITHUB_REPO}/releases/latest/download/component-descriptor.yaml"
+    RELEASE_DESCRIPTION="the latest release"
+  fi
+
+  if [[ -n "$COMPONENTS_FILE_DIR" ]]; then
+    [[ -d "$COMPONENTS_FILE_DIR" ]] \
+      || die "component descriptor directory '$COMPONENTS_FILE_DIR' does not exist."
+    COMPONENTS_FILE="${COMPONENTS_FILE_DIR%/}/component-descriptor.yaml"
+    [[ ! -d "$COMPONENTS_FILE" ]] \
+      || die "component descriptor destination '$COMPONENTS_FILE' is a directory."
+    COMPONENTS_TMP="$(mktemp "${COMPONENTS_FILE_DIR%/}/.component-descriptor.yaml.XXXXXX")"
+  else
+    COMPONENTS_TMP="$(mktemp)"
+    COMPONENTS_FILE="$COMPONENTS_TMP"
+  fi
+
+  log "Downloading component descriptor for ${RELEASE_DESCRIPTION} ..."
+  download "$DESCRIPTOR_URL" "$COMPONENTS_TMP" \
+    || die "Could not download component-descriptor.yaml for ${RELEASE_DESCRIPTION}."
+
+  if [[ -n "$COMPONENTS_FILE_DIR" ]]; then
+    mv -f "$COMPONENTS_TMP" "$COMPONENTS_FILE" \
+      || die "Could not save component-descriptor.yaml to '$COMPONENTS_FILE'."
+    COMPONENTS_TMP=""
+    log "Saved component descriptor to '${COMPONENTS_FILE}'."
+  fi
+fi
 
 # ── detect version from the component descriptor ──────────────────────────────
 
@@ -125,19 +214,6 @@ esac
 ASSET_NAME="${BINARY_NAME}-${OS}-${ARCH}"
 log "Platform: ${OS}/${ARCH} → asset '${ASSET_NAME}'"
 
-# ── download helper ───────────────────────────────────────────────────────────
-
-download() {
-  local url="$1" dest="$2"
-  if command -v curl &>/dev/null; then
-    curl -fSL --progress-bar -o "$dest" "$url"
-  elif command -v wget &>/dev/null; then
-    wget -q --show-progress -O "$dest" "$url"
-  else
-    die "Neither curl nor wget found. Install one and retry."
-  fi
-}
-
 # ── resolve download URL ──────────────────────────────────────────────────────
 
 if [[ "$OS" == "windows" ]]; then
@@ -180,7 +256,6 @@ if [[ -f "$VERSIONED_BINARY" ]]; then
   log "Binary already cached at '${VERSIONED_BINARY}', skipping download."
 else
   ARCHIVE_TMP="$(mktemp)"
-  trap 'rm -f "$ARCHIVE_TMP"' EXIT
 
   log "Downloading ${DOWNLOAD_URL} ..."
   if ! download "$DOWNLOAD_URL" "$ARCHIVE_TMP"; then
