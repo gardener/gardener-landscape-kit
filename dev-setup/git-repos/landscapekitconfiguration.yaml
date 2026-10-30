@@ -15,7 +15,7 @@ repositories:
     # (flux-distroless-rebuild.yaml ran on main and Renovate pinned real -glk.<sha>@sha256:<digest> refs into
     # componentvector/components.yaml). Until then this file overrides the bootstrap -glk.0 tags with the
     # pullable upstream ghcr.io/fluxcd refs so e2e clusters can pull the controller images.
-    - components-flux-upstream.yaml
+    - components-flux-upstream-override.yaml
   landscape:
     ref:
       # branch: main
