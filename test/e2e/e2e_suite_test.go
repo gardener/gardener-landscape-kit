@@ -5,6 +5,7 @@
 package e2e
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -26,6 +27,9 @@ var _ = BeforeSuite(func() {
 	GLKBaseRepoName = os.Getenv("GLK_BASE_REPO_NAME")
 	GLKLandscapeRepoName = os.Getenv("GLK_LANDSCAPE_REPO_NAME")
 	RepoOwner = GitUserName
+
+	RegistryHostname = os.Getenv("REGISTRY_HOSTNAME")
+	RegistryURL = fmt.Sprintf("oci://%s:6001/glk-e2e-ocm", RegistryHostname)
 })
 
 func TestE2E(t *testing.T) {

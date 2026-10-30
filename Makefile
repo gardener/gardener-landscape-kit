@@ -60,7 +60,7 @@ tidy:
 
 .PHONY: format
 format: $(GOIMPORTS) $(GOIMPORTSREVISER)
-	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg
+	@bash $(GARDENER_HACK_DIR)/format.sh ./cmd ./pkg ./test
 
 tools-for-generate: $(CRD_REF_DOCS)
 	@go mod download

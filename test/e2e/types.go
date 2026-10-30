@@ -24,4 +24,9 @@ var (
 	GLKLandscapeRepoName string
 	// RepoOwner is the owner of the Forgejo repositories.
 	RepoOwner string
+
+	// RegistryHostname is the hostname (without port) of the local OCI registry.
+	RegistryHostname string
+	// RegistryURL is the oci:// URL of the base repository path used to seed synthetic OCM components.
+	RegistryURL string
 )

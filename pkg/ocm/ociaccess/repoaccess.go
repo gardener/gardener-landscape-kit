@@ -55,9 +55,10 @@ type RepoAccess struct {
 }
 
 // NewRepoAccess creates a new RepoAccess instance for accessing an OCI repository.
+// The repositoryURL must use the scheme oci://.
 func NewRepoAccess(repositoryURL string) (*RepoAccess, error) {
 	parts := strings.SplitN(repositoryURL, "://", 2)
-	if len(parts) != 2 {
+	if len(parts) != 2 || parts[0] != "oci" {
 		return nil, fmt.Errorf("invalid repository URL %q, expected format oci://<repository>", repositoryURL)
 	}
 	resolver, err := urlresolver.New(urlresolver.WithBaseURL(parts[1]))
@@ -81,6 +82,16 @@ func NewRepoAccess(repositoryURL string) (*RepoAccess, error) {
 		repo:          repo,
 		logOutput:     logOutput,
 	}, nil
+}
+
+// AddComponentVersion adds (pushes) a component version to the repository.
+func (r *RepoAccess) AddComponentVersion(ctx context.Context, descriptor *descriptorruntime.Descriptor) error {
+	r.logOutput.Reset()
+	if err := r.repo.AddComponentVersion(ctx, descriptor); err != nil {
+		return fmt.Errorf("failed to add component version %s:%s to repository %s: %w",
+			descriptor.Component.Name, descriptor.Component.Version, r.RepositoryURL, err)
+	}
+	return nil
 }
 
 // GetComponentVersion retrieves the component descriptor for a specific component version from the repository.
