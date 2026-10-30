@@ -19,7 +19,10 @@ The following dependencies have been updated:\n\
   customManagers: [
     {
       customType: 'regex',
-      managerFilePatterns: ['/.github/actions/glk/action.yaml'],
+      managerFilePatterns: [
+        '/.github/actions/glk/action.yaml',
+        '/.github/workflows/flux-distroless-rebuild.yaml',
+      ],
       matchStrings: ['YQ_VERSION="(?<currentValue>v[^"]+)"'],
       depNameTemplate: 'mikefarah/yq',
       datasourceTemplate: 'github-releases',
@@ -54,6 +57,18 @@ The following dependencies have been updated:\n\
         '# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)\\s+export GOTOOLCHAIN\\s*:?\\??=\\s*go(?<currentValue>[^\\s]+)',
       ],
     },
+    {
+      // GLK-rebuilt distroless Flux controller images in componentvector/components.yaml.
+      // currentDigest captures the optional @sha256:... suffix so Renovate tracks both tag bumps
+      // (v1.10.1 → v1.10.2) and same-tag digest refreshes.
+      customType: 'regex',
+      managerFilePatterns: ['/^componentvector\\/components\\.yaml$/'],
+      matchStrings: [
+        '\\s*-\\s*name:\\s*(?:[a-z]+-controller)\\s*\\n\\s*repository:\\s*(?<depName>europe-docker\\.pkg\\.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/[^\\s]+)\\s*\\n\\s*tag:\\s*(?<currentValue>v?[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?',
+      ],
+      datasourceTemplate: 'docker',
+      versioningTemplate: 'loose',
+    },
   ],
   packageRules: [
     {
@@ -73,6 +88,18 @@ The following dependencies have been updated:\n\
       enabled: true,
     },
     {
+      // Groups all four controllers into one PR per flux version bump; pinDigests also pins the
+      // bootstrap entry on first encounter and tracks same-tag distroless base refreshes.
+      groupName: 'glk-flux-controllers',
+      matchDatasources: ['docker'],
+      matchPackageNames: [
+        '/^europe-docker\\.pkg\\.dev\\/gardener-project\\/public\\/gardener\\/gardener-landscape-kit\\/flux\\/.+$/',
+      ],
+      separateMultipleMinor: true,
+      pinDigests: true,
+      enabled: true,
+    },
+    {
       groupName: "fluxcd-controllers",
       matchPackageNames: [
         '/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/',
@@ -82,6 +109,8 @@ The following dependencies have been updated:\n\
     },
     {
       // Flux controller OCI images are managed by hack/flux-gotk-generate.sh.
+      // Also prevents Renovate from ever touching componentvector/components-flux-upstream.yaml,
+      // which is regenerated exclusively by `make generate` (hack/flux-gotk-generate.sh).
       matchDatasources: ['docker'],
       matchPackageNames: ['/^ghcr\\.io\\/fluxcd\\/.+-controller$/'],
       enabled: false,

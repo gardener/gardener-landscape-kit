@@ -8,17 +8,17 @@ components:
       repository: ghcr.io/fluxcd/flux-cli
       tag: v2.10.0
     - name: helm-controller
-      repository: ghcr.io/fluxcd/helm-controller
-      tag: v1.7.1
+      repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller
+      tag: v1.7.1-glk.0
     - name: kustomize-controller
-      repository: ghcr.io/fluxcd/kustomize-controller
-      tag: v1.10.1
+      repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller
+      tag: v1.10.1-glk.0
     - name: notification-controller
-      repository: ghcr.io/fluxcd/notification-controller
-      tag: v1.10.0
+      repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller
+      tag: v1.10.0-glk.0
     - name: source-controller
-      repository: ghcr.io/fluxcd/source-controller
-      tag: v1.10.1
+      repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller
+      tag: v1.10.1-glk.0
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.153.2

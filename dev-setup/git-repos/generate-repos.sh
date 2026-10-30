@@ -64,6 +64,8 @@ generate_base() {
 
   cp "$SCRIPT_DIR/components.yaml" "${GLK_BASE_REPO_PATH}/components.yaml"
   sed -i "s|<DEV-VERSION>|$glk_dev_image_version|g" "${GLK_BASE_REPO_PATH}/components.yaml"
+  # TODO(LucaBernstein): Remove once the first distroless Flux controller images have been built and pushed.
+  cp "$REPO_ROOT/componentvector/components-flux-upstream-override.yaml" "${GLK_BASE_REPO_PATH}/components-flux-upstream-override.yaml"
 
   glk generate base -c "${GLK_CONFIG_PATH}" "${GLK_BASE_REPO_PATH}"
 

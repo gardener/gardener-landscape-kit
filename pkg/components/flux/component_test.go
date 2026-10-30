@@ -266,7 +266,7 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(fs.WriteFile("/components.yaml", content, 0o644)).To(Succeed())
 			}
 
-			It("should contain the pinned Flux controller image refs", func() {
+			It("should contain the GLK-rebuilt (distroless) Flux controller image refs from the default component vector", func() {
 				component, err := NewComponent()
 				Expect(err).NotTo(HaveOccurred())
 				Expect(component.GenerateLandscape(components.NewContext(), opts)).To(Succeed())
@@ -275,10 +275,15 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(err).NotTo(HaveOccurred())
 				content := string(data)
 
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/source-controller:v"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/kustomize-controller:v"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/helm-controller:v"))
-				Expect(content).To(ContainSubstring("image: ghcr.io/fluxcd/notification-controller:v"))
+				// The source of truth references GLK-rebuilt distroless images, not the upstream ghcr.io/fluxcd ones.
+				const glkFluxRepoPrefix = "europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/"
+				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "source-controller:v"))
+				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "kustomize-controller:v"))
+				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "helm-controller:v"))
+				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "notification-controller:v"))
+
+				// The generated manifest must not leak the upstream Alpine-based image refs.
+				Expect(content).NotTo(ContainSubstring("image: ghcr.io/fluxcd/"))
 			})
 
 			It("should use overridden images from the component vector imageVectorOverwrite", func() {
@@ -310,6 +315,52 @@ var _ = Describe("Flux Component Generation", func() {
 				Expect(content).To(ContainSubstring("image: my.registry.io/fluxcd/notification-controller:v9.9.9"))
 
 				Expect(content).NotTo(ContainSubstring("ghcr.io/fluxcd"))
+			})
+
+			It("should render digest-pinned (tag@sha256) refs into the manifest", func() {
+				// Renovate pins rebuilt images as tag@sha256:<digest>. imagevector.ImageSource passes the tag field
+				// verbatim into the ref, so the digest must survive into the rendered gotk-components.yaml.
+				const (
+					repoPrefix = "europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/"
+					digest     = "@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+				)
+				writeComponentsVectorFile(`
+- name: source-controller
+  repository: ` + repoPrefix + `source-controller
+  tag: v1.10.1-glk.a1b2c3d` + digest + `
+- name: kustomize-controller
+  repository: ` + repoPrefix + `kustomize-controller
+  tag: v1.10.1-glk.a1b2c3d` + digest + `
+- name: helm-controller
+  repository: ` + repoPrefix + `helm-controller
+  tag: v1.7.1-glk.a1b2c3d` + digest + `
+- name: notification-controller
+  repository: ` + repoPrefix + `notification-controller
+  tag: v1.10.0-glk.a1b2c3d` + digest + `
+`)
+				opts = buildOpts(func(conf *v1alpha1.LandscapeKitConfiguration) {
+					conf.Repositories.Landscape.ComponentsFiles = []string{"components.yaml"}
+				})
+
+				component, err := NewComponent()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(component.GenerateLandscape(components.NewContext(), opts)).To(Succeed())
+
+				data, err := fs.ReadFile("/landscapeDir/flux/flux-system/gotk-components.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				content := string(data)
+
+				Expect(content).To(ContainSubstring("image: " + repoPrefix + "source-controller:v1.10.1-glk.a1b2c3d" + digest))
+				Expect(content).To(ContainSubstring("image: " + repoPrefix + "kustomize-controller:v1.10.1-glk.a1b2c3d" + digest))
+				Expect(content).To(ContainSubstring("image: " + repoPrefix + "helm-controller:v1.7.1-glk.a1b2c3d" + digest))
+				Expect(content).To(ContainSubstring("image: " + repoPrefix + "notification-controller:v1.10.0-glk.a1b2c3d" + digest))
+
+				// Every rendered controller image must carry a digest pin — no bare tag may slip through.
+				for _, line := range strings.Split(content, "\n") {
+					if strings.Contains(line, "image: "+repoPrefix) {
+						Expect(line).To(ContainSubstring("@sha256:"), "controller image is not digest-pinned: %q", line)
+					}
+				}
 			})
 		})
 	})

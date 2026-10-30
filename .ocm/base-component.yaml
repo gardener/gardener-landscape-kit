@@ -7,6 +7,8 @@ main-source:
         comment: |
           we use gosec for sast scanning. See attached log.
 resources:
+  # Generated from componentvector/components.yaml by hack/flux-gotk-generate.sh.
+  # TODO(LucaBernstein): A -glk.0 tag is a bootstrap placeholder (image not published yet), replaced with a -glk.<sha>@sha256:<digest> ref once flux-distroless-rebuild.yaml publishes and Renovate pins it.
   - name: flux-cli
     version: v2.10.0
     type: ociImage
@@ -20,50 +22,50 @@ resources:
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/flux-cli
   - name: helm-controller
-    version: v1.7.1
+    version: v1.7.1-glk.0
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/helm-controller:v1.7.1
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller:v1.7.1-glk.0
     labels:
       - name: imagevector.gardener.cloud/name
         value: helm-controller
       - name: imagevector.gardener.cloud/repository
-        value: ghcr.io/fluxcd/helm-controller
+        value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller
   - name: kustomize-controller
-    version: v1.10.1
+    version: v1.10.1-glk.0
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/kustomize-controller:v1.10.1
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller:v1.10.1-glk.0
     labels:
       - name: imagevector.gardener.cloud/name
         value: kustomize-controller
       - name: imagevector.gardener.cloud/repository
-        value: ghcr.io/fluxcd/kustomize-controller
+        value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller
   - name: notification-controller
-    version: v1.10.0
+    version: v1.10.0-glk.0
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/notification-controller:v1.10.0
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller:v1.10.0-glk.0
     labels:
       - name: imagevector.gardener.cloud/name
         value: notification-controller
       - name: imagevector.gardener.cloud/repository
-        value: ghcr.io/fluxcd/notification-controller
+        value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller
   - name: source-controller
-    version: v1.10.1
+    version: v1.10.1-glk.0
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: ghcr.io/fluxcd/source-controller:v1.10.1
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller:v1.10.1-glk.0
     labels:
       - name: imagevector.gardener.cloud/name
         value: source-controller
       - name: imagevector.gardener.cloud/repository
-        value: ghcr.io/fluxcd/source-controller
+        value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller

@@ -1,0 +1,103 @@
+name: Flux Distroless Rebuild
+
+# Rebuilds the four Flux controllers on a distroless/minimal base whenever the upstream refs change
+# (componentvector/components-flux-upstream.yaml updated by make generate) or on manual dispatch.
+# Build and push use the shared gardener/cc-utils oci-ocm.yaml@v1 workflow, same as build.yaml.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - componentvector/components-flux-upstream.yaml
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger (e.g. distroless base digest refresh)'
+        type: string
+        required: false
+
+jobs:
+  prepare:
+    name: Prepare rebuild matrix
+    # Only run for the canonical repository to avoid spurious builds from forks.
+    if: ${{ github.repository == 'gardener/gardener-landscape-kit' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install yq
+        shell: bash
+        run: |
+          YQ_VERSION="v4.45.4"
+          OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+          ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+          OUTPUT_PATH="${HOME}/.local/bin"
+          mkdir -p "${OUTPUT_PATH}"
+          wget -qO "${OUTPUT_PATH}/yq" \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${OS}_${ARCH}"
+          chmod +x "${OUTPUT_PATH}/yq"
+          echo "${OUTPUT_PATH}" >> "${GITHUB_PATH}"
+
+      - name: Build controller matrix
+        id: build-matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          UPSTREAM="componentvector/components-flux-upstream.yaml"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+
+          # Emit one JSON object per controller, carrying all fields oci-ocm.yaml@v1 needs.
+          # kustomize-controller uses the --target kustomize stage (debian:slim + tini + git + gpg + ssh).
+          # The three remaining controllers use --target static (distroless/static, no shell deps).
+          matrix_items="[]"
+          while IFS=$'\t' read -r name repo tag; do
+            if [[ "$name" == "kustomize-controller" ]]; then
+              target="kustomize"
+            else
+              target="static"
+            fi
+            flux_image="${repo}:${tag}"
+            version="${tag}-glk.${SHORT_SHA}"
+            matrix_items=$(printf '%s' "${matrix_items}" | \
+              controller="${name}" target="${target}" flux_image="${flux_image}" version="${version}" \
+              yq -o json '. += [{"controller": env(controller), "target": env(target), "flux_image": env(flux_image), "version": env(version)}]')
+          done < <(yq '.images[] | .name + "\t" + .repository + "\t" + .tag' "${UPSTREAM}")
+
+          echo "matrix=${matrix_items}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: Build ${{ matrix.controller }}
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    uses: gardener/cc-utils/.github/workflows/oci-ocm.yaml@v1
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    with:
+      name: ${{ matrix.controller }}
+      version: ${{ matrix.version }}
+      # The full push target resolves to:
+      #   europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/<controller>:<version>
+      oci-registry: europe-docker.pkg.dev/gardener-project/public
+      oci-repository: gardener/gardener-landscape-kit/flux/${{ matrix.controller }}
+      oci-platforms: linux/arm64,linux/amd64
+      dockerfile: flux.Dockerfile
+      target: ${{ matrix.target }}
+      build-args: |
+        FLUX_IMAGE=${{ matrix.flux_image }}
+        CONTROLLER=${{ matrix.controller }}
+      # push: always is required because this workflow does not run the prepare.yaml job that
+      # emits the `prepare-workflow-values` artifact checked by the default `push: if-possible`.
+      push: always
