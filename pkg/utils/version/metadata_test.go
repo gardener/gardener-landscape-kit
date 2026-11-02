@@ -79,7 +79,7 @@ var _ = Describe("Version Metadata", func() {
 			metadata, err := ReadVersionMetadata(targetPath, fs)
 			Expect(metadata).To(BeNil())
 			Expect(err).To(MatchError(And(
-				ContainSubstring("older version of gardener-landscape-kit"),
+				ContainSubstring("missing the version information of gardener-landscape-kit"),
 				ContainSubstring("regenerate the base directory (/test/target)"),
 			)))
 		})
@@ -205,7 +205,7 @@ var _ = Describe("Version Metadata", func() {
 
 		It("should return error when version file is missing", func() {
 			err := ValidateLandscapeVersionCompatibility(targetPath, fs)
-			Expect(err).To(MatchError(ContainSubstring("older version of gardener-landscape-kit")))
+			Expect(err).To(MatchError(ContainSubstring("base directory is missing the version information of gardener-landscape-kit")))
 		})
 
 		It("should return error when base version is older", func() {
