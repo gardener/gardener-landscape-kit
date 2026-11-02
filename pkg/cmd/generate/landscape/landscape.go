@@ -75,9 +75,14 @@ func validate(opts *options.Options) error {
 	// base.target is joined to reach the actual base content.
 	pathToBase := filepath.Join(opts.TargetDirPath, landscape.BaseLink, opts.Config.Repositories.Base.Target)
 
-	// Validate version compatibility
-	opts.Log.V(1).Info("Validating version compatibility", "pathToBase", pathToBase)
 	fs := afero.Afero{Fs: afero.NewOsFs()}
+	baseDirExist, err := fs.DirExists(pathToBase)
+	if err != nil {
+		return fmt.Errorf("failed to check if base directory exists: %w", err)
+	}
+	if !baseDirExist {
+		return fmt.Errorf("base directory does not exist at %q. Please generate the base or adjust the base paths in the gardener-landscape-kit config", pathToBase)
+	}
 	if err := version.ValidateLandscapeVersionCompatibility(pathToBase, fs); err != nil {
 		return fmt.Errorf("version compatibility check failed: %w", err)
 	}
