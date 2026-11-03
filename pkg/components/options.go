@@ -74,7 +74,7 @@ type options struct {
 // GetComponentsVector returns the component vector based on the given component dir.
 func (o *options) GetComponentsVector(relativeComponentDir string) (utilscomponentvector.Interface, error) {
 	if relativeComponentDir != "" {
-		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.GetTargetPath(), DirName, relativeComponentDir))
+		localComponents, err := readLocalComponentsFile(o.filesystem, o.logger, filepath.Join(o.GetTargetPath(), relativeComponentDir))
 		if err != nil {
 			return nil, err
 		}
