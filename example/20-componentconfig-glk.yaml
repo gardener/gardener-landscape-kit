@@ -26,7 +26,6 @@ kind: LandscapeKitConfiguration
 #     - components.yaml
 #     - custom-components.yaml
 # components:
-## --- BEGIN generated component names (managed by hack/tools/example-components-generator) ---
 # - name: flux
 # - name: github
 # - name: gardener-operator
@@ -48,7 +47,6 @@ kind: LandscapeKitConfiguration
 # - name: runtime-gvisor
 # - name: virtual-garden-access
 # - name: garden-config
-## --- END generated component names ---
 # versionConfig:
 #   defaultVersionsUpdateStrategy: ReleaseBranch
 #   checkMode: Strict # or Warning

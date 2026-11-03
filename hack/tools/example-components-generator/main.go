@@ -5,22 +5,18 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
-	"slices"
-	"strings"
+	"text/template"
 
 	"github.com/gardener/gardener-landscape-kit/pkg/registry"
 )
 
-const (
-	beginPin = "## --- BEGIN generated component names (managed by hack/tools/example-components-generator) ---"
-	endPin   = "## --- END generated component names ---"
-)
-
 func main() {
-	filePath := flag.String("file", "example/20-componentconfig-glk.yaml", "Path to the example YAML file to update")
+	templatePath := flag.String("template", "example/20-componentconfig-glk.yaml.tpl", "Path to the template file")
+	filePath := flag.String("file", "example/20-componentconfig-glk.yaml", "Path to the output file")
 	flag.Parse()
 
 	names, err := componentNames()
@@ -28,31 +24,31 @@ func main() {
 		fatalf("%v", err)
 	}
 
-	info, err := os.Stat(*filePath)
+	tplData, err := os.ReadFile(*templatePath)
 	if err != nil {
+		fatalf("cannot read template %q: %v", *templatePath, err)
+	}
+
+	tpl, err := template.New("example").Parse(string(tplData))
+	if err != nil {
+		fatalf("cannot parse template %q: %v", *templatePath, err)
+	}
+
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, struct{ Components []string }{Components: names}); err != nil {
+		fatalf("cannot execute template: %v", err)
+	}
+
+	info, err := os.Stat(*filePath)
+	if err != nil && !os.IsNotExist(err) {
 		fatalf("cannot stat file %q: %v", *filePath, err)
 	}
-
-	data, err := os.ReadFile(*filePath)
-	if err != nil {
-		fatalf("cannot read file %q: %v", *filePath, err)
-	}
-	lines := strings.Split(string(data), "\n")
-
-	beginIdx, endIdx, err := pinRange(lines)
-	if err != nil {
-		fatalf("%s: %v", *filePath, err)
+	mode := os.FileMode(0644)
+	if info != nil {
+		mode = info.Mode()
 	}
 
-	// Rebuild the file: keep everything up to and including the BEGIN pin, replace the managed region with one
-	// commented entry per component, then keep everything from the END pin onward.
-	result := slices.Clone(lines[:beginIdx+1])
-	for _, name := range names {
-		result = append(result, "# - name: "+name)
-	}
-	result = append(result, lines[endIdx:]...)
-
-	if err := os.WriteFile(*filePath, []byte(strings.Join(result, "\n")), info.Mode()); err != nil {
+	if err := os.WriteFile(*filePath, buf.Bytes(), mode); err != nil {
 		fatalf("cannot write file %q: %v", *filePath, err)
 	}
 }
@@ -68,22 +64,6 @@ func componentNames() ([]string, error) {
 		names = append(names, comp.GetComponentMetadata().Name)
 	}
 	return names, nil
-}
-
-// pinRange locates the BEGIN and END pin lines that delimit the generated region and validates their ordering.
-func pinRange(lines []string) (beginIdx, endIdx int, err error) {
-	beginIdx = slices.Index(lines, beginPin)
-	if beginIdx == -1 {
-		return 0, 0, fmt.Errorf("BEGIN pin not found")
-	}
-	endIdx = slices.Index(lines, endPin)
-	if endIdx == -1 {
-		return 0, 0, fmt.Errorf("END pin not found")
-	}
-	if endIdx <= beginIdx {
-		return 0, 0, fmt.Errorf("END pin (line %d) must come after BEGIN pin (line %d)", endIdx+1, beginIdx+1)
-	}
-	return beginIdx, endIdx, nil
 }
 
 func fatalf(format string, args ...any) {
