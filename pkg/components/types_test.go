@@ -266,7 +266,7 @@ var _ = Describe("Types", func() {
 		Describe("#GetComponentsVector with local component file", func() {
 			const (
 				componentName   = "github.com/gardener/gardener"
-				relativeCompDir = "gardener/garden"
+				relativeCompDir = "components/gardener/garden"
 			)
 			var localComponentsFile string
 
@@ -291,7 +291,7 @@ var _ = Describe("Types", func() {
 				opts.Config.Repositories.Base.ComponentsFiles = []string{"components.yaml"}
 
 				// Local override files live next to the component directory.
-				localComponentsFile = "/path/to/target/components/" + relativeCompDir + "/components.yaml"
+				localComponentsFile = "/path/to/target/" + relativeCompDir + "/components.yaml"
 			})
 
 			It("should merge a local override that only patches resources onto the global entry", func() {

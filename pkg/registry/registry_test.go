@@ -296,6 +296,42 @@ var _ = Describe("Registry", func() {
 			Expect(mockComp1.generateLandscapeCalled).To(BeTrue())
 			Expect(mockComp2.generateLandscapeCalled).To(BeFalse())
 		})
+
+		It("should successfully find a custom component override in a custom component", func() {
+			fs := landscapeOptions.GetFilesystem()
+
+			Expect(fs.WriteFile("components.yaml", []byte(`components:
+- name: mockComp1
+  sourceRepository: https://example.com/mockComp1
+  version: v1.0.0`), 0777)).To(Succeed())
+			config.Repositories.Landscape.ComponentsFiles = []string{"components.yaml"}
+			var err error
+			landscapeOptions, err = components.NewLandscapeOptions(
+				&generateoptions.Options{
+					Options: &cmd.Options{Log: log},
+					Config:  config,
+				},
+				afero.Afero{Fs: fs},
+			)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(fs.WriteFile("components/custom/components.yaml", []byte(`components:
+- name: mockComp1
+  resources:
+    chart:
+      ociImage:
+        repository: my-registry.example.com/charts/mockComp1
+        tag: v1.2.3`), 0777)).To(Succeed())
+			Expect(fs.WriteFile("components/custom/component-name", []byte("mockComp1"), 0777)).To(Succeed())
+			Expect(fs.WriteFile("components/custom/file.tpl", []byte("{{ .resources.chart.ociImage.tag }}"), 0777)).To(Succeed())
+
+			err = reg.GenerateLandscape(landscapeOptions)
+			Expect(err).NotTo(HaveOccurred())
+
+			generatedContents, err := fs.ReadFile("components/custom/file")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(generatedContents).To(Equal([]byte("v1.2.3")))
+		})
 	})
 
 	Describe("Integration", func() {
