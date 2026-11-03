@@ -81,7 +81,7 @@ func (c *component) writeBaseTemplateFiles(opts components.Options) error {
 }
 
 func (c *component) getTemplateValues(opts components.Options) (map[string]any, error) {
-	componentsVector, err := opts.GetComponentsVector(c.Directory)
+	componentsVector, err := opts.GetComponentsVector(path.Join(components.DirName, c.Directory))
 	if err != nil {
 		return nil, err
 	}

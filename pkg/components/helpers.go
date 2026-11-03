@@ -4,12 +4,15 @@
 
 package components
 
-import "fmt"
+import (
+	"fmt"
+	"path"
+)
 
 // GetComponentVectorTemplateValues returns the template values from the component vector, such as OCI image references, Helm chart references, etc.
 // See `docs/usage/component.md` for details.
 func GetComponentVectorTemplateValues(opts Options, relativeComponentDir string, componentName string) (map[string]any, error) {
-	componentsVector, err := opts.GetComponentsVector(relativeComponentDir)
+	componentsVector, err := opts.GetComponentsVector(path.Join(DirName, relativeComponentDir))
 	if err != nil {
 		return nil, fmt.Errorf("error getting components vector: %w", err)
 	}
