@@ -5,6 +5,7 @@
 package componentvector
 
 import (
+	"cmp"
 	"fmt"
 	"maps"
 	"path/filepath"
@@ -129,24 +130,39 @@ func mergeComponents(base, override *components) *components {
 	return &components{nameToComponentVector: merged}
 }
 
+// imageSourceKey uniquely identifies an ImageSource within an image vector overwrite.
+// Images with the same name but different targetVersion are distinct entries (used for
+// runtime-version-specific image selection), so both fields form the identity key.
+type imageSourceKey struct {
+	name          string
+	targetVersion string
+}
+
+func imageKey(img imagevector.ImageSource) imageSourceKey {
+	return imageSourceKey{name: img.Name, targetVersion: ptr.Deref(img.TargetVersion, "")}
+}
+
 func mergeImageVectorOverwrite(base, override *ImageVectorOverwrite) *ImageVectorOverwrite {
 	if override == nil {
 		return base
 	}
 
-	nameToImage := make(map[string]imagevector.ImageSource)
+	keyToImage := make(map[imageSourceKey]imagevector.ImageSource)
 	if base != nil {
 		for _, img := range base.Images {
-			nameToImage[img.Name] = img
+			keyToImage[imageKey(img)] = img
 		}
 	}
 	for _, img := range override.Images {
-		nameToImage[img.Name] = img
+		keyToImage[imageKey(img)] = img
 	}
 	return &ImageVectorOverwrite{Images: slices.SortedFunc(
-		maps.Values(nameToImage),
+		maps.Values(keyToImage),
 		func(a, b imagevector.ImageSource) int {
-			return strings.Compare(a.Name, b.Name)
+			return cmp.Or(
+				strings.Compare(a.Name, b.Name),
+				strings.Compare(ptr.Deref(a.TargetVersion, ""), ptr.Deref(b.TargetVersion, "")),
+			)
 		},
 	)}
 }
