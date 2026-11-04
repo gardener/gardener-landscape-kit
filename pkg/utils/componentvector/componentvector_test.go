@@ -1022,8 +1022,10 @@ components:
 	})
 
 	Describe("#MergeAndValidateComponents", func() {
-		It("should merge componentVectorOverrides correctly and maintain entries for multiple versions", func() {
-			baseYAML := `
+		var baseYAML string
+
+		BeforeEach(func() {
+			baseYAML = `
 components:
   - name: comp1
     version: 1.0.0
@@ -1040,6 +1042,20 @@ components:
           targetVersion: 1.0.1
           version: 1.0.1
 `
+		})
+
+		It("should merge componentVectorOverrides with multiple versions correctly and maintain entries without override", func() {
+			cv, err := NewWithOverride([]byte(baseYAML))
+			Expect(err).NotTo(HaveOccurred())
+			comp1 := cv.FindComponentVector("comp1")
+			Expect(comp1).NotTo(BeNil())
+			Expect(comp1.ImageVectorOverwrite.Images).To(ContainElements(
+				HaveField("Version", HaveValue(Equal("1.0.0"))),
+				HaveField("Version", HaveValue(Equal("1.0.1"))),
+			))
+		})
+
+		It("should merge componentVectorOverrides with multiple versions correctly and maintain entries with override", func() {
 			cv, err := NewWithOverride([]byte(baseYAML), []byte(baseYAML)) // Need at least one override to trigger merge function
 			Expect(err).NotTo(HaveOccurred())
 			comp1 := cv.FindComponentVector("comp1")
