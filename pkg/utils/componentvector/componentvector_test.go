@@ -1020,4 +1020,34 @@ components:
 			Expect(vec.ComponentImageVectorOverwrites.Components[0].Name).To(Equal("sub-a"))
 		})
 	})
+
+	Describe("#MergeAndValidateComponents", func() {
+		It("should merge componentVectorOverrides correctly and maintain entries for multiple versions", func() {
+			baseYAML := `
+components:
+  - name: comp1
+    version: 1.0.0
+    imageVectorOverwrite:
+      images:
+        - name: img-only
+          repository: registry.example.com/img-only
+          tag: v1.0.0
+          targetVersion: 1.0.0
+          version: 1.0.0
+        - name: img-only
+          repository: registry.example.com/img-only
+          tag: v1.0.1
+          targetVersion: 1.0.1
+          version: 1.0.1
+`
+			cv, err := NewWithOverride([]byte(baseYAML), []byte(baseYAML)) // Need at least one override to trigger merge function
+			Expect(err).NotTo(HaveOccurred())
+			comp1 := cv.FindComponentVector("comp1")
+			Expect(comp1).NotTo(BeNil())
+			Expect(comp1.ImageVectorOverwrite.Images).To(ContainElements(
+				HaveField("Version", HaveValue(Equal("1.0.0"))),
+				HaveField("Version", HaveValue(Equal("1.0.1"))),
+			))
+		})
+	})
 })
