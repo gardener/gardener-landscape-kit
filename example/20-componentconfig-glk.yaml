@@ -26,7 +26,27 @@ kind: LandscapeKitConfiguration
 #     - components.yaml
 #     - custom-components.yaml
 # components:
-# - name: component-name
+# - name: flux
+# - name: github
+# - name: gardener-operator
+# - name: garden
+# - name: networking-calico
+# - name: networking-cilium
+# - name: provider-alicloud
+# - name: provider-aws
+# - name: provider-azure
+# - name: provider-gcp
+# - name: provider-openstack
+# - name: os-gardenlinux
+# - name: os-suse-chost
+# - name: shoot-cert-service
+# - name: shoot-dns-service
+# - name: shoot-oidc-service
+# - name: shoot-traefik
+# - name: shoot-networking-problemdetector
+# - name: runtime-gvisor
+# - name: virtual-garden-access
+# - name: garden-config
 # versionConfig:
 #   defaultVersionsUpdateStrategy: ReleaseBranch
 #   checkMode: Strict # or Warning

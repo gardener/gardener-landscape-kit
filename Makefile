@@ -73,6 +73,7 @@ generate: tools-for-generate $(GOIMPORTS) $(FLUX_CLI) $(YQ)
 	@GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) $(HACK_DIR)/update-github-templates.sh
 	@ARRAY_KEY=matchPackageNames NEEDLE='// GENERATOR-PIN' GARDENER_HACK_DIR=$(GARDENER_HACK_DIR) RENOVATE_CONFIG=$(REPO_ROOT)/.github/renovate.json5 bash $(GARDENER_HACK_DIR)/generate-renovate-ignore-deps.sh
 	@$(HACK_DIR)/sync-glk-version.sh
+	@go run $(HACK_DIR)/tools/example-components-generator -file $(REPO_ROOT)/example/20-componentconfig-glk.yaml
 	$(MAKE) format
 
 .PHONY: check
