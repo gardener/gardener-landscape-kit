@@ -4,6 +4,7 @@ go 1.27.0
 
 require (
 	codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v3 v3.0.0
+	codeberg.org/mvdkleijn/forgejo-sdk/forgejo/v4 v4.0.0
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/elliotchance/orderedmap/v3 v3.1.1
 	github.com/fluxcd/kustomize-controller/api v1.10.1
@@ -37,7 +38,7 @@ require (
 require (
 	cel.dev/expr v0.25.3 // indirect
 	dario.cat/mergo v1.0.2 // indirect
-	github.com/42wim/httpsig v1.2.4 // indirect
+	github.com/42wim/httpsig v1.3.0 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
@@ -95,10 +96,10 @@ require (
 	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.3.0 // indirect
-	github.com/go-openapi/errors v0.22.8 // indirect
+	github.com/go-openapi/errors v0.22.9 // indirect
 	github.com/go-openapi/jsonpointer v1.0.1 // indirect
 	github.com/go-openapi/jsonreference v1.0.2 // indirect
-	github.com/go-openapi/strfmt v0.27.0 // indirect
+	github.com/go-openapi/strfmt v0.27.4 // indirect
 	github.com/go-openapi/swag v0.29.2 // indirect
 	github.com/go-openapi/swag/cmdutils v0.29.2 // indirect
 	github.com/go-openapi/swag/conv v0.29.2 // indirect
@@ -159,7 +160,7 @@ require (
 	github.com/nexucis/lamenv v0.5.2 // indirect
 	github.com/nlepage/go-tarfs v1.2.1 // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/oklog/ulid/v2 v2.1.1 // indirect
+	github.com/oklog/ulid/v2 v2.1.2 // indirect
 	github.com/open-telemetry/opentelemetry-operator/apis v0.160.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
