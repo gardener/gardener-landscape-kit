@@ -109,7 +109,7 @@ The following dependencies have been updated:\n\
     },
     {
       // Flux controller OCI images are managed by hack/flux-gotk-generate.sh.
-      // Also prevents Renovate from ever touching componentvector/components-flux-upstream.yaml,
+      // Also prevents Renovate from ever touching hack/flux/components-flux-upstream.yaml,
       // which is regenerated exclusively by `make generate` (hack/flux-gotk-generate.sh).
       matchDatasources: ['docker'],
       matchPackageNames: ['/^ghcr\\.io\\/fluxcd\\/.+-controller$/'],
