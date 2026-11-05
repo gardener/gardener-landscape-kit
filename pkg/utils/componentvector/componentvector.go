@@ -251,7 +251,11 @@ func (cv *ComponentVector) TemplateValues() (map[string]any, error) {
 			if img.Ref != nil {
 				ref = *img.Ref
 			} else if img.Repository != nil && img.Tag != nil {
-				ref = *img.Repository + ":" + *img.Tag
+				if strings.HasPrefix(*img.Tag, "sha256:") {
+					ref = *img.Repository + "@" + *img.Tag
+				} else {
+					ref = *img.Repository + ":" + *img.Tag
+				}
 			}
 			imagesMap[kebabToCamelCase(img.Name)] = map[string]any{"ref": ref}
 		}
