@@ -1066,4 +1066,64 @@ components:
 			))
 		})
 	})
+
+	Describe("#TemplateValues", func() {
+		// Regression: when an ImageSource carries repository + a digest-only tag
+		// (e.g. "sha256:abc..."), TemplateValues must join them with "@" not ":".
+		// Previously it produced "repo:sha256:digest" instead of "repo@sha256:digest".
+		It("should use '@' separator when tag is a bare digest in the images template map", func() {
+			// Simulate what OCM produces after SplitOCIImageReference on a digest-pinned ref:
+			// the separator is dropped, leaving tag = "sha256:<digest>".
+			baseYAML := `
+components:
+  - name: comp1
+    version: v1.0.0
+    imageVectorOverwrite:
+      images:
+        - name: some-controller
+          repository: registry.example.com/org/some-controller
+          tag: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+`
+			cv, err := NewWithOverride([]byte(baseYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vals, err := cv.FindComponentVector("comp1").TemplateValues()
+			Expect(err).NotTo(HaveOccurred())
+
+			images, ok := vals["images"].(map[string]any)
+			Expect(ok).To(BeTrue())
+			someController, ok := images["someController"].(map[string]any)
+			Expect(ok).To(BeTrue())
+			Expect(someController["ref"]).To(Equal(
+				"registry.example.com/org/some-controller@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			), "digest-only tag must be joined with '@', not ':'")
+		})
+
+		// Regression: tag+digest combined (e.g. "v1.0.0@sha256:...") must also use "@" before the digest.
+		It("should use '@' separator when tag is a tag+digest combination in the images template map", func() {
+			baseYAML := `
+components:
+  - name: comp1
+    version: v1.0.0
+    imageVectorOverwrite:
+      images:
+        - name: some-controller
+          repository: registry.example.com/org/some-controller
+          tag: "v1.0.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+`
+			cv, err := NewWithOverride([]byte(baseYAML))
+			Expect(err).NotTo(HaveOccurred())
+
+			vals, err := cv.FindComponentVector("comp1").TemplateValues()
+			Expect(err).NotTo(HaveOccurred())
+
+			images, ok := vals["images"].(map[string]any)
+			Expect(ok).To(BeTrue())
+			someController, ok := images["someController"].(map[string]any)
+			Expect(ok).To(BeTrue())
+			Expect(someController["ref"]).To(Equal(
+				"registry.example.com/org/some-controller:v1.0.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			), "tag+digest tag must keep ':' before the tag part and '@' before the digest part")
+		})
+	})
 })
