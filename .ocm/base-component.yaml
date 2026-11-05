@@ -7,7 +7,7 @@ main-source:
         comment: |
           we use gosec for sast scanning. See attached log.
 resources:
-  # Generated from componentvector/components.yaml by hack/flux-gotk-generate.sh.
+  # Generated from componentvector/components.yaml by hack/flux/flux-gotk-generate.sh.
   # TODO(LucaBernstein): A -glk.0 tag is a bootstrap placeholder (image not published yet), replaced with a -glk.<sha>@sha256:<digest> ref once flux-distroless-rebuild.yaml publishes and Renovate pins it.
   - name: flux-cli
     version: v2.10.0
