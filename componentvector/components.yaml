@@ -1,7 +1,7 @@
 components:
 - name: github.com/gardener/gardener-landscape-kit
   sourceRepository: https://github.com/gardener/gardener-landscape-kit
-  version: v0.8.4-dev
+  version: v0.8.4
   imageVectorOverwrite:
     images:
     - name: flux-cli
