@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: Contributors to the Gardener project
+#
+# SPDX-License-Identifier: Apache-2.0
+
+alias flux=$FLUX_CLI
+
+echo "> Generating Flux components"
+flux install \
+  --export \
+  > $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-components.yaml
+flux create secret git flux-system \
+  --url="https://github.com/<org>/<repo>" \
+  --username="<username>" \
+  --password="<git_token>" \
+  --export \
+  > $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/git-sync-secret.yaml
+echo "{{- if eq .sourceKind \"GitRepository\" }}" > $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+flux create source git flux-system \
+  --tag "<ref>" \
+  --secret-ref flux-system --url "https://github.com/<org>/<repo>" \
+  --recurse-submodules \
+  --export \
+  >> $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+echo "{{- else if eq .sourceKind \"OCIRepository\" }}" >> $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+flux create source oci flux-system \
+  --tag "<ref>" \
+  --secret-ref flux-system --url "https://github.com/<org>/<repo>" \
+  --interval=5m \
+  --export \
+  >> $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+echo "{{- end }}" >> $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+flux create kustomization flux-system \
+  --interval 10m \
+  --path "{{ .flux_path }}" \
+  --source GitRepository/flux-system \
+  --export \
+  | sed -e 's|kind: GitRepository|kind: {{ .sourceKind }}|g' \
+  >> $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml \
+
+# Some post processing is needed because the flux CLI does not accept template variables everywhere.
+
+## Replace URL placeholder with Helm template variables
+sed -i 's|https://github.com/<org>/<repo>|{{ .source_url }}|g' $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+
+## Replace ref placeholder
+sed -i 's|tag\:\s<ref>|{{ .source_ref }}|g' $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+
+## Add comment for recurseSubmodules
+sed -i -e 's/recurseSubmodules: true/recurseSubmodules: true # required if Git submodules are used, e.g. to include the base repo in the landscape repo./g' \
+  $REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-sync.yaml
+
+GOTK=$REPO_ROOT/pkg/components/flux/templates/landscape/flux-system/gotk-components.yaml
+COMPONENTS=$REPO_ROOT/componentvector/components.yaml
+UPSTREAM=$REPO_ROOT/hack/flux/components-flux-upstream.yaml
+UPSTREAM_OVERRIDE=$REPO_ROOT/hack/flux/components-flux-upstream-override.yaml
+OCM_BASE_COMPONENT=$REPO_ROOT/.ocm/base-component.yaml
+
+# Registry the GLK-rebuilt distroless Flux controller images are published to. The rebuild pipeline
+# (.github/workflows/flux-distroless-rebuild.yaml) pushes to <GLK_FLUX_REGISTRY>/<controller>, and
+# componentvector/components.yaml (the source of truth consumed by `glk generate`) references these images.
+GLK_FLUX_REGISTRY="europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux"
+
+GLK_INDEX=$(yq '.components | to_entries | .[] | select(.value.name == "github.com/gardener/gardener-landscape-kit") | .key' "$COMPONENTS")
+
+# Convert a hyphenated controller name to camelCase key, e.g. "source-controller" -> "sourceController"
+to_camel_case() {
+  echo "$1" | sed -E 's/-([a-z])/\U\1/g'
+}
+
+## Update Flux controller images across the two-file split and the downstream manifests/OCM descriptor.
+#
+# Two files hold Flux controller image references:
+#   components-flux-upstream.yaml  -- upstream ghcr.io/fluxcd refs; input to the distroless rebuild
+#                                     pipeline only; never consumed by `glk generate` or bumped by Renovate.
+#   components.yaml                -- source of truth for `glk generate`; holds GLK-rebuilt distroless
+#                                     refs (<GLK_FLUX_REGISTRY>/<controller>:<flux-tag>-glk.<sha>@sha256:<digest>).
+#                                     This script preserves existing rebuilt tags when the upstream flux
+#                                     tag is unchanged; otherwise seeds a bootstrap <flux-tag>-glk.0 tag
+#                                     for the rebuild pipeline + Renovate to replace with the real ref.
+echo "> Updating Flux controller images in componentvector/ (upstream + source-of-truth) and .ocm/base-component.yaml"
+
+# Reset the upstream companion file to a clean, flat image list. The rebuild pipeline reads `.images[]` from it.
+cat > "$UPSTREAM" <<'EOF'
+# SPDX-FileCopyrightText: Contributors to the Gardener project
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Upstream Flux controller images, derived from the pinned flux-cli version by hack/flux/flux-gotk-generate.sh.
+# DO NOT EDIT MANUALLY and DO NOT let Renovate bump this file: it is regenerated by `make generate` and consumed
+# by the distroless rebuild pipeline (.github/workflows/flux-distroless-rebuild.yaml) as its build input only.
+images: []
+EOF
+
+# Clear existing Flux controller images from the source of truth so stale entries don't accumulate, preserving
+# non-controller entries (e.g. flux-cli). We re-add the controller entries below, reusing any previously written
+# rebuilt tag for unchanged upstream tags.
+prev_sot=$(mktemp)
+trap 'rm -f "$prev_sot" "$ocm_resources_file"' EXIT
+GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].imageVectorOverwrite.images' "$COMPONENTS" > "$prev_sot"
+GLK_INDEX=$GLK_INDEX yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images = (.components[env(GLK_INDEX)].imageVectorOverwrite.images | map(select(.name == "flux-cli")))' "$COMPONENTS"
+
+ocm_resources_file=$(mktemp)
+echo "[]" > "$ocm_resources_file"
+
+# Add Flux controller images to both companion files.
+while IFS= read -r image; do
+  # image is e.g. "ghcr.io/fluxcd/source-controller:v1.8.5"
+  controller="${image#ghcr.io/fluxcd/}"   # "source-controller:v1.8.5"
+  controller="${controller%%:*}"           # "source-controller"
+  upstream_tag="${image##*:}"              # "v1.8.5"
+  upstream_repo="${image%:*}"              # "ghcr.io/fluxcd/source-controller"
+  resource_key=$(to_camel_case "$controller")
+
+  # 1) Record the upstream ref in the companion file (input to the rebuild pipeline).
+  controller=$controller upstream_repo=$upstream_repo upstream_tag=$upstream_tag \
+    yq -i '.images += [{"name": env(controller), "repository": env(upstream_repo), "tag": env(upstream_tag)}]' "$UPSTREAM"
+
+  # 2) Preserve the existing rebuilt tag if the upstream tag is unchanged; otherwise bootstrap with -glk.0.
+  glk_repo="${GLK_FLUX_REGISTRY}/${controller}"
+  prev_tag=$(controller=$controller glk_repo=$glk_repo yq '
+    [.[] | select(.name == env(controller) and .repository == env(glk_repo)) | .tag] | .[0] // ""' "$prev_sot")
+  if [[ -n "$prev_tag" && "$prev_tag" == "${upstream_tag}-glk."* ]]; then
+    glk_tag="$prev_tag"
+  else
+    glk_tag="${upstream_tag}-glk.0"
+  fi
+
+  controller=$controller glk_repo=$glk_repo glk_tag=$glk_tag GLK_INDEX=$GLK_INDEX \
+    yq -i '.components[env(GLK_INDEX)].imageVectorOverwrite.images += [{"name": env(controller), "repository": env(glk_repo), "tag": env(glk_tag)}]' "$COMPONENTS"
+
+  # The gotk-components.yaml template references images by camelCase key (e.g. {{ .images.sourceController.ref }}).
+  sed -i "s|image: ${upstream_repo}:${upstream_tag}|image: {{ .images.${resource_key}.ref }}|g" "$GOTK"
+done < <(grep -oP "(?<=image: )ghcr\.io/fluxcd/[^\s]+" "$GOTK" | sort -u)
+
+# Add all gardener-landscape-kit resources from componentvector/components.yaml (the source of truth, i.e. the
+# GLK-rebuilt controller images plus flux-cli) to .ocm/base-component.yaml.
+while IFS=$'\t' read -r name repo tag; do
+  image="${repo}:${tag}"
+  name=$name tag=$tag image=$image repo=$repo \
+    yq -i '. += [{"name": env(name), "version": env(tag), "type": "ociImage", "relation": "external", "access": {"type": "ociRegistry", "imageReference": env(image)}, "labels": [{"name": "imagevector.gardener.cloud/name", "value": env(name)}, {"name": "imagevector.gardener.cloud/repository", "value": env(repo)}]}]' \
+    "$ocm_resources_file"
+done < <(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].imageVectorOverwrite.images[] | .name + "\t" + .repository + "\t" + .tag' "$COMPONENTS")
+
+resources_file=$ocm_resources_file yq -i '.resources = load(env(resources_file))' "$OCM_BASE_COMPONENT"
+
+# Generate the Components-schema override for e2e: wraps the upstream refs so componentsFiles can overlay
+# the bootstrap -glk.0 tags in components.yaml with pullable ghcr.io/fluxcd refs during the bootstrap period.
+# TODO(LucaBernstein): Remove once the first distroless Flux controller images have been built and pushed.
+GLK_NAME=$(GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].name' "$COMPONENTS")
+cat > "$UPSTREAM_OVERRIDE" <<'EOF'
+# SPDX-FileCopyrightText: Contributors to the Gardener project
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# DO NOT EDIT MANUALLY: generated by hack/flux/flux-gotk-generate.sh from hack/flux/components-flux-upstream.yaml.
+# TODO(LucaBernstein): Remove once the first distroless Flux controller images have been built and pushed.
+components: []
+EOF
+GLK_NAME=$GLK_NAME yq -i '.components += [{"name": env(GLK_NAME), "imageVectorOverwrite": {"images": []}}]' "$UPSTREAM_OVERRIDE"
+while IFS=$'\t' read -r name repo tag; do
+  name=$name repo=$repo tag=$tag \
+    yq -i '.components[0].imageVectorOverwrite.images += [{"name": env(name), "repository": env(repo), "tag": env(tag)}]' "$UPSTREAM_OVERRIDE"
+done < <(yq '.images[] | .name + "\t" + .repository + "\t" + .tag' "$UPSTREAM")
+
+# Document the bootstrap state: -glk.0 refs are placeholders until the rebuild pipeline publishes the images.
+yq -i '.resources head_comment="Generated from componentvector/components.yaml by hack/flux/flux-gotk-generate.sh.\nTODO(LucaBernstein): A -glk.0 tag is a bootstrap placeholder (image not published yet), replaced with a -glk.<sha>@sha256:<digest> ref once flux-distroless-rebuild.yaml publishes and Renovate pins it."' "$OCM_BASE_COMPONENT"
+
+# Sync flux-cli version to GitHub Action definition in dev-setup, replacing whatever version is currently pinned there.
+FLUX_CLI_VERSION=$(yq -e '.components[0].imageVectorOverwrite.images[] | select(.name == "flux-cli") | .tag' $COMPONENTS)
+WORKFLOW_FILE="$REPO_ROOT/dev-setup/git-repos/workflow-push-oci.yaml"
+sed -i -E "s|(fluxcd/flux2/action@).+|\1$FLUX_CLI_VERSION|g" "$WORKFLOW_FILE"
