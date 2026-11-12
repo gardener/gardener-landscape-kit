@@ -54,7 +54,7 @@ jobs:
             version="${tag}-glk.${SHORT_SHA}"
             matrix_items=$(printf '%s' "${matrix_items}" | \
               controller="${name}" target="${target}" flux_image="${flux_image}" version="${version}" \
-              yq -o json '. += [{"controller": env(controller), "target": env(target), "flux_image": env(flux_image), "version": env(version)}]')
+              yq -o json -I=0 '. += [{"controller": env(controller), "target": env(target), "flux_image": env(flux_image), "version": env(version)}]')
           done < <(yq '.images[] | .name + "\t" + .repository + "\t" + .tag' "${UPSTREAM}")
 
           echo "matrix=${matrix_items}" >> "${GITHUB_OUTPUT}"
