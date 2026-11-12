@@ -56,10 +56,9 @@ COMPONENTS=$REPO_ROOT/componentvector/components.yaml
 UPSTREAM=$REPO_ROOT/hack/flux/components-flux-upstream.yaml
 OCM_BASE_COMPONENT=$REPO_ROOT/.ocm/base-component.yaml
 
-# Registry the GLK-rebuilt distroless Flux controller images are published to. The rebuild pipeline
-# (.github/workflows/flux-distroless-rebuild.yaml) pushes to <GLK_FLUX_REGISTRY>/<controller>, and
-# componentvector/components.yaml (the source of truth consumed by `glk generate`) references these images.
-GLK_FLUX_REGISTRY="europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux"
+# Consumer registry for the GLK-rebuilt Flux controller images. The rebuild pipeline pushes to the writable `snapshots` repository.
+# The `public` virtual repository exposes the same images for pulls and Renovate lookups.
+GLK_FLUX_REGISTRY="europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux"
 
 GLK_INDEX=$(yq '.components | to_entries | .[] | select(.value.name == "github.com/gardener/gardener-landscape-kit") | .key' "$COMPONENTS")
 
@@ -93,7 +92,7 @@ EOF
 
 # Clear existing Flux controller images from the source of truth so stale entries don't accumulate, preserving
 # non-controller entries (e.g. flux-cli). We re-add the controller entries below, reusing any previously written
-# rebuilt tag for unchanged upstream tags.
+# published rebuilt ref regardless of upstream tag changes.
 prev_sot=$(mktemp)
 trap 'rm -f "$prev_sot" "$ocm_resources_file"' EXIT
 GLK_INDEX=$GLK_INDEX yq '.components[env(GLK_INDEX)].imageVectorOverwrite.images' "$COMPONENTS" > "$prev_sot"
