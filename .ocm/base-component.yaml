@@ -22,48 +22,48 @@ resources:
       - name: imagevector.gardener.cloud/repository
         value: ghcr.io/fluxcd/flux-cli
   - name: helm-controller
-    version: v1.7.1-glk.0
+    version: v1.7.1-glk.f7ce3bb-linux_arm64
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller:v1.7.1-glk.0
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller:v1.7.1-glk.f7ce3bb-linux_arm64
     labels:
       - name: imagevector.gardener.cloud/name
         value: helm-controller
       - name: imagevector.gardener.cloud/repository
         value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller
   - name: kustomize-controller
-    version: v1.10.1-glk.0
+    version: v1.10.1-glk.f7ce3bb-linux_arm64
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller:v1.10.1-glk.0
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller:v1.10.1-glk.f7ce3bb-linux_arm64
     labels:
       - name: imagevector.gardener.cloud/name
         value: kustomize-controller
       - name: imagevector.gardener.cloud/repository
         value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller
   - name: notification-controller
-    version: v1.10.0-glk.0
+    version: v1.10.0-glk.f7ce3bb-linux_arm64
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller:v1.10.0-glk.0
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller:v1.10.0-glk.f7ce3bb-linux_arm64
     labels:
       - name: imagevector.gardener.cloud/name
         value: notification-controller
       - name: imagevector.gardener.cloud/repository
         value: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller
   - name: source-controller
-    version: v1.10.1-glk.0
+    version: v1.10.1-glk.f7ce3bb-linux_arm64
     type: ociImage
     relation: external
     access:
       type: ociRegistry
-      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller:v1.10.1-glk.0
+      imageReference: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller:v1.10.1-glk.f7ce3bb-linux_arm64
     labels:
       - name: imagevector.gardener.cloud/name
         value: source-controller
