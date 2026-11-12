@@ -276,7 +276,7 @@ var _ = Describe("Flux Component Generation", func() {
 				content := string(data)
 
 				// The source of truth references GLK-rebuilt distroless images, not the upstream ghcr.io/fluxcd ones.
-				const glkFluxRepoPrefix = "europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/"
+				const glkFluxRepoPrefix = "europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/"
 				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "source-controller:v"))
 				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "kustomize-controller:v"))
 				Expect(content).To(ContainSubstring("image: " + glkFluxRepoPrefix + "helm-controller:v"))
@@ -321,7 +321,7 @@ var _ = Describe("Flux Component Generation", func() {
 				// Renovate pins rebuilt images as tag@sha256:<digest>. imagevector.ImageSource passes the tag field
 				// verbatim into the ref, so the digest must survive into the rendered gotk-components.yaml.
 				const (
-					repoPrefix = "europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/"
+					repoPrefix = "europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/"
 					digest     = "@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 				)
 				writeComponentsVectorFile(`

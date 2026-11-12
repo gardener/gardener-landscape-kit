@@ -60,7 +60,7 @@ OCM_BASE_COMPONENT=$REPO_ROOT/.ocm/base-component.yaml
 # Registry the GLK-rebuilt distroless Flux controller images are published to. The rebuild pipeline
 # (.github/workflows/flux-distroless-rebuild.yaml) pushes to <GLK_FLUX_REGISTRY>/<controller>, and
 # componentvector/components.yaml (the source of truth consumed by `glk generate`) references these images.
-GLK_FLUX_REGISTRY="europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux"
+GLK_FLUX_REGISTRY="europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux"
 
 GLK_INDEX=$(yq '.components | to_entries | .[] | select(.value.name == "github.com/gardener/gardener-landscape-kit") | .key' "$COMPONENTS")
 

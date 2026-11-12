@@ -10,15 +10,19 @@ components:
     - name: helm-controller
       repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller
       tag: v1.7.1-glk.0
+      repository: europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/helm-controller
     - name: kustomize-controller
       repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/kustomize-controller
       tag: v1.10.1-glk.0
+      repository: europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/kustomize-controller
     - name: notification-controller
       repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/notification-controller
       tag: v1.10.0-glk.0
+      repository: europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/notification-controller
     - name: source-controller
       repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/source-controller
       tag: v1.10.1-glk.0
+      repository: europe-docker.pkg.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/source-controller
 - name: github.com/gardener/gardener
   sourceRepository: https://github.com/gardener/gardener
   version: v1.153.4

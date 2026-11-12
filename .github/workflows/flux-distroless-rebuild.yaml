@@ -75,11 +75,10 @@ jobs:
     with:
       name: ${{ matrix.controller }}
       version: ${{ matrix.version }}
-      # The full push target resolves to:
-      #   europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/<controller>:<version>
-      oci-registry: europe-docker.pkg.dev/gardener-project/public
+      oci-registry: europe-docker.pkg.dev/gardener-project/snapshots
       oci-repository: gardener/gardener-landscape-kit/flux/${{ matrix.controller }}
       oci-platforms: linux/arm64,linux/amd64
+      commit-objects-artefact: '' # Build the checked-out commit directly
       dockerfile: hack/flux/Dockerfile
       target: ${{ matrix.target }}
       build-args: |

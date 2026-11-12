@@ -64,7 +64,7 @@ The following dependencies have been updated:\n\
       customType: 'regex',
       managerFilePatterns: ['/^componentvector\\/components\\.yaml$/'],
       matchStrings: [
-        '\\s*-\\s*name:\\s*(?:[a-z]+-controller)\\s*\\n\\s*repository:\\s*(?<depName>europe-docker\\.pkg\\.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/[^\\s]+)\\s*\\n\\s*tag:\\s*(?<currentValue>v?[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?',
+        '\\s*-\\s*name:\\s*(?:[a-z]+-controller)\\s*\\n\\s*repository:\\s*(?<depName>europe-docker\\.pkg\\.dev/gardener-project/snapshots/gardener/gardener-landscape-kit/flux/[^\\s]+)\\s*\\n\\s*tag:\\s*(?<currentValue>v?[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?',
       ],
       datasourceTemplate: 'docker',
       versioningTemplate: 'loose',
@@ -88,12 +88,11 @@ The following dependencies have been updated:\n\
       enabled: true,
     },
     {
-      // Groups all four controllers into one PR per flux version bump; pinDigests also pins the
-      // bootstrap entry on first encounter and tracks same-tag distroless base refreshes.
+      // Groups all four controllers into one PR per Flux version bump; pinDigests also tracks same-tag distroless base refreshes.
       groupName: 'glk-flux-controllers',
       matchDatasources: ['docker'],
       matchPackageNames: [
-        '/^europe-docker\\.pkg\\.dev\\/gardener-project\\/public\\/gardener\\/gardener-landscape-kit\\/flux\\/.+$/',
+        '/^europe-docker\\.pkg\\.dev\\/gardener-project\\/snapshots\\/gardener\\/gardener-landscape-kit\\/flux\\/.+$/',
       ],
       separateMultipleMinor: true,
       pinDigests: true,
