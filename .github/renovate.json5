@@ -96,6 +96,8 @@ The following dependencies have been updated:\n\
       ],
       separateMultipleMinor: true,
       pinDigests: true,
+      // Only the unsuffixed tag points to the multiarch index; platform build tags must not be consumed.
+      allowedVersions: '/^v?\\d+\\.\\d+\\.\\d+-glk\\.[a-f0-9]+$/',
       enabled: true,
     },
     {
