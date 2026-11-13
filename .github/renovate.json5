@@ -88,8 +88,7 @@ The following dependencies have been updated:\n\
       enabled: true,
     },
     {
-      // Groups all four controllers into one PR per flux version bump; pinDigests also pins the
-      // bootstrap entry on first encounter and tracks same-tag distroless base refreshes.
+      // Groups all four controllers into one PR per Flux version bump; pinDigests also tracks same-tag distroless base refreshes.
       groupName: 'glk-flux-controllers',
       matchDatasources: ['docker'],
       matchPackageNames: [
@@ -97,6 +96,8 @@ The following dependencies have been updated:\n\
       ],
       separateMultipleMinor: true,
       pinDigests: true,
+      // Only the unsuffixed tag points to the multiarch index; platform build tags must not be consumed.
+      allowedVersions: '/^v?\\d+\\.\\d+\\.\\d+-glk\\.[a-f0-9]+$/',
       enabled: true,
     },
     {

@@ -40,4 +40,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=upstream /usr/local/bin/kustomize-controller /usr/local/bin/kustomize-controller
 USER 65534:65534
 WORKDIR /
-ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/kustomize-controller"]
+# Debian installs tini in /usr/bin (the upstream Alpine image uses /sbin).
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/kustomize-controller"]
