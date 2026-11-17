@@ -41,7 +41,7 @@ jobs:
           SHORT_SHA="$(git rev-parse --short HEAD)"
 
           # Emit one JSON object per controller, carrying all fields oci-ocm.yaml@v1 needs.
-          # kustomize-controller uses the --target kustomize stage (debian:slim + tini + git + gpg + ssh).
+          # kustomize-controller uses the --target kustomize stage (Alpine + tini + git + gpg + ssh).
           # The three remaining controllers use --target static (distroless/static, no shell deps).
           matrix_items="[]"
           while IFS=$'\t' read -r name repo tag; do

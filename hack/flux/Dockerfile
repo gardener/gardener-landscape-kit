@@ -2,7 +2,7 @@
 # of the upstream image — no recompilation.
 #
 #   static    source-controller, helm-controller, notification-controller  (distroless/static)
-#   kustomize kustomize-controller                                         (debian:13-slim + git/gpg/ssh/tini)
+#   kustomize kustomize-controller                                         (alpine + git/gpg/ssh/tini)
 #
 # Build: --target <static|kustomize> --build-arg FLUX_IMAGE=<upstream-ref> --build-arg CONTROLLER=<name>
 
@@ -23,22 +23,15 @@ USER 65534:65534
 WORKDIR /
 ENTRYPOINT ["/controller"]
 
-# kustomize: kustomize-controller shells out to git/gpg/ssh and uses tini as PID 1, so it needs those at runtime.
-# We install them from Debian packages rather than copying the upstream Alpine (musl) binaries, which are
-# incompatible with a glibc base. debian:13-slim is used over distroless/base because the git/gpg/ssh shared-library
-# tree is large and error-prone to hand-copy into distroless.
-# Digest-pinned; Renovate keeps the @sha256 current.
+# kustomize: keep the upstream Alpine runtime tools and GPG configuration, but refresh packages.
+# This does not fix vulnerabilities embedded in the copied Go binary.
 # renovate: datasource=docker
-FROM debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2 AS kustomize
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        git \
-        gnupg \
-        openssh-client \
-        tini \
-    && rm -rf /var/lib/apt/lists/*
+FROM alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf AS kustomize
+RUN apk --no-cache upgrade \
+    && apk --no-cache add ca-certificates git openssh-client gnupg tini \
+    && update-ca-certificates
 COPY --from=upstream /usr/local/bin/kustomize-controller /usr/local/bin/kustomize-controller
+ENV GNUPGHOME=/tmp
 USER 65534:65534
 WORKDIR /
-# Debian installs tini in /usr/bin (the upstream Alpine image uses /sbin).
-ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/kustomize-controller"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/kustomize-controller"]
