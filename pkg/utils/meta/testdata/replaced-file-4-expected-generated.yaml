@@ -4,6 +4,6 @@ metadata:
   name: test-secret
   namespace: garden-test
 data:
-  a: value
   another: entry
+  a: value
 type: Opaque

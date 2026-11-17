@@ -66,3 +66,9 @@ Therefore, the toolkit's components produce Kubernetes manifests that Flux autom
 Besides the deployment system, generated manifests must allow configuration overlays for various landscapes.
 For this purpose, the toolkit heavily relies on [Kustomize](https://kustomize.io/), a tool to customize Kubernetes configurations.
 The resulting repository structure can be realized in various ways. However, the recommended approach is to use one repository per landscape (see [Repo per environment](https://fluxcd.io/flux/guides/repository-structure/#repo-per-environment)).
+
+## Editing Managed Files
+
+GLK preserves user overrides and existing YAML mapping-key order when updating
+managed files. See [Editing GLK-managed YAML files](docs/usage/managed-files.md)
+for merge and ordering behavior.
