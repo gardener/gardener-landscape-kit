@@ -19,11 +19,24 @@ jobs:
     if: ${{ github.repository == 'gardener/gardener-landscape-kit' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
+      id-token: write
     steps:
+      # The federation service must authorize this workflow to use the GitHub App.
+      - name: Authenticate with GitHub App
+        id: github-auth
+        uses: gardener/cc-utils/.github/actions/github-auth@v1
+        with:
+          token-server: ${{ vars.FEDERATED_GITHUB_ACCESS_TOKEN_SERVER }}
+          repositories: ${{ github.event.repository.name }}
+          permissions: |
+            contents: write
+            pull-requests: write
+
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          token: ${{ steps.github-auth.outputs.token }}
 
       - name: Set up git identity
         uses: gardener/cc-utils/.github/actions/setup-git-identity@v1
@@ -74,12 +87,21 @@ jobs:
           git checkout -b "${BRANCH}"
           git add pkg/utils/version/VERSION componentvector/components.yaml
           git commit --signoff -m "Prepare next Dev Cycle \`${NEXT}\`"$'\n\n'"[make generate]"
-          git push origin "HEAD:${BRANCH}"
+          if git fetch origin "refs/heads/${BRANCH}"; then
+            # A previous run may have pushed the branch before PR creation failed.
+            # Reuse it only if the version-bump files match; never overwrite it.
+            if ! git diff --quiet HEAD FETCH_HEAD -- pkg/utils/version/VERSION componentvector/components.yaml; then
+              echo "::error::Branch ${BRANCH} already exists with different version-bump files."
+              exit 1
+            fi
+          else
+            git push origin "HEAD:${BRANCH}"
+          fi
           echo "branch=${BRANCH}" >> "${GITHUB_OUTPUT}"
 
       - name: Open pull request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.github-auth.outputs.token }}
           CURRENT: ${{ steps.version.outputs.current }}
           NEXT: ${{ steps.version.outputs.next }}
           BRANCH: ${{ steps.push.outputs.branch }}
