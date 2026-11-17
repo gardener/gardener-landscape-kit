@@ -88,11 +88,6 @@ done
 
 echo "🚀 git-server is up and running at $GIT_SERVER_URL"
 
-echo "📦 Mirroring runner job container image to local registry"
-docker pull "$RUNNER_JOB_IMAGE_SOURCE"
-docker tag "$RUNNER_JOB_IMAGE_SOURCE" "$RUNNER_JOB_IMAGE_LOCAL"
-docker push "$RUNNER_JOB_IMAGE_LOCAL"
-
 for repo_name in $GLK_BASE_REPO_NAME $GLK_LANDSCAPE_REPO_NAME; do
   create_repo $repo_name
 done

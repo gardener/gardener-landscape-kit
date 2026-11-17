@@ -7,9 +7,9 @@ jobs:
   glk-generate:
     uses: ./.github/workflows/glk.yaml
     with:
-      runs-on: docker
+      runs-on: ubuntu-latest
       set-commit-status: false
-      status-runs-on: host
+      status-runs-on: ubuntu-latest
       glk-commands: |
         glk generate <COMMAND> -c $GITHUB_WORKSPACE/<BASE-PATH>landscapekitconfiguration.yaml $GITHUB_WORKSPACE
       components-file: '<BASE-PATH>components.yaml'

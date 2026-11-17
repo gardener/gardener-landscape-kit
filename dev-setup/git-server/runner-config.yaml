@@ -26,10 +26,8 @@ runner:
   # Extra environment variables to run jobs.
   envs:
     DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_VERIFY: 1
+    DOCKER_TLS_VERIFY: "1"
     DOCKER_CERT_PATH: /certs/client
-    A_TEST_ENV_NAME_1: a_test_env_value_1
-    A_TEST_ENV_NAME_2: a_test_env_value_2
   # Extra environment variables to run jobs from a file.
   # It will be ignored if it's empty or the file doesn't exist.
   env_file: .env
@@ -63,7 +61,7 @@ runner:
   # Like: ["macos-arm64:host", "ubuntu-latest:docker://node:20-bookworm", "ubuntu-22.04:docker://node:20-bookworm"]
   # If it's empty when registering, it will ask for inputting labels.
   # If it's empty when executing the `daemon`, it will use labels in the `.runner` file.
-  labels: ["d","docker:docker://glk-registry.local.gardener.cloud:6001/forgejo-runner-job:3.5.1"]
+  labels: ["ubuntu-latest:docker://catthehacker/ubuntu:act-22.04", "ubuntu-22.04:docker://catthehacker/ubuntu:act-22.04", "ubuntu-24.04:docker://catthehacker/ubuntu:act-24.04"]
 
 cache:
   #
@@ -164,7 +162,7 @@ cache:
   # In that case you can specify which IP or hostname to use to reach the
   # internal cache server created by the Forgejo runner.
   #
-  host: ""
+  host: "glk-forgejo-runner"
   #
   # The port bound by the internal cache proxy.
   # 0 means to use a random available port.
@@ -182,6 +180,8 @@ container:
   # Specifies the network to which the container will connect.
   # Could be `host`, `bridge` or the name of a custom network.
   # If it's empty, create a network automatically.
+  # This is the DinD container's network namespace, not the development machine's.
+  # Its Docker DNS resolves Forgejo, the registry, and the Docker TLS endpoint.
   network: host
   # Whether to create networks with IPv6 enabled. Requires the Docker daemon to be set up accordingly.
   # Only takes effect if "network" is set to "".
@@ -189,7 +189,8 @@ container:
   # Whether to use privileged mode or not when launching task containers (privileged mode is required for Docker-in-Docker).
   privileged: false
   # And other options to be used when the container is started (e.g., --volume /etc/ssl/certs:/etc/ssl/certs:ro).
-  options: -v /certs/client:/certs/client
+  # Bind sources are paths inside DinD, where job containers are created.
+  options: -v /certs/client:/certs/client:ro
   # The parent directory of a job's working directory.
   # If it's empty, /workspace will be used.
   workdir_parent:

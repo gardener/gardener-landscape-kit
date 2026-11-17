@@ -11,7 +11,7 @@ services:
     image: codeberg.org/forgejo/forgejo:16.0.7
     entrypoint: [ "/bin/sh", "/entrypoint.sh" ]
     healthcheck:
-      test: [ "CMD-SHELL", "test -f /runner/config.yaml" ]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:6080/api/healthz >/dev/null && test -f /runner/config.yaml && ! grep -qE '<TOKEN>|<UUID>' /runner/config.yaml" ]
       interval: 10s
       retries: 5
       start_period: 2s
@@ -32,7 +32,8 @@ services:
 
   docker-in-docker:
     container_name: glk-forgejo-dind
-    image: data.forgejo.org/oci/docker:dind
+    # The registry publishes major-version tags only.
+    image: data.forgejo.org/oci/docker:29-dind@sha256:7bf70dcb85c822e3fa6f2d332143e474b99147b9d7b39102b0cfe8b04a7dd61b
     # Copy the registry CA into the path Docker expects before starting dockerd. The colon in
     # "glk-registry.local.gardener.cloud:6001" prevents using a bind-mount directly to that path.
     command:
@@ -43,18 +44,28 @@ services:
       cp /registry-ca/ca.crt "/etc/docker/certs.d/glk-registry.local.gardener.cloud:6001/ca.crt"
       exec dockerd-entrypoint.sh
     hostname: docker  # Must set hostname as TLS certificates are only valid for docker or localhost
-    privileged: true
+    privileged: true # Required for Docker-in-Docker; only use this runner for trusted workflows.
     environment:
       DOCKER_TLS_CERTDIR: /certs
-      DOCKER_HOST: docker-in-docker
+    healthcheck:
+      test: [ "CMD", "docker", "--host=tcp://docker:2376", "--tlsverify", "--tlscacert=/certs/client/ca.pem", "--tlscert=/certs/client/cert.pem", "--tlskey=/certs/client/key.pem", "info" ]
+      interval: 5s
+      retries: 12
+      start_period: 5s
+      timeout: 10s
     volumes:
     - ../../dev/git-server/docker_certs:/certs
     - ../infra/registry/tls:/registry-ca:ro
     restart: unless-stopped
+    networks:
+      default:
+        aliases:
+        # Used by both the runner and job containers sharing DinD's network namespace.
+        - docker
 
   runner:
     container_name: glk-forgejo-runner
-    image: data.forgejo.org/forgejo/runner:13.2.1
+    image: data.forgejo.org/forgejo/runner:13.2.1@sha256:568cea8c15ddc01fc8f330124892f572af7db37fa28344a2c1914405793bf61d
     command: >-
       forgejo-runner --config /runner/config.yaml daemon
     environment:
@@ -63,13 +74,13 @@ services:
       DOCKER_TLS_VERIFY: "1"
     volumes:
     - ../../dev/git-server/runner:/runner
-    - ../../dev/git-server/docker_certs:/certs
+    - ../../dev/git-server/docker_certs/client:/certs/client:ro
     restart: unless-stopped
     depends_on:
       forgejo:
         condition: service_healthy
       docker-in-docker:
-        condition: service_started
+        condition: service_healthy
 
 networks:
   default:
