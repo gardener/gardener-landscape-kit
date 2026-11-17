@@ -50,10 +50,13 @@ generate_runner_token() {
   fi
 
   UUID=$(echo -n "$TOKEN" | head -c 16 | xxd -p -c 16 | sed -E 's/(.{8})(.{4})(.{4})(.{4})(.{12})/\1-\2-\3-\4-\5/')
-  cp /runner-config.yaml /runner/config.yaml
+  # Publish the complete configuration atomically so the healthcheck cannot start
+  # the runner while the token and UUID are still being substituted.
+  cp /runner-config.yaml /runner/config.yaml.tmp
 
-  sed -i "s|<TOKEN>|$TOKEN|g" /runner/config.yaml
-  sed -i "s|<UUID>|$UUID|g" /runner/config.yaml
+  sed -i "s|<TOKEN>|$TOKEN|g" /runner/config.yaml.tmp
+  sed -i "s|<UUID>|$UUID|g" /runner/config.yaml.tmp
+  mv /runner/config.yaml.tmp /runner/config.yaml
 }
 
 if [ ! -d /data/gitea/conf ]; then
