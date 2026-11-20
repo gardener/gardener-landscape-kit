@@ -211,12 +211,12 @@ github.com/gardener/dependency-watchdog v1.8.1 h1:PIliv48TLOSmfDecLMXWHZ9gJC+ktq
 github.com/gardener/dependency-watchdog v1.8.1/go.mod h1:jRIyBZ4ySWy+EdQjfLm/N+90vBPdWJ7khiBN7CGQs18=
 github.com/gardener/etcd-druid/api v0.39.2 h1:zP4WQdrhh09YGjamoBqss8gmjyT6c1BGwN2wXCvkKJY=
 github.com/gardener/etcd-druid/api v0.39.2/go.mod h1:HsqEM/h4XuxPC4cFDm20V9TPAUqv0tjtnzds/nZ5p7Y=
-github.com/gardener/gardener v1.154.5 h1:oUVbNwGJMF3lfoVNep78hFrPiaUB84kgOmW7HiBMRkw=
-github.com/gardener/gardener v1.154.5/go.mod h1:66tcYGCLYVgsPuezFAUHm34EdEe1/8pNFTXL++/70IU=
+github.com/gardener/gardener v1.154.6 h1:zqX8bgFAEdrGTvWGaMNoNyhaSELlmA3dM+b3TclKcBU=
+github.com/gardener/gardener v1.154.6/go.mod h1:66tcYGCLYVgsPuezFAUHm34EdEe1/8pNFTXL++/70IU=
 github.com/gardener/gardener/hack/tools v1.154.6 h1:xwbbKb+v0H3ZrOUDaxdqIzv+AxisJpsVs6YQhCu5f18=
 github.com/gardener/gardener/hack/tools v1.154.6/go.mod h1:zIfMofxBgvRtEwybADxykpruzHCYQ0sZf79WD+f4u+w=
-github.com/gardener/gardener/pkg/apis v1.154.5 h1:8oJcFyYUa64PFo1j+rA2GDxaLz0ae+W7+Zj5KW3r9Ao=
-github.com/gardener/gardener/pkg/apis v1.154.5/go.mod h1:nyhCMuYjnF14E79VG8yRJGwfUO0UeJMC0iZRSdMUhaU=
+github.com/gardener/gardener/pkg/apis v1.154.6 h1:hAhjVIF1rkIqX8BLBo0VjggeyAJnK0VBvG6XTAWtkDs=
+github.com/gardener/gardener/pkg/apis v1.154.6/go.mod h1:nyhCMuYjnF14E79VG8yRJGwfUO0UeJMC0iZRSdMUhaU=
 github.com/gardener/machine-controller-manager v0.63.1 h1:OUlDDARMAqwIH2zyEvMmGTFqc/VgFc0bH1LskhLoGk8=
 github.com/gardener/machine-controller-manager v0.63.1/go.mod h1:MU2Cyrwvh+jYYvRUGxUMx8LNmFUvGog01YHlpsCiRrM=
 github.com/gardener/pvc-autoscaler v0.3.3 h1:lmTseqHOZnvyb3O0plv5Yv9idhgJG473Ba4IwvWxhqI=
