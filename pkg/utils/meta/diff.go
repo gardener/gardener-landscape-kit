@@ -42,7 +42,7 @@ type manifestDiff struct {
 // ThreeWayMergeManifest creates or updates a manifest based on a given YAML object.
 // It performs a three-way merge between the old default template, the new default template, and the current user-modified version.
 // It preserves user modifications while applying updates from the new default template.
-// Contents from the current manifest are prioritized and sorted first.
+// Current document and mapping-key order is preserved; new default entries are appended.
 func ThreeWayMergeManifest(oldDefaultYaml, newDefaultYaml, currentYaml []byte, mode configv1alpha1.MergeMode) ([]byte, error) {
 	var (
 		output []byte

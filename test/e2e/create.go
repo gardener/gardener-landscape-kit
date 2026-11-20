@@ -248,12 +248,15 @@ data: {}
 		git.add("components")
 		git.commit("Prepare garden component")
 		git.push(branchName)
+		preparedCommit := git.headCommit()
 
 		By("Waiting for landscape generation action to succeed")
-		forgejo.waitForActionSuccess(ctx, GLKLandscapeRepoName, landscapeBranch, git.headCommit())
+		forgejo.waitForActionSuccess(ctx, GLKLandscapeRepoName, landscapeBranch, preparedCommit)
 
-		By("Verifying action committed generated content")
-		forgejo.verifyActionCommit(GLKLandscapeRepoName, landscapeBranch)
+		By("Verifying regeneration preserves the Garden edits without creating a commit")
+		// User overrides and key order are preserved, so regeneration should be a no-op.
+		git.rebase(branchName)
+		Expect(git.headCommit()).To(Equal(preparedCommit), "regeneration should not change the prepared Garden content")
 
 		By("Merging landscape PR")
 		forgejo.mergePR(GLKLandscapeRepoName, landscapePRIndex)

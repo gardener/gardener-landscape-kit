@@ -71,133 +71,103 @@ func threeWayMergeSection(oldDefaultYaml, newDefaultYaml, currentYaml []byte, mo
 		}
 	}
 
-	return EncodeResult(threeWayMerge(&oldDefault, &newDefault, &current, mode))
-}
-
-// threeWayMerge performs a three-way merge of YAML nodes
-// oldDefault: the previous default template
-// newDefault: the new default template
-// current: the user's current version (possibly modified)
-func threeWayMerge(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
-	// Unwrap document nodes
-	if oldDefault.Kind == yaml.DocumentNode {
-		oldDefault = oldDefault.Content[0]
+	oldNode, newNode, currentNode := documentContent(&oldDefault), documentContent(&newDefault), documentContent(&current)
+	if newNode.Kind == 0 && oldNode.Kind == yaml.MappingNode && currentNode.Kind == yaml.MappingNode {
+		// A removed mapping document still retains user-added entries.
+		newNode = &yaml.Node{Kind: yaml.MappingNode, Tag: currentNode.Tag}
 	}
-	if newDefault.Kind == yaml.DocumentNode {
-		newDefault = newDefault.Content[0]
-	}
-	if current.Kind == yaml.DocumentNode {
-		return &yaml.Node{
-			Kind:    yaml.DocumentNode,
-			Content: []*yaml.Node{threeWayMerge(oldDefault, newDefault, current.Content[0], mode)},
-		}
-	}
-
-	// If current equals oldDefault (including comments), no user modifications were made - use newDefault
-	if nodesEqual(oldDefault, current, true) {
-		return newDefault
-	}
-
-	// Build maps for easier lookup (we only handle mappings for Kubernetes manifests)
-	oldMap := buildMap(oldDefault)
-	currentMap := buildMap(current)
-	newMap := buildMap(newDefault)
-
-	// Create result node preserving current's comments and style
-	result := &yaml.Node{
-		Kind:        yaml.MappingNode,
-		Style:       current.Style,
-		Tag:         newDefault.Tag,
+	result, _ := mergeNode(oldNode, newNode, currentNode, mode)
+	document := &yaml.Node{
+		Kind:        yaml.DocumentNode,
+		Content:     []*yaml.Node{result},
 		HeadComment: current.HeadComment,
 		LineComment: current.LineComment,
 		FootComment: current.FootComment,
 	}
+	mergeNodeComments(&oldDefault, &newDefault, document)
+	return EncodeResult(document)
+}
 
-	// Process keys from newDefault
-	for i := 0; i < len(newDefault.Content); i += 2 {
-		newKeyNode, newValueNode := newDefault.Content[i], newDefault.Content[i+1]
-		key := newKeyNode.Value
-		oldValue, oldExists := oldMap[key]
-		currentValue, currentExists := currentMap[key]
+// mergeNode merges compatible collections recursively and treats type changes as atomic replacements.
+// The second return value reports a conflicting atomic replacement; collection conflicts are handled per entry.
+func mergeNode(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) (*yaml.Node, bool) {
+	oldDefault = documentContent(oldDefault)
+	var result *yaml.Node
+	var conflict bool
+	switch {
+	case canMergeCollection(yaml.MappingNode, oldDefault, newDefault, current):
+		result = mergeMapping(oldDefault, newDefault, current, mode)
+	case canMergeCollection(yaml.SequenceNode, oldDefault, newDefault, current):
+		result = mergeSequence(oldDefault, newDefault, current, mode)
+	default:
+		defaultChanged := !nodesEqual(oldDefault, newDefault, false)
+		userChanged := !nodesEqual(oldDefault, current, false)
+		result = copyNode(current)
+		if defaultChanged && !userChanged {
+			result = copyNode(newDefault)
+		}
+		conflict = oldDefault.Kind != 0 && defaultChanged && userChanged && !nodesEqual(newDefault, current, false)
+	}
+	// Merge comments independently of which version supplied the value.
+	result.HeadComment = current.HeadComment
+	result.LineComment = current.LineComment
+	result.FootComment = current.FootComment
+	mergeNodeComments(oldDefault, newDefault, result)
+	return result, conflict
+}
 
-		var resultKeyNode, resultValue *yaml.Node
+func canMergeCollection(kind yaml.Kind, oldDefault, newDefault, current *yaml.Node) bool {
+	return current.Kind == kind && newDefault.Kind == kind && current.Tag == newDefault.Tag &&
+		(oldDefault.Kind == 0 || oldDefault.Kind == kind && oldDefault.Tag == newDefault.Tag)
+}
 
-		if oldExists && !currentExists {
-			// Has been dropped from current.
+// mergeMapping preserves surviving current keys in place and appends truly new default keys in default order.
+func mergeMapping(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
+	oldEntries := mappingEntries(oldDefault)
+	newEntries := mappingEntries(newDefault)
+	currentEntries := mappingEntries(current)
+	result := copyNode(current)
+	result.Content = nil
+
+	for i := 0; i < len(current.Content); i += 2 {
+		currentEntry := mappingEntry{key: current.Content[i], value: current.Content[i+1]}
+		key := currentEntry.key.Value
+		oldEntry, existedInOld := oldEntries[key]
+		newEntry, existsInNew := newEntries[key]
+		if !existsInNew {
+			if !existedInOld {
+				result.Content = append(result.Content, currentEntry.key, currentEntry.value)
+			}
 			continue
 		}
-		if !currentExists {
-			// New key - add from newDefault
-			resultKeyNode, resultValue = newKeyNode, newValueNode
-		} else {
-			resultKeyNode = findKeyNode(current, key)
-
-			// Three-way merge the key node's comments (e.g. HeadComment above the key).
-			oldKeyNode := findKeyNode(oldDefault, key)
-			mergeNodeComments(oldKeyNode, newKeyNode, resultKeyNode)
-
-			// Handle nested structures (mappings and sequences)
-			switch {
-			case currentValue.Kind == yaml.MappingNode && newValueNode.Kind == yaml.MappingNode:
-				if !oldExists {
-					oldValue = &yaml.Node{Kind: yaml.MappingNode}
-				}
-				resultValue = threeWayMerge(oldValue, newValueNode, currentValue, mode)
-			case currentValue.Kind == yaml.SequenceNode && newValueNode.Kind == yaml.SequenceNode:
-				if !oldExists {
-					oldValue = &yaml.Node{Kind: yaml.SequenceNode}
-				}
-				resultValue = threeWayMergeSequence(oldValue, newValueNode, currentValue, mode)
-			case oldExists && !nodesEqual(oldValue, newValueNode, false) && nodesEqual(oldValue, currentValue, false):
-				// Default changed and current was not modified: take the new default.
-				resultValue = &yaml.Node{
-					Kind: newValueNode.Kind, Value: newValueNode.Value, Style: newValueNode.Style, Tag: newValueNode.Tag,
-					HeadComment: currentValue.HeadComment, LineComment: currentValue.LineComment, FootComment: currentValue.FootComment,
-					Content: newValueNode.Content,
-				}
-				mergeNodeComments(oldValue, newValueNode, resultValue)
-			case oldExists && !nodesEqual(oldValue, newValueNode, false):
-				// Both default and current changed: keep current (user's value wins).
-				resultValue = currentValue
-				mergeNodeComments(oldValue, newValueNode, resultValue)
-				if mode == configv1alpha1.MergeModeHint {
-					if !nodesEqual(newValueNode, currentValue, false) {
-						annotateConflict(resultKeyNode, resultValue, newValueNode)
-					} else {
-						// Values converged — strip any lingering GLK annotation.
-						stripGLKAnnotations(resultKeyNode, resultValue)
-					}
-				}
-			default:
-				resultValue = currentValue
-				if oldExists {
-					mergeNodeComments(oldValue, newValueNode, resultValue)
-					if mode == configv1alpha1.MergeModeHint && nodesEqual(newValueNode, currentValue, false) {
-						// Values converged — strip any lingering GLK annotation.
-						stripGLKAnnotations(resultKeyNode, resultValue)
-					}
-				}
-			}
-		}
-
-		result.Content = append(result.Content, resultKeyNode, resultValue)
+		keyNode, valueNode := mergeMappingEntry(oldEntry, newEntry, currentEntry, mode)
+		result.Content = append(result.Content, keyNode, valueNode)
 	}
 
-	// Then add any keys from current that don't exist in newDefault AND didn't exist in oldDefault (user-added keys)
-	for i := 0; i < len(current.Content); i += 2 {
-		keyNode, valueNode := current.Content[i], current.Content[i+1]
-		key := keyNode.Value
-
-		_, existsInNew := newMap[key]
-		_, existedInOld := oldMap[key]
-
-		if !existsInNew && !existedInOld {
-			// key exists only in current (user-added) - keep it at the end
+	for i := 0; i < len(newDefault.Content); i += 2 {
+		keyNode, valueNode := newDefault.Content[i], newDefault.Content[i+1]
+		_, existsInCurrent := currentEntries[keyNode.Value]
+		_, existedInOld := oldEntries[keyNode.Value]
+		if !existsInCurrent && !existedInOld {
 			result.Content = append(result.Content, keyNode, valueNode)
 		}
 	}
-
 	return result
+}
+
+func mergeMappingEntry(oldDefault, newDefault, current mappingEntry, mode configv1alpha1.MergeMode) (*yaml.Node, *yaml.Node) {
+	keyNode := copyNode(current.key)
+	mergeNodeComments(documentContent(oldDefault.key), newDefault.key, keyNode)
+	valueNode, conflict := mergeNode(oldDefault.value, newDefault.value, current.value, mode)
+	if mode == configv1alpha1.MergeModeHint {
+		switch {
+		case conflict:
+			annotateConflict(keyNode, valueNode, newDefault.value)
+		case nodesEqual(newDefault.value, valueNode, false):
+			stripGLKAnnotations(keyNode, valueNode)
+		}
+	}
+	return keyNode, valueNode
 }
 
 // annotateConflict adds a GLK-managed annotation comment to resultValue (or resultKeyNode for complex nodes) indicating the current GLK default.
@@ -243,8 +213,8 @@ func glkManagedHeadComment(existingHead string) string {
 // and the new default comment is appended on a new line (amendment).
 // If the default comment did not change (old == new), the user's comment is kept as-is.
 func mergeComment(oldComment, newComment, currentComment string) string {
-	if oldComment == newComment {
-		// Default did not change — preserve whatever the user has.
+	if oldComment == newComment || currentComment == newComment {
+		// The default is unchanged or both versions converged — preserve current.
 		return currentComment
 	}
 	// Default changed.
@@ -270,123 +240,104 @@ func mergeNodeComments(oldNode, newNode, resultNode *yaml.Node) {
 	resultNode.FootComment = mergeComment(oldNode.FootComment, newNode.FootComment, resultNode.FootComment)
 }
 
-// Order is preserved based on newDefault, with user additions appended at the end
-func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
-	if nodesEqual(oldDefault, current, true) {
-		return newDefault
-	}
-
-	result := &yaml.Node{
-		Kind:        yaml.SequenceNode,
-		Style:       newDefault.Style,
-		Tag:         newDefault.Tag,
-		HeadComment: current.HeadComment,
-		LineComment: current.LineComment,
-		FootComment: current.FootComment,
-	}
-
-	// Detect a shared identity key for the sequence items (e.g. "name").
-	// When present, items are matched across old/new/current by identity so that
-	// value and comment changes from the new default can be merged into the user's
-	// modified item, rather than treating them as separate entries.
+// mergeSequence selects identity, positional, or set matching. Modified sequences keep current item order;
+// unchanged sequences follow the new default, while matched mapping items still preserve their key order.
+func mergeSequence(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) *yaml.Node {
+	result := copyNode(newDefault)
 	identityKey := detectIdentityKey(oldDefault, newDefault, current)
+	switch {
+	case identityKey != "":
+		result.Content = mergeKeyedSequence(oldDefault, newDefault, current, identityKey, mode)
+	case len(oldDefault.Content) == len(newDefault.Content) && len(newDefault.Content) == len(current.Content) && allMappings(oldDefault, newDefault, current):
+		result.Content = mergePositionalSequence(oldDefault, newDefault, current, mode)
+	case nodesEqual(oldDefault, current, true):
+		// Without a stable mapping-item match, an unchanged list can be replaced outright.
+		result.Content = newDefault.Content
+	default:
+		result.Content = mergeSetSequence(oldDefault, newDefault, current)
+	}
+	return result
+}
 
-	if identityKey != "" {
-		// Build identity-keyed maps for each version.
-		oldByID := make(map[string]*yaml.Node, len(oldDefault.Content))
-		for _, item := range oldDefault.Content {
-			if id := mappingValue(item, identityKey); id != "" {
-				oldByID[id] = item
-			}
-		}
-		newByID := make(map[string]*yaml.Node, len(newDefault.Content))
-		for _, item := range newDefault.Content {
-			if id := mappingValue(item, identityKey); id != "" {
-				newByID[id] = item
-			}
-		}
+func sequenceByIdentity(sequence *yaml.Node, identityKey string) map[string]*yaml.Node {
+	result := make(map[string]*yaml.Node, len(sequence.Content))
+	for _, item := range sequence.Content {
+		result[mappingValue(item, identityKey)] = item
+	}
+	return result
+}
 
-		// Process current items in order.
-		for _, currentItem := range current.Content {
-			id := mappingValue(currentItem, identityKey)
-			if id == "" {
-				result.Content = append(result.Content, currentItem)
-				continue
+func mergeKeyedSequence(oldDefault, newDefault, current *yaml.Node, identityKey string, mode configv1alpha1.MergeMode) []*yaml.Node {
+	oldByID := sequenceByIdentity(oldDefault, identityKey)
+	newByID := sequenceByIdentity(newDefault, identityKey)
+	currentByID := sequenceByIdentity(current, identityKey)
+	unchanged := nodesEqual(oldDefault, current, true)
+	items := current.Content
+	if unchanged {
+		items = newDefault.Content
+	}
+	var result []*yaml.Node
+	for _, item := range items {
+		id := mappingValue(item, identityKey)
+		currentItem, newItem := currentByID[id], newByID[id]
+		switch {
+		case currentItem == nil:
+			result = append(result, newItem)
+		case newItem == nil:
+			if oldByID[id] == nil {
+				// Keep user additions, but drop items removed by the default.
+				result = append(result, currentItem)
 			}
-			newItem, existsInNew := newByID[id]
-			if !existsInNew {
-				// Item was removed in newDefault — drop it if it also existed in old.
-				if _, existsInOld := oldByID[id]; existsInOld {
-					continue
-				}
-				// User-added item (not in old or new) — keep it.
-				result.Content = append(result.Content, currentItem)
-				continue
-			}
-			// Item exists in both current and newDefault — three-way merge the mapping.
-			oldItem, existsInOld := oldByID[id]
-			if !existsInOld {
-				oldItem = &yaml.Node{Kind: yaml.MappingNode}
-			}
-			result.Content = append(result.Content, threeWayMerge(oldItem, newItem, currentItem, mode))
+		default:
+			merged, _ := mergeNode(oldByID[id], newItem, currentItem, mode)
+			result = append(result, merged)
 		}
-
-		// Append items from newDefault that are truly new (not in old) and not already in current.
-		currentIDs := make(map[string]bool, len(current.Content))
-		for _, item := range current.Content {
-			if id := mappingValue(item, identityKey); id != "" {
-				currentIDs[id] = true
-			}
-		}
+	}
+	if !unchanged {
 		for _, newItem := range newDefault.Content {
 			id := mappingValue(newItem, identityKey)
-			if id != "" && !currentIDs[id] && oldByID[id] == nil {
-				result.Content = append(result.Content, newItem)
+			if currentByID[id] == nil && oldByID[id] == nil {
+				// Add truly new default items, without restoring user-deleted items.
+				result = append(result, newItem)
 			}
 		}
-
-		return result
 	}
+	return result
+}
 
-	// No identity key found.
-	// When all three sequences have the same length and all items are mappings,
-	// match items by position and three-way merge each pair. This handles cases
-	// where list items are modified but their count and order stay the same
-	// (e.g., a single scalar field in a mapping item is changed).
-	if len(oldDefault.Content) == len(newDefault.Content) && len(newDefault.Content) == len(current.Content) && allMappings(oldDefault, newDefault, current) {
-		for i := range current.Content {
-			result.Content = append(result.Content, threeWayMerge(oldDefault.Content[i], newDefault.Content[i], current.Content[i], mode))
-		}
-		return result
+func mergePositionalSequence(oldDefault, newDefault, current *yaml.Node, mode configv1alpha1.MergeMode) []*yaml.Node {
+	result := make([]*yaml.Node, len(current.Content))
+	for i := range current.Content {
+		result[i], _ = mergeNode(oldDefault.Content[i], newDefault.Content[i], current.Content[i], mode)
 	}
+	return result
+}
 
-	// Fall back to full-string set-based merge.
-	oldSet := make(map[string]bool)
-	for _, item := range oldDefault.Content {
-		oldSet[nodeToString(item)] = true
+func sequenceSet(sequence *yaml.Node) map[string]bool {
+	result := make(map[string]bool, len(sequence.Content))
+	for _, item := range sequence.Content {
+		result[nodeComparisonKey(item)] = true
 	}
+	return result
+}
 
-	currentMap := make(map[string]bool)
-	for _, item := range current.Content {
-		currentMap[nodeToString(item)] = true
-	}
-
-	newSet := make(map[string]bool)
-	for _, item := range newDefault.Content {
-		newSet[nodeToString(item)] = true
-	}
+func mergeSetSequence(oldDefault, newDefault, current *yaml.Node) []*yaml.Node {
+	oldSet := sequenceSet(oldDefault)
+	newSet := sequenceSet(newDefault)
+	currentSet := sequenceSet(current)
+	var result []*yaml.Node
 
 	for _, currentItem := range current.Content {
-		key := nodeToString(currentItem)
+		key := nodeComparisonKey(currentItem)
 		if !oldSet[key] || newSet[key] {
-			result.Content = append(result.Content, currentItem)
+			result = append(result, currentItem)
 		}
 	}
 
 	for _, newItem := range newDefault.Content {
-		key := nodeToString(newItem)
-		if !oldSet[key] && !currentMap[key] {
-			result.Content = append(result.Content, newItem)
+		key := nodeComparisonKey(newItem)
+		if !oldSet[key] && !currentSet[key] {
+			result = append(result, newItem)
 		}
 	}
 
@@ -397,16 +348,12 @@ func threeWayMergeSequence(oldDefault, newDefault, current *yaml.Node, mode conf
 var candidateIdentityKeys = []string{"name", "id", "key"}
 
 // detectIdentityKey returns the name of a field that can serve as a unique identity key for the items of a sequence, or "" when no such key can be detected.
-// A key is considered valid when every mapping item in at least one of the three sequences contains that field and all
+// A key is considered valid when every mapping item in all non-empty sequences contains that field and all
 // values for that field within the same sequence are unique (no duplicates within old/new/current).
 func detectIdentityKey(oldDefault, newDefault, current *yaml.Node) string {
 	// Only attempt identity-key detection when all items are mapping nodes.
-	for _, seq := range []*yaml.Node{oldDefault, newDefault, current} {
-		for _, item := range seq.Content {
-			if item.Kind != yaml.MappingNode {
-				return ""
-			}
-		}
+	if !allMappings(oldDefault, newDefault, current) {
+		return ""
 	}
 
 	for _, candidate := range candidateIdentityKeys {

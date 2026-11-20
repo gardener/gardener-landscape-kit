@@ -109,6 +109,28 @@ var _ = Describe("Writer", func() {
 			Expect(string(content)).To(MatchYAML(strings.ReplaceAll(string(objYaml), "key: value", "key: changedValue")))
 		})
 
+		It("should preserve user key order on disk while storing the generated default order", func() {
+			const header = "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: test\n"
+			initial := []byte(header + "data:\n  a: old\n  z: old\n")
+			Expect(WriteObjectsToFilesystem(map[string][]byte{"test.yaml": initial}, "/landscape", "manifest", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
+
+			modified := []byte(header + "data:\n  z: user\n  # User-added key stays in place\n  custom: user\n  a: old\n")
+			Expect(fs.WriteFile("/landscape/manifest/test.yaml", modified, 0600)).To(Succeed())
+			updated := []byte(header + "data:\n  a: new\n  b: added\n  z: old\n")
+			expected := header + "data:\n  z: user\n  # User-added key stays in place\n  custom: user\n  a: new\n  b: added\n"
+
+			for range 2 {
+				Expect(WriteObjectsToFilesystem(map[string][]byte{"test.yaml": updated}, "/landscape", "manifest", fs, configv1alpha1.MergeModeSilent)).To(Succeed())
+				content, err := fs.ReadFile("/landscape/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(content)).To(Equal(expected))
+
+				baseline, err := fs.ReadFile("/landscape/.glk/defaults/manifest/test.yaml")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(baseline).To(Equal(updated))
+			}
+		})
+
 		It("should add a disclaimer to files containing manifests of kind secret", func() {
 			obj.Kind = "Secret"
 			objYaml, err := yaml.Marshal(obj)
