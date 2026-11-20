@@ -101,6 +101,15 @@ The following dependencies have been updated:\n\
       enabled: true,
     },
     {
+      groupName: 'flux-debian-base-images',
+      matchDatasources: ['docker'],
+      matchFileNames: ['hack/flux/Dockerfile'],
+      matchPackageNames: [
+        'debian',
+        '/^gcr\\.io\\/distroless\\/.+-debian\\d+$/',
+      ],
+    },
+    {
       groupName: "fluxcd-controllers",
       matchPackageNames: [
         '/^github\\.com/fluxcd/[^/]+-controller(/.*)?$/',
