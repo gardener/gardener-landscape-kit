@@ -10,7 +10,7 @@ require (
 	github.com/fluxcd/pkg/apis/meta v1.38.0
 	github.com/fluxcd/source-controller/api v1.10.2
 	github.com/gardener/gardener v1.154.5
-	github.com/gardener/gardener/hack/tools v1.154.5
+	github.com/gardener/gardener/hack/tools v1.154.6
 	github.com/gardener/gardener/pkg/apis v1.154.5
 	github.com/go-logr/logr v1.4.4
 	github.com/go-sprout/sprout v1.1.1
