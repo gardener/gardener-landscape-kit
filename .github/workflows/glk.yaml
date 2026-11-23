@@ -114,25 +114,32 @@ jobs:
     - name: Commit and push changes
       if: ${{ !inputs.fork-mode }}
       id: push
+      env:
+        COMMIT_MESSAGE: ${{ inputs.commit-message }}
+        HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       run: |
         git add .
         if git diff --cached --quiet; then
           echo "No changes to commit"
         else
-          git commit -m "${{ inputs.commit-message }}"
-          git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+          git commit -m "$COMMIT_MESSAGE"
+          git push origin "HEAD:$HEAD_REF"
           echo "pushed=true" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Set status on pushed commit
       if: ${{ !inputs.fork-mode && inputs.set-commit-status && steps.push.outputs.pushed == 'true' }}
+      env:
+        STATUS_CONTEXT: ${{ inputs.status-context }}
       run: |
+        payload=$(jq -cn --arg context "$STATUS_CONTEXT" \
+          '{state:"success", context:$context, description:"GLK generation completed"}')
         curl -sS -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
           "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ steps.push.outputs.sha }}" \
-          -d "{\"state\":\"success\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"GLK generation completed\"}" || true
+          -d "$payload" || true
 
     - name: Check for diff (fork mode)
       if: ${{ inputs.fork-mode }}
@@ -150,6 +157,8 @@ jobs:
 
     - name: Post status to PR (fork-mode)
       if: ${{ inputs.fork-mode && inputs.set-commit-status }}
+      env:
+        STATUS_CONTEXT: ${{ inputs.status-context }}
       run: |
         if [[ "${{ steps.fork-diff.outputs.has-diff }}" == "true" ]]; then
           state="failure"
@@ -158,11 +167,13 @@ jobs:
           state="success"
           description="GLK generation produced no diff."
         fi
+        payload=$(jq -cn --arg state "$state" --arg context "$STATUS_CONTEXT" --arg description "$description" \
+          '{state:$state, context:$context, description:$description}')
         curl -sS -X POST \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
           "${{ github.api_url }}/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }}" \
-          -d "{\"state\":\"${state}\",\"context\":\"${{ inputs.status-context }}\",\"description\":\"${description}\"}" || true
+          -d "$payload" || true
 
     - name: Fail if diff detected (fork mode)
       if: ${{ inputs.fork-mode && steps.fork-diff.outputs.has-diff == 'true' }}
