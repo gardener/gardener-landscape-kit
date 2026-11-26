@@ -5,21 +5,21 @@ apiVersion: v1alpha1
 kind: TestFixture
 metadata:
   labels:
+    bar: baz
     # Very new label
     newLabel: newValue
-    bar: baz
 data:
 # optionalSection:
 #   keyOptional: optionalValue
   # This is the key. Please change it.
   # New default comment for key will be ignored as the user modified the value.
   key: valueChanged
-  # New comment for key4
-  # New default comment for key4 will be used as the user did not modify the value.
-  key4: value4
   keyModified: value2
   # add new value in between with comments
   keyInBetween: added_by_user # with a comment
+  # New comment for key4
+  # New default comment for key4 will be used as the user did not modify the value.
+  key4: value4
 enumeration:
 - item0_new
 # Comment for item2

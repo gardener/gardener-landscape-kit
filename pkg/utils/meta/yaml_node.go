@@ -11,31 +11,49 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
-// buildMap creates a map from YAML mapping node for easier lookup (assumes node is a mapping)
-func buildMap(node *yaml.Node) map[string]*yaml.Node {
-	result := make(map[string]*yaml.Node)
-	for i := 0; i < len(node.Content); i += 2 {
-		key := node.Content[i].Value
-		value := node.Content[i+1]
-		result[key] = value
+type mappingEntry struct {
+	key, value *yaml.Node
+}
+
+// mappingEntries indexes both nodes of each entry. An absent or non-mapping node has no entries.
+func mappingEntries(node *yaml.Node) map[string]mappingEntry {
+	result := make(map[string]mappingEntry)
+	if node == nil || node.Kind != yaml.MappingNode {
+		return result
+	}
+	for i := 0; i+1 < len(node.Content); i += 2 {
+		result[node.Content[i].Value] = mappingEntry{key: node.Content[i], value: node.Content[i+1]}
 	}
 	return result
 }
 
-// findKeyNode finds the key node for a given key in a mapping (assumes node is a mapping)
-func findKeyNode(node *yaml.Node, key string) *yaml.Node {
-	for i := 0; i < len(node.Content); i += 2 {
-		if node.Content[i].Value == key {
-			return node.Content[i]
-		}
+// documentContent unwraps a document and represents absent content as an empty node.
+func documentContent(node *yaml.Node) *yaml.Node {
+	if node == nil {
+		return &yaml.Node{}
 	}
-	return &yaml.Node{Kind: yaml.ScalarNode, Value: key}
+	if node.Kind == yaml.DocumentNode {
+		if len(node.Content) == 0 {
+			return &yaml.Node{}
+		}
+		return node.Content[0]
+	}
+	return node
 }
 
-// nodesEqual checks if two YAML nodes are equal
-// compareComments: if true, comments must also match; if false, only values are compared
+// copyNode shallow-copies a node; callers rebuilding a collection replace Content separately.
+func copyNode(node *yaml.Node) *yaml.Node {
+	result := *node
+	return &result
+}
+
+// nodesEqual compares node kinds, YAML tags, and values.
+// Comparing comments also makes mapping order significant; otherwise mapping order is ignored.
 func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
-	if a.Kind != b.Kind {
+	if a == nil || b == nil {
+		return a == b
+	}
+	if a.Kind != b.Kind || a.Tag != b.Tag {
 		return false
 	}
 
@@ -75,14 +93,14 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 			}
 		} else {
 			// When ignoring comments, use map comparison (order-independent)
-			aMap := buildMap(a)
-			bMap := buildMap(b)
+			aMap := mappingEntries(a)
+			bMap := mappingEntries(b)
 			if len(aMap) != len(bMap) {
 				return false
 			}
-			for key, aValue := range aMap {
-				bValue, exists := bMap[key]
-				if !exists || !nodesEqual(aValue, bValue, false) {
+			for key, aEntry := range aMap {
+				bEntry, exists := bMap[key]
+				if !exists || !nodesEqual(aEntry.key, bEntry.key, false) || !nodesEqual(aEntry.value, bEntry.value, false) {
 					return false
 				}
 			}
@@ -92,10 +110,10 @@ func nodesEqual(a, b *yaml.Node, compareComments bool) bool {
 	return true
 }
 
-// nodeToString converts a node to a string representation for comparison
-func nodeToString(node *yaml.Node) string {
+// nodeComparisonKey compares scalars by type and value, and complex nodes by their serialized YAML.
+func nodeComparisonKey(node *yaml.Node) string {
 	if node.Kind == yaml.ScalarNode {
-		return node.Value
+		return node.Tag + "\x00" + node.Value
 	}
 	// For non-scalar nodes, marshal to YAML for comparison
 	var buf bytes.Buffer
