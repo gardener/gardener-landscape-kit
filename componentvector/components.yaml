@@ -6,7 +6,7 @@ components:
     images:
     - name: flux-cli
       repository: ghcr.io/fluxcd/flux-cli
-      tag: v2.10.0
+      tag: v2.10.1
     - name: helm-controller
       repository: europe-docker.pkg.dev/gardener-project/public/gardener/gardener-landscape-kit/flux/helm-controller
       tag: v1.7.1-glk.ff7f56f@sha256:4203aa5bd20369fcf1c75f040d746a2b88f8d21dc11a87150b29c71d80fcb755
