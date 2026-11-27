@@ -25,7 +25,7 @@ jobs:
       # The federation service must authorize this workflow to use the GitHub App.
       - name: Authenticate with GitHub App
         id: github-auth
-        uses: gardener/cc-utils/.github/actions/github-auth@bce63f62928717a11f610ec8022af9feb497d5df # v1
+        uses: gardener/cc-utils/.github/actions/github-auth@d478850afa1a7e0f9deb710e4d44eb0a2d8dce07 # 1.2881.0
         with:
           token-server: ${{ vars.FEDERATED_GITHUB_ACCESS_TOKEN_SERVER }}
           repositories: ${{ github.event.repository.name }}
@@ -39,7 +39,7 @@ jobs:
           token: ${{ steps.github-auth.outputs.token }}
 
       - name: Set up git identity
-        uses: gardener/cc-utils/.github/actions/setup-git-identity@bce63f62928717a11f610ec8022af9feb497d5df # v1
+        uses: gardener/cc-utils/.github/actions/setup-git-identity@d478850afa1a7e0f9deb710e4d44eb0a2d8dce07 # 1.2881.0
 
       - name: Set up Go
         uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7
